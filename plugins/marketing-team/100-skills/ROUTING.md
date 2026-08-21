@@ -1,4 +1,4 @@
-# 방법론 100 · 라우팅 테이블 (정본)
+# 스킬 100 · 라우팅 테이블 (정본)
 
 > 디렉터가 상시로 들고 있는 명부. **본문은 매칭된 순간에만 연다** (Progressive Disclosure).
 > 자동 생성 · `node scripts/build-routing.mjs` · **손으로 고치지 않는다** (SKILL.md frontmatter 가 정본).

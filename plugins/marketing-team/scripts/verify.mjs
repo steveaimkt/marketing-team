@@ -131,9 +131,9 @@ else {
   ok.push(`스킬 ${skills.length}개`);
 }
 
-// ⑤ 방법론 명부
+// ⑤ 스킬 명부
 const M = path.join(ROOT, '100-skills');
-if (!fs.existsSync(M)) err('100-skills/ 없음 — 팀이 지휘할 방법론이 없다');
+if (!fs.existsSync(M)) err('100-skills/ 없음 — 팀이 지휘할 스킬이 없다');
 else {
   const n = [];
   const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
@@ -141,8 +141,8 @@ else {
     if (e.isDirectory()) walk(p); else if (e.name === 'SKILL.md') n.push(p);
   });
   walk(M);
-  if (n.length !== 100) warn(`방법론 ${n.length}개 (기준 100)`);
-  else ok.push('방법론 100개');
+  if (n.length !== 100) warn(`스킬 ${n.length}개 (기준 100)`);
+  else ok.push('마케팅 스킬 100개');
   for (const f of ['ROUTING.md', 'CHAINS.md', 'compliance.md', 'gates/compliance-gate.md', 'gates/quality-checklist.md'])
     if (!fs.existsSync(path.join(M, f))) err(`100-skills/${f} 없음`);
 }
@@ -156,7 +156,7 @@ for (const dir of [adir, sdir]) {
     if (e.isDirectory()) return walk(p);
     if (!e.name.endsWith('.md')) return;
     const t = fs.readFileSync(p, 'utf8');
-    for (const m of t.matchAll(/`(?:\$\{CLAUDE_PLUGIN_ROOT\}\/)?((?:docs|100-skills|brand|sample-data|scripts)\/[^`\s)]+?\.(?:md|mjs|json|csv))`/g))
+    for (const m of t.matchAll(/`(?:\$\{CLAUDE_PLUGIN_ROOT\}\/)?((?:docs|100-skills|brand-templates|sample-data|scripts)\/[^`\s)]+?\.(?:md|mjs|json|csv))`/g))
       REFD.add([m[1], path.relative(ROOT, p)].join('|'));
   });
   walk(dir);
@@ -165,7 +165,7 @@ for (const r of REFD) {
   const [target, from] = r.split('|');
   if (!fs.existsSync(path.join(ROOT, target))) err(`없는 파일을 참조한다: ${target}  ← ${from}`);
 }
-if (REFD.size) ok.push(`참조 ${REFD.size}건 검사`);
+if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs·logs 는 실행 중 생기므로 제외)`);
 
 // ⑦ 개인 인스턴스 흔적
 const TRACES = ['트루먼', '/private/tmp/claude-', '/Users/'];
