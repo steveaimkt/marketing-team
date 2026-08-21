@@ -226,6 +226,14 @@ for (const link of ['agents', 'skills']) {
   else ok.push('경로 규칙 전원 명시 (패키지 안 vs 작업 폴더)');
 }
 
+// ⑩ 디렉터에 완주 조건이 살아 있나 (2026-08-22 시뮬에서 「짧게」 한마디에 게이트·착지가 빠졌다)
+{
+  const d = fs.existsSync(dpath) ? fs.readFileSync(dpath, 'utf8') : '';
+  for (const k of ['완주 조건', '파일 착지', '규제 게이트', '원장'])
+    if (!d.includes(k)) { err(`디렉터에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
+  if (d.includes('완주 조건')) ok.push('완주 조건 셋 명시 (단축 요청에도 생략 불가)');
+}
+
 // 출력
 console.log('\n마케팅 팀 패키지 점검\n');
 for (const o of ok) console.log(`  ✅ ${o}`);
