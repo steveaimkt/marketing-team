@@ -167,6 +167,8 @@ for (const dir of [adir, sdir]) {
 }
 for (const r of REFD) {
   const [target, from] = r.split('|');
+  // {번호}·… 같은 자리표시자는 참조가 아니다. 실행 시에 채워진다
+  if (/[{}…]/.test(target)) continue;
   if (!fs.existsSync(path.join(ROOT, target))) err(`없는 파일을 참조한다: ${target}  ← ${from}`);
 }
 if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs·logs 는 실행 중 생기므로 제외)`);
