@@ -20,7 +20,7 @@
 ```
 
 명령어를 외우지 않는다. **부르는 말 454개**가 뒤에서 받고, 안 걸리면 3단 폴백이 받는다.
-전체 명부는 [100-skills/ROUTING.md](100-skills/ROUTING.md).
+전체 명부는 [100-skills/ROUTING.md](plugins/marketing-team/100-skills/ROUTING.md).
 
 ---
 
@@ -67,7 +67,7 @@
 | 클론해서 폴더 열기 | ❌ | ✅ |
 
 **제품(팀·방법론)과 내 데이터(브랜드·산출물)가 분리돼 있어서** 플러그인이 성립한다.
-경로 규칙은 [docs/공통규약.md §0](docs/공통규약.md).
+경로 규칙은 [docs/공통규약.md §0](plugins/marketing-team/docs/공통규약.md).
 
 ---
 
@@ -90,7 +90,7 @@
 ```
 
 **팀장은 검토자도 겸한다.** 「광고 검토해줘」처럼 부르면 6관점으로 판정하고
-**고칠 지점 3개까지만** 짚는다 — 대신 만들어 주지는 않는다 ([docs/검토-절차.md](docs/검토-절차.md)).
+**고칠 지점 3개까지만** 짚는다 — 대신 만들어 주지는 않는다 ([docs/검토-절차.md](plugins/marketing-team/docs/검토-절차.md)).
 
 **멈춰 서는 자리가 32곳.** 대외로 나가는 산출물 32개는 발행 전 규제 검사를 통과해야 한다.
 표시광고법이 공통이고, `brand/profile.md` 의 업종에 따라 화장품법·건강기능식품법이 자동으로 갈아 끼워진다.
@@ -133,14 +133,23 @@ node scripts/validate-skills.mjs # 방법론 100개가 계약대로 생겼는가
 
 ## 폴더
 
-| 경로 | 무엇 |
-|---|---|
-| `agents/` | 담당 15명. **평탄하게 둔다** — 하위 폴더를 만들지 않는다 |
-| `skills/` | 방법론찾기 · 팀-구축 · 팀-점검 · 브랜드프로필 |
-| `docs/` | 공통규약 · 검토 절차 · 팀 헌장. **에이전트가 아닌 문서는 전부 여기** |
-| `100-skills/` | 방법론 100개 카탈로그 (사본 · `scripts/sync-skills.mjs` 로 갱신) |
-| `brand/` | 브랜드 프로필 · 톤 · 팀 편성 (빈 템플릿으로 배포) |
-| `sample-data/` | 브랜드 정보가 없어도 완주하게 하는 샘플 |
-| `outputs/` `logs/` | 산출물과 원장이 떨어지는 곳 |
+```
+.claude-plugin/marketplace.json   마켓플레이스 카탈로그
+plugins/marketing-team/           ← 플러그인 본체 (설치되는 것은 이 폴더다)
+  agents/       담당 15명 · 평탄하게 둔다 (하위 폴더 금지)
+  skills/       방법론찾기 · 팀-구축 · 팀-점검 · 브랜드프로필
+  docs/         공통규약 · 검토-절차 · 팀-헌장 — 담당이 아닌 문서는 전부 여기
+  100-skills/   방법론 100개 카탈로그
+  brand/        빈 템플릿 원본
+  sample-data/  브랜드 정보가 없어도 완주하게 하는 샘플
+  scripts/      verify · validate-skills · build-leads · sync-skills
+.claude/                          클론해서 폴더로 열 때의 연결 고리
+brand/ outputs/ logs/ inputs/     클론 모드의 작업 폴더
+```
+
+> **왜 한 겹 더 들어가 있나** · 마켓플레이스는 「저장소 어디에 플러그인이 있는지」를 가리켜야 한다.
+> 저장소 루트 자체를 가리키면(`"source": "./"`) **코워크가 동기화에 실패한다**(2026-08-22 실측).
+> 그래서 플러그인을 `plugins/marketing-team/` 에 두고 거기를 가리킨다.
+> `scripts/verify.mjs` 가 이 규칙을 매번 검사한다.
 
 MIT License.

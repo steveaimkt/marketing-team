@@ -35,6 +35,27 @@ else {
   }
 }
 
+// ①-2 마켓플레이스 매니페스트 (배포 저장소 구조일 때만)
+{
+  const REPO0 = path.resolve(ROOT, '..', '..');
+  const mk = path.join(REPO0, '.claude-plugin', 'marketplace.json');
+  if (fs.existsSync(mk)) {
+    let m; try { m = JSON.parse(fs.readFileSync(mk, 'utf8')); } catch (e) { err(`marketplace.json 파싱 실패: ${e.message}`); }
+    if (m) {
+      const entry = (m.plugins || [])[0];
+      if (!entry) err('marketplace.json 에 plugins 항목이 없다');
+      else {
+        if (typeof entry.source !== 'string' || !entry.source.startsWith('./') || entry.source === './')
+          err(`marketplace.json 의 source 는 "./하위폴더" 여야 한다 (지금: ${JSON.stringify(entry.source)}) — ` +
+              '저장소 루트 자체를 가리키면 코워크가 동기화에 실패한다 (실측 2026-08-22)');
+        else if (!fs.existsSync(path.join(REPO0, entry.source, '.claude-plugin', 'plugin.json')))
+          err(`marketplace.json 의 source 가 가리키는 곳에 플러그인이 없다: ${entry.source}`);
+        else ok.push(`마켓플레이스 → ${entry.source}`);
+      }
+    }
+  }
+}
+
 // ② 담당(agents) · 평탄해야 한다
 const adir = path.join(ROOT, 'agents');
 const agents = [];
@@ -146,8 +167,11 @@ scan(ROOT);
 
 // ⑧ 폴더로 열어 쓰는 경로 · .claude/ 연결 고리
 //   깃이 심링크를 텍스트 파일로 받아 오는 환경(주로 윈도우)이 있다. 그러면 담당이 하나도 안 걸린다.
+const REPO = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+  ? path.resolve(ROOT, '..', '..')   // plugins/<name>/ 안에 있다 = 배포 저장소 구조
+  : ROOT;                            // 단독 폴더로 쓰는 중
 for (const link of ['agents', 'skills']) {
-  const p = path.join(ROOT, '.claude', link);
+  const p = path.join(REPO, '.claude', link);
   let st;
   try { st = fs.lstatSync(p); } catch {
     warn(`.claude/${link} 없음 — 폴더를 직접 열어 쓰는 경로에서는 담당이 안 뜬다`);
@@ -158,7 +182,7 @@ for (const link of ['agents', 'skills']) {
     else ok.push(`.claude/${link} → ${fs.readlinkSync(p)}`);
   } else if (st.isFile()) {
     err(`.claude/${link} 이 심링크가 아니라 텍스트 파일이다 (깃이 링크를 파일로 받은 경우) — ` +
-        `rm .claude/${link} && cp -R ${link} .claude/${link} 로 실제 복사본을 둔다`);
+        `그 파일을 지우고 plugins/marketing-team/${link} 폴더를 .claude/ 안으로 복사한다`);
   } else {
     ok.push(`.claude/${link} (복사본)`);
   }
