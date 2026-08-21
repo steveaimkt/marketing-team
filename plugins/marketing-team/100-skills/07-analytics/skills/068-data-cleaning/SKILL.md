@@ -53,7 +53,7 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 | Phase 5 뒤 | "정리본입니다. 원본을 덮어쓸까요?" | **사본으로만 낸다** · 원본은 건드리지 않는다 |
 
 ## Phases
-1. **구조 파악** — [data/connections.md](../../../../data/connections.md) 모드 판정: Google Sheets MCP 연결 시 get_spreadsheet_info·read_sheet로 직접 조회, **미연결 시 CSV/XLSX 업로드 폴백**. 열 구성·행 수·데이터 타입 스캔.
+1. **구조 파악** — `data/connections.md` 모드 판정: Google Sheets MCP 연결 시 get_spreadsheet_info·read_sheet로 직접 조회, **미연결 시 CSV/XLSX 업로드 폴백**. 열 구성·행 수·데이터 타입 스캔.
 2. **4축 진단** — 표준 클리닝 체크리스트:
 
 | 축 | 검사 항목 | 기본 처리 후보 |

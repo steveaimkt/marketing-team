@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const issues = [];
+const notes = [];
 const err = (m) => issues.push(['🔴', m]);
 const warn = (m) => issues.push(['🟡', m]);
 const ok = [];
@@ -54,6 +55,24 @@ else {
       }
     }
   }
+}
+
+// ①-3 플러그인 안에 또 다른 플러그인이 있으면 안 된다
+//   왜: 배포판에서 딸려온 카테고리별 plugin.json 10개가 100-skills/ 안에 남아 있었다.
+//       코워크 백엔드가 이걸 보고 failed_content 로 거부했다 (2026-08-22 실측).
+{
+  const found = [];
+  const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    if (e.name === 'node_modules') return;
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return walk(q);
+    if (e.name === 'plugin.json' && path.basename(d) === '.claude-plugin') found.push(path.relative(ROOT, q));
+  });
+  walk(ROOT);
+  if (found.length > 1)
+    err(`플러그인 안에 plugin.json 이 ${found.length}개다 — 하나여야 한다. 중첩된 매니페스트: ` +
+        found.filter(f => f !== '.claude-plugin/plugin.json').slice(0, 5).join(', '));
+  else ok.push('매니페스트 1개 (중첩 없음)');
 }
 
 // ② 담당(agents) · 평탄해야 한다
@@ -174,7 +193,7 @@ for (const link of ['agents', 'skills']) {
   const p = path.join(REPO, '.claude', link);
   let st;
   try { st = fs.lstatSync(p); } catch {
-    warn(`.claude/${link} 없음 — 폴더를 직접 열어 쓰는 경로에서는 담당이 안 뜬다`);
+    notes.push(`.claude/${link} 없음 — 정상이다. 폴더로 열어 쓸 때 「팀 점검하자」가 만든다`);
     continue;
   }
   if (st.isSymbolicLink()) {
@@ -204,6 +223,7 @@ for (const link of ['agents', 'skills']) {
 // 출력
 console.log('\n마케팅 팀 패키지 점검\n');
 for (const o of ok) console.log(`  ✅ ${o}`);
+for (const n of notes) console.log(`  ·  ${n}`);
 if (issues.length) {
   console.log('');
   for (const [sev, m] of issues) console.log(`  ${sev} ${m}`);

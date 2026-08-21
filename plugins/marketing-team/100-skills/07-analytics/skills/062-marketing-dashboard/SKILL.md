@@ -54,7 +54,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 
 ## Phases
 1. **지표·소스 정의** ⏸ — 사용자와 핵심 지표 4~8개 확정 (미지정 시 profile.md §5 운영 채널 기준 기본 세트 제안: 매출·광고비·ROAS·전환·CPA·트래픽). 지표별 소스 매핑.
-2. **데이터 확보** — [data/connections.md](../../../../data/connections.md) 모드 판정: GA4·Coupler.io·Sheets MCP 연결 시 자동 조회, **미연결 시 CSV 업로드 폴백** (CSV → HTML 경로는 연결 없이 완주 가능). `[실데이터]`/`[샘플]` 태그.
+2. **데이터 확보** — `data/connections.md` 모드 판정: GA4·Coupler.io·Sheets MCP 연결 시 자동 조회, **미연결 시 CSV 업로드 폴백** (CSV → HTML 경로는 연결 없이 완주 가능). `[실데이터]`/`[샘플]` 태그.
 3. **정규화** — 채널별 지표를 공통 스키마·동일 기간으로 정렬. 채널 간 정의 차이(전환 기준 등)는 각주로.
 4. **HTML 생성** — html-report-template 골격 적용:
    - `header` 제목·기간·생성 타임스탬프 / `kpi` 카드 4~8개 (값+증감 delta) / `highlights` 핵심 3가지 (텍스트)

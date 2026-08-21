@@ -54,7 +54,7 @@ success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대�
 
 ## Phases
 1. **기준 로드** — profile.md §4 손익분기 ROAS·목표 CPA·월 예산 자동 참조.
-2. **모드 판정** — [data/connections.md](../../../../data/connections.md) 연결 보드 확인: meta-ads MCP·검색광고 API·Notion 연결 시 자동 수집, **미연결 매체는 CSV 업로드 폴백** (매체 혼합 허용 — 매체별 소스를 산출물에 명시). `[실데이터]`/`[샘플]` 태그 필수.
+2. **모드 판정** — `data/connections.md` 연결 보드 확인: meta-ads MCP·검색광고 API·Notion 연결 시 자동 수집, **미연결 매체는 CSV 업로드 폴백** (매체 혼합 허용 — 매체별 소스를 산출물에 명시). `[실데이터]`/`[샘플]` 태그 필수.
 3. **취합·정규화** — 매체별 로우데이터 → 공통 스키마 변환. 기간 정합성 검증(전 매체 동일 7일).
 4. **주간 분석** — ① 통합 KPI 카드 4개(광고비·매출·ROAS·전환, WoW 증감 포함) ② 매체 비교표 ③ ROAS TOP 3 / BOTTOM 3 (캠페인 레벨) ④ 변화 원인 가설.
 5. **HTML 리포트 생성** — html-report-template 표준 골격 + 인라인 SVG 차트 3종:
