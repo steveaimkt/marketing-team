@@ -1,7 +1,7 @@
 {
   "name": "marketing-team",
   "description": "마케팅 스킬 100개와 그것을 지휘하는 팀. 디렉터는 메인 대화에서 돌고, 팀장 10 · 스태프 4 가 서브에이전트로 붙는다.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "WMBB"
   },
