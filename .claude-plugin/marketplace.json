@@ -8,11 +8,14 @@
     {
       "name": "marketing-team",
       "source": "./plugins/marketing-team",
-      "description": "디렉터 1 · 팀장 10 · 스태프 4. 설치 즉시 15명이 뜨고, 우리말 한마디로 마케팅 방법론 100개를 굴린다.",
+      "description": "디렉터 1 · 팀장 10 · 스태프 4. 설치 즉시 15명이 뜨고, 우리말 한마디로 마케팅 스킬 100개를 굴린다.",
       "category": "productivity",
-      "version": "0.1.0",
-      "author": { "name": "WMBB" },
+      "version": "0.2.0",
+      "author": {
+        "name": "WMBB"
+      },
       "license": "MIT"
     }
-  ]
+  ],
+  "description": "마케팅 스킬 100개와 그것을 지휘하는 팀. 디렉터 1 · 팀장 10 · 스태프 4."
 }

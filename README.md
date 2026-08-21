@@ -50,7 +50,7 @@
 
 ```
 /plugin marketplace add steveaimkt/marketing-team
-/plugin install marketing-team
+/plugin install marketing-team@marketing-team
 ```
 
 작업할 폴더를 하나 열고 **`1-시작하기`**. 그 폴더에 `brand/` · `outputs/` · `logs/` 를 만들어 준다.
@@ -146,7 +146,7 @@ plugins/marketing-team/           ← 플러그인 본체 (설치되는 것은 �
   skills/       스킬-100-보기 · 3-팀-짜기 · 1-시작하기 · 2-브랜드-등록하기
   docs/         공통규약 · 검토-절차 · 팀-헌장 — 담당이 아닌 문서는 전부 여기
   100-skills/   스킬 100개 카탈로그
-  brand/        빈 템플릿 원본
+  brand-templates/  빈 템플릿 원본 — 작업 폴더의 brand/ 와 이름이 겹치면 안 된다
   sample-data/  브랜드 정보가 없어도 완주하게 하는 샘플
   scripts/      verify · validate-skills · build-leads · sync-skills
 .claude/                          클론해서 폴더로 열 때의 연결 고리

@@ -7,7 +7,7 @@
 (내부 리포트·분석 산출물은 대상 아님 → `gate: false`)
 
 ## 절차 (3 STEP)
-1. **룰 로드** — [brand/profile.md](../../brand/profile.md)의 업종 값 확인 → [brand/compliance.md](../compliance.md)에서 해당 업종 섹션 + 공통(표시광고법) 섹션 로드. profile.md 미작성 시 [data/samples/profile-sample.md](../../sample-data/profile-sample.md)의 업종 값 사용
+1. **룰 로드** — `brand/profile.md`의 업종 값 확인 → [brand/compliance.md](../compliance.md)에서 해당 업종 섹션 + 공통(표시광고법) 섹션 로드. profile.md 미작성 시 [data/samples/profile-sample.md](../../sample-data/profile-sample.md)의 업종 값 사용
 2. **전수 스캔** — 산출물 전문을 문장 단위로 검사:
    - 금지 표현 검출 → 치환 사전이 있으면 자동 치환, 없으면 대안 문구 제안
    - 필수 고지 누락 검사 (건기식 마크, 대가성 표기 등)

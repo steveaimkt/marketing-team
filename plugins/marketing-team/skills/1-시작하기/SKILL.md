@@ -59,9 +59,10 @@ inputs/    내 파일을 넣어 두는 곳
 
 ## 2-A. 스크립트로 · 클로드 코드
 
-    node scripts/verify.mjs
+    node "${CLAUDE_PLUGIN_ROOT}/scripts/verify.mjs"
 
-플러그인으로 설치했다면 스크립트는 패키지 안에 있다. 경로를 못 찾으면 2-B 로 간다.
+`${CLAUDE_PLUGIN_ROOT}` 를 붙이는 이유는, 설치판에서 **현재 폴더가 패키지가 아니기 때문**이다.
+폴더로 클론해 열었으면 `node scripts/verify.mjs` 도 된다. 둘 다 실패하면 2-B 로 간다.
 
 ## 2-B. 파일을 읽어서 · 코워크
 
