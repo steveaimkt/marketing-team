@@ -107,6 +107,9 @@ if (!fs.existsSync(dpath)) err('skills/마케팅-디렉터/SKILL.md 없음 — �
 else {
   const d = fs.readFileSync(dpath, 'utf8');
   for (const a of agents) if (!d.includes(a)) err(`디렉터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
+  // 담당은 「내가 나를 검사할 수 없는 자리」에만 둔다 (2026-08-22 결정). 실행자는 두지 않는다.
+  const exec = agents.filter(a => !a.startsWith('staff-'));
+  if (exec.length) err(`실행 담당이 있다: ${exec.join(', ')} — 실행은 디렉터가 메인에서 한다. 담당은 판정 전담만`);
   for (const m of d.matchAll(/`(lead-[a-z-]+|staff-[a-z-]+)`/g))
     if (!agents.includes(m[1])) err(`디렉터가 없는 담당을 부른다: ${m[1]}`);
 }
