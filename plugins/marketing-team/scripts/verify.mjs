@@ -94,18 +94,19 @@ else {
     if (!desc) err(`agents/${e.name} · description 없음 — 디렉터가 언제 부를지 모른다`);
     agents.push(base);
   }
-  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비)`);
+  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비) · 디렉터는 스킬`);
 }
 
 // ③ 디렉터가 전원을 알고 있나 · 유령이 없나
-const dpath = path.join(adir, 'marketing-director.md');
-if (!fs.existsSync(dpath)) err('agents/marketing-director.md 없음 — 입구가 없다');
+// 디렉터는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
+//   서브에이전트가 다시 위임하면 맥락이 두 겹으로 접힌다. 내려가는 단계는 언제나 한 단이다.
+if (fs.existsSync(path.join(adir, 'marketing-director.md')))
+  err('agents/marketing-director.md 가 있다 — 디렉터는 skills/마케팅-디렉터 여야 한다 (중첩 위임 방지)');
+const dpath = path.join(ROOT, 'skills', '마케팅-디렉터', 'SKILL.md');
+if (!fs.existsSync(dpath)) err('skills/마케팅-디렉터/SKILL.md 없음 — 입구가 없다');
 else {
   const d = fs.readFileSync(dpath, 'utf8');
-  for (const a of agents) {
-    if (a === 'marketing-director') continue;
-    if (!d.includes(a)) err(`디렉터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
-  }
+  for (const a of agents) if (!d.includes(a)) err(`디렉터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
   for (const m of d.matchAll(/`(lead-[a-z-]+|staff-[a-z-]+)`/g))
     if (!agents.includes(m[1])) err(`디렉터가 없는 담당을 부른다: ${m[1]}`);
 }

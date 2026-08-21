@@ -8,9 +8,9 @@
     {
       "name": "marketing-team",
       "source": "./plugins/marketing-team",
-      "description": "디렉터 1 · 팀장 10 · 스태프 4. 설치 즉시 15명이 뜨고, 우리말 한마디로 마케팅 스킬 100개를 굴린다.",
+      "description": "디렉터가 메인 대화에서 받아 팀장 10 · 스태프 4 에게 한 단계로 위임한다. 우리말 한마디로 마케팅 스킬 100개를 굴린다.",
       "category": "productivity",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "author": {
         "name": "WMBB"
       },
