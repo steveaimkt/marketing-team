@@ -51,6 +51,9 @@ for (const s of skills) {
   for (const c of list(fld(f, 'chains_to'))) if (c !== 'ALL' && !ids.has(c)) add(id, 'ERR', `끊긴 체인 → ${c}`);
   // 3 requires 실재
   for (const r of list(fld(f, 'requires'))) {
+    // 작업 폴더 자산(brand·outputs·logs·inputs)은 실행 중에 생긴다. 패키지에 있으면 오히려 틀린다
+    //   ⚠️ 2026-08-22 · 패키지 안 brand/ 가 독자 프로필보다 먼저 잡혀 조용히 틀리던 것을 없앴다.
+    if (/^(brand|outputs|logs|inputs)\//.test(r)) continue;
     const cand = [path.join(ROOT, r), path.join(M, r), path.join(M, path.basename(r))];
     if (!cand.some(x => fs.existsSync(x))) add(id, 'ERR', `없는 requires: ${r}`);
   }
