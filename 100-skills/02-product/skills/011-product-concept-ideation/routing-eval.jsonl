@@ -1,0 +1,6 @@
+{"intent": "다음 분기에 낼 만한 새 상품 아이디어를 같이 잡아보자", "expected_skill": "011"}
+{"intent": "리뷰 보니까 불만이 많던데 이걸 노린 신제품 뭐가 있을까", "expected_skill": "011", "ambiguous_with": ["006"]}
+{"intent": "우리 카테고리에서 경쟁사들이 안 건드리는 빈틈으로 컨셉 몇 개 뽑아줘", "expected_skill": "011", "ambiguous_with": ["002"]}
+{"intent": "신제품 후보들 점수 매겨서 뭐가 승산 있는지 골라줘", "expected_skill": "011", "ambiguous_with": ["010", "014"]}
+{"intent": "새 제품 컨셉이랑 그게 팔릴지 확인할 방법까지 정리해줘", "expected_skill": "011", "ambiguous_with": ["019"]}
+{"intent": "요즘 트렌드 반영해서 만들어볼 만한 제품 브레인스토밍하자", "expected_skill": "011", "ambiguous_with": ["005"]}

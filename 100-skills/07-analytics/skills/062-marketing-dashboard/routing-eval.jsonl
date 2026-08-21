@@ -1,0 +1,6 @@
+{"intent": "우리 마케팅 지표들 한 화면에서 볼 수 있게 만들어줘", "expected_skill": "062"}
+{"intent": "채널별 성과를 대시보드 형태로 정리해줘", "expected_skill": "062"}
+{"intent": "폰에서도 볼 수 있는 지표 현황판 하나 만들어줘", "expected_skill": "062"}
+{"intent": "이 데이터로 HTML 리포트 예쁘게 뽑아줘", "expected_skill": "062", "ambiguous_with": ["045"]}
+{"intent": "매출이랑 광고 지표 통합해서 보여주는 화면 필요해", "expected_skill": "062", "ambiguous_with": ["067"]}
+{"intent": "KPI 모니터링용 보드 세팅해줘", "expected_skill": "062", "ambiguous_with": ["066"]}

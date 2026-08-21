@@ -1,0 +1,5 @@
+{"intent": "외주 디자이너한테 전달할 브랜드 규정집 하나 만들어줘", "expected_skill": "082"}
+{"intent": "로고랑 컬러 사용 규칙을 문서로 정리해줘", "expected_skill": "082"}
+{"intent": "우리 브랜드북을 한 장으로 압축해줘", "expected_skill": "082"}
+{"intent": "톤앤매너 가이드 문서화해줘", "expected_skill": "082", "ambiguous_with": ["081"]}
+{"intent": "팀원마다 카피 톤이 달라서 기준 문서가 필요해", "expected_skill": "082", "ambiguous_with": ["081"]}

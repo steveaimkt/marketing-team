@@ -1,0 +1,6 @@
+{"intent": "이번 달 마케팅 전체 결산 보고서 만들어줘", "expected_skill": "067"}
+{"intent": "대표님한테 올릴 월간 마케팅 보고 정리해줘", "expected_skill": "067"}
+{"intent": "한 달치 채널 성과 모아서 통합 리포트 뽑아줘", "expected_skill": "067", "ambiguous_with": ["045"]}
+{"intent": "월말인데 마케팅 성과 요약이랑 다음 달 계획까지 묶어줘", "expected_skill": "067", "ambiguous_with": ["095"]}
+{"intent": "경영진용으로 세 줄 요약 있는 보고서 필요해", "expected_skill": "067"}
+{"intent": "지난달이랑 비교해서 이번 달 마케팅 어땠는지 보고서로 써줘", "expected_skill": "067", "ambiguous_with": ["061"]}

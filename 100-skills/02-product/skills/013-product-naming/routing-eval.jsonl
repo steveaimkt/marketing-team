@@ -1,0 +1,6 @@
+{"intent": "신제품 이름 후보를 여러 스타일로 뽑아줘", "expected_skill": "013"}
+{"intent": "우리 브랜드 느낌에 맞는 제품명 20개 정도 지어줘", "expected_skill": "013"}
+{"intent": "이름 정하기 전에 상표 걸리는지 뭘 확인해야 하는지도 알려줘", "expected_skill": "013"}
+{"intent": "새 라인업 이름 짓고 스토어랑 인스타 계정명으로 쓸 수 있는지 봐줘", "expected_skill": "013", "ambiguous_with": ["053"]}
+{"intent": "도메인이랑 SNS 핸들까지 확보 가능한 네이밍으로 골라줘", "expected_skill": "013"}
+{"intent": "브랜드명 후보 뽑고 어떤 게 제일 나은지 평가해줘", "expected_skill": "013", "ambiguous_with": ["081"]}

@@ -1,0 +1,6 @@
+{"intent": "이 스킬 100개가 전체적으로 어떻게 굴러가는 거야?", "expected_skill": "100"}
+{"intent": "마케팅 OS 구조 좀 설명해줘", "expected_skill": "100"}
+{"intent": "내 업무에 맞게 에이전트 팀 구성 설계해줘", "expected_skill": "100", "ambiguous_with": ["091"]}
+{"intent": "스킬들을 하나로 묶어서 상시 운영하고 싶어", "expected_skill": "100"}
+{"intent": "부서장이랑 커맨드 조합 어떻게 짜면 좋을까", "expected_skill": "100"}
+{"intent": "오케스트레이터가 뭐 하는 건지 알려주고 내 걸로 세팅해줘", "expected_skill": "100", "ambiguous_with": ["092"]}

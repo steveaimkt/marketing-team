@@ -1,0 +1,6 @@
+{"intent": "신제품 나왔는데 상세페이지 기획부터 카피까지 잡아줘", "expected_skill": "051"}
+{"intent": "우리 토너 상세페이지 초안 좀 써줄래?", "expected_skill": "051", "ambiguous_with": ["052"]}
+{"intent": "제품 소개 페이지 구조를 어떻게 짜야 할지 모르겠어", "expected_skill": "051", "ambiguous_with": ["048"]}
+{"intent": "스마트스토어에 올릴 상품 상세 설명 만들어줘", "expected_skill": "051", "ambiguous_with": ["053"]}
+{"intent": "상세페이지 24개 섹션 템플릿으로 뽑아줘", "expected_skill": "051"}
+{"intent": "지금 상세 카피가 약해서 페인포인트부터 다시 쓰고 싶어", "expected_skill": "051", "ambiguous_with": ["048"]}

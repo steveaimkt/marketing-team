@@ -1,0 +1,6 @@
+{"intent": "리뷰 데이터 가지고 우리 고객이 어떤 사람들인지 유형화해줘", "expected_skill": "008"}
+{"intent": "타깃 고객 프로필을 서너 개로 정리해줘", "expected_skill": "008"}
+{"intent": "우리 제품 사는 사람들의 JTBD가 뭔지 정의해줘", "expected_skill": "008", "ambiguous_with": ["012"]}
+{"intent": "광고 타깃팅 하게 고객 세그먼트별 특징을 카드로 만들어줘", "expected_skill": "008", "ambiguous_with": ["065"]}
+{"intent": "고객이 어떤 여정으로 우리 제품을 사게 되는지 사람 중심으로 그려줘", "expected_skill": "008", "ambiguous_with": ["073"]}
+{"intent": "구매 데이터랑 인터뷰 내용으로 대표 고객상 만들어줘", "expected_skill": "008"}

@@ -1,0 +1,21 @@
+# 산출물 · 로그 — 팀이 만든 것은 각자 로컬에 남는다
+outputs/*
+!outputs/README.md
+inputs/*
+!inputs/README.md
+logs/team-run/*
+!logs/team-run/_템플릿.md
+
+# brand/ 의 파일은 빈 템플릿 상태로 배포된다 (그래서 추적한다).
+# 내 회사 정보로 채운 뒤 공개 저장소에 올릴 생각이면 아래 주석을 풀어라.
+# brand/profile.md
+# brand/tone.md
+# brand/my-team.md
+# brand/my-playbook.md
+# brand/업무-방법론-분해표.md
+
+.DS_Store
+node_modules/
+
+# 출판 전략 메모 — 제품이 아니다. Public 전환 시 새어 나가면 안 된다
+codex/

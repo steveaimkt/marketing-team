@@ -1,0 +1,6 @@
+{"intent": "신규 채널 세 개 중에 뭐부터 들어가는 게 맞을까?", "expected_skill": "010"}
+{"intent": "일본이랑 미국 중에 어느 시장 먼저 공략할지 평가해줘", "expected_skill": "010"}
+{"intent": "진입 후보들 임팩트랑 난이도로 매트릭스 그려줘", "expected_skill": "010", "ambiguous_with": ["091"]}
+{"intent": "카테고리 확장 옵션들 우선순위 매겨줘", "expected_skill": "010", "ambiguous_with": ["014"]}
+{"intent": "이 시장 들어갈 만한지 다른 후보랑 비교해서 판단해줘", "expected_skill": "010", "ambiguous_with": ["004"]}
+{"intent": "새 시장 골라서 런칭 준비까지 이어가고 싶은데 어디부터 볼까", "expected_skill": "010", "ambiguous_with": ["018"]}

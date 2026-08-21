@@ -1,0 +1,6 @@
+{"intent": "상세페이지 두 버전 중 뭐가 나은지 실험해보고 싶은데 어떻게 설계해?", "expected_skill": "019"}
+{"intent": "테스트 제대로 하려면 트래픽이 얼마나 필요한지 계산해줘", "expected_skill": "019"}
+{"intent": "가설 세우고 실험 계획서 형태로 만들어줘", "expected_skill": "019", "ambiguous_with": ["011"]}
+{"intent": "테스트 시작하기 전에 승패 판정 기준부터 정해두자", "expected_skill": "019", "ambiguous_with": ["047"]}
+{"intent": "광고 소재 두 개 비교하려는데 며칠 몇 명한테 돌려야 해?", "expected_skill": "019", "ambiguous_with": ["047", "043"]}
+{"intent": "전환율 개선 아이디어를 실험으로 검증할 수 있게 설계해줘", "expected_skill": "019", "ambiguous_with": ["048"]}

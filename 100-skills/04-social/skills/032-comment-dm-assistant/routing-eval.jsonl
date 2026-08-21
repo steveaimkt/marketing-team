@@ -1,0 +1,6 @@
+{"intent": "인스타 댓글 쌓인 거 답변 초안 좀 만들어줘", "expected_skill": "032"}
+{"intent": "악플 달렸는데 어떻게 답해야 안 시끄러워질까", "expected_skill": "032", "ambiguous_with": ["089"]}
+{"intent": "DM으로 온 문의들 브랜드 톤 맞춰서 답장 써줘", "expected_skill": "032"}
+{"intent": "고소하겠다는 댓글이 달렸어 이거 어떡하지", "expected_skill": "032", "ambiguous_with": ["089"]}
+{"intent": "유튜브 댓글 문의 답변 템플릿 정리해줘", "expected_skill": "032", "ambiguous_with": ["072"]}
+{"intent": "팔로워가 보낸 항의 메시지에 뭐라고 회신할지 초안 잡아줘", "expected_skill": "032", "ambiguous_with": ["054"]}

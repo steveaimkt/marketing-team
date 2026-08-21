@@ -1,0 +1,6 @@
+{"intent": "스마트스토어 매출이 왜 안 나오는지 봐줘", "expected_skill": "055"}
+{"intent": "내 스토어 전체적으로 진단 좀 해줘", "expected_skill": "055"}
+{"intent": "유입은 있는데 구매가 안 일어나, 뭐가 문제야?", "expected_skill": "055", "ambiguous_with": ["048"]}
+{"intent": "스토어 성장하려면 뭘 먼저 고쳐야 할까", "expected_skill": "055", "ambiguous_with": ["042"]}
+{"intent": "네이버 스토어 검색 노출부터 재구매까지 점검해줘", "expected_skill": "055", "ambiguous_with": ["053"]}
+{"intent": "우리 가게 온라인 스토어 컨설팅 받는 것처럼 분석해줘", "expected_skill": "055"}

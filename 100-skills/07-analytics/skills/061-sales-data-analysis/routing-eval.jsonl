@@ -1,0 +1,6 @@
+{"intent": "지난 분기 판매 데이터 넣을 테니 뭐가 잘 됐는지 분석해줘", "expected_skill": "061"}
+{"intent": "매출이 갑자기 꺾였는데 원인 찾아줘", "expected_skill": "061"}
+{"intent": "채널별 상품별로 매출 쪼개서 보여줘", "expected_skill": "061", "ambiguous_with": ["062"]}
+{"intent": "이번 달 실적 정리해서 어떤 상품이 효자인지 알려줘", "expected_skill": "061", "ambiguous_with": ["067"]}
+{"intent": "주문 데이터에서 이상한 날짜 있는지 확인하고 해석해줘", "expected_skill": "061", "ambiguous_with": ["068"]}
+{"intent": "매출 늘었는데 수량 때문인지 단가 때문인지 구분해줘", "expected_skill": "061"}

@@ -1,0 +1,5 @@
+{"intent": "우리 브랜드 스토리를 제대로 정리하고 싶어", "expected_skill": "081"}
+{"intent": "창업하게 된 이야기를 브랜드 서사로 만들어줘", "expected_skill": "081"}
+{"intent": "브랜드 미션 문장 하나 멋지게 뽑아줘", "expected_skill": "081"}
+{"intent": "우리 브랜드 철학을 문서로 정리해줘", "expected_skill": "081", "ambiguous_with": ["082"]}
+{"intent": "회사소개에 들어갈 우리가 왜 이 일을 하는지 글 써줘", "expected_skill": "081", "ambiguous_with": ["012"]}

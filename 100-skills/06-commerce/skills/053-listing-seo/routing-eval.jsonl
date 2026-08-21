@@ -1,0 +1,6 @@
+{"intent": "쿠팡에 올릴 상품명 어떻게 지어야 검색에 잘 걸릴까?", "expected_skill": "053"}
+{"intent": "스마트스토어 태그랑 카테고리 좀 잡아줘", "expected_skill": "053"}
+{"intent": "상품 제목에 키워드를 어떤 순서로 넣어야 해?", "expected_skill": "053", "ambiguous_with": ["001"]}
+{"intent": "검색 노출 잘 되게 리스팅 정리해줘", "expected_skill": "053", "ambiguous_with": ["055"]}
+{"intent": "상품명 후보 몇 개 뽑아서 비교해줘", "expected_skill": "053"}
+{"intent": "우리 제품 검색하면 안 나오는데 제목 때문인 것 같아", "expected_skill": "053", "ambiguous_with": ["055"]}

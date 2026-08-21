@@ -1,0 +1,10 @@
+{
+  "name": "marketing-team",
+  "description": "마케팅 방법론 100개를 지휘하는 팀. 디렉터 1 · 팀장 10 · 스태프 4 = 15명이 설치 즉시 뜬다. 우리말로 부르면 담당 팀장이 받아 브리핑하고, 만들고, 규제 게이트를 통과시켜 파일로 남긴다.",
+  "version": "0.1.0",
+  "author": { "name": "WMBB" },
+  "homepage": "https://github.com/steveaimkt/marketing-team",
+  "repository": "https://github.com/steveaimkt/marketing-team.git",
+  "license": "MIT",
+  "keywords": ["marketing", "korean", "agents", "team", "skills-100"]
+}

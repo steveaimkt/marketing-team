@@ -1,0 +1,6 @@
+{"intent": "이 유튜브 영상 짧은 버전으로 여러 개 쪼개줄 수 있어?", "expected_skill": "026", "ambiguous_with": ["027"]}
+{"intent": "릴스에 올릴 30초짜리 대본 몇 개 뽑아줘", "expected_skill": "026"}
+{"intent": "지난주 블로그 글로 틱톡 콘텐츠 만들어줘", "expected_skill": "026", "ambiguous_with": ["027"]}
+{"intent": "첫 3초에 안 넘기게 훅 세운 숏폼 스크립트 부탁해", "expected_skill": "026", "ambiguous_with": ["040"]}
+{"intent": "본편 하나 찍었는데 쇼츠용으로 재활용하고 싶어", "expected_skill": "026", "ambiguous_with": ["024"]}
+{"intent": "세로 영상 대본 다섯 개 세트로 만들어줘", "expected_skill": "026"}

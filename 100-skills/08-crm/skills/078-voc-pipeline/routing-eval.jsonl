@@ -1,0 +1,6 @@
+{"intent": "리뷰랑 CS 문의랑 SNS 반응을 한군데 모아서 관리하는 체계 만들어줘", "expected_skill": "078", "ambiguous_with": ["006"]}
+{"intent": "고객 불만을 제품 배송 CS 가격으로 나눠서 매주 집계하고 싶어", "expected_skill": "078"}
+{"intent": "VoC를 개선 과제로 넘기는 프로세스 잡아줘", "expected_skill": "078", "ambiguous_with": ["020"]}
+{"intent": "채널별 고객 피드백 수집 표준이랑 주기 정해줘", "expected_skill": "078"}
+{"intent": "반복되는 클레임을 유형별로 태깅하는 시스템 구축해줘", "expected_skill": "078", "ambiguous_with": ["072"]}
+{"intent": "고객의 소리 파이프라인 만들어서 백로그까지 연결해줘", "expected_skill": "078", "ambiguous_with": ["006", "020"]}

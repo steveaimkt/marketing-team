@@ -1,0 +1,6 @@
+{"intent": "한동안 안 산 고객들 다시 데려오는 캠페인 만들어줘", "expected_skill": "077"}
+{"intent": "휴면 고객 기준부터 정하고 깨우는 메시지 순서 짜줘", "expected_skill": "077", "ambiguous_with": ["065"]}
+{"intent": "이탈 고객한테 쿠폰 줘서 복귀시키는 게 남는 장사인지 계산해줘", "expected_skill": "077"}
+{"intent": "재구매율 떨어진 코호트 살리는 윈백 시나리오 3단으로 설계해줘", "expected_skill": "077", "ambiguous_with": ["064"]}
+{"intent": "떠나려는 고객 붙잡는 리텐션 캠페인 돌리자", "expected_skill": "077", "ambiguous_with": ["074"]}
+{"intent": "6개월 넘게 조용한 회원들한테 마지막으로 뭐라도 보내보자", "expected_skill": "077"}

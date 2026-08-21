@@ -1,0 +1,6 @@
+{"intent": "우리 신제품 관련해서 사람들이 뭘로 검색하는지 찾아봐줘", "expected_skill": "001"}
+{"intent": "블로그 쓰기 전에 어떤 검색어를 노려야 할지 우선순위 매겨줘", "expected_skill": "001", "ambiguous_with": ["022"]}
+{"intent": "경쟁 덜한 틈새 검색어 좀 발굴해줄래", "expected_skill": "001"}
+{"intent": "토너 모공 쪽 검색량이랑 경쟁 강도 같이 비교해서 정리해줘", "expected_skill": "001"}
+{"intent": "요즘 올라오는 검색어 기반으로 콘텐츠 소재 뽑아줘", "expected_skill": "001", "ambiguous_with": ["005"]}
+{"intent": "스토어 상품명에 넣을 만한 검색어 후보 골라줘", "expected_skill": "001", "ambiguous_with": ["053"]}

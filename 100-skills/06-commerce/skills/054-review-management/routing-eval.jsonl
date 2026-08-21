@@ -1,0 +1,6 @@
+{"intent": "스토어에 새 리뷰가 30개 쌓였는데 답글 좀 정리해서 달아줘", "expected_skill": "054"}
+{"intent": "별점 1점짜리 악성 후기가 달렸어, 뭐라고 대응하지?", "expected_skill": "054", "ambiguous_with": ["072"]}
+{"intent": "구매평마다 감사 인사 답변을 자동으로 만들어줘", "expected_skill": "054"}
+{"intent": "쿠팡 상품평 답글을 우리 톤에 맞춰서 뽑아줘", "expected_skill": "054"}
+{"intent": "고객 후기 답변 초안 좀 써줘, 불만 글은 따로 표시해주고", "expected_skill": "054", "ambiguous_with": ["072"]}
+{"intent": "리뷰 관리 좀 도와줘, 매번 답글 다는 게 일이야", "expected_skill": "054", "ambiguous_with": ["006"]}

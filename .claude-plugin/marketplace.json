@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
+  "name": "marketing-team",
+  "description": "마케팅 방법론 100개를 지휘하는 팀 패키지.",
+  "owner": { "name": "WMBB", "url": "https://github.com/steveaimkt" },
+  "plugins": [
+    {
+      "name": "marketing-team",
+      "description": "디렉터 1 · 팀장 10 · 스태프 4. 설치 즉시 15명이 뜨고, 우리말 한마디로 방법론 100개를 굴린다.",
+      "category": "productivity",
+      "version": "0.1.0",
+      "source": "./",
+      "author": { "name": "WMBB" },
+      "license": "MIT"
+    }
+  ]
+}

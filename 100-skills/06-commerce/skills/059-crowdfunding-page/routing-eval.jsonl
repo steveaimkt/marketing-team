@@ -1,0 +1,6 @@
+{"intent": "와디즈 펀딩 오픈하려는데 스토리 페이지 잡아줘", "expected_skill": "059"}
+{"intent": "텀블벅에 올릴 프로젝트 페이지 기획해줘", "expected_skill": "059"}
+{"intent": "펀딩 리워드 가격 구성 어떻게 짜야 할지 알려줘", "expected_skill": "059", "ambiguous_with": ["016"]}
+{"intent": "얼리버드 수량이랑 할인율 설계해줘", "expected_skill": "059", "ambiguous_with": ["017"]}
+{"intent": "신제품 펀딩 페이지 만들 건데 상세페이지랑 뭐가 달라야 해?", "expected_skill": "059", "ambiguous_with": ["051"]}
+{"intent": "펀딩 목표 금액을 얼마로 잡아야 할지 계산해줘", "expected_skill": "059"}

@@ -1,0 +1,6 @@
+{"intent": "우리가 노리는 카테고리가 돈이 얼마나 되는 시장인지 계산해줘", "expected_skill": "004"}
+{"intent": "사업계획서에 넣을 TAM SAM SOM 수치 뽑아줘", "expected_skill": "004"}
+{"intent": "이 제품으로 현실적으로 먹을 수 있는 매출 규모가 얼마나 될까", "expected_skill": "004"}
+{"intent": "탑다운이랑 바텀업 둘 다로 시장 사이즈 검증해줘", "expected_skill": "004"}
+{"intent": "이 시장 요즘 크고 있는 게 맞는지 규모부터 봐줘", "expected_skill": "004", "ambiguous_with": ["005"]}
+{"intent": "신규 시장 들어가기 전에 크기부터 가늠해보자", "expected_skill": "004", "ambiguous_with": ["010"]}

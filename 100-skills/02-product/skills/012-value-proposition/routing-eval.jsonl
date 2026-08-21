@@ -1,0 +1,6 @@
+{"intent": "우리 제품을 누가 왜 사야 하는지 한 문장으로 정리하고 싶어", "expected_skill": "012"}
+{"intent": "경쟁사랑 비교해서 우리만의 차별점이 뭔지 정의해줘", "expected_skill": "012", "ambiguous_with": ["002"]}
+{"intent": "스펙 자랑 말고 우리 브랜드가 주는 진짜 가치를 문장으로 만들어줘", "expected_skill": "012", "ambiguous_with": ["015", "081"]}
+{"intent": "상세페이지 만들기 전에 핵심 메시지부터 잡아야 할 것 같아", "expected_skill": "012", "ambiguous_with": ["051"]}
+{"intent": "출시 준비하면서 제품 포지셔닝 문장 먼저 확정하자", "expected_skill": "012", "ambiguous_with": ["018"]}
+{"intent": "타깃 고객이 어떤 상황에서 우리를 선택하는지 JTBD로 정리해줘", "expected_skill": "012", "ambiguous_with": ["008"]}

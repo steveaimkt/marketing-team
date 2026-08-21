@@ -1,0 +1,6 @@
+{"intent": "브랜드에서 협찬 들어왔는데 기획안 어떻게 쓰지", "expected_skill": "088"}
+{"intent": "광고주가 브리프 보내줬어, 이걸 콘텐츠 기획으로 바꿔줘", "expected_skill": "088"}
+{"intent": "유튜브 브랜디드 콘텐츠 구성 잡아줘", "expected_skill": "088", "ambiguous_with": ["024"]}
+{"intent": "앞광고로 갈 건데 영상 흐름 어떻게 짜야 자연스러울까", "expected_skill": "088"}
+{"intent": "스폰서 받은 제품 리뷰 콘텐츠 기획해줘", "expected_skill": "088"}
+{"intent": "협찬 조건이랑 콘텐츠 방향 정리해서 광고주한테 보낼 안 만들어줘", "expected_skill": "088", "ambiguous_with": ["087"]}

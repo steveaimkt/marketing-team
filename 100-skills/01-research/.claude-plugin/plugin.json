@@ -1,0 +1,15 @@
+{
+  "name": "marketing-skills-01-research",
+  "version": "1.3.0",
+  "description": "마케팅 100 스킬 OS · 시장조사 & 트렌드 — 키워드·경쟁사·시장규모·트렌드·리뷰·페르소나 (001~010) — 스킬 10개 부분 설치 팩 (오케스트레이터 포함 전체는 marketing-100-skills 번들)",
+  "author": {
+    "name": "사용자 (이 회사)"
+  },
+  "keywords": [
+    "marketing",
+    "korean",
+    "claude-skills",
+    "01-research"
+  ],
+  "license": "MIT"
+}

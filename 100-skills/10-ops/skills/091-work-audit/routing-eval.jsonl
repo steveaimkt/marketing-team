@@ -1,0 +1,6 @@
+{"intent": "뭐부터 자동화해야 할지 모르겠어", "expected_skill": "091"}
+{"intent": "내 업무 중에 AI한테 넘길 만한 걸 찾아줘", "expected_skill": "091"}
+{"intent": "마케터OS 처음 쓰는데 어디서부터 시작하면 돼?", "expected_skill": "091", "ambiguous_with": ["100"]}
+{"intent": "반복되는 마케팅 잡무 좀 진단해줘", "expected_skill": "091", "ambiguous_with": ["092"]}
+{"intent": "우리 팀 업무 목록 정리하고 자동화 계획 세워줘", "expected_skill": "091"}
+{"intent": "일이 너무 많은데 업무 구조부터 좀 봐줘", "expected_skill": "091", "ambiguous_with": ["093"]}

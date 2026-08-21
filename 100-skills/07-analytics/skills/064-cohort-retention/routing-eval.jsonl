@@ -1,0 +1,6 @@
+{"intent": "우리 고객들 재구매율이 실제로 어떻게 되는지 계산해줘", "expected_skill": "064"}
+{"intent": "월별로 들어온 고객들이 몇 달이나 남아있는지 분석해줘", "expected_skill": "064"}
+{"intent": "첫 구매하고 나서 고객이 언제쯤 이탈하는지 찾아줘", "expected_skill": "064", "ambiguous_with": ["077"]}
+{"intent": "코호트별 유지율 표로 만들어서 비교해줘", "expected_skill": "064"}
+{"intent": "고객 잔존율 곡선 보고 어디서 개입해야 할지 알려줘", "expected_skill": "064", "ambiguous_with": ["065"]}
+{"intent": "행사 때 들어온 고객이랑 평소 고객이랑 누가 더 오래 남는지 봐줘", "expected_skill": "064", "ambiguous_with": ["061"]}

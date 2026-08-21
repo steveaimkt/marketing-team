@@ -1,0 +1,6 @@
+{"intent": "주문 내역 엑셀이 엉망인데 분석 가능하게 다듬어줘", "expected_skill": "068"}
+{"intent": "이 CSV 결측치랑 중복 정리부터 해줘", "expected_skill": "068"}
+{"intent": "날짜 형식이 제각각인 데이터 통일해줘", "expected_skill": "068"}
+{"intent": "매출 분석하기 전에 데이터 검증부터 해야 할 것 같아", "expected_skill": "068", "ambiguous_with": ["061"]}
+{"intent": "시트에 이상한 값들 섞여 있는데 걸러내줘", "expected_skill": "068", "ambiguous_with": ["061"]}
+{"intent": "여러 채널 주문 파일 합치기 전에 형식 맞춰줘", "expected_skill": "068"}

@@ -1,0 +1,6 @@
+{"intent": "인스타그램 한 달 동안 뭐 올릴지 다 짜줘", "expected_skill": "031", "ambiguous_with": ["021"]}
+{"intent": "우리 계정 그리드가 지저분한데 통일감 있게 재설계해줘", "expected_skill": "031"}
+{"intent": "피드 30개 캡션에 해시태그까지 세트로 만들어줘", "expected_skill": "031"}
+{"intent": "프로필 첫인상 좋게 9개 게시물 배치 잡아줘", "expected_skill": "031"}
+{"intent": "인스타 콘텐츠 유형 비율 어떻게 섞을지 정해줘", "expected_skill": "031", "ambiguous_with": ["039"]}
+{"intent": "인스타 무드 통일해서 다음 달 게시물 전부 기획해줘", "expected_skill": "031", "ambiguous_with": ["021"]}

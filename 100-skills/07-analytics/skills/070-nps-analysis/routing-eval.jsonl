@@ -1,0 +1,6 @@
+{"intent": "고객 만족도 조사 돌린 거 결과 좀 해석해줘", "expected_skill": "070"}
+{"intent": "NPS 점수 계산하고 그룹별로 나눠줘", "expected_skill": "070"}
+{"intent": "설문 주관식 답변 500개인데 공통 주제로 묶어줘", "expected_skill": "070", "ambiguous_with": ["006"]}
+{"intent": "추천 안 하겠다는 고객들이 왜 그런지 이유 뽑아줘", "expected_skill": "070"}
+{"intent": "수료생 설문 결과로 뭘 개선해야 할지 정리해줘", "expected_skill": "070", "ambiguous_with": ["078"]}
+{"intent": "설문 응답 데이터 리포트로 만들어줘", "expected_skill": "070", "ambiguous_with": ["007"]}

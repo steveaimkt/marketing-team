@@ -1,0 +1,6 @@
+{"intent": "다음 달 출시인데 오늘부터 뭘 준비해야 하는지 정리해줘", "expected_skill": "018"}
+{"intent": "런칭 D-30부터 출시 후까지 일정표 만들어줘", "expected_skill": "018"}
+{"intent": "출시 때 팀에서 누가 뭘 맡을지 역할 분담까지 짜줘", "expected_skill": "018"}
+{"intent": "신제품 나오는데 채널별로 언제 뭘 올릴지 계획 세워줘", "expected_skill": "018", "ambiguous_with": ["021"]}
+{"intent": "출시하면서 언론 배포까지 포함한 전체 런칭 플랜 잡아줘", "expected_skill": "018", "ambiguous_with": ["083"]}
+{"intent": "출시 직전에 빠뜨린 거 없는지 최종 점검 리스트 뽑아줘", "expected_skill": "018"}

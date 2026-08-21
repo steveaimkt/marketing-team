@@ -1,0 +1,6 @@
+{"intent": "신제품 반응 알아볼 설문지 문항 짜줘", "expected_skill": "007"}
+{"intent": "고객들한테 뭘 물어봐야 할지 조사 설계 좀 해줘", "expected_skill": "007"}
+{"intent": "설문 응답 300개 들어왔는데 연령대별로 갈라서 분석해줘", "expected_skill": "007", "ambiguous_with": ["070"]}
+{"intent": "구매 의향 조사용 질문 리스트 만들어줘, 유도 질문 없이", "expected_skill": "007"}
+{"intent": "리커트 척도로 만족도 문항 구성해줘", "expected_skill": "007"}
+{"intent": "고객이 왜 사는지 직접 물어보는 조사 만들고 싶어", "expected_skill": "007", "ambiguous_with": ["080"]}

@@ -1,0 +1,6 @@
+{"intent": "VIP 등급제 만들어서 혜택 구조 짜줘", "expected_skill": "076"}
+{"intent": "멤버십 등급 나누는 기준이랑 혜택 원가 계산해줘", "expected_skill": "076"}
+{"intent": "우수 고객한테 뭘 줘야 남는 장사인지 시뮬레이션해줘", "expected_skill": "076", "ambiguous_with": ["016"]}
+{"intent": "등급별 적립률 다르게 하면 마진이 얼마나 깎이는지 봐줘", "expected_skill": "076"}
+{"intent": "단골 우대 프로그램 설계하고 강등 규칙까지 정해줘", "expected_skill": "076", "ambiguous_with": ["065"]}
+{"intent": "우리 쇼핑몰에 로열티 프로그램 도입하려는데 구조 잡아줘", "expected_skill": "076"}

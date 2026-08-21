@@ -1,0 +1,6 @@
+{"intent": "우리 고객이 처음 알게 돼서 재구매까지 어떤 경로로 오는지 한눈에 보고 싶어", "expected_skill": "073"}
+{"intent": "구매 직전에 자꾸 빠져나가는 것 같은데 여정에서 어느 지점이 문제인지 짚어줘", "expected_skill": "073", "ambiguous_with": ["048", "064"]}
+{"intent": "터치포인트별로 고객 감정이 어떻게 변하는지 곡선으로 정리해줘", "expected_skill": "073"}
+{"intent": "세그먼트별로 구매까지 가는 길이 다른지 여정으로 비교해줘", "expected_skill": "073", "ambiguous_with": ["065"]}
+{"intent": "고객 접점 지도를 만들어서 어디에 뭘 개입할지 정하자", "expected_skill": "073"}
+{"intent": "인지부터 재구매까지 단계별로 마찰 포인트 찾아줘", "expected_skill": "073"}

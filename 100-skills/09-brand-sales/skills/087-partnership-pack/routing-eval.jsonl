@@ -1,0 +1,6 @@
+{"intent": "저 브랜드랑 콜라보 하고 싶은데 제안 어떻게 넣지", "expected_skill": "087"}
+{"intent": "회사 대 회사로 파트너십 제안서 보내려고 해", "expected_skill": "087", "ambiguous_with": ["084"]}
+{"intent": "제휴하면 수익 배분을 어떻게 짜야 할까", "expected_skill": "087"}
+{"intent": "커뮤니티 운영자랑 공동 프로모션 제안 문서 만들어줘", "expected_skill": "087"}
+{"intent": "수익 셰어 옵션 몇 가지로 딜 구조 설계해줘", "expected_skill": "087"}
+{"intent": "인플루언서랑 협업 조건 정리한 제안 보내자", "expected_skill": "087", "ambiguous_with": ["034"]}

@@ -1,0 +1,6 @@
+{"intent": "신제품 판매가를 얼마로 잡는 게 좋을지 정해줘", "expected_skill": "017"}
+{"intent": "원가랑 경쟁사 가격 고려해서 가격안 세 개로 뽑아줘", "expected_skill": "017"}
+{"intent": "이 가격이면 몇 개 팔아야 본전인지까지 계산해줘", "expected_skill": "017", "ambiguous_with": ["069"]}
+{"intent": "경쟁사보다 싸게 갈지 프리미엄으로 갈지 방향 잡아줘", "expected_skill": "017", "ambiguous_with": ["009"]}
+{"intent": "행사 할인 말고 평소 정가 자체를 다시 잡고 싶어", "expected_skill": "017", "ambiguous_with": ["016"]}
+{"intent": "원가 항목별로 뜯어보고 가격 인상 여부 판단해줘", "expected_skill": "017", "ambiguous_with": ["014"]}

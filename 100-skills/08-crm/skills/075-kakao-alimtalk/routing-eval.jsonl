@@ -1,0 +1,6 @@
+{"intent": "주문 확인 알림톡 템플릿 문구 만들어줘", "expected_skill": "075"}
+{"intent": "카카오 채널로 프로모션 메시지 보내려는데 규정에 맞게 문구 잡아줘", "expected_skill": "075"}
+{"intent": "알림톡 심사에서 자꾸 반려되는데 통과되게 고쳐줘", "expected_skill": "075"}
+{"intent": "이 메시지가 알림톡으로 되는지 친구톡으로 가야 하는지 판단해줘", "expected_skill": "075"}
+{"intent": "재입고 안내 카톡 메시지 설계해줘", "expected_skill": "075", "ambiguous_with": ["074"]}
+{"intent": "예약 리마인드 카카오 메시지 변수 넣어서 템플릿으로 만들어줘", "expected_skill": "075"}

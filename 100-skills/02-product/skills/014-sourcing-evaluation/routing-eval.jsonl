@@ -1,0 +1,6 @@
+{"intent": "알리에서 원가 4천원짜리 찾았는데 쿠팡에 팔면 남는지 계산해줘", "expected_skill": "014"}
+{"intent": "소싱 후보 3개 중에 뭐가 제일 승산 있는지 점수 매겨줘", "expected_skill": "014", "ambiguous_with": ["010"]}
+{"intent": "이 아이템 수수료랑 반품까지 다 빼면 실제로 얼마 남아?", "expected_skill": "014", "ambiguous_with": ["017"]}
+{"intent": "새로 들여올 상품인데 경쟁 너무 센 건 아닌지 봐줘", "expected_skill": "014", "ambiguous_with": ["002"]}
+{"intent": "이 제품 첫 발주 몇 개나 해야 할지도 같이 판단해줘", "expected_skill": "014"}
+{"intent": "MOQ 300개라는데 이거 소싱해도 되는 물건인지 평가해줘", "expected_skill": "014"}

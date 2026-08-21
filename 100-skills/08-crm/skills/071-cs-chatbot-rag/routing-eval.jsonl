@@ -1,0 +1,6 @@
+{"intent": "고객 문의 반복되는 거 자동으로 답하게 봇 하나 만들어줘", "expected_skill": "071"}
+{"intent": "우리 FAQ 문서 기반으로 답변하는 챗봇 구축하고 싶어", "expected_skill": "071"}
+{"intent": "CS 지식베이스 만들어서 문의 들어오면 알아서 응대하게 해줘", "expected_skill": "071", "ambiguous_with": ["072"]}
+{"intent": "밤에 들어오는 배송 문의 자동응대 시스템 세팅해줘", "expected_skill": "071", "ambiguous_with": ["032"]}
+{"intent": "문의 답변할 때 회사 정책 문서 참조해서 답하게 만들 수 있어?", "expected_skill": "071"}
+{"intent": "RAG로 우리 매뉴얼 학습시켜서 고객 응대 봇 돌리자", "expected_skill": "071"}

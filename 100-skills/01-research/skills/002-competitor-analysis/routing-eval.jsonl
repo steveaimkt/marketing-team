@@ -1,0 +1,6 @@
+{"intent": "경쟁 브랜드 3군데랑 우리가 뭐가 다른지 표로 정리해줘", "expected_skill": "002"}
+{"intent": "같은 카테고리 상위 셀러들 포지셔닝이랑 채널 운영 상황 비교 리포트 뽑아줘", "expected_skill": "002"}
+{"intent": "경쟁사들이 상세페이지에서 공통으로 미는 메시지가 뭔지 분석해줘", "expected_skill": "002", "ambiguous_with": ["051"]}
+{"intent": "우리 시장에서 비집고 들어갈 틈이 어디인지 경쟁 구도 좀 봐줘", "expected_skill": "002", "ambiguous_with": ["010"]}
+{"intent": "경쟁사 가격이랑 채널까지 묶어서 한눈에 보이게 비교해줘", "expected_skill": "002", "ambiguous_with": ["009"]}
+{"intent": "새로 들어온 경쟁 브랜드 어떤 식으로 파는지 조사해서 정리해줘", "expected_skill": "002", "ambiguous_with": ["003"]}

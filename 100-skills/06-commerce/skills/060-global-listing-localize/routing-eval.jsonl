@@ -1,0 +1,6 @@
+{"intent": "이 상세페이지 아마존용 영어 버전으로 바꿔줘", "expected_skill": "060"}
+{"intent": "일본 시장에 올릴 리스팅으로 현지화해줘", "expected_skill": "060"}
+{"intent": "쇼피 규격에 맞게 상품 페이지 옮겨줘", "expected_skill": "060", "ambiguous_with": ["053"]}
+{"intent": "해외 판매하려면 단위랑 인증 표기 어떻게 바꿔야 해?", "expected_skill": "060"}
+{"intent": "우리 제품 소구점을 미국 고객한테 먹히게 다시 써줘", "expected_skill": "060", "ambiguous_with": ["051"]}
+{"intent": "아마존 불릿 포인트랑 백엔드 키워드 채워줘", "expected_skill": "060", "ambiguous_with": ["053"]}

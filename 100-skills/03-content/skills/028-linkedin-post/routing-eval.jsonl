@@ -1,0 +1,6 @@
+{"intent": "이번 런칭 소식을 링크드인 스타일로 다듬어줘", "expected_skill": "028"}
+{"intent": "B2B 잠재고객 겨냥한 소셜 글 하나 뽑아줄래", "expected_skill": "028", "ambiguous_with": ["026"]}
+{"intent": "후크 세게 들어가는 링크드인 게시물 초안 써줘", "expected_skill": "028"}
+{"intent": "내 실패 경험담으로 링크드인에서 반응 나올 글 만들어줘", "expected_skill": "028"}
+{"intent": "회사 계정에 올릴 전문가 톤 포스트 작성 부탁해", "expected_skill": "028", "ambiguous_with": ["026"]}
+{"intent": "댓글 많이 달리게 저요 유도하는 글 하나 써줘", "expected_skill": "028"}

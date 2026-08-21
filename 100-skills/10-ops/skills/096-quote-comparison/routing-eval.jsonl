@@ -1,0 +1,6 @@
+{"intent": "업체 세 군데서 견적 받았는데 어디가 나은지 분석해줘", "expected_skill": "096"}
+{"intent": "이 견적서 바가지인지 항목별로 검토해줘", "expected_skill": "096"}
+{"intent": "홈페이지 제작 견적 두 개 비교해서 협상할 거리 찾아줘", "expected_skill": "096", "ambiguous_with": ["094"]}
+{"intent": "대행사 제안서들 조건 비교표로 만들어줘", "expected_skill": "096", "ambiguous_with": ["084"]}
+{"intent": "견적에 빠진 항목이나 숨은 비용 있는지 봐줘", "expected_skill": "096"}
+{"intent": "입찰 들어온 업체들 가격이랑 범위 정리해줘", "expected_skill": "096"}

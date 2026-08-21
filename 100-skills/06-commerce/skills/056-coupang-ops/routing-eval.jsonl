@@ -1,0 +1,6 @@
+{"intent": "쿠팡 매출 관리 좀 도와줘, 뭐부터 봐야 해?", "expected_skill": "056"}
+{"intent": "아이템위너 뺏겼는데 어떻게 되찾지?", "expected_skill": "056"}
+{"intent": "로켓그로스 재고 얼마나 넣어야 할지 계산해줘", "expected_skill": "056"}
+{"intent": "쿠팡 노출이 갑자기 떨어졌어, 점검해줘", "expected_skill": "056", "ambiguous_with": ["041"]}
+{"intent": "품절 나기 전에 발주 시점 미리 알려줘", "expected_skill": "056", "ambiguous_with": ["069"]}
+{"intent": "쿠팡 판매 데이터 보고 가격이랑 재고 전략 짜줘", "expected_skill": "056", "ambiguous_with": ["041"]}

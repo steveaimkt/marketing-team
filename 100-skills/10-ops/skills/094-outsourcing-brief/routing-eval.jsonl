@@ -1,0 +1,6 @@
+{"intent": "디자이너한테 보낼 작업 의뢰서 정리해줘", "expected_skill": "094"}
+{"intent": "영상 편집 외주 맡기려는데 요청서 어떻게 써야 해", "expected_skill": "094"}
+{"intent": "개발 외주 견적 받으려면 요구사항부터 정리해야 하지?", "expected_skill": "094", "ambiguous_with": ["096"]}
+{"intent": "외주 범위랑 검수 기준을 문서로 만들어줘", "expected_skill": "094"}
+{"intent": "로고 새로 맡길 건데 브리프 표준으로 하나 뽑아줘", "expected_skill": "094"}
+{"intent": "촬영 스튜디오에 넘길 외주 작업 지시서 표준으로 만들어줘", "expected_skill": "094", "ambiguous_with": ["034"]}

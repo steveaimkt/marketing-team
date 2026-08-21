@@ -1,0 +1,5 @@
+{"intent": "어제 고객사 미팅 녹취록인데 정리하고 다음 할 일 뽑아줘", "expected_skill": "086"}
+{"intent": "상담 끝났는데 팔로업 메일 하나 써줘", "expected_skill": "086"}
+{"intent": "미팅에서 뭐가 결정됐고 뭐가 보류됐는지 나눠서 정리해줘", "expected_skill": "086", "ambiguous_with": ["093"]}
+{"intent": "영업 미팅 내용에서 제안서에 쓸 포인트 뽑아줘", "expected_skill": "086", "ambiguous_with": ["084"]}
+{"intent": "파트너 협의 메모 정리해서 누가 뭘 언제까지 하는지 표로 만들어줘", "expected_skill": "086", "ambiguous_with": ["093"]}

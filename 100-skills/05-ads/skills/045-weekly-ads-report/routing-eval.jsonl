@@ -1,0 +1,6 @@
+{"intent": "이번 주 광고 돌아간 거 매체별로 정리해서 리포트 만들어줘", "expected_skill": "045"}
+{"intent": "매주 월요일마다 광고 성과 리포트 자동으로 받고 싶어", "expected_skill": "045"}
+{"intent": "메타랑 네이버 광고 성과를 한 장에 모아서 보여줘", "expected_skill": "045", "ambiguous_with": ["046"]}
+{"intent": "지난주 대비 광고 지표 어떻게 변했는지 HTML로 뽑아줘", "expected_skill": "045", "ambiguous_with": ["062"]}
+{"intent": "주간 광고 결산 돌려줘", "expected_skill": "045", "ambiguous_with": ["067"]}
+{"intent": "광고 성과 요약해서 노션에 아카이브까지 해줘", "expected_skill": "045"}

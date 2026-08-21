@@ -1,0 +1,6 @@
+{"intent": "공급사가 준 사양서밖에 없는데 이걸로 팔리는 문구 좀 만들어줘", "expected_skill": "015"}
+{"intent": "우리 제품 기능들을 고객이 알아듣는 말로 바꿔줘", "expected_skill": "015"}
+{"intent": "스펙표 보고 상세페이지에 쓸 소구점 뽑아줘", "expected_skill": "015", "ambiguous_with": ["051"]}
+{"intent": "배터리 용량 이런 거 말고 고객 입장에서 뭐가 좋은지로 정리해줘", "expected_skill": "015", "ambiguous_with": ["012"]}
+{"intent": "제품 특징 중에 광고에서 밀어야 할 포인트 순위 매겨줘", "expected_skill": "015", "ambiguous_with": ["043"]}
+{"intent": "이 스펙에서 과장 없이 주장할 수 있는 장점만 골라줘", "expected_skill": "015"}

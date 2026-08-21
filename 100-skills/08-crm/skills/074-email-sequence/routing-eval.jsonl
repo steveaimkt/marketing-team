@@ -1,0 +1,6 @@
+{"intent": "회원가입하면 자동으로 나가는 환영 메일 3통 짜줘", "expected_skill": "074"}
+{"intent": "장바구니에 담고 결제 안 한 사람한테 보낼 메일 흐름 설계해줘", "expected_skill": "074"}
+{"intent": "구매 주기 맞춰서 재구매 유도 메일이 자동으로 나가게 하고 싶어", "expected_skill": "074", "ambiguous_with": ["077"]}
+{"intent": "이메일 자동화 시나리오별로 몇 통씩 언제 보낼지 설계해줘", "expected_skill": "074", "ambiguous_with": ["023"]}
+{"intent": "이메일 드립 캠페인 만들어서 승인 받고 발송까지 해줘", "expected_skill": "074", "ambiguous_with": ["023"]}
+{"intent": "휴면 직전 고객한테 리마인드 메일 시퀀스 돌리고 싶어", "expected_skill": "074", "ambiguous_with": ["077"]}

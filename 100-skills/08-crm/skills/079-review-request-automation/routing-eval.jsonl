@@ -1,0 +1,6 @@
+{"intent": "구매한 고객한테 후기 써달라는 메일 자동으로 보내자", "expected_skill": "079"}
+{"intent": "리뷰 요청은 배송 며칠 뒤에 보내는 게 좋아? 플로우로 짜줘", "expected_skill": "079"}
+{"intent": "후기 남기면 적립금 주는 이벤트 규정 지켜서 설계해줘", "expected_skill": "079"}
+{"intent": "리뷰 안 쓴 구매자한테 리마인드 메시지 만들어줘", "expected_skill": "079", "ambiguous_with": ["054"]}
+{"intent": "포토리뷰 모으는 자동화 만들어줘", "expected_skill": "079", "ambiguous_with": ["054"]}
+{"intent": "구매 후 도착 확인부터 후기 요청까지 메시지 순서 설계해줘", "expected_skill": "079", "ambiguous_with": ["074"]}

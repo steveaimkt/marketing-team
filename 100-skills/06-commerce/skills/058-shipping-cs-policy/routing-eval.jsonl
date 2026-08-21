@@ -1,0 +1,6 @@
+{"intent": "스토어에 올릴 반품 규정 문구 만들어줘", "expected_skill": "058"}
+{"intent": "교환이랑 환불 정책 정리해서 상세페이지에 넣으려고 해", "expected_skill": "058"}
+{"intent": "배송 안내문 법적으로 문제없게 써줘", "expected_skill": "058", "ambiguous_with": ["049"]}
+{"intent": "단순변심 반품 배송비는 누가 내는 걸로 정해야 해?", "expected_skill": "058"}
+{"intent": "CS팀이 쓸 반품 처리 기준 문서 만들어줘", "expected_skill": "058", "ambiguous_with": ["072"]}
+{"intent": "우리 쇼핑몰 AS 보증 정책 초안 잡아줘", "expected_skill": "058", "ambiguous_with": ["072"]}

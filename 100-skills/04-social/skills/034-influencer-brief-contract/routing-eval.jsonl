@@ -1,0 +1,6 @@
+{"intent": "이번에 선정한 인플루언서한테 보낼 협업 가이드 문서 뽑아줘", "expected_skill": "034"}
+{"intent": "크리에이터 계약서에 뭐가 들어가야 하는지 체크해줘", "expected_skill": "034", "ambiguous_with": ["099"]}
+{"intent": "협찬 콘텐츠 광고 표기는 어떻게 하라고 안내해야 해?", "expected_skill": "034"}
+{"intent": "인플루언서 소속사가 보낸 계약 조건 검토해줘", "expected_skill": "034", "ambiguous_with": ["099"]}
+{"intent": "체험단 10명한테 돌릴 공통 가이드 만들어줘", "expected_skill": "034", "ambiguous_with": ["037"]}
+{"intent": "이 크리에이터 콘텐츠 나중에 광고로 쓰려면 뭘 합의해야 해", "expected_skill": "034"}

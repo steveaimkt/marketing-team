@@ -1,0 +1,6 @@
+{"intent": "고객 인터뷰 질문지를 JTBD 방식으로 만들어줘", "expected_skill": "080"}
+{"intent": "다음 주 고객 미팅에서 뭘 물어봐야 할지 스크립트 짜줘", "expected_skill": "080"}
+{"intent": "인터뷰 녹음 풀어놓은 거 요약하고 인사이트 뽑아줘", "expected_skill": "080"}
+{"intent": "고객이 왜 우리를 선택했는지 알아보는 인터뷰 설계해줘", "expected_skill": "080", "ambiguous_with": ["008"]}
+{"intent": "인터뷰 결과를 페르소나 만들 재료로 정리해줘", "expected_skill": "080", "ambiguous_with": ["008"]}
+{"intent": "휴면 고객 몇 명 만나서 떠난 이유 물어볼 질문 준비해줘", "expected_skill": "080", "ambiguous_with": ["077"]}

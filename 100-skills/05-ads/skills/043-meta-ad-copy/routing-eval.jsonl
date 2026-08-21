@@ -1,0 +1,6 @@
+{"intent": "이번 캠페인 문구를 여러 버전으로 만들어서 비교해보고 싶어", "expected_skill": "043"}
+{"intent": "메타에 돌릴 광고 시안 카피 후보군 쭉 뽑아줘", "expected_skill": "043"}
+{"intent": "헤드라인 A안 B안 나눠서 테스트해볼 수 있게 준비해줘", "expected_skill": "043", "ambiguous_with": ["019"]}
+{"intent": "이 소구점으로 문구 열 개쯤 쓰고 점수도 같이 매겨줘", "expected_skill": "043", "ambiguous_with": ["047"]}
+{"intent": "카피가 약한 것 같은데 다른 스타일로 여러 개 다시 써줘", "expected_skill": "043", "ambiguous_with": ["047"]}
+{"intent": "신제품 출시 광고 멘트 후보 만들어서 제일 좋은 걸 추천해줘", "expected_skill": "043"}

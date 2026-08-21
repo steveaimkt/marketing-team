@@ -1,0 +1,6 @@
+{"intent": "다음 주 영업 미팅에서 쓸 발표 슬라이드 좀 짜줘", "expected_skill": "085"}
+{"intent": "우리 제품 소개 피치덱 구조부터 잡아줘", "expected_skill": "085"}
+{"intent": "고객사 앞에서 발표할 PPT 카피 써줘", "expected_skill": "085", "ambiguous_with": ["084"]}
+{"intent": "세일즈용 덱 10장짜리 만들어줘", "expected_skill": "085"}
+{"intent": "고객 유형별로 슬라이드 내용 바꿔서 준비해줘", "expected_skill": "085"}
+{"intent": "재계약 미팅용 성과 발표자료 필요해", "expected_skill": "085", "ambiguous_with": ["067"]}

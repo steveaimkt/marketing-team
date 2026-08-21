@@ -1,0 +1,6 @@
+{"intent": "고객들이 올린 사진 우리 계정에 올려도 되게 절차 만들어줘", "expected_skill": "037"}
+{"intent": "후기 콘텐츠 모아서 광고에도 쓰고 싶은데 동의는 어떻게 받아", "expected_skill": "037"}
+{"intent": "UGC 수집 캠페인 하나 설계해줘", "expected_skill": "037", "ambiguous_with": ["035"]}
+{"intent": "리그램할 때 쓸 표준 동의 문구랑 관리 대장 만들어줘", "expected_skill": "037"}
+{"intent": "고객 사진 재활용 채널별로 어떻게 돌려쓸지 정리해줘", "expected_skill": "037", "ambiguous_with": ["027"]}
+{"intent": "인스타에 우리 제품 찍어 올린 사람들 콘텐츠 모아서 활용하는 체계 잡아줘", "expected_skill": "037", "ambiguous_with": ["079"]}

@@ -1,0 +1,6 @@
+{"intent": "이번 주 구독자한테 보낼 글 초안 하나 잡아줘", "expected_skill": "023", "ambiguous_with": ["074"]}
+{"intent": "새 기능 소개하는 이메일 레터 하나 써줄래", "expected_skill": "023"}
+{"intent": "메일링용 콘텐츠 800자 정도로 만들고 제목 후보도 여러 개 뽑아줘", "expected_skill": "023"}
+{"intent": "이 아티클 세 개 묶어서 위클리 레터로 정리해줘", "expected_skill": "023"}
+{"intent": "우리 브랜드 톤으로 뉴스레터 원고 다듬어서 완성해줘", "expected_skill": "023", "ambiguous_with": ["074"]}
+{"intent": "구독자 오픈율 잘 나올 만한 메일 제목이랑 본문 같이 작성해줘", "expected_skill": "023"}

@@ -1,0 +1,6 @@
+{"intent": "고객사에서 RFP 왔는데 제안서 초안 좀 잡아줘", "expected_skill": "084"}
+{"intent": "어제 들어온 문의 건, 보낼 제안 문서로 만들어줘", "expected_skill": "084"}
+{"intent": "이번 입찰 들어가려는데 수주용 제안서 작성 도와줘", "expected_skill": "084", "ambiguous_with": ["096"]}
+{"intent": "우리 서비스 소개랑 가격 넣어서 고객 맞춤 제안서 뽑아줘", "expected_skill": "084", "ambiguous_with": ["085"]}
+{"intent": "제안요청서 분석해서 목차부터 짜줘", "expected_skill": "084"}
+{"intent": "이 업체 따내려면 제안서 어떻게 써야 할까", "expected_skill": "084", "ambiguous_with": ["087"]}

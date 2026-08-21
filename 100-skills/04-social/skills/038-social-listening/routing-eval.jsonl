@@ -1,0 +1,6 @@
+{"intent": "요즘 온라인에서 우리 브랜드 어떻게 언급되는지 정리해줘", "expected_skill": "038"}
+{"intent": "이번 주 브랜드 여론 리포트 뽑아줘", "expected_skill": "038"}
+{"intent": "커뮤니티랑 유튜브 댓글에서 우리 얘기 감성 분석해줘", "expected_skill": "038", "ambiguous_with": ["006"]}
+{"intent": "부정적인 얘기 갑자기 늘어나면 알 수 있게 감시 돌려줘", "expected_skill": "038", "ambiguous_with": ["089"]}
+{"intent": "언급량 추이랑 많이 나오는 주제 주간으로 추적해줘", "expected_skill": "038", "ambiguous_with": ["005"]}
+{"intent": "브랜드 관련 게시글이랑 댓글 모아서 긍부정 흐름 보여줘", "expected_skill": "038", "ambiguous_with": ["006"]}

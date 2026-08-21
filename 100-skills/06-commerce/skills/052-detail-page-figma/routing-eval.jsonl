@@ -1,0 +1,6 @@
+{"intent": "이 기획서 그대로 피그마 시안으로 만들어줘", "expected_skill": "052"}
+{"intent": "상세페이지 디자인 작업까지 자동으로 해줄 수 있어?", "expected_skill": "052", "ambiguous_with": ["051"]}
+{"intent": "24섹션 기획안을 디자인 파일로 옮겨줘", "expected_skill": "052"}
+{"intent": "상세페이지 시안 뽑아서 디자이너한테 넘기려고 해", "expected_skill": "052"}
+{"intent": "피그마에 상세페이지 프레임 자동으로 깔아줘", "expected_skill": "052"}
+{"intent": "카피는 다 나왔고 이제 레이아웃만 잡으면 돼", "expected_skill": "052", "ambiguous_with": ["051"]}

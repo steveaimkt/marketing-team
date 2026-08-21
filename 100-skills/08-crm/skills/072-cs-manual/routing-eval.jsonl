@@ -1,0 +1,6 @@
+{"intent": "우리 쇼핑몰 CS 응대 기준 문서로 정리해줘", "expected_skill": "072"}
+{"intent": "악성 리뷰 달렸을 때 어떻게 답할지 스크립트 만들어줘", "expected_skill": "072", "ambiguous_with": ["054"]}
+{"intent": "상담 알바 새로 뽑았는데 줄 응대 가이드 만들어줘", "expected_skill": "072"}
+{"intent": "문의 유형별로 답변 템플릿이랑 상담원한테 넘기는 기준 정해줘", "expected_skill": "072", "ambiguous_with": ["071"]}
+{"intent": "환불 얼마 이상이면 사장한테 보고할지 CS 규칙 세워줘", "expected_skill": "072", "ambiguous_with": ["058"]}
+{"intent": "인스타 DM으로 오는 컴플레인 대응 멘트 정리해줘", "expected_skill": "072", "ambiguous_with": ["032"]}

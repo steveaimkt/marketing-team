@@ -1,0 +1,6 @@
+{"intent": "광고 A안 B안 돌렸는데 어느 쪽이 이긴 건지 판정해줘", "expected_skill": "047"}
+{"intent": "이 테스트 결과가 통계적으로 의미 있는 건지 봐줘", "expected_skill": "047"}
+{"intent": "B안 전환율이 높긴 한데 그냥 우연 아닐까?", "expected_skill": "047"}
+{"intent": "AB 테스트 언제까지 더 돌려야 하는지 계산해줘", "expected_skill": "047", "ambiguous_with": ["019"]}
+{"intent": "이긴 소재 기준으로 다음에 뭘 테스트할지 제안해줘", "expected_skill": "047", "ambiguous_with": ["043"]}
+{"intent": "썸네일 두 개 테스트 수치 뽑아왔는데 승자 정해줘", "expected_skill": "047", "ambiguous_with": ["025"]}

@@ -1,0 +1,6 @@
+{"intent": "새로 온 팀원용 업무 매뉴얼 만들어줘", "expected_skill": "097"}
+{"intent": "다음 달에 담당자 바뀌는데 인수인계 자료 정리해줘", "expected_skill": "097"}
+{"intent": "내 업무 프로세스를 문서로 표준화하고 싶어", "expected_skill": "097", "ambiguous_with": ["091", "092"]}
+{"intent": "우리 팀 계정이랑 툴 목록 인수인계용으로 정리해줘", "expected_skill": "097"}
+{"intent": "신입이 첫 주에 볼 온보딩 가이드 뽑아줘", "expected_skill": "097"}
+{"intent": "마케팅 업무 루틴을 매뉴얼로 만들어서 위임하고 싶어", "expected_skill": "097", "ambiguous_with": ["093"]}

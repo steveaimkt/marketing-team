@@ -1,0 +1,6 @@
+{"intent": "이 유튜브 스크립트 링크드인이랑 뉴스레터용으로도 만들어줘", "expected_skill": "027", "ambiguous_with": ["028", "023"]}
+{"intent": "블로그 글 하나 썼는데 다른 플랫폼에도 다 뿌리고 싶어", "expected_skill": "027"}
+{"intent": "원소스 멀티유즈로 콘텐츠 세트 뽑아줘", "expected_skill": "027"}
+{"intent": "이 콘텐츠 채널마다 톤 다르게 각색해줘", "expected_skill": "027", "ambiguous_with": ["026"]}
+{"intent": "발표 자료를 SNS 여러 군데 올릴 버전으로 나눠서 정리해줘", "expected_skill": "027"}
+{"intent": "하나 만든 걸로 일주일치 채널별 게시물 순서까지 짜줘", "expected_skill": "027", "ambiguous_with": ["021"]}

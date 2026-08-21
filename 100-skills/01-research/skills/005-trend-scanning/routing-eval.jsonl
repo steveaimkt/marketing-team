@@ -1,0 +1,6 @@
+{"intent": "우리 카테고리에서 요즘 뜨는 키워드랑 흐름 정리해줘", "expected_skill": "005"}
+{"intent": "최근 한 달 사이에 갑자기 언급 늘어난 주제 찾아줘", "expected_skill": "005"}
+{"intent": "뉴스랑 커뮤니티에서 잡히는 신호로 다음 콘텐츠 방향 잡아줘", "expected_skill": "005", "ambiguous_with": ["021"]}
+{"intent": "검색어 급상승하는 것 중에 우리 브랜드랑 관련된 것만 골라줘", "expected_skill": "005", "ambiguous_with": ["001"]}
+{"intent": "요즘 시장 분위기 어떤지 스캔 한 번 돌려줘", "expected_skill": "005", "ambiguous_with": ["004"]}
+{"intent": "토너패드 쪽 시그널 모아서 마케팅 시사점까지 뽑아줘", "expected_skill": "005"}

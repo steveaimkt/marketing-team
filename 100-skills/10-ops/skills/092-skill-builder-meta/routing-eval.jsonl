@@ -1,0 +1,6 @@
+{"intent": "내가 매주 하는 리포트 작업을 스킬로 만들고 싶어", "expected_skill": "092"}
+{"intent": "SKILL.md 하나 같이 써줘, 처음이라 모르겠어", "expected_skill": "092"}
+{"intent": "이 반복 절차를 자동화 스킬로 등록하자", "expected_skill": "092", "ambiguous_with": ["091"]}
+{"intent": "나만의 커스텀 스킬 제작 도와줘", "expected_skill": "092"}
+{"intent": "우리 팀 업무 하나를 100스킬 체계에 추가하고 싶어", "expected_skill": "092", "ambiguous_with": ["100"]}
+{"intent": "내 콘텐츠 검수 루틴을 에이전트로 만들어줘", "expected_skill": "092"}

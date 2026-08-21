@@ -1,0 +1,6 @@
+{"intent": "이번 주 한 일 정리하고 다음 주 계획 세우자", "expected_skill": "098"}
+{"intent": "금요일이니까 주간 회고 돌려줘", "expected_skill": "098", "ambiguous_with": ["030"]}
+{"intent": "다음 주에 뭐부터 해야 할지 우선순위 정해줘", "expected_skill": "098", "ambiguous_with": ["091"]}
+{"intent": "이번 주 못 끝낸 일들 어떻게 할지 정리해줘", "expected_skill": "098", "ambiguous_with": ["093"]}
+{"intent": "한 주 동안 뭘 배웠는지 회고 템플릿으로 정리해줘", "expected_skill": "098"}
+{"intent": "이번 주 성과 돌아보고 루틴도 손봐줘", "expected_skill": "098", "ambiguous_with": ["030"]}

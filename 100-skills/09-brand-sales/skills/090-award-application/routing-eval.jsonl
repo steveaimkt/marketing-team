@@ -1,0 +1,6 @@
+{"intent": "정부지원사업 공고 떴는데 신청서 초안 잡아줘", "expected_skill": "090"}
+{"intent": "수출바우처 지원서 써야 하는데 도와줘", "expected_skill": "090"}
+{"intent": "브랜드 어워드 응모 서류 만들어줘", "expected_skill": "090"}
+{"intent": "사업계획서를 평가 배점에 맞춰서 다시 구성해줘", "expected_skill": "090", "ambiguous_with": ["084"]}
+{"intent": "이 공고 우리가 자격이 되는지 보고 서류 준비 목록 뽑아줘", "expected_skill": "090"}
+{"intent": "벤처 인증 심사 서류 어떻게 써야 할지 구조 잡아줘", "expected_skill": "090", "ambiguous_with": ["084"]}

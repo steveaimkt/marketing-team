@@ -1,0 +1,6 @@
+{"intent": "캠페인 링크마다 UTM 어떻게 붙일지 규칙 정해줘", "expected_skill": "050"}
+{"intent": "utm 소스가 페이스북이랑 facebook으로 갈라져 있는데 정리해줘", "expected_skill": "050"}
+{"intent": "어느 채널이 전환에 기여했는지 어떻게 해석해야 해?", "expected_skill": "050", "ambiguous_with": ["046"]}
+{"intent": "광고 유입 추적 태그 체계를 새로 잡고 싶어", "expected_skill": "050", "ambiguous_with": ["063"]}
+{"intent": "라스트클릭으로만 보면 안 된다던데 기여 분석 기준 잡아줘", "expected_skill": "050", "ambiguous_with": ["046"]}
+{"intent": "뉴스레터랑 인스타 링크 파라미터 명명 규칙 표로 만들어줘", "expected_skill": "050"}

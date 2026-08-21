@@ -1,0 +1,6 @@
+{"intent": "이번 영상 제목 후보 좀 여러 개 비교하게 뽑아줄래", "expected_skill": "025"}
+{"intent": "클릭률 안 나오는데 썸네일 문구 다시 잡아줘", "expected_skill": "025"}
+{"intent": "유튜브 올리기 전에 제목이랑 썸네일 AB 테스트 조합 만들어줘", "expected_skill": "025", "ambiguous_with": ["019"]}
+{"intent": "영상은 다 찍었고 제목만 세게 지어줘", "expected_skill": "025", "ambiguous_with": ["024"]}
+{"intent": "썸네일에 넣을 카피랑 레이아웃 지시서 만들어줘", "expected_skill": "025"}
+{"intent": "이 영상 오프닝 말고 클릭 자체가 안 되는 것 같아, 패키징 바꿔보자", "expected_skill": "025", "ambiguous_with": ["040"]}

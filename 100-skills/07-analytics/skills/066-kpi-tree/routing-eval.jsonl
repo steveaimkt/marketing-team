@@ -1,0 +1,5 @@
+{"intent": "우리 회사 북극성 지표를 뭘로 잡아야 할까", "expected_skill": "066"}
+{"intent": "분기 매출 목표를 팀이 움직일 수 있는 지표로 쪼개줘", "expected_skill": "066"}
+{"intent": "어떤 지표를 추적해야 할지 체계 좀 잡아줘", "expected_skill": "066", "ambiguous_with": ["062"]}
+{"intent": "지표가 얼마나 떨어지면 알림 받을지 기준선 정해줘", "expected_skill": "066"}
+{"intent": "마케팅 성과 측정 프레임 만들어줘", "expected_skill": "066", "ambiguous_with": ["067"]}

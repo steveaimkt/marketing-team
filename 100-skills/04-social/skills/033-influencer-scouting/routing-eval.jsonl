@@ -1,0 +1,6 @@
+{"intent": "우리 브랜드랑 맞는 뷰티 크리에이터 좀 골라줄래", "expected_skill": "033"}
+{"intent": "이 인스타 계정 팔로워 산 것 같은데 확인해줘", "expected_skill": "033"}
+{"intent": "협찬 제안이 왔는데 이 사람 계정 괜찮은지 평가해줘", "expected_skill": "033", "ambiguous_with": ["034"]}
+{"intent": "월 100만원 예산으로 시딩할 나노 인플루언서 추려줘", "expected_skill": "033"}
+{"intent": "인플루언서 마케팅 시작하려는데 누구랑 해야 할까", "expected_skill": "033", "ambiguous_with": ["088"]}
+{"intent": "지난번 협업했던 계정들 다시 쓸 만한지 점수 매겨줘", "expected_skill": "033"}

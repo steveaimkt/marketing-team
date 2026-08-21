@@ -1,0 +1,6 @@
+{"intent": "경쟁 제품들 실제 판매가 다 모아서 우리 가격이랑 비교해줘", "expected_skill": "009"}
+{"intent": "우리 제품이 시장에서 비싼 편인지 싼 편인지 맵으로 보여줘", "expected_skill": "009"}
+{"intent": "가격대별로 경쟁 제품 쭉 깔아놓고 빈 가격대가 어디인지 찾아줘", "expected_skill": "009", "ambiguous_with": ["017"]}
+{"intent": "리뷰 평점 대비 가격으로 보면 어느 브랜드가 거품인지 분석해줘", "expected_skill": "009", "ambiguous_with": ["002"]}
+{"intent": "지금 판매가 유지해도 되는지 경쟁 가격 조사해서 판단해줘", "expected_skill": "009", "ambiguous_with": ["017"]}
+{"intent": "ml당 가격으로 환산해서 경쟁사들이랑 비교표 만들어줘", "expected_skill": "009"}

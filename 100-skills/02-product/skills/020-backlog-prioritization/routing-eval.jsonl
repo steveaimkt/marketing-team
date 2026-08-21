@@ -1,0 +1,6 @@
+{"intent": "고객 불만사항 쌓인 것 중에 뭐부터 고칠지 정해줘", "expected_skill": "020", "ambiguous_with": ["078"]}
+{"intent": "개선 요청 목록이 30개인데 우선순위 매겨줘", "expected_skill": "020"}
+{"intent": "RICE 점수로 개선 과제 정렬해줘", "expected_skill": "020"}
+{"intent": "리소스가 부족해서 다 못 하는데 뭘 먼저 할지 근거 있게 골라줘", "expected_skill": "020", "ambiguous_with": ["010"]}
+{"intent": "VoC 정리한 걸로 다음 분기 개선 백로그 만들어줘", "expected_skill": "020", "ambiguous_with": ["078"]}
+{"intent": "요청 들어온 기능들 임팩트 대비 공수로 평가해줘", "expected_skill": "020"}

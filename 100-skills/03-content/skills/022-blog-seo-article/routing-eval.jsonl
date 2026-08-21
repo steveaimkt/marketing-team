@@ -1,0 +1,6 @@
+{"intent": "모공 토너 추천이라는 키워드로 상위 노출 노리는 글 하나 완성해줘", "expected_skill": "022", "ambiguous_with": ["001"]}
+{"intent": "네이버 블로그에 올릴 정보성 포스팅 초안 잡아줄래", "expected_skill": "022"}
+{"intent": "검색 유입 잘 되게 소제목 구조 잡아서 아티클 써줘", "expected_skill": "022"}
+{"intent": "이 키워드 검색하는 사람들 의도 분석해서 글 구조부터 잡아줘", "expected_skill": "022", "ambiguous_with": ["001"]}
+{"intent": "제품 비교 콘텐츠를 블로그용으로 길게 하나 뽑아줘", "expected_skill": "022", "ambiguous_with": ["002"]}
+{"intent": "메타 타이틀이랑 디스크립션까지 포함해서 SEO 원고 만들어줘", "expected_skill": "022"}

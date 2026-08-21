@@ -1,0 +1,6 @@
+{"intent": "커뮤니티에 우리 제품 불량 글이 퍼지고 있는데 어떻게 대응하지", "expected_skill": "089"}
+{"intent": "사과문 올려야 할 것 같은데 초안 잡아줘", "expected_skill": "089"}
+{"intent": "기자한테 해명 요청 연락이 왔어 답변 문구 필요해", "expected_skill": "089", "ambiguous_with": ["083"]}
+{"intent": "악성 댓글이 갑자기 늘었는데 대응할지 말지 판단해줘", "expected_skill": "089", "ambiguous_with": ["032"]}
+{"intent": "CS 응대 실수가 캡처돼서 돌고 있어 수습 플랜 짜줘", "expected_skill": "089"}
+{"intent": "이슈 터졌을 때 쓸 대응 매뉴얼 미리 만들어두고 싶어", "expected_skill": "089", "ambiguous_with": ["072"]}

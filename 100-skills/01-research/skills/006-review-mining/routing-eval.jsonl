@@ -1,0 +1,6 @@
+{"intent": "고객 리뷰 500개 쌓였는데 뭐가 문제인지 정리 좀 해줘", "expected_skill": "006"}
+{"intent": "이번 달 CS 문의랑 구매평에서 반복되는 불만을 순위로 뽑아줘", "expected_skill": "006"}
+{"intent": "우리 제품 쓰는 사람들이 제일 힘들어하는 지점 5개만 알려줘", "expected_skill": "006", "ambiguous_with": ["018"]}
+{"intent": "SNS 댓글 반응 감정별로 나눠서 분석해줄래", "expected_skill": "006", "ambiguous_with": ["007"]}
+{"intent": "부정 후기들 원인별로 묶어서 어떤 이슈가 큰지 보여줘", "expected_skill": "006"}
+{"intent": "고객들 목소리 모아서 개선 요청 많은 순서로 정리해줘", "expected_skill": "006", "ambiguous_with": ["007"]}

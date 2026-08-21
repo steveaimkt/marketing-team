@@ -1,0 +1,6 @@
+{"intent": "인스타 팔로워가 석 달째 제자리인데 원인 좀 찾아줘", "expected_skill": "039"}
+{"intent": "우리 계정 요즘 도달이 왜 이렇게 떨어졌지", "expected_skill": "039", "ambiguous_with": ["030"]}
+{"intent": "채널 데이터 보고 뭐부터 고쳐야 할지 알려줘", "expected_skill": "039"}
+{"intent": "이번에 올린 릴스 조회수가 유독 낮았는데 분석해줘", "expected_skill": "039", "ambiguous_with": ["030", "025"]}
+{"intent": "유튜브 채널 성장이 멈춘 것 같아 진단 돌려줘", "expected_skill": "039"}
+{"intent": "계정 감사해서 병목이랑 액션 뽑아줘", "expected_skill": "039"}

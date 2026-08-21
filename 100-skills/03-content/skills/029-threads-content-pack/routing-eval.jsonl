@@ -1,0 +1,6 @@
+{"intent": "스레드에 올릴 글 하나 이어지는 형식으로 만들어줘", "expected_skill": "029"}
+{"intent": "우리 브랜드 계정에 연재할 짧은 글 시리즈 기획해줘", "expected_skill": "029", "ambiguous_with": ["031"]}
+{"intent": "threads에서 팔로워 늘릴 만한 콘텐츠 뽑아줄래", "expected_skill": "029"}
+{"intent": "이 얘기 다섯 개 포스트로 쪼개서 스레드 연작으로 써줘", "expected_skill": "029", "ambiguous_with": ["027"]}
+{"intent": "짧게 치고 빠지는 스레드 문체로 글 좀 다듬어줘", "expected_skill": "029", "ambiguous_with": ["028"]}
+{"intent": "스레드 1편에 훅 걸고 마지막 편에 팔로우 유도하는 구성으로 부탁해", "expected_skill": "029"}

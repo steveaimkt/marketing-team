@@ -1,0 +1,6 @@
+{"intent": "광고 예산을 채널별로 어떻게 나눌지 다시 정해줘", "expected_skill": "046"}
+{"intent": "지금 ROAS 보고 어디 예산 줄이고 어디 늘릴지 시나리오 뽑아줘", "expected_skill": "046"}
+{"intent": "메타랑 네이버 중에 어디에 돈을 더 쓰는 게 맞아?", "expected_skill": "046", "ambiguous_with": ["045"]}
+{"intent": "우리 광고가 손익분기 넘는 건지 진단해줘", "expected_skill": "046", "ambiguous_with": ["041"]}
+{"intent": "다음 달 마케팅 예산 배분 계획 세워줘", "expected_skill": "046", "ambiguous_with": ["095"]}
+{"intent": "부진한 채널 예산 빼서 잘 되는 데로 옮기는 안 만들어줘", "expected_skill": "046"}

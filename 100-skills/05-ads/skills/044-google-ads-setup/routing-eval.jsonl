@@ -1,0 +1,6 @@
+{"intent": "구글 검색광고 처음 시작하는데 캠페인 어떻게 짜야 해?", "expected_skill": "044"}
+{"intent": "유튜브 광고 돌려보고 싶은데 세팅 순서 알려줘", "expected_skill": "044"}
+{"intent": "PMax 캠페인 지금 열어도 되는 건지 판단해줘", "expected_skill": "044"}
+{"intent": "월 100만원 예산으로 구글 광고 구조 잡아줘", "expected_skill": "044", "ambiguous_with": ["046"]}
+{"intent": "구글 광고 품질점수 미리 챙겨야 할 거 있어?", "expected_skill": "044", "ambiguous_with": ["045"]}
+{"intent": "구글 광고 타깃팅이랑 전환 추적 뭐부터 세팅하지", "expected_skill": "044", "ambiguous_with": ["063"]}

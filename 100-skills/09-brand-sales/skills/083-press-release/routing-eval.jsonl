@@ -1,0 +1,6 @@
+{"intent": "신제품 나왔는데 언론에 배포할 자료 좀 써줘", "expected_skill": "083"}
+{"intent": "기자들한테 돌릴 릴리스 초안이 필요해", "expected_skill": "083"}
+{"intent": "이번 투자 유치 소식을 기사로 내보내고 싶어", "expected_skill": "083"}
+{"intent": "우리 수상 소식 보도자료 형식으로 정리해줘", "expected_skill": "083"}
+{"intent": "언론 홍보용 글 하나 만들어줘", "expected_skill": "083", "ambiguous_with": ["081"]}
+{"intent": "회사 새 소식 알리는 공식 발표문 작성해줘", "expected_skill": "083", "ambiguous_with": ["089"]}

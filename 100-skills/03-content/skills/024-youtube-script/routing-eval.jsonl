@@ -1,0 +1,6 @@
+{"intent": "다음 영상 대본 좀 처음부터 끝까지 짜줄래", "expected_skill": "024", "ambiguous_with": ["026"]}
+{"intent": "성과 인증하는 컨셉으로 10분 영상 구성안 만들어줘", "expected_skill": "024"}
+{"intent": "튜토리얼 영상 나레이션 원고 타임코드 포함해서 뽑아줘", "expected_skill": "024"}
+{"intent": "훅부터 CTA까지 유튜브 롱폼 스크립트 작성해줘", "expected_skill": "024", "ambiguous_with": ["040"]}
+{"intent": "이 주제로 시청 지속률 잘 나오게 영상 흐름 설계해줘", "expected_skill": "024", "ambiguous_with": ["025"]}
+{"intent": "협찬 아니고 내 제품 시연하는 유튜브 대본 하나 부탁해", "expected_skill": "024", "ambiguous_with": ["088"]}

@@ -1,0 +1,6 @@
+{"intent": "네이버 검색광고 성과 좀 진단해줘", "expected_skill": "042"}
+{"intent": "우리 네이버 광고 브랜드 키워드 빼고 보면 실제로 남는 거야?", "expected_skill": "042"}
+{"intent": "쇼핑검색광고 키워드 중에 적자인 것들 찾아서 조정안 내줘", "expected_skill": "042"}
+{"intent": "네이버 광고 ROAS는 좋아 보이는데 뭔가 이상해, 뜯어봐줘", "expected_skill": "042", "ambiguous_with": ["046"]}
+{"intent": "스마트스토어 광고 효율이 안 나오는데 어디가 문제인지 봐줘", "expected_skill": "042", "ambiguous_with": ["055"]}
+{"intent": "네이버 키워드 입찰가 내릴 거 골라줘", "expected_skill": "042", "ambiguous_with": ["001"]}

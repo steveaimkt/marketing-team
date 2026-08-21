@@ -1,0 +1,6 @@
+{"intent": "광고 클릭은 잘 나오는데 페이지에서 구매를 안 해, 뭐가 문제야", "expected_skill": "048"}
+{"intent": "랜딩페이지 전환율이 왜 이렇게 낮은지 봐줘", "expected_skill": "048"}
+{"intent": "우리 상세페이지에서 사람들이 어디서 나가는지 진단해줘", "expected_skill": "048", "ambiguous_with": ["051"]}
+{"intent": "랜딩 첫 화면이랑 CTA 문구 점검 좀 해줘", "expected_skill": "048"}
+{"intent": "페이지 개선을 뭐부터 손대야 전환이 오를까", "expected_skill": "048", "ambiguous_with": ["019"]}
+{"intent": "GA4 보니까 이탈률이 높은데 페이지 쪽 문제 찾아줘", "expected_skill": "048", "ambiguous_with": ["063"]}

@@ -1,0 +1,6 @@
+{"intent": "객단가 올리게 세트 상품 구성 좀 짜줘", "expected_skill": "016"}
+{"intent": "이번 행사에 낼 묶음 할인 상품 설계해줘", "expected_skill": "016", "ambiguous_with": ["057"]}
+{"intent": "할인 얼마까지 줘도 남는지 계산하면서 기획전 구성해줘", "expected_skill": "016", "ambiguous_with": ["017"]}
+{"intent": "재고 안 도는 상품 끼워서 잘 나가는 것과 세트로 묶어줘", "expected_skill": "016"}
+{"intent": "1+1으로 갈지 사은품으로 갈지 마진 비교해서 정해줘", "expected_skill": "016"}
+{"intent": "본체에 소모품 묶어서 재구매 유도하는 세트 만들어줘", "expected_skill": "016", "ambiguous_with": ["076"]}

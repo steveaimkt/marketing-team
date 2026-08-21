@@ -1,0 +1,6 @@
+{"intent": "쿠팡 광고 돌리는데 성과가 어떤지 정리해서 보여줘", "expected_skill": "041"}
+{"intent": "쿠팡에서 돈만 나가고 주문 안 나오는 키워드 골라내줘", "expected_skill": "041"}
+{"intent": "쿠팡 키워드 리포트 받아놨는데 입찰가 어떻게 조정할지 알려줘", "expected_skill": "041"}
+{"intent": "쿠팡 광고 ROAS가 괜찮은 건지 판단해줘", "expected_skill": "041", "ambiguous_with": ["046"]}
+{"intent": "쿠팡 운영 전반 좀 봐줘, 특히 광고비가 새는 것 같아", "expected_skill": "041", "ambiguous_with": ["056"]}
+{"intent": "이번 주 쿠팡 캠페인 중에 뭘 끄고 뭘 키울지 정해줘", "expected_skill": "041", "ambiguous_with": ["046"]}

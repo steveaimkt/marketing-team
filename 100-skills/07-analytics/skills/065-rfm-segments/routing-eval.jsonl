@@ -1,0 +1,6 @@
+{"intent": "주문 데이터 줄 테니까 고객을 그룹으로 나눠봐", "expected_skill": "065"}
+{"intent": "RFM으로 우리 고객 분석해줘", "expected_skill": "065"}
+{"intent": "단골이랑 떠나가는 고객 구분해서 각각 뭘 해야 할지 알려줘", "expected_skill": "065", "ambiguous_with": ["077"]}
+{"intent": "우리 고객 유형별로 분류 좀 해줘", "expected_skill": "065", "ambiguous_with": ["008"]}
+{"intent": "VIP 고객이랑 휴면 고객 나눠서 액션 플랜 짜줘", "expected_skill": "065", "ambiguous_with": ["076"]}
+{"intent": "구매 이력 기반으로 타겟 나눠서 메시지 전략 세우고 싶어", "expected_skill": "065", "ambiguous_with": ["074"]}

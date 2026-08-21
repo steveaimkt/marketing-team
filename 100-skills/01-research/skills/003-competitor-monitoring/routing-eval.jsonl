@@ -1,0 +1,6 @@
+{"intent": "경쟁 브랜드들 사이트 바뀌는 거 매주 정리해서 알려줘", "expected_skill": "003"}
+{"intent": "넘버즈인 가격이나 프로모션 바뀌면 알 수 있게 걸어줘", "expected_skill": "003"}
+{"intent": "경쟁사 신제품 나오는지 계속 감시 좀 해줄래", "expected_skill": "003", "ambiguous_with": ["002"]}
+{"intent": "지난주랑 비교해서 경쟁사들 뭐가 달라졌는지 뽑아줘", "expected_skill": "003"}
+{"intent": "경쟁사 SNS랑 광고 바뀌는 흐름 주간으로 추적해줘", "expected_skill": "003", "ambiguous_with": ["038"]}
+{"intent": "우리 브랜드 언급 말고 경쟁사 움직임만 모니터링 돌려줘", "expected_skill": "003", "ambiguous_with": ["038"]}

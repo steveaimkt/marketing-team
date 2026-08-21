@@ -1,0 +1,6 @@
+{"intent": "광고비를 지금의 두 배로 태우면 매출이 얼마나 나올지 계산해줘", "expected_skill": "069"}
+{"intent": "다음 분기 매출 시나리오 몇 개 뽑아서 비교해줘", "expected_skill": "069"}
+{"intent": "전환율이 1%p 오르면 매출 임팩트가 얼마나 되는지 봐줘", "expected_skill": "069"}
+{"intent": "내년 매출 전망치 잡아줘", "expected_skill": "069", "ambiguous_with": ["061"]}
+{"intent": "예산을 얼마 쓰면 목표 매출에 도달하는지 시뮬레이션 돌려줘", "expected_skill": "069", "ambiguous_with": ["095"]}
+{"intent": "보수적으로 갔을 때랑 공격적으로 갔을 때 결과 차이 보여줘", "expected_skill": "069"}

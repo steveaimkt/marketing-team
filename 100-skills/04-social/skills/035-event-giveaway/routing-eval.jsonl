@@ -1,0 +1,6 @@
+{"intent": "팔로워 늘리려고 인스타 이벤트 하나 열고 싶어", "expected_skill": "035"}
+{"intent": "신제품 나오는데 기브어웨이 어떻게 짜면 좋을까", "expected_skill": "035"}
+{"intent": "후기 모으는 이벤트 기획하고 당첨자 뽑는 것까지 정리해줘", "expected_skill": "035", "ambiguous_with": ["037"]}
+{"intent": "경품 이벤트 할 때 세금이랑 고지문구 뭐 챙겨야 해?", "expected_skill": "035", "ambiguous_with": ["099"]}
+{"intent": "댓글 참여 이벤트 문구랑 운영 순서 만들어줘", "expected_skill": "035"}
+{"intent": "이벤트 당첨자 발표하고 경품 보내는 절차 세워줘", "expected_skill": "035"}

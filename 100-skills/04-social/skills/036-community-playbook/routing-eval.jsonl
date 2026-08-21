@@ -1,0 +1,6 @@
+{"intent": "우리 브랜드 팬 커뮤니티 하나 열어보고 싶은데 어떻게 시작해", "expected_skill": "036"}
+{"intent": "디스코드 서버 채널 어떻게 나눠야 할지 설계해줘", "expected_skill": "036"}
+{"intent": "네이버 카페 운영 규칙이랑 등급 제도 세워줘", "expected_skill": "036", "ambiguous_with": ["076"]}
+{"intent": "신규 멤버가 들어오면 뭘 하게 해야 안 나갈까", "expected_skill": "036"}
+{"intent": "커뮤니티가 조용한데 활성화 룰 만들어줘", "expected_skill": "036", "ambiguous_with": ["032"]}
+{"intent": "수강생 전용 커뮤니티 구조랑 온보딩 짜줘", "expected_skill": "036"}

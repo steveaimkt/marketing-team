@@ -1,0 +1,6 @@
+{"intent": "다음 분기 마케팅 예산을 채널별로 어떻게 나눌지 계획 세워줘", "expected_skill": "095", "ambiguous_with": ["046"]}
+{"intent": "월 500만원으로 광고 예산 배분안 만들어줘", "expected_skill": "095"}
+{"intent": "목표 매출 기준으로 광고비 얼마나 필요한지 역산해줘", "expected_skill": "095", "ambiguous_with": ["069"]}
+{"intent": "내년 마케팅 비용 월별로 얼마 나가는지 시트로 정리해줘", "expected_skill": "095"}
+{"intent": "신규 채널 테스트 예산까지 포함해서 예산 플랜 짜줘", "expected_skill": "095"}
+{"intent": "다음 달부터 새로 시작하는 캠페인 예산 구조 잡아줘", "expected_skill": "095", "ambiguous_with": ["046"]}

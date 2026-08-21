@@ -1,0 +1,6 @@
+{"intent": "다음 달 뭘 언제 올릴지 한 판으로 정리해줘", "expected_skill": "021", "ambiguous_with": ["057"]}
+{"intent": "우리 채널들 발행 스케줄 좀 체계적으로 잡아줄래", "expected_skill": "021"}
+{"intent": "글감이 매번 고갈되는데 한 달치 주제 미리 뽑아서 배치해줘", "expected_skill": "021", "ambiguous_with": ["030"]}
+{"intent": "인스타랑 블로그 몇 개씩 올릴지 주간 단위로 편성해줘", "expected_skill": "021", "ambiguous_with": ["031"]}
+{"intent": "신제품 런칭 앞두고 콘텐츠 발행 타임라인 짜야 해", "expected_skill": "021", "ambiguous_with": ["018"]}
+{"intent": "키워드 리서치 결과 나온 걸로 이번 달 콘텐츠 일정에 반영해줘", "expected_skill": "021", "ambiguous_with": ["001"]}

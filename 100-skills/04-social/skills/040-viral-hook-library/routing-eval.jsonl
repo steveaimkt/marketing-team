@@ -1,0 +1,6 @@
+{"intent": "이 릴스 첫 3초가 약한데 세게 바꿔줘", "expected_skill": "040"}
+{"intent": "콘텐츠 도입부 후킹 문구 여러 개 뽑아줄래", "expected_skill": "040"}
+{"intent": "유튜브 오프닝 멘트 사람들 안 나가게 만들어줘", "expected_skill": "040", "ambiguous_with": ["024"]}
+{"intent": "글 첫 줄이 밋밋해서 스크롤을 못 멈추게 하고 싶어", "expected_skill": "040", "ambiguous_with": ["028"]}
+{"intent": "잘 터지는 훅 패턴으로 이 주제 10개 변형해줘", "expected_skill": "040"}
+{"intent": "광고 헤드라인으로 쓸 후킹 문장 후보 뽑아줘", "expected_skill": "040", "ambiguous_with": ["043"]}

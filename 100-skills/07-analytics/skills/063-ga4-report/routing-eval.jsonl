@@ -1,0 +1,6 @@
+{"intent": "우리 홈페이지 방문자가 어디서 오는지 분석해줘", "expected_skill": "063"}
+{"intent": "GA4 데이터 뽑아놨는데 이거 해석 좀 해줘", "expected_skill": "063"}
+{"intent": "전환이 왜 안 나오는지 애널리틱스로 원인 찾아줘", "expected_skill": "063", "ambiguous_with": ["048"]}
+{"intent": "채널별 유입이랑 전환까지 이어지는 흐름 정리해줘", "expected_skill": "063", "ambiguous_with": ["050"]}
+{"intent": "이벤트 수집이 제대로 되고 있는지 GA4 세팅 점검해줘", "expected_skill": "063"}
+{"intent": "사이트 들어온 사람들이 어느 페이지에서 나가는지 봐줘", "expected_skill": "063", "ambiguous_with": ["048"]}

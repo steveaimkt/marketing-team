@@ -1,0 +1,6 @@
+{"intent": "오늘 팀 회의 녹음본 정리해서 누가 뭘 할지 나눠줘", "expected_skill": "093", "ambiguous_with": ["086"]}
+{"intent": "회의에서 정한 것들 담당자랑 기한 붙여서 표로 만들어줘", "expected_skill": "093"}
+{"intent": "지난주 회의 때 미뤄둔 안건 뭐가 남았는지 확인해줘", "expected_skill": "093", "ambiguous_with": ["098"]}
+{"intent": "주간 회의 메모 요약하고 액션 아이템 뽑아줘", "expected_skill": "093", "ambiguous_with": ["086", "098"]}
+{"intent": "팀원별로 업무 나눈 거 정리 좀 해줘", "expected_skill": "093"}
+{"intent": "킥오프 회의 내용으로 역할 분담표 만들어줘", "expected_skill": "093"}

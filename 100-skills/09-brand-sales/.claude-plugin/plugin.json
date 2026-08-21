@@ -1,0 +1,15 @@
+{
+  "name": "marketing-skills-09-brand-sales",
+  "version": "1.3.0",
+  "description": "마케팅 100 스킬 OS · 브랜딩 & PR·세일즈 — 스토리·보도자료·제안서·피치덱·제휴 (081~090) — 스킬 10개 부분 설치 팩 (오케스트레이터 포함 전체는 marketing-100-skills 번들)",
+  "author": {
+    "name": "사용자 (이 회사)"
+  },
+  "keywords": [
+    "marketing",
+    "korean",
+    "claude-skills",
+    "09-brand-sales"
+  ],
+  "license": "MIT"
+}

@@ -1,0 +1,6 @@
+{"intent": "지난달 올린 콘텐츠들 뭐가 먹혔는지 정리해줘", "expected_skill": "030"}
+{"intent": "발행한 글이랑 영상 성과 비교해서 다음 달 방향 잡아줘", "expected_skill": "030", "ambiguous_with": ["021"]}
+{"intent": "우리 콘텐츠 중에 전환까지 이어진 건 어떤 거야", "expected_skill": "030"}
+{"intent": "월말인데 콘텐츠 성적표 한번 뽑아보자", "expected_skill": "030", "ambiguous_with": ["067"]}
+{"intent": "잘 된 콘텐츠 패턴 찾아서 다음 소재 추천해줘", "expected_skill": "030"}
+{"intent": "이번 분기 발행 콘텐츠 회고 자료 만들어서 다음 기획에 반영하자", "expected_skill": "030", "ambiguous_with": ["039", "098"]}
