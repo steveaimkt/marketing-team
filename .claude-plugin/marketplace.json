@@ -8,9 +8,9 @@
     {
       "name": "marketing-team",
       "source": "./plugins/marketing-team",
-      "description": "마케팅 스킬 100개를 바로 쓴다. 브랜드 정보를 채우면 100개를 우리 것 15~30개로 줄여 내 에이전트로 조립한다. 발행물은 독립 감사관을 거친다.",
+      "description": "스킬 100개를 갖춘 마케터를 세팅한다. 하고 싶은 일을 말하면 디렉터가 알맞은 스킬을 꺼내 쓰고, 결과를 파일로 남긴다.",
       "category": "productivity",
-      "version": "0.10.0",
+      "version": "0.11.0",
       "author": {
         "name": "WMBB"
       },

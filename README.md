@@ -56,7 +56,7 @@
 →  목록에 뜬 marketing-team 을 Install
 ```
 
-설치하면 **Skills 탭에 6개, Agents 탭에 2명**이 뜬다.
+설치하면 **Skills 탭에 3개, Agents 탭에 2명**이 뜬다.
 그다음 **`0-사용가이드`** 를 누른다.
 
 ### ② 클로드 코드 · Claude Code
