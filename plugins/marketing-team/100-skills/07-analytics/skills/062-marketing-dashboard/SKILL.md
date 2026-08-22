@@ -76,7 +76,10 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `<!doctype html>` + `charset=utf-8` 완전 문서 · **자체 완결**(CDN·외부 폰트 금지) · 아티팩트로 발행하지 않는다 (`docs/공통규약.md §H`)
 
-## Output Format
+## Output Format · **파일에 들어갈 내용**
+
+⛔ **아래는 `outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
+파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 마케팅 대시보드 — {기간} · [실데이터|샘플]
 파일: outputs/{날짜}/dashboard-{날짜}.html ({n}KB · 360px ✅ · 다크모드 ✅)

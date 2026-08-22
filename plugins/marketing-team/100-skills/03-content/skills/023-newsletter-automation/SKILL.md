@@ -67,7 +67,10 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `<!doctype html>` + `charset=utf-8` 완전 문서 · **자체 완결**(CDN·외부 폰트 금지) · 아티팩트로 발행하지 않는다 (`docs/공통규약.md §H`)
 
-## Output Format
+## Output Format · **파일에 들어갈 내용**
+
+⛔ **아래는 `outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
+파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 📧 뉴스레터 초안: {핵심 메시지}
 **요약 1줄**: {이번 호를 한 문장으로}

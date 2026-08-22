@@ -69,7 +69,10 @@ success_metrics: [자동응대 처리율, 오답률, 상담사 이관 정확도]
 > **함께 나오는 것** · 같은 폴더에 `knowledge_base/_index.md` 와 `knowledge_base/{카테고리}/{주제}.md`.
 > 주 산출물(`.md`)에 구축 결과·응대 정책·테스트 요약을 담고, 지식베이스는 그 아래 폴더로 둔다.
 
-## Output Format
+## Output Format · **파일에 들어갈 내용**
+
+⛔ **아래는 `outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag.md` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
+파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 🤖 CS 챗봇 구축: {브랜드} ({구축일})
 ## KB 구성
