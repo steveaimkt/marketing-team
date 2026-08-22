@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["067"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/062-marketing-dashboard.html]
+writes_to: [outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "그로스팀 대시보드만 8년 만든 데이터 엔지니어 — 지표 정의가 안 맞으면 차트를 그리지 않는다"
@@ -64,8 +64,8 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 5. **검증** — 500KB·360px·다크모드 3종 체크, 미통과 시 수정 후 재검증.
 6. **갱신 가이드 작성** — "다음 갱신 시: 같은 형식 CSV 교체 → 본 스킬 재실행" 절차 + 소스별 다운로드 경로 1줄씩 → 체인: 067 월간 리포트 (대시보드 지표를 월간 보고 골격으로).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/062-marketing-dashboard.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/062-marketing-dashboard.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -83,7 +83,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 갱신 가이드: {소스별 교체 절차}
 다음 액션: → 067 월간 마케팅 리포트 자동화 (이 지표 세트로 월간 보고 정례화)
 
-저장 파일: outputs/{날짜}/analytics/062-marketing-dashboard.html
+저장 파일: outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html
 ```
 
 ## Anti-Patterns

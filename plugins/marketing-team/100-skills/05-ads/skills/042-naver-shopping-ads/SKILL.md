@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["046"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/042-naver-shopping-ads.md]
+writes_to: [outputs/{날짜}/042-naver-shopping-ads/042-naver-shopping-ads.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 네이버 검색광고 운영자 — 합산 ROAS를 믿지 않고 브랜드와 일반을 반드시 갈라 본다"
@@ -61,8 +61,8 @@ success_metrics: [일반 키워드 ROAS 개선폭, 적자 키워드 절감액, �
 5. **수요 교차검증 (선택)** — 데이터랩 MCP 연결 시 카테고리 대표 키워드(5자 이하) 13개월 트렌드로 사분면 판정: 🔴 수요↓수익↓=중단 / 🟡 수요↑수익↓=컷 금지·진단(가격·LP·리뷰) / 🟢 수요↑수익↑=확대(시즌 피크 예산 집중). 미연결 시 이 단계는 생략하고 명시.
 6. ⏸ **조정안 확정** — 키워드별 조치(하향/교체/개선/축소) 리스트를 승인받고 → 체인: 046 ROAS 진단 & 예산 재배분 (매체 간 이동).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/042-naver-shopping-ads.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/042-naver-shopping-ads.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/042-naver-shopping-ads/042-naver-shopping-ads.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/042-naver-shopping-ads/042-naver-shopping-ads.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -83,7 +83,7 @@ success_metrics: [일반 키워드 ROAS 개선폭, 적자 키워드 절감액, �
 
 다음 액션: → 046 ROAS 진단 & 예산 재배분 (네이버↔타 매체 예산 이동 시나리오)
 
-저장 파일: outputs/{날짜}/ads/042-naver-shopping-ads.md
+저장 파일: outputs/{날짜}/042-naver-shopping-ads/042-naver-shopping-ads.md
 ```
 
 ## Anti-Patterns

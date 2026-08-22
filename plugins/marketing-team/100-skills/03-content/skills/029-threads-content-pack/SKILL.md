@@ -17,7 +17,7 @@ requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["027"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/content/029-threads-content-pack.md]
+writes_to: [outputs/{날짜}/029-threads-content-pack/029-threads-content-pack.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "스레드 팔로워 1만을 만든 연작 스토리텔러 — 편마다 첫 줄을 새로 쓴다"
@@ -60,8 +60,8 @@ success_metrics: [시리즈 완독률(5편 도달), 팔로워 증가 수, 시리
 7. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 게이트 결과 블록 부착 후에만 전달.
 8. **체인 제안** — 027 OSMU 멀티채널 변환기 (같은 코어를 링크드인·뉴스레터 버전으로).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/029-threads-content-pack.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/029-threads-content-pack.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/029-threads-content-pack/029-threads-content-pack.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/029-threads-content-pack/029-threads-content-pack.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -94,7 +94,7 @@ success_metrics: [시리즈 완독률(5편 도달), 팔로워 증가 수, 시리
 ## 다음 액션
 → 027 OSMU 멀티채널 변환기 (이 시리즈의 코어를 타 채널로)
 
-저장 파일: outputs/{날짜}/content/029-threads-content-pack.md
+저장 파일: outputs/{날짜}/029-threads-content-pack/029-threads-content-pack.md
 ```
 
 ## Anti-Patterns

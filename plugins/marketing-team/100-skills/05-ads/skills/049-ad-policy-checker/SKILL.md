@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["099"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/049-ad-policy-checker.md]
+writes_to: [outputs/{날짜}/049-ad-policy-checker/049-ad-policy-checker.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 광고 심의 검수자 — 반려 한 번이 집행 일주일보다 비싸다고 믿는다"
@@ -67,8 +67,8 @@ success_metrics: [광고 반려율 감소, 재심사 대기일 절감, 검수 �
 4. **판정·치환 로그** — 문장별 (원문 → 검출 사유 → 대체 표현) 로그 작성. ⛔ 검출 시 대체 불가 사유와 수정 방향 제시, 2회 연속 ⛔면 사용자 에스컬레이션.
 5. **체인 제안** — 표시광고법 외 법무 쟁점(개인정보·경품 고지 등) 발견 시 → 099 법무 기초 체커. 성과 판정이 필요한 소재는 041/042/045/046 계열로 (그쪽 판정 기준 = profile.md 손익분기 ROAS).
 
-6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/049-ad-policy-checker.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/049-ad-policy-checker.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/049-ad-policy-checker/049-ad-policy-checker.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/049-ad-policy-checker/049-ad-policy-checker.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -85,7 +85,7 @@ success_metrics: [광고 반려율 감소, 재심사 대기일 절감, 검수 �
 ※ 본 결과는 사전 검토 참고용이며 최종 판단은 각 매체 심의 기준을 따릅니다.
 다음 액션: → 099 법무 기초 체커 (표시광고법 외 법무 쟁점 정밀 점검)
 
-저장 파일: outputs/{날짜}/ads/049-ad-policy-checker.md
+저장 파일: outputs/{날짜}/049-ad-policy-checker/049-ad-policy-checker.md
 ```
 
 ## Anti-Patterns

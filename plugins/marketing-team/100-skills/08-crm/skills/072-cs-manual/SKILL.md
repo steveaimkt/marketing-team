@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["071"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/072-cs-manual.md]
+writes_to: [outputs/{날짜}/072-cs-manual/072-cs-manual.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "고객센터 슈퍼바이저 10년차 — 상담사가 3초 안에 못 찾는 매뉴얼은 없는 매뉴얼로 친다"
@@ -66,8 +66,8 @@ success_metrics: [건당 응대 시간 단축폭, 상담사 간 응대 품질 �
 - 스크립트 수정은 매뉴얼 버전을 올리고 변경 이력 1줄을 남긴다 (구버전 응대 혼용 방지).
 - 답글에는 출처·내부 문서명을 노출하지 않는다 (고객에게 보이는 채널이므로).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/072-cs-manual.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/072-cs-manual.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/072-cs-manual/072-cs-manual.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/072-cs-manual/072-cs-manual.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -92,7 +92,7 @@ success_metrics: [건당 응대 시간 단축폭, 상담사 간 응대 품질 �
 ## 다음 액션
 → 071 CS 챗봇 구축 (이 매뉴얼을 KB로 투입해 자동응대 확장)
 
-저장 파일: outputs/{날짜}/crm/072-cs-manual.md
+저장 파일: outputs/{날짜}/072-cs-manual/072-cs-manual.md
 ```
 
 ## Anti-Patterns

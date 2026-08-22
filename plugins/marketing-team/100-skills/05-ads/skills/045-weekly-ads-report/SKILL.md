@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["046"]
 gate: false
 mutating: true
-writes_to: [outputs/{날짜}/ads/045-weekly-ads-report.html, notion]
+writes_to: [outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html, notion]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "9년차 미디어 플래너 출신 리포팅 담당자 — 손으로 만드는 주간 보고서를 없애는 게 목표다"
@@ -62,8 +62,8 @@ success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대�
 6. **적재·발송** — Notion 아카이브 1행 (연결 시). ⏸ 외부 채널 발송·매주 자동 가동(cron)은 사용자 승인 후에만.
 7. **체인 제안** — BOTTOM 캠페인·매체 불균형 발견 시 → 046 ROAS 진단 & 예산 재배분.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/045-weekly-ads-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/045-weekly-ads-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -80,7 +80,7 @@ success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대�
 파일: outputs/{날짜}/weekly-ads-{날짜}.html · Notion 아카이브 {✅/미연결}
 다음 액션: → 046 ROAS 진단 & 예산 재배분 (BOTTOM 캠페인 예산 이동 시나리오)
 
-저장 파일: outputs/{날짜}/ads/045-weekly-ads-report.html
+저장 파일: outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html
 ```
 
 ## Anti-Patterns

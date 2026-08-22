@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["040"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/social/031-instagram-feed-planning.md]
+writes_to: [outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "팔로워 10만 계정 그리드를 설계해온 인스타그램 아트디렉터 — 낱장이 아니라 9칸 단위로 본다"
@@ -63,8 +63,8 @@ success_metrics: [프로필 방문 대비 팔로우 전환율, 게시물 저장�
 7. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP (오퍼·효능 표현, 대가성 표기 집중), 결과 블록 부착.
 8. **체인 제안** — 040 바이럴 훅 라이브러리 (첫 줄 훅이 약한 슬롯의 훅 10종 재생성).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/031-instagram-feed-planning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/031-instagram-feed-planning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -92,7 +92,7 @@ success_metrics: [프로필 방문 대비 팔로우 전환율, 게시물 저장�
 ## 다음 액션
 → 040 바이럴 훅 라이브러리 (훅 약한 슬롯 교체) · 발행 후 월말 030 성과 회고로 루프
 
-저장 파일: outputs/{날짜}/social/031-instagram-feed-planning.md
+저장 파일: outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md
 ```
 
 ## Anti-Patterns

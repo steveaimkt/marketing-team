@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["008", "070"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/007-survey-design.md]
+writes_to: [outputs/{날짜}/007-survey-design/007-survey-design.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "14년차 리서치 설계자 — 어느 가설도 검증하지 못하는 문항은 설계에서 지운다"
@@ -66,8 +66,8 @@ success_metrics: [가설-문항 매핑률 100%, 금지 룰 위반 문항 0건, �
 6. **세그먼트 교차 분석** — 인구통계·행동 축 × 본문 응답 교차표 작성. 세그먼트 간 차이가 큰 항목(10%p 이상)을 발견 사항으로 승격. 개방형 응답이 100건 이상이면 070 설문·NPS 응답 분석으로 위임 제안.
 7. **가설 판정 + 체인 제안** — 가설별 지지/기각/보류 + 근거 문항·수치. 008 타깃 페르소나 빌더 (세그먼트 → 페르소나) · 070 설문·NPS 응답 분석 (주관식 심화) 추천으로 마무리.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/007-survey-design.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/007-survey-design.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/007-survey-design/007-survey-design.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/007-survey-design/007-survey-design.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -94,7 +94,7 @@ success_metrics: [가설-문항 매핑률 100%, 금지 룰 위반 문항 0건, �
 ## 다음 액션
 → 008 타깃 페르소나 빌더 (차이 큰 세그먼트 → 페르소나) / 070 설문·NPS 응답 분석 (개방형 심화)
 
-저장 파일: outputs/{날짜}/research/007-survey-design.md
+저장 파일: outputs/{날짜}/007-survey-design/007-survey-design.md
 ```
 
 ## Anti-Patterns

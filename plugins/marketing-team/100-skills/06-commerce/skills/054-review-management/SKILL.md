@@ -18,7 +18,7 @@ requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["006", "079"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/054-review-management.md]
+writes_to: [outputs/{날짜}/054-review-management/054-review-management.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 CS 총괄 출신 리뷰 매니저 — 부정 리뷰 한 개를 광고비보다 무겁게 다룬다"
@@ -62,8 +62,8 @@ success_metrics: [리뷰 답변 처리 시간, 에스컬레이션 누락 건수,
 5. ⏸ **부정·위험 에스컬레이션** — 부정 리뷰는 "사실관계 확인 필요 항목 + 대응 방향 2안(사과·보상형 / 안내·해명형)"으로 정리해 사용자 판단을 받는다. 위험 리뷰는 답변 초안을 만들지 않고 대응 가이드만 제시한다.
 6. ⏸ **compliance-gate 통과** — gates/compliance-gate.md 3 STEP(룰 로드 → 전수 스캔 → 판정 리포트)을 실행하고, 게이트 결과 블록을 부착한 최종본만 전달한다. ⛔ 판정 답변은 전달하지 않는다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/054-review-management.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/054-review-management.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/054-review-management/054-review-management.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/054-review-management/054-review-management.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ success_metrics: [리뷰 답변 처리 시간, 에스컬레이션 누락 건수,
 
 다음 액션: 이번 리뷰 태그를 006 소비자 리뷰 마이닝에 넘기면 페인포인트 TOP 5가 나옵니다.
 
-저장 파일: outputs/{날짜}/commerce/054-review-management.md
+저장 파일: outputs/{날짜}/054-review-management/054-review-management.md
 ```
 
 ## Anti-Patterns

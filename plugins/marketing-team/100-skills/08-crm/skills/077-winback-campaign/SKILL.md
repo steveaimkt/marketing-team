@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074", "075"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/crm/077-winback-campaign.md]
+writes_to: [outputs/{날짜}/077-winback-campaign/077-winback-campaign.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "휴면 고객 재활성화 캠페인 9년차 — 전원 발송은 예산 낭비, 돌아올 고객부터 고른다"
@@ -62,8 +62,8 @@ success_metrics: [휴면 복귀율, 윈백 캠페인 ROI, 오퍼 비용 회수�
 6. **compliance-gate 검사** — 카피 전수 스캔, 게이트 결과 블록 부착.
 7. ⏸ **캠페인 확정** — 대상 세그먼트·시퀀스·오퍼를 사용자가 승인 → 074 이메일 시퀀스 빌더(발송 실행)·075 카카오 알림톡·친구톡 설계(카톡 채널 병행)로 핸드오프.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/077-winback-campaign.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/077-winback-campaign.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/077-winback-campaign/077-winback-campaign.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/077-winback-campaign/077-winback-campaign.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [휴면 복귀율, 윈백 캠페인 ROI, 오퍼 비용 회수�
 ### ⑤ 캠페인 확정 ⏸
 다음 액션: 확정안을 074 이메일 시퀀스 빌더로 발송 실행하고, 오퍼 단계는 075 알림톡·친구톡으로 병행하세요.
 
-저장 파일: outputs/{날짜}/crm/077-winback-campaign.md
+저장 파일: outputs/{날짜}/077-winback-campaign/077-winback-campaign.md
 ```
 
 ## Anti-Patterns

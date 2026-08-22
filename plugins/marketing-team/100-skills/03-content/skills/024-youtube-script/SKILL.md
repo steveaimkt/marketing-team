@@ -17,7 +17,7 @@ requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["025", "026"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/content/024-youtube-script.md]
+writes_to: [outputs/{날짜}/024-youtube-script/024-youtube-script.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "구독 10만 채널을 키운 영상 스크립트 작가 — 결과물을 먼저 못 보여주는 오프닝은 버린다"
@@ -58,8 +58,8 @@ success_metrics: [대본 작성 시간, 인트로 30초 시청 유지율, 평균
 7. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행 (과장 성과·보장성 표현 집중 스캔), 게이트 결과 블록 부착.
 8. **체인 제안** — 025 썸네일·제목 A/B (HOOK 소재 전달) → 026 쇼츠/릴스 대본 팩 (이 스크립트가 롱폼 원본).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/024-youtube-script.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/024-youtube-script.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/024-youtube-script/024-youtube-script.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/024-youtube-script/024-youtube-script.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -92,7 +92,7 @@ success_metrics: [대본 작성 시간, 인트로 30초 시청 유지율, 평균
 ## 다음 액션
 → 025 썸네일·제목 A/B → 026 쇼츠/릴스 대본 팩 (이 스크립트를 숏폼 5개로)
 
-저장 파일: outputs/{날짜}/content/024-youtube-script.md
+저장 파일: outputs/{날짜}/024-youtube-script/024-youtube-script.md
 ```
 
 ## Anti-Patterns

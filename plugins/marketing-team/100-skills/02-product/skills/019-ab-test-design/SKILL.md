@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["047"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/019-ab-test-design.md]
+writes_to: [outputs/{날짜}/019-ab-test-design/019-ab-test-design.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 실험 설계 데이터 사이언티스트 — 표본수 계산 없이는 테스트를 시작하지 않는다"
@@ -62,8 +62,8 @@ success_metrics: [표본수 공식 대입값 공개율, 단일 변수 준수율 
 7. ⏸ **설계서 승인** — 설계서 1페이지를 보여주고 사용자가 시작일과 함께 확정한다.
 8. **산출 + 체인 제안** — 테스트 종료 후 047 광고 소재 A/B 판독기 (결과 데이터 → 통계 판정). 설계서를 047 입력으로 그대로 전달한다.
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/019-ab-test-design.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/019-ab-test-design.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/019-ab-test-design/019-ab-test-design.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/019-ab-test-design/019-ab-test-design.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -93,7 +93,7 @@ success_metrics: [표본수 공식 대입값 공개율, 단일 변수 준수율 
 ## 다음 액션
 → 테스트 종료 후 047 A/B 판독기 (이 설계서 + 결과 데이터로 판정)
 
-저장 파일: outputs/{날짜}/product/019-ab-test-design.md
+저장 파일: outputs/{날짜}/019-ab-test-design/019-ab-test-design.md
 ```
 
 ## Anti-Patterns

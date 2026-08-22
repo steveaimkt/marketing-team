@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["053", "042"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/commerce/055-smartstore-audit.md]
+writes_to: [outputs/{날짜}/055-smartstore-audit/055-smartstore-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "13년차 스마트스토어 성장 컨설턴트 — 부진 원인을 유입·전환·재구매 셋 중 하나로 반드시 짚는다"
@@ -56,8 +56,8 @@ success_metrics: [병목 지표 개선폭, 2주 액션 실행률, 진단 소요 
 5. **병목 특정** — 3축 점수표(각 5점 만점)를 만들고 최저 축을 병목으로 판정, 근거 수치 2개 이상 인용.
 6. **액션 목록** — 병목 축 개선 액션을 2주 실행 가능 순으로 3~5개, 각 액션에 스킬 연결. 다음: 노출 병목이면 053, 광고 유입 병목이면 042.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/055-smartstore-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/055-smartstore-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/055-smartstore-audit/055-smartstore-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/055-smartstore-audit/055-smartstore-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -84,7 +84,7 @@ success_metrics: [병목 지표 개선폭, 2주 액션 실행률, 진단 소요 
 
 다음 액션: 병목이 노출이면 053 상품명·검색 최적화, 광고 유입이면 042 네이버 쇼핑검색광고 최적화로 이어가세요.
 
-저장 파일: outputs/{날짜}/commerce/055-smartstore-audit.md
+저장 파일: outputs/{날짜}/055-smartstore-audit/055-smartstore-audit.md
 ```
 
 ## Anti-Patterns

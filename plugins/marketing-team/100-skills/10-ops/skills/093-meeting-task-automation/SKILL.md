@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["098"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/093-meeting-task-automation.md]
+writes_to: [outputs/{날짜}/093-meeting-task-automation/093-meeting-task-automation.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "PMO에서 회의를 실행으로 바꿔온 프로젝트 매니저 — 담당자와 기한 없는 액션 아이템은 할 일로 인정하지 않는다"
@@ -56,8 +56,8 @@ success_metrics: [회의록 정리 시간, 액션 아이템 완료율, 미결 �
 5. ⏸ **미정 항목 확정** — 담당·기한 미정 태스크와 `[추정]` 항목을 모아 사용자 확정을 받는다. 확정분을 반영해 최종본 산출.
 6. **체인 제안** — 배분표를 098 주간 업무 회고 & 플래닝의 다음 주 우선순위 입력으로 연결. 회의가 신규 인력 온보딩 관련이면 097 병행 제안.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/093-meeting-task-automation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/093-meeting-task-automation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/093-meeting-task-automation/093-meeting-task-automation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/093-meeting-task-automation/093-meeting-task-automation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -82,7 +82,7 @@ success_metrics: [회의록 정리 시간, 액션 아이템 완료율, 미결 �
 
 다음 액션: → 098 주간 업무 회고 & 플래닝 (이번 배분을 다음 주 우선순위에 반영)
 
-저장 파일: outputs/{날짜}/ops/093-meeting-task-automation.md
+저장 파일: outputs/{날짜}/093-meeting-task-automation/093-meeting-task-automation.md
 ```
 
 ## Anti-Patterns
@@ -106,4 +106,4 @@ success_metrics: [회의록 정리 시간, 액션 아이템 완료율, 미결 �
 - **프로젝트 킥오프**: 킥오프 회의의 결정·역할 분담을 1호 회의록으로 만들어 두면 이후 회의마다 미결 추적표가 자동 대조 기준이 된다.
 - **회의 문화 교정**: 이월 ⚠️ 2회 항목을 다음 회의 첫 안건으로 올리는 규칙만으로 "말만 하고 안 하는" 항목이 드러난다 — 추적표가 곧 실행 압력.
 
-> 참고 — 회의록 아카이브 규칙: 산출물을 `outputs/{날짜}/meeting/` 에 저장하면 다음 회의의 "이전 회의록" 입력으로 그대로 쓸 수 있다 (미결 추적의 연료).
+> 참고 — 회의록 아카이브 규칙: 산출물을 `outputs/{날짜}/093-meeting-task-automation/` 에 저장하면 다음 회의의 "이전 회의록" 입력으로 그대로 쓸 수 있다 (미결 추적의 연료).

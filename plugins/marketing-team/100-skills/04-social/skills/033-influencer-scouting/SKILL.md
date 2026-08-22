@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["034"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/social/033-influencer-scouting.csv]
+writes_to: [outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "가짜 팔로워에 데어본 인플루언서 마케팅 리드 — 팔로워 수가 아니라 진성도로 줄 세운다"
@@ -63,8 +63,8 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 5. **예산 매칭** — 규모 구간별 추정 단가 × 예산으로 조합안 2개(소수 정예형 vs 나노 분산형)를 만들고 CPE 추정을 병기한다.
 6. **TOP 5 확정 → 034 체인** — 합계 순 TOP 5 + 1순위 컨택 시 확인할 질문 3개(최근 인사이트 캡처·경쟁사 협업 여부·2차 활용 가능 여부) 제시.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/033-influencer-scouting.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/033-influencer-scouting.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -87,7 +87,7 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 ## 다음 액션
 → 034 인플루언서 계약·브리프 (1순위 협업 조건·브리프 확정)
 
-저장 파일: outputs/{날짜}/social/033-influencer-scouting.csv
+저장 파일: outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv
 ```
 
 ## Anti-Patterns

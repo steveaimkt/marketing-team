@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["072"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/058-shipping-cs-policy.md]
+writes_to: [outputs/{날짜}/058-shipping-cs-policy/058-shipping-cs-policy.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 이커머스 CS 정책 설계자 — 분쟁은 문구 한 줄에서 시작된다고 믿는다"
@@ -56,8 +56,8 @@ success_metrics: [CS 분쟁 건수 감소, 정책 작성 시간, 법정 기준 �
 5. **위치별 고지 문구 세트** — ① 상세페이지 하단(법정 필수 고지 + 반품 기준 요약) ② FAQ(케이스별 Q&A 문체) ③ 주문/배송 안내(출고·도착 기한, 배송비).
 6. ⏸ **게이트 검사 → 전달** — "환불 절대 불가"류 위법 표현 스캔 후 전달. 다음: 072 CS 응대 매뉴얼 빌더로 상담 스크립트화.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/058-shipping-cs-policy.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/058-shipping-cs-policy.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/058-shipping-cs-policy/058-shipping-cs-policy.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/058-shipping-cs-policy/058-shipping-cs-policy.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -88,7 +88,7 @@ success_metrics: [CS 분쟁 건수 감소, 정책 작성 시간, 법정 기준 �
 
 다음 액션: 이 정책 기준표를 072 CS 응대 매뉴얼 빌더에 넘기면 상담 스크립트가 나옵니다.
 
-저장 파일: outputs/{날짜}/commerce/058-shipping-cs-policy.md
+저장 파일: outputs/{날짜}/058-shipping-cs-policy/058-shipping-cs-policy.md
 ```
 
 ## Anti-Patterns

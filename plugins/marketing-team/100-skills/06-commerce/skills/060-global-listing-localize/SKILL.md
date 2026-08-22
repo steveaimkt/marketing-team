@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["051"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/060-global-listing-localize.md]
+writes_to: [outputs/{날짜}/060-global-listing-localize/060-global-listing-localize.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 글로벌 커머스 로컬라이저 — 직역된 리스팅을 현지화라고 부르지 않는다"
@@ -73,8 +73,8 @@ success_metrics: [현지화 작업 시간, 규격·단위 오류 건수, 해외 
 5. **카피 현지화** — 섹션별 재구성 작성 + 결정 로그(원문→변환문→[재구성/직역/삭제]+사유). 날짜·주소·고객센터 표기도 마켓 관행으로 (MM/DD/YYYY, 현지 반품 정책 문구).
 6. ⏸ **규제 게이트** — 마켓 규제 사전으로 gates/compliance-gate.md 검사 (US: 의약적 효능·whitening류 표현 / JP: 약기법 효능 56개 범위 외 표현) → 치환 로그 부착 후 전달. 리워드: 마켓 등록은 사용자가 셀러센트럴에서 수동 실행.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/060-global-listing-localize.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/060-global-listing-localize.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/060-global-listing-localize/060-global-listing-localize.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/060-global-listing-localize/060-global-listing-localize.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -90,7 +90,7 @@ success_metrics: [현지화 작업 시간, 규격·단위 오류 건수, 해외 
 
 다음 액션: 원본 리뉴얼이 먼저 필요하면 → 051 상세페이지 24섹션 빌더 / 등록 후 상품명 튜닝은 053 상품명·검색 최적화
 
-저장 파일: outputs/{날짜}/commerce/060-global-listing-localize.md
+저장 파일: outputs/{날짜}/060-global-listing-localize/060-global-listing-localize.md
 ```
 
 ## Anti-Patterns

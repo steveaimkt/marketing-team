@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["016"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/commerce/057-promo-calendar.csv]
+writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "9년차 프로모션 MD — 실마진 계산 없는 행사 참여를 도박이라 부른다"
@@ -63,8 +63,8 @@ success_metrics: [행사 실마진율, 역마진 딜 차단 건수, 기획 소�
 5. **딜 기획안** — 확정 행사별: 대상 상품·행사가·할인 구조(쿠폰/즉시할인)·목표 판매량(재고 소요 공식)·손익 시뮬레이션.
 6. **D-day 타임라인** — 행사일 역산: D-21 신청/제안 → D-14 재고 발주(리드타임 반영) → D-7 소재·상세 배너 → D-3 가격·쿠폰 세팅 → D-day 모니터링. 다음: 016 번들·프로모션 설계로 객단가 구성 보강.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/057-promo-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/057-promo-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ D-21 신청 → D-14 재고 발주 → D-7 소재 → D-3 가격·쿠폰 세팅 
 
 다음 액션: 016 번들·프로모션 설계로 행사용 번들을 짜면 객단가까지 잡을 수 있습니다.
 
-저장 파일: outputs/{날짜}/commerce/057-promo-calendar.csv
+저장 파일: outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv
 ```
 
 ## Anti-Patterns

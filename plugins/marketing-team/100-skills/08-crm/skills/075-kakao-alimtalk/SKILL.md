@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/crm/075-kakao-alimtalk.md]
+writes_to: [outputs/{날짜}/075-kakao-alimtalk/075-kakao-alimtalk.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "알림톡 심사 반려 수백 건을 복구해본 메시징 운영자 — 심사 기준에 안 맞는 문구는 애초에 쓰지 않는다"
@@ -65,8 +65,8 @@ success_metrics: [템플릿 심사 통과율, 발송 클릭률, 템플릿 제작
 6. ⏸ **템플릿 확정** — 사용자 승인 후 최종본 인도. 등록·심사 제출은 카카오 비즈니스 콘솔에서 사람이 진행 (심사 1~3영업일 안내).
 7. **체인 제안** — 074 이메일 시퀀스 빌더 (같은 시나리오를 이메일 채널과 결합해 멀티채널 시퀀스로).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/075-kakao-alimtalk.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/075-kakao-alimtalk.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/075-kakao-alimtalk/075-kakao-alimtalk.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/075-kakao-alimtalk/075-kakao-alimtalk.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -93,7 +93,7 @@ success_metrics: [템플릿 심사 통과율, 발송 클릭률, 템플릿 제작
 
 다음 액션: 확정 템플릿을 074 이메일 시퀀스 빌더와 결합해 카톡+이메일 멀티채널 시퀀스로 확장할 수 있습니다.
 
-저장 파일: outputs/{날짜}/crm/075-kakao-alimtalk.md
+저장 파일: outputs/{날짜}/075-kakao-alimtalk/075-kakao-alimtalk.md
 ```
 
 ## Anti-Patterns

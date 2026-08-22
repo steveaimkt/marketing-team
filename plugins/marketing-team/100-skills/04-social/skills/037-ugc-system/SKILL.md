@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["027"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/social/037-ugc-system.md]
+writes_to: [outputs/{날짜}/037-ugc-system/037-ugc-system.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "UGC 권리 분쟁 0건을 지켜온 콘텐츠 라이츠 매니저 — 동의 대장 없는 리그램은 하지 않는다"
@@ -69,8 +69,8 @@ success_metrics: [동의 확보 UGC 건수, 재활용 콘텐츠 산출 수, 권�
 6. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP (대가성 표기·후기 조작 오인 표현 집중), 결과 블록 부착.
 7. **체인 제안** — 027 OSMU 멀티채널 변환기 (동의 확보된 UGC TOP 건을 채널별 포맷으로 일괄 변환).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/037-ugc-system.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/037-ugc-system.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/037-ugc-system/037-ugc-system.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/037-ugc-system/037-ugc-system.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -100,7 +100,7 @@ success_metrics: [동의 확보 UGC 건수, 재활용 콘텐츠 산출 수, 권�
 ## 다음 액션
 → 027 OSMU 멀티채널 변환기 (동의 완료 UGC를 채널별 포맷으로) · ⏸ 광고 사용 건은 정식 동의 회수 후
 
-저장 파일: outputs/{날짜}/social/037-ugc-system.md
+저장 파일: outputs/{날짜}/037-ugc-system/037-ugc-system.md
 ```
 
 ## Anti-Patterns

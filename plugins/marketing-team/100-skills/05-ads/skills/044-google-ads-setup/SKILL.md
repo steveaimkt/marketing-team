@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["045"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/044-google-ads-setup.md]
+writes_to: [outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 구글 애즈 컨설턴트 — 전환 추적 없는 캠페인은 시작조차 안 시킨다"
@@ -72,8 +72,8 @@ success_metrics: [세팅 소요 시간, 초기 낭비 지출 절감액, 품질�
 6. **타깃팅·전환 추적 체크리스트** — 위치(대한민국·"현재 위치" 설정), 언어(한국어+영어 병기 주의), 잠재고객 세그먼트(관찰 모드로 시작), 기기·광고 일정, 콘텐츠 제외(앱 지면), GA4 연동·향상된 전환·리마케팅 태그. 각 항목 ☐ 체크박스로 제공.
 7. ⏸ **세팅안 확정** — 설계안 승인 후 마무리 → 체인: 집행 2주 후 045 광고 주간 리포트로 성과 점검 루프 시작.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/044-google-ads-setup.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/044-google-ads-setup.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -88,7 +88,7 @@ success_metrics: [세팅 소요 시간, 초기 낭비 지출 절감액, 품질�
 
 다음 액션: → 집행 2주 후 045 광고 주간 리포트 자동화 (검색어 리포트로 제외 키워드 갱신)
 
-저장 파일: outputs/{날짜}/ads/044-google-ads-setup.md
+저장 파일: outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md
 ```
 
 ## Anti-Patterns

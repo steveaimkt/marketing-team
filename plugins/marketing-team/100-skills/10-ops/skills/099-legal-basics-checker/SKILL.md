@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/compliance.md]
 chains_to: ["049"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/099-legal-basics-checker.md]
+writes_to: [outputs/{날짜}/099-legal-basics-checker/099-legal-basics-checker.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "마케팅 법무 검토를 전담해온 컴플라이언스 심사역 — 애매하면 통과가 아니라 전문가 확인으로 넘긴다"
@@ -56,8 +56,8 @@ success_metrics: [위반 사전 적발 건수, 점검 소요 시간, 공개 후 
 5. **판정 리포트** — 항목별 3단 판정표 + ⛔·⚠️ 건마다 {현재 상태 → 근거 → 수정안}. ⛔ 존재 시 수정안 반영본 기준 재점검 1회 (게이트의 재시도 루프 계승).
 6. ⏸ **확정·체인** — 수정안 채택 여부를 사용자가 결정. ⛔ 잔존 상태로 집행 강행은 전문가 확인을 조건으로 권고. 이후 광고 소재 제작·집행 단계면 049 체인.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/099-legal-basics-checker.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/099-legal-basics-checker.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/099-legal-basics-checker/099-legal-basics-checker.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/099-legal-basics-checker/099-legal-basics-checker.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -79,7 +79,7 @@ success_metrics: [위반 사전 적발 건수, 점검 소요 시간, 공개 후 
 
 다음 액션: → 049 광고 정책·심의 체커 (광고 소재 집행 전 매체별 심의 점검)
 
-저장 파일: outputs/{날짜}/ops/099-legal-basics-checker.md
+저장 파일: outputs/{날짜}/099-legal-basics-checker/099-legal-basics-checker.md
 ```
 
 ## Anti-Patterns

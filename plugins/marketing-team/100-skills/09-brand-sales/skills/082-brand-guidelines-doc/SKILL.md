@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["081"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/082-brand-guidelines-doc.md]
+writes_to: [outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 브랜드 디자인 디렉터 — 규정집에 해석의 여지가 남으면 외주 사고가 난다고 믿고 허용/금지를 끝까지 명문화한다"
@@ -62,8 +62,8 @@ success_metrics: [가이드 문서화 소요 시간, 외주 리젝 왕복 횟수
 5. ⏸ **tone.md 전체 갱신 승인** — 어휘 사전·문체 규칙·채널 변주 갱신안을 diff로 제시 → 승인 시 반영. 원페이지와 tone.md가 서로 어긋나지 않는지 교차 검증 (단일 진실 소스는 tone.md).
 6. **배포 안내·체인** — 외주·협업 전달 시나리오별 사용법 1줄씩 (디자인 외주 = 원페이지+로고 파일 / 카피 외주 = 원페이지+tone.md) → 체인: 081 브랜드 스토리·미션 빌더 (서사가 비었거나 낡았으면 세트 완성).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/082-brand-guidelines-doc.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/082-brand-guidelines-doc.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -84,7 +84,7 @@ success_metrics: [가이드 문서화 소요 시간, 외주 리젝 왕복 횟수
 
 다음 액션: → 081 브랜드 스토리·미션 빌더 (서사·미션이 비어 있다면 — 규정의 "왜"를 채우는 세트)
 
-저장 파일: outputs/{날짜}/brand-sales/082-brand-guidelines-doc.md
+저장 파일: outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md
 ```
 
 ## Anti-Patterns

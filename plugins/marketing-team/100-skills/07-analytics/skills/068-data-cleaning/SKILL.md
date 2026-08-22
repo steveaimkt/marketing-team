@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["061"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/068-data-cleaning.csv]
+writes_to: [outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "금융권 데이터 품질관리 9년차 엔지니어 — 원본은 절대 건드리지 않고 변경은 전수 기록한다"
@@ -68,8 +68,8 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 5. **사후 검증** — 처리 전후 행 수·합계(매출 등 핵심 열) 대조표 제시 — 합계가 변했다면 원인(제거된 행)을 명시.
 6. **산출·체인** — 정리본 + 로그 + 품질 요약 전달 → 061 판매 데이터 분석 (정리본 즉시 투입). Sheets 모드면 새 탭에 정리본 기록 제안 (원본 탭 불변).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/068-data-cleaning.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/068-data-cleaning.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 파일: {원본명}_cleaned.{ext} + cleaning-log.md (원본 불변)
 다음 액션: → 061 판매 데이터 분석 (정리본으로 즉시 분석 시작)
 
-저장 파일: outputs/{날짜}/analytics/068-data-cleaning.csv
+저장 파일: outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv
 ```
 
 ## Anti-Patterns

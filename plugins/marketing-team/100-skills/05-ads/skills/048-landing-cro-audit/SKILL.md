@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["019", "051"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/048-landing-cro-audit.md]
+writes_to: [outputs/{날짜}/048-landing-cro-audit/048-landing-cro-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "13년차 CRO 컨설턴트 — 트래픽 탓하기 전에 첫 화면부터 뜯어본다"
@@ -70,8 +70,8 @@ success_metrics: [전환율 개선폭, 이탈률 감소폭, 진단 소요 시간
 5. **우선순위 처방** — 임팩트(상/중/하) × 난이도(카피 수정<섹션 추가<구조 개편)로 TOP 5 선정. 첫 화면 축 결함은 무조건 1순위 후보 (이탈 대부분이 첫 화면에서 발생).
 6. ⏸ **처방 확정** — TOP 5 승인 후 분기: 개선안 검증은 019 A/B 테스트 설계로, 결손 12섹션+ 전면 재구축은 051로.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/048-landing-cro-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/048-landing-cro-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/048-landing-cro-audit/048-landing-cro-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/048-landing-cro-audit/048-landing-cro-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -86,7 +86,7 @@ success_metrics: [전환율 개선폭, 이탈률 감소폭, 진단 소요 시간
 
 다음 액션: → 019 A/B 테스트 설계 (처방 1번 검증) / 051 상세페이지 24섹션 빌더 (결손 12+ 전면 재구축)
 
-저장 파일: outputs/{날짜}/ads/048-landing-cro-audit.md
+저장 파일: outputs/{날짜}/048-landing-cro-audit/048-landing-cro-audit.md
 ```
 
 ## Anti-Patterns

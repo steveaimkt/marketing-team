@@ -18,7 +18,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["038", "089"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/social/032-comment-dm-assistant.md]
+writes_to: [outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "위기 대응까지 겪어본 8년차 소셜 CS 매니저 — 답변은 화난 1명이 아니라 지켜보는 100명에게 쓴다"
@@ -74,8 +74,8 @@ success_metrics: [건당 응대 초안 작성 시간, 위기 건 검출·에스�
 5. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP (리뷰 답변도 대외 발행물), 결과 블록 부착.
 6. ⏸ **발송 승인 + 패턴 기록** — 초안 일괄 검토 후 사용자가 채널에 수동 게시. 반복 문의 주제는 기록해 038 소셜 리스닝 테마와 대조 제안.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/032-comment-dm-assistant.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/032-comment-dm-assistant.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -100,7 +100,7 @@ success_metrics: [건당 응대 초안 작성 시간, 위기 건 검출·에스�
 ## 다음 액션
 ⏸ 초안 승인 후 수동 게시 → 반복 테마는 038 소셜 리스닝 리포트로 · 위기 카드는 089 위기 플랜으로
 
-저장 파일: outputs/{날짜}/social/032-comment-dm-assistant.md
+저장 파일: outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md
 ```
 
 ## Anti-Patterns

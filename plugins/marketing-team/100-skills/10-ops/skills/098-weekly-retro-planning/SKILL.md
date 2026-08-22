@@ -17,7 +17,7 @@ requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["095"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/098-weekly-retro-planning.md]
+writes_to: [outputs/{날짜}/098-weekly-retro-planning/098-weekly-retro-planning.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "스프린트 회고를 수년간 운영해온 애자일 코치 — 반성문이 아니라 다음 주 우선순위 3개가 나와야 회고로 인정한다"
@@ -56,8 +56,8 @@ success_metrics: [주간 회고 소요 시간, 우선순위 TOP 3 완수율, 이
 5. ⏸ **다음 주 TOP 3 확정** — 이월 확정분 + 신규 후보에서 효과 기준(091 매트릭스의 효과 축 재사용: 빈도×영향)으로 TOP 3를 제안하고 사용자 확정. 각 항목에 완료 기준 1줄.
 6. **환류·체인** — 루틴 드리프트 감지 시 my-playbook §3 갱신안 제시. 월말 주간이면 095 예산 플래너(다음 달 예산 점검) 체인, 콘텐츠 성과를 깊이 파야 하면 030 핸드오프.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/098-weekly-retro-planning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/098-weekly-retro-planning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/098-weekly-retro-planning/098-weekly-retro-planning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/098-weekly-retro-planning/098-weekly-retro-planning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -84,7 +84,7 @@ success_metrics: [주간 회고 소요 시간, 우선순위 TOP 3 완수율, 이
 
 다음 액션: → 095 마케팅 예산 플래너 (월말 주간 — 다음 달 예산 점검) / 030 콘텐츠 성과 회고 (콘텐츠 지표 심층 분석)
 
-저장 파일: outputs/{날짜}/ops/098-weekly-retro-planning.md
+저장 파일: outputs/{날짜}/098-weekly-retro-planning/098-weekly-retro-planning.md
 ```
 
 ## Anti-Patterns

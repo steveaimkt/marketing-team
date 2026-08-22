@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["012", "043"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/008-persona-builder.md]
+writes_to: [outputs/{날짜}/008-persona-builder/008-persona-builder.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "9년차 고객 인사이트 플래너 — 데이터에 없는 인물은 만들지 않는다"
@@ -66,8 +66,8 @@ success_metrics: [근거 표기 항목 비율, 페르소나 3~5종 도출, 페�
 - 구매 데이터 CSV (재구매 주기·객단가·옵션 선택 패턴)
 - 설문 응답 (007 세그먼트 교차표) · 인터뷰 녹취·요약 (080)
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/008-persona-builder.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/008-persona-builder.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/008-persona-builder/008-persona-builder.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/008-persona-builder/008-persona-builder.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -92,7 +92,7 @@ success_metrics: [근거 표기 항목 비율, 페르소나 3~5종 도출, 페�
 ## 다음 액션
 → 012 USP·가치제안 정의 (JTBD → 가치제안문) / 043 메타 광고 소재 카피 팩 (페르소나별 오디언스 소재)
 
-저장 파일: outputs/{날짜}/research/008-persona-builder.md
+저장 파일: outputs/{날짜}/008-persona-builder/008-persona-builder.md
 ```
 
 ## Anti-Patterns

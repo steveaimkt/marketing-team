@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["026", "043"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/social/040-viral-hook-library.md]
+writes_to: [outputs/{날짜}/040-viral-hook-library/040-viral-hook-library.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "훅 하나로 조회수 10배 차이를 만들어본 카피 디렉터 — 본문이 못 갚는 훅은 폐기한다"
@@ -69,8 +69,8 @@ success_metrics: [훅 산출 개수(10종), 첫 3초 유지율·첫 줄 완독�
 6. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP (효능 과장·최상급 표현 근거 검사 포함), 결과 블록 부착.
 7. **TOP 3 추천 → 체인** — 채널 적합도 기준 TOP 3 + 선택 훅으로 026 쇼츠 대본 또는 043 광고 카피 확장 제안.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/040-viral-hook-library.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/040-viral-hook-library.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/040-viral-hook-library/040-viral-hook-library.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/040-viral-hook-library/040-viral-hook-library.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -95,7 +95,7 @@ success_metrics: [훅 산출 개수(10종), 첫 3초 유지율·첫 줄 완독�
 ## 다음 액션
 → 026 쇼츠/릴스 대본 팩 (TOP 1 훅으로 대본 전개) · 043 메타 광고 소재 카피 팩 (훅을 광고 헤드라인으로)
 
-저장 파일: outputs/{날짜}/social/040-viral-hook-library.md
+저장 파일: outputs/{날짜}/040-viral-hook-library/040-viral-hook-library.md
 ```
 
 ## Anti-Patterns

@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["051"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/053-listing-seo.md]
+writes_to: [outputs/{날짜}/053-listing-seo/053-listing-seo.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 커머스 검색 최적화 전문가 — 검색량 없는 예쁜 상품명은 장식이라 본다"
@@ -61,8 +61,8 @@ success_metrics: [검색 유입 증가율, 타깃 키워드 노출 순위, 세�
 5. **태그·카테고리 세팅** — 태그는 보조 키워드에서 상품명 미사용분으로 채우고, 카테고리는 대표 키워드의 상위 노출 상품들이 속한 카테고리와 일치시킨다.
 6. ⏸ **게이트 검사 → 전달** — 금지·과장 표현 스캔 후 전달. 다음: 051 상세페이지 24섹션 빌더로 본문 제작.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/053-listing-seo.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/053-listing-seo.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/053-listing-seo/053-listing-seo.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/053-listing-seo/053-listing-seo.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -92,7 +92,7 @@ success_metrics: [검색 유입 증가율, 타깃 키워드 노출 순위, 세�
 
 다음 액션: 051 상세페이지 24섹션 빌더로 본문까지 만들면 등록 세트가 완성됩니다.
 
-저장 파일: outputs/{날짜}/commerce/053-listing-seo.md
+저장 파일: outputs/{날짜}/053-listing-seo/053-listing-seo.md
 ```
 
 ## Anti-Patterns

@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["084"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/085-sales-deck.pptx]
+writes_to: [outputs/{날짜}/085-sales-deck/085-sales-deck.pptx]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "발표장에서 계약을 닫아온 세일즈 덱 코치 — 슬라이드 제목만 읽어도 결론이 서지 않으면 덱을 엎는다"
@@ -60,8 +60,8 @@ success_metrics: [미팅 후 다음 단계 전환율, 덱 제작 시간, 핵심 
 5. **1분 요약 버전** — 엘리베이터 상황용으로 표지+결론+CTA 3장 요약 세트를 덧붙인다.
 6. ⏸ **compliance-gate 통과** — 성과 수치·비교 주장·최상급 표현 검사 후 판정 블록을 부착한 최종본만 전달한다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/085-sales-deck.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/085-sales-deck.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/085-sales-deck/085-sales-deck.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/085-sales-deck/085-sales-deck.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -86,7 +86,7 @@ success_metrics: [미팅 후 다음 단계 전환율, 덱 제작 시간, 핵심 
 
 다음 액션: 084 제안서 자동 생성으로 서면 제출본을 만들 수 있습니다 (미팅 후 문서 요청 대응).
 
-저장 파일: outputs/{날짜}/brand-sales/085-sales-deck.pptx
+저장 파일: outputs/{날짜}/085-sales-deck/085-sales-deck.pptx
 ```
 
 ## Anti-Patterns

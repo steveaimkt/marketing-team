@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["054"]
 gate: true
 mutating: true
-writes_to: [outputs/{날짜}/crm/079-review-request-automation.md, email]
+writes_to: [outputs/{날짜}/079-review-request-automation/079-review-request-automation.md, email]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "리뷰 전환 설계 8년차 CRM 운영자 — 대가성 표기 없는 인센티브 요청은 발송을 막는다"
@@ -63,8 +63,8 @@ success_metrics: [리뷰 작성 전환율, 발송 대비 리뷰 건수, 요청 �
 6. **발송·로그** — 이메일 도구 연결 시 초안 생성(기본), 미연결 시 채널별 복붙 패키지 인도. 발송/인도 내역 로그 1행 기록. (카톡 채널 병행은 075 규격 참조.)
 7. **체인 제안** — 054 리뷰 관리 시스템 (수집된 리뷰의 감정 분류·답변 초안·에스컬레이션).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/079-review-request-automation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/079-review-request-automation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/079-review-request-automation/079-review-request-automation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/079-review-request-automation/079-review-request-automation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -88,7 +88,7 @@ success_metrics: [리뷰 작성 전환율, 발송 대비 리뷰 건수, 요청 �
 ### ④ 발송 승인 ⏸ → 승인 시: 초안 {n}통 생성 + 발송 로그 기록
 다음 액션: 수집된 리뷰는 054 리뷰 관리 시스템으로 분류·답변·에스컬레이션하세요.
 
-저장 파일: outputs/{날짜}/crm/079-review-request-automation.md
+저장 파일: outputs/{날짜}/079-review-request-automation/079-review-request-automation.md
 ```
 
 ## Anti-Patterns

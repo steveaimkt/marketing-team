@@ -17,7 +17,7 @@ requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/content/023-newsletter-automation.html]
+writes_to: [outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "오픈율 40%대를 유지해온 이메일 마케터 — CTA는 한 통에 하나뿐이다"
@@ -59,8 +59,8 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 6. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 산출물 하단에 게이트 결과 블록 부착. ⛔ 차단이면 수정·재통과 전 전달 금지.
 7. **체인 제안** — 074 이메일 시퀀스 빌더 (발송은 그쪽의 ⏸ HITL 승인 영역).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/023-newsletter-automation.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/023-newsletter-automation.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -91,7 +91,7 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 ## 다음 액션
 → 074 이메일 시퀀스 빌더 (승인 후 발송·아카이브)
 
-저장 파일: outputs/{날짜}/content/023-newsletter-automation.html
+저장 파일: outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html
 ```
 
 ## Anti-Patterns

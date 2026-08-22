@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["078"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/020-backlog-prioritization.csv]
+writes_to: [outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 프로덕트 오너 — 목소리 큰 요청도 RICE 산식 앞에 똑같이 줄 세운다"
@@ -62,8 +62,8 @@ success_metrics: [요소별 근거 병기 항목 비율, 중복 병합 건수, �
 7. ⏸ **백로그 확정** — 표를 보여주고 사용자가 전략적 조정(순위 강제 변경 시 사유 기록)과 함께 확정한다.
 8. **산출 + 체인 제안** — 078 VoC 취합·분류 시스템 (다음 분기 VoC를 백로그로 잇는 상시 루프 구축).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/020-backlog-prioritization.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/020-backlog-prioritization.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -90,7 +90,7 @@ success_metrics: [요소별 근거 병기 항목 비율, 중복 병합 건수, �
 ## 다음 액션
 → 078 VoC 취합·분류 시스템 (분기 VoC → 백로그 자동 연결 루프)
 
-저장 파일: outputs/{날짜}/product/020-backlog-prioritization.csv
+저장 파일: outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv
 ```
 
 ## Anti-Patterns

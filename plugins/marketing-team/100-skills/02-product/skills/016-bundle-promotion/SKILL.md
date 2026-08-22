@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["057"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/016-bundle-promotion.md]
+writes_to: [outputs/{날짜}/016-bundle-promotion/016-bundle-promotion.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 프로모션 기획 MD — 할인율이 아니라 실마진 하한에서 역산해 딜을 짠다"
@@ -57,8 +57,8 @@ success_metrics: [번들 실마진율, 객단가 상승률, 저회전 재고 소
 7. ⏸ **추천 확정** — 3안 비교표 + 추천 1안(목표 객단가와 마진 정책 기준 근거)을 제시하고 사용자가 확정한다.
 8. **산출 + 체인 제안** — 057 프로모션 캘린더 & 행사 대응 (확정 번들을 행사 슬롯에 배치, D-day 타임라인).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/016-bundle-promotion.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/016-bundle-promotion.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/016-bundle-promotion/016-bundle-promotion.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/016-bundle-promotion/016-bundle-promotion.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -84,7 +84,7 @@ success_metrics: [번들 실마진율, 객단가 상승률, 저회전 재고 소
 ## 다음 액션
 → 057 프로모션 캘린더 (A안을 5월 가정의 달 슬롯 배치 + D-day 타임라인)
 
-저장 파일: outputs/{날짜}/product/016-bundle-promotion.md
+저장 파일: outputs/{날짜}/016-bundle-promotion/016-bundle-promotion.md
 ```
 
 ## Anti-Patterns

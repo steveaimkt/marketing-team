@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["096"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/094-outsourcing-brief.md]
+writes_to: [outputs/{날짜}/094-outsourcing-brief/094-outsourcing-brief.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "발주와 검수 양쪽을 다 겪은 프로덕션 디렉터 — 브리프에 검수 기준이 없으면 발주 자체를 보류시킨다"
@@ -61,8 +61,8 @@ success_metrics: [수정 왕복 횟수, 브리프 작성 시간, 일정 내 납�
 4. **검수 기준표 작성** — 산출물별 합격 조건을 검증 가능한 문장으로: "고급스럽게" (✗) → "인쇄 시 300dpi, 로고 최소 여백 규정 준수, 오탈자 0건" (✓). 검수 회차(1차 시안/최종)별 확인 항목 분리.
 5. ⏸ **발주 전 체크** — 브리프 완성본과 체크리스트(5대 축 ✓ / 불포함 명시 ✓ / 귀속 조항 ✓ / 예산-범위 정합 ✓)를 제시하고 사용자가 확정한다. 확정 후 096(견적 비교) 체인을 제안 — 같은 브리프를 복수 업체에 보내야 견적이 비교 가능해진다.
 
-6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/094-outsourcing-brief.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/094-outsourcing-brief.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/094-outsourcing-brief/094-outsourcing-brief.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/094-outsourcing-brief/094-outsourcing-brief.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ success_metrics: [수정 왕복 횟수, 브리프 작성 시간, 일정 내 납�
 
 다음 액션: 096 경쟁 입찰·견적 비교기 — 이 브리프로 2~3개 업체 견적을 받아 비교하세요.
 
-저장 파일: outputs/{날짜}/ops/094-outsourcing-brief.md
+저장 파일: outputs/{날짜}/094-outsourcing-brief/094-outsourcing-brief.md
 ```
 
 ## Anti-Patterns

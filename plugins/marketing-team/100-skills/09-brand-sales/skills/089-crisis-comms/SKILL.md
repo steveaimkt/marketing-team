@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["032", "083"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/089-crisis-comms.md]
+writes_to: [outputs/{날짜}/089-crisis-comms/089-crisis-comms.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "기업 위기관리 상황실을 지켜온 커뮤니케이션 참모 — 확인 안 된 사실 위에 사과문을 쓰는 것을 최악의 2차 사고로 본다"
@@ -55,8 +55,8 @@ success_metrics: [초동 대응 문구 완성 시간, 사실관계 오류 건수
 5. ⏸ **compliance-gate 통과** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP + §6 금기 검사 + (법적 유형) `[변호사 검토 필수]` 플래그 확인. 판정 블록 부착본만 전달.
 6. **사후 체계·체인** — 위기 키워드 목록(이번 이슈에서 도출)을 032 댓글·DM 응대 어시스턴트의 위기 키워드 감지 사전에 등록 제안 → 주 체인: 032 (일상 응대 감시 체계로 전환) · 083 보도자료 (L3 진화 후 공식 입장·개선 발표).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/089-crisis-comms.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/089-crisis-comms.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/089-crisis-comms/089-crisis-comms.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/089-crisis-comms/089-crisis-comms.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -79,7 +79,7 @@ L3/법적? ─ {예 → 에스컬레이션 라인: 대표 승인·변호사}
 
 다음 액션: → 032 댓글·DM 응대 (위기 키워드 {n}개 감지 사전 등록) / 083 보도자료 (진화 후 공식 입장 발표)
 
-저장 파일: outputs/{날짜}/brand-sales/089-crisis-comms.md
+저장 파일: outputs/{날짜}/089-crisis-comms/089-crisis-comms.md
 ```
 
 ## Anti-Patterns

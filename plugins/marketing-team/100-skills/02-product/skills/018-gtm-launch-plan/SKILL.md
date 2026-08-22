@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["021", "083"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/018-gtm-launch-plan.md]
+writes_to: [outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 런칭 PM — 출시일 하루가 아니라 D-30부터 D+30까지 60일을 관리한다"
@@ -57,8 +57,8 @@ success_metrics: [기한·담당 부착 태스크 비율 100%, 플랜 수립 소
 7. ⏸ **플랜 확정** — 타임라인·RACI를 보여주고 사용자가 일정·담당을 조정 확정한다.
 8. **산출 + 체인 제안** — 021 콘텐츠 캘린더 빌더 (D-14~D+30 콘텐츠 태스크 상세화) · 083 보도자료 작성 (PR 트랙 실행).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/018-gtm-launch-plan.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/018-gtm-launch-plan.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -92,7 +92,7 @@ success_metrics: [기한·담당 부착 태스크 비율 100%, 플랜 수립 소
 ## 다음 액션
 → 021 콘텐츠 캘린더 (D-14~D+30 콘텐츠 상세화) / 083 보도자료 작성 (D-7 배포 준비)
 
-저장 파일: outputs/{날짜}/product/018-gtm-launch-plan.md
+저장 파일: outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md
 ```
 
 ## Anti-Patterns

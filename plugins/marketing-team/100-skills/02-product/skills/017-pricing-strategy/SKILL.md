@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["016"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/017-pricing-strategy.md]
+writes_to: [outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "14년차 CFO 출신 프라이싱 컨설턴트 — VAT 한 줄이 틀리면 시나리오 전체를 다시 짠다"
@@ -59,8 +59,8 @@ success_metrics: [원가 항목 분해 완성도, 시나리오 3안 손익분기
 8. ⏸ **추천 확정** — 비교표 + 추천 1안(브랜드 전략 정합 근거) 제시, 사용자 확정.
 9. **산출 + 체인 제안** — 016 번들·프로모션 설계 (확정 정가 기준 행사·번들 여지 설계).
 
-10. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/017-pricing-strategy.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/017-pricing-strategy.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+10. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -90,7 +90,7 @@ success_metrics: [원가 항목 분해 완성도, 시나리오 3안 손익분기
 ## 다음 액션
 → 016 번들·프로모션 설계 (정가 확정 후 행사·번들 여지 설계)
 
-저장 파일: outputs/{날짜}/product/017-pricing-strategy.md
+저장 파일: outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md
 ```
 
 ## Anti-Patterns

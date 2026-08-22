@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["084"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/090-award-application.md]
+writes_to: [outputs/{날짜}/090-award-application/090-award-application.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "정부지원·어워드 심사위원석에 앉아본 지원서 전략가 — 배점표를 역산하지 않은 초안은 초안으로 치지 않는다"
@@ -57,8 +57,8 @@ success_metrics: [심사 통과율, 서류 작성 시간, 평가 기준 커버�
 6. **분량 검사** — 항목별 글자수 카운트 → 제한 초과 시 삭제 우선순위(선정 논리 태깅 없는 문장부터)로 압축, 미달 시 증빙 기반 보강 후보 제시.
 7. ⏸ **compliance-gate 통과** — 과장·허위 소지 표현("국내 유일", "보장") 전수 검사 + 증빙 없는 주장 잔존 여부 확인. 판정 블록 부착본만 전달 → 체인: 084 제안서 자동 생성 (같은 선정 논리·증빙으로 B2B 제안서 파생).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/090-award-application.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/090-award-application.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/090-award-application/090-award-application.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/090-award-application/090-award-application.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -84,7 +84,7 @@ success_metrics: [심사 통과율, 서류 작성 시간, 평가 기준 커버�
 
 다음 액션: → 084 제안서 자동 생성 (같은 선정 논리·증빙 자산으로 B2B 제안서 파생)
 
-저장 파일: outputs/{날짜}/brand-sales/090-award-application.md
+저장 파일: outputs/{날짜}/090-award-application/090-award-application.md
 ```
 
 ## Anti-Patterns

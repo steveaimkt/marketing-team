@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["017"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/009-price-positioning-map.csv]
+writes_to: [outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 프라이싱 애널리스트 — 정가가 아니라 실구매가와 단위가격으로만 비교한다"
@@ -69,8 +69,8 @@ success_metrics: [가격 정규화 완료 제품 수, 갭 발견 건수(최대 3
 | 리뷰 규모 | 20 | min(20, log10(리뷰수+1) × 5) — 규모 격차의 왜곡 방지 |
 | 스펙·구성 | 20 | 카테고리 핵심 속성 5개 충족률 × 20 (체크리스트 공개) |
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/009-price-positioning-map.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/009-price-positioning-map.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -94,7 +94,7 @@ success_metrics: [가격 정규화 완료 제품 수, 갭 발견 건수(최대 3
 ## 다음 액션
 → 017 가격 전략 설계 (갭·자사 판정 기반 가격 시나리오 3안)
 
-저장 파일: outputs/{날짜}/research/009-price-positioning-map.csv
+저장 파일: outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv
 ```
 
 ## Anti-Patterns

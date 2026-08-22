@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["078"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/070-nps-analysis.md]
+writes_to: [outputs/{날짜}/070-nps-analysis/070-nps-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "VoC 텍스트 분석 8년차 리서처 — 점수보다 비추천 사유 문장을 먼저 읽는다"
@@ -61,8 +61,8 @@ success_metrics: [응답 분석 소요 시간, 비추천 사유 규명률, 불�
 5. **그룹별 사유 분석** — ① 비추천: 이탈 사유 TOP 3 (개선 시급) ② 중립: "9점이 되려면 뭐가 필요한가" 갭 테마 ③ 추천: 추천 이유 = 소구점 후보 (043·051 카피 재료로 표기).
 6. **후속 플로우·체인** — 비추천 응답 중 CS 시급 건(환불·분쟁 소지)은 에스컬레이션 목록으로 분리 ⏸ → 주 체인: 078 VoC 취합·분류 시스템 (테마를 개선 백로그로 연결). 보조: 불만 고객 개별 후속 아웃리치는 079 리뷰·후기 요청 자동화의 후속 플로우 응용, 설문 재설계는 007.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/070-nps-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/070-nps-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/070-nps-analysis/070-nps-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/070-nps-analysis/070-nps-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -86,7 +86,7 @@ success_metrics: [응답 분석 소요 시간, 비추천 사유 규명률, 불�
 
 다음 액션: → 078 VoC 취합·분류 시스템 (테마 → 개선 백로그 연결) · 보조: 079 (불만 고객 후속 아웃리치) / 007 (다음 설문 재설계)
 
-저장 파일: outputs/{날짜}/analytics/070-nps-analysis.md
+저장 파일: outputs/{날짜}/070-nps-analysis/070-nps-analysis.md
 ```
 
 ## Anti-Patterns

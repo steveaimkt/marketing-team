@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["046", "069"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/095-budget-planner.csv]
+writes_to: [outputs/{날짜}/095-budget-planner/095-budget-planner.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CFO 앞에서 마케팅 예산을 방어해온 퍼포먼스 전략가 — 산식 없는 배분안은 숫자가 아니라 희망사항으로 취급한다"
@@ -56,8 +56,8 @@ success_metrics: [예산 대비 집행 오차율, 플랜 수립 시간, 목표 �
 5. ⏸ **배분안 확정** — 배분표·캐시플로·가정 목록을 제시하고 사용자 확정을 받는다. 조정 요청은 산식의 가중치·목표값 변경으로 반영 (수치 임의 수정 금지).
 6. **체인 제안** — 확정안을 069 예측 시뮬레이션으로 넘겨 변수(전환율·CPC) 변동 시나리오 검증. 집행 후 4주 데이터가 쌓이면 046 ROAS 진단 & 재배분으로 플랜 대비 실적을 교정.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/095-budget-planner.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/095-budget-planner.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/095-budget-planner/095-budget-planner.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/095-budget-planner/095-budget-planner.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -82,7 +82,7 @@ success_metrics: [예산 대비 집행 오차율, 플랜 수립 시간, 목표 �
 
 다음 액션: → 069 예측 시뮬레이션 (배분안 변수 검증) / 046 ROAS 진단 & 재배분 (집행 4주 후 교정)
 
-저장 파일: outputs/{날짜}/ops/095-budget-planner.csv
+저장 파일: outputs/{날짜}/095-budget-planner/095-budget-planner.csv
 ```
 
 ## Anti-Patterns

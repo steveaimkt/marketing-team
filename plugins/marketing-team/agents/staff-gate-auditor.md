@@ -83,7 +83,10 @@ tools: Read, Glob, Grep, Write
 
 ## 착지
 
-- 판정 리포트 : `outputs/{YYYY-MM-DD}/gate/{대상}.md`
+- 판정 리포트 : **검사한 산출물과 같은 폴더 안**에 `gate.md` 로 남긴다.
+  예 · 대상이 `outputs/2026-08-22/043-meta-ad-copy/043-meta-ad-copy.md` 면
+  판정은 `outputs/2026-08-22/043-meta-ad-copy/gate.md` 다.
+  **한 실행의 결과는 한자리에 모인다.** 재감사면 `gate-2.md`.
 - 결과는 `logs/build-log.md` 해당 행의 `게이트` 열에 ✅/⚠️/⛔ 로 기록한다.
 - ⛔ 차단도 원장에 남긴다 — 산출물 열은 「차단됨」. 누적 카운터에는 넣지 않는다.
 

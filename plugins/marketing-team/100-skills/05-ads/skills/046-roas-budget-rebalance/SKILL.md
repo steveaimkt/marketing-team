@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["043", "095"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/046-roas-budget-rebalance.md]
+writes_to: [outputs/{날짜}/046-roas-budget-rebalance/046-roas-budget-rebalance.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "15년차 미디어믹스 전략가 — 감이 아니라 한계 ROAS로 예산을 옮긴다"
@@ -68,8 +68,8 @@ success_metrics: [통합 ROAS 개선폭, 저효율 채널 절감액, 의사결�
 6. ⏸ **추천안 확정** — 1개 안을 근거와 함께 추천하고 사용자 선택을 받는다. 실행은 각 매체 관리자에서 수동.
 7. **체인 제안** — 🔴 채널의 소재 병목이면 043 메타 광고 소재 카피 팩, 월 단위 예산 전체 설계는 095 마케팅 예산 플래너.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/046-roas-budget-rebalance.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/046-roas-budget-rebalance.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/046-roas-budget-rebalance/046-roas-budget-rebalance.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/046-roas-budget-rebalance/046-roas-budget-rebalance.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -86,7 +86,7 @@ success_metrics: [통합 ROAS 개선폭, 저효율 채널 절감액, 의사결�
 
 다음 액션: → 043 소재 카피 팩 (🔴 채널 소재 교체) / 095 마케팅 예산 플래너 (월 예산 전체 재설계)
 
-저장 파일: outputs/{날짜}/ads/046-roas-budget-rebalance.md
+저장 파일: outputs/{날짜}/046-roas-budget-rebalance/046-roas-budget-rebalance.md
 ```
 
 ## Anti-Patterns

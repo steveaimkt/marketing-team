@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["065", "077"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/064-cohort-retention.csv]
+writes_to: [outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "구독 서비스 리텐션만 10년 판 그로스 분석가 — 평균은 버리고 꺾임 지점만 본다"
@@ -55,8 +55,8 @@ success_metrics: [재구매율 개선폭, 이탈 시점 식별 리드타임, 코
 5. **코호트 간 비교** — 최근 코호트 vs 과거 코호트의 동일 경과월 유지율 비교 → 개선/악화 추세 판정 + 원인 가설(획득 채널 변화·프로모션 유입 품질·제품 변경).
 6. ⏸ **개입 대상 확정** — "꺾임 직전 시점의 고객"을 개입 타겟으로 제안하고 사용자 선택을 받은 뒤 체인 핸드오프: 065 RFM 분석(타겟을 세그먼트로 정밀화) · 077 윈백 캠페인(이미 꺾인 코호트 재활성).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/064-cohort-retention.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/064-cohort-retention.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -78,7 +78,7 @@ success_metrics: [재구매율 개선폭, 이탈 시점 식별 리드타임, 코
 - 개입 시점: 첫 구매 후 {k}차월 (꺾임 직전) · 대상 {n}명/월
 다음 액션: → 065 고객 세그먼트 RFM 분석 (개입 대상 정밀화) / 077 이탈 방지 윈백 캠페인 (이미 이탈한 코호트 재활성)
 
-저장 파일: outputs/{날짜}/analytics/064-cohort-retention.csv
+저장 파일: outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv
 ```
 
 ## Anti-Patterns

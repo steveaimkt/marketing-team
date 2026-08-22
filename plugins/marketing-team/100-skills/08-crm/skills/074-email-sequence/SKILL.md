@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["077"]
 gate: true
 mutating: true
-writes_to: [outputs/{날짜}/crm/074-email-sequence.md, email, notion]
+writes_to: [outputs/{날짜}/074-email-sequence/074-email-sequence.md, email, notion]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "라이프사이클 이메일만 11년 설계한 CRM 마케터 — 안 열린 메일은 안 보낸 메일로 계산한다"
@@ -65,8 +65,8 @@ success_metrics: [시퀀스 발송 전환율, 오픈율·클릭률, 수신거부
 7. **발송·아카이브** — 이메일 도구 연결 시 초안 생성(기본: 사람이 최종 클릭), 미연결 시 ESP 복붙 패키지로 인도. 완전 자동 실발송은 검증된 정기 시퀀스에만 (신규·일회성은 초안+사람 확인). 발송/인도 내역을 아카이브에 1행 기록.
 8. **체인 제안** — 077 이탈 방지 윈백 캠페인 (재구매 시퀀스에도 반응 없는 고객을 윈백으로 이관).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/074-email-sequence.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/074-email-sequence.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/074-email-sequence/074-email-sequence.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/074-email-sequence/074-email-sequence.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [시퀀스 발송 전환율, 오픈율·클릭률, 수신거부
 ### ③ 발송 승인 ⏸  → 승인 시: 초안 {n}통 생성 · 아카이브 {n}행 기록
 다음 액션: 재구매 시퀀스 무반응 고객은 077 이탈 방지 윈백 캠페인으로 이관하세요.
 
-저장 파일: outputs/{날짜}/crm/074-email-sequence.md
+저장 파일: outputs/{날짜}/074-email-sequence/074-email-sequence.md
 ```
 
 ## Anti-Patterns

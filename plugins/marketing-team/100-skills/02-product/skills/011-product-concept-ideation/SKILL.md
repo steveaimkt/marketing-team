@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["012"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/011-product-concept-ideation.md]
+writes_to: [outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 신사업 프로듀서 — 갭에서 출발하지 않은 아이디어는 아이디어로 인정하지 않는다"
@@ -62,8 +62,8 @@ success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·폐기 �
 7. ⏸ **컨셉 선택** — 스코어표를 보여주고 사용자가 진행할 컨셉 1~2개를 확정한다.
 8. **산출 + 체인 제안** — 012 USP·가치제안 정의 (선택 컨셉의 6단 가치제안문 작성).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/011-product-concept-ideation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/011-product-concept-ideation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -91,7 +91,7 @@ success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·폐기 �
 ## 다음 액션
 → 012 USP·가치제안 정의 (선택 컨셉의 6단 가치제안문) / 검증 실험이 필요하면 019 A/B 테스트 설계
 
-저장 파일: outputs/{날짜}/product/011-product-concept-ideation.md
+저장 파일: outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md
 ```
 
 ## Anti-Patterns

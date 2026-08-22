@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["053"]
 gate: false
 mutating: true
-writes_to: [outputs/{날짜}/commerce/052-detail-page-figma.html, figma]
+writes_to: [outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html, figma]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "8년차 이커머스 UI 디자이너 — 기획서와 시안이 어긋나는 순간을 못 참는다"
@@ -57,8 +57,8 @@ success_metrics: [시안 제작 시간 단축, 기획-시안 불일치 건수, �
 5. **Figma 반영** — Figma MCP(채널 연결 확인 → 프레임 생성 → 텍스트·플레이스홀더 배치) 순차 실행. **MCP 미연결 시**: 같은 매핑 JSON으로 셀프컨테인드 HTML 시안을 생성해 폴백.
 6. **검수 안내** — 이미지 교체 위치 목록 + 텍스트 오버플로 체크포인트 전달. 다음: 053 상품명·검색 최적화로 리스팅 마무리.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/052-detail-page-figma.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/052-detail-page-figma.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -85,7 +85,7 @@ brand_main: {#hex} · accent: {#hex} · 배경: #111111/#1A1A1A · 서브텍스�
 
 다음 액션: 053 상품명·검색 최적화로 리스팅(상품명·태그)까지 마치면 등록 준비 완료입니다.
 
-저장 파일: outputs/{날짜}/commerce/052-detail-page-figma.html
+저장 파일: outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html
 ```
 
 ## Anti-Patterns

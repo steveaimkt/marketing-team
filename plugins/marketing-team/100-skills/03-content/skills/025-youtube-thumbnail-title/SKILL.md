@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["024"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/content/025-youtube-thumbnail-title.md]
+writes_to: [outputs/{날짜}/025-youtube-thumbnail-title/025-youtube-thumbnail-title.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CTR 10%를 넘겨본 유튜브 그로스 PD — 본문이 못 갚는 제목은 채택하지 않는다"
@@ -72,8 +72,8 @@ success_metrics: [썸네일 CTR, 제목 후보 산출 개수(10안), 후보 제�
 7. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP (과장 수치·보장성 표현 집중 스캔), 결과 블록 부착.
 8. **체인 제안** — 024 YouTube 스크립트 (제목이 먼저 확정됐으면 그 약속을 갚는 스크립트 역산 제작).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/025-youtube-thumbnail-title.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/025-youtube-thumbnail-title.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/025-youtube-thumbnail-title/025-youtube-thumbnail-title.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/025-youtube-thumbnail-title/025-youtube-thumbnail-title.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -101,7 +101,7 @@ success_metrics: [썸네일 CTR, 제목 후보 산출 개수(10안), 후보 제�
 ## 다음 액션
 → 024 YouTube 스크립트 (TOP 1 제목의 약속을 HOOK에서 30초 안에 갚도록 역산)
 
-저장 파일: outputs/{날짜}/content/025-youtube-thumbnail-title.md
+저장 파일: outputs/{날짜}/025-youtube-thumbnail-title/025-youtube-thumbnail-title.md
 ```
 
 ## Anti-Patterns

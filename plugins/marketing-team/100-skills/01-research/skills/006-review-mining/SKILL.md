@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["008", "012"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/006-review-mining.csv]
+writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 VoC 분석가 — 고객의 문장을 각색하지 않고 그대로 옮긴다"
@@ -69,8 +69,8 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 TOP 5 도출
 - CS 문의 (메일 라벨 내보내기 등)
 - 상품 상세 URL (스크랩 가능 시)
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/006-review-mining.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/006-review-mining.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/006-review-mining/006-review-mining.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/006-review-mining/006-review-mining.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -94,7 +94,7 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 TOP 5 도출
 → 008 타깃 페르소나 빌더 (페인포인트·구매동기 → 페르소나 정의) / 012 USP·가치제안 정의 (긍정 클러스터 → 소구점)
 · 보조: 051 상세페이지 24섹션 빌더 (페인포인트 → 섹션 메시지)
 
-저장 파일: outputs/{날짜}/research/006-review-mining.csv
+저장 파일: outputs/{날짜}/006-review-mining/006-review-mining.csv
 ```
 
 ## Anti-Patterns

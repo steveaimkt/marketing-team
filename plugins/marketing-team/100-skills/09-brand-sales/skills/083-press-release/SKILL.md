@@ -18,7 +18,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["028"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/083-press-release.md]
+writes_to: [outputs/{날짜}/083-press-release/083-press-release.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "일간지 데스크 출신 홍보 전문가 — 자랑을 뉴스로 착각하지 않고, 기자가 3초 안에 앵글을 잡도록 쓴다"
@@ -66,8 +66,8 @@ success_metrics: [기사화 성사율, 보도자료 작성 시간, 피칭 메일
 5. **배포 리스트 + 피칭 메일** — 업종·앵글 기준으로 매체 카테고리별 배포 리스트(전문지·경제지·지역지·뉴스와이어 등 8~12곳 골격)와 기자 피칭 메일 1통(제목 2안)을 작성한다. 실제 발송은 사용자가 직접.
 6. ⏸ **compliance-gate 통과** — gates/compliance-gate.md 3 STEP 실행. "국내 최초" "1위" 등 최상급 표현은 근거 자료 확보 여부를 확인하고, 게이트 결과 블록을 부착한 최종본만 전달한다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/083-press-release.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/083-press-release.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/083-press-release/083-press-release.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/083-press-release/083-press-release.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -99,7 +99,7 @@ _{서브헤드}_
 
 다음 액션: 028 링크드인 포스트 빌더로 이 소식을 링크드인 포스트로 전환할 수 있습니다 (보조: 027 OSMU 멀티채널 변환기 — 블로그·뉴스레터 동시 변형).
 
-저장 파일: outputs/{날짜}/brand-sales/083-press-release.md
+저장 파일: outputs/{날짜}/083-press-release/083-press-release.md
 ```
 
 ## Anti-Patterns

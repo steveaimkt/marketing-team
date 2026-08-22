@@ -18,7 +18,7 @@ requires: [brand/profile.md, brand/tone.md]
 chains_to: ["022", "027"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/content/021-content-calendar.csv]
+writes_to: [outputs/{날짜}/021-content-calendar/021-content-calendar.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 콘텐츠 전략 디렉터 — 근거를 못 대는 글감은 캘린더에 올리지 않는다"
@@ -61,8 +61,8 @@ success_metrics: [캘린더 작성 시간, 슬롯 발행 이행률, 퍼널 3단�
 5. **슬롯 배치** — 날짜×채널 매트릭스에 주제 배치. 슬롯마다 기획 근거(어느 입력에서 왔나)와 실행 스킬(022/024/026/028/029) 매핑.
 6. **주차별 플랜 + 체인 제안** — 주차 단위 제작 순서 정리 → 022 블로그 SEO 아티클(글감 실행) 또는 027 OSMU(1소스 다채널 확산).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/021-content-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/021-content-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/021-content-calendar/021-content-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/021-content-calendar/021-content-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -90,7 +90,7 @@ IG {7} + Blog {4} + LinkedIn {4} + Threads {8} + NL {2} = {25} ✅ (캐파 일�
 ## 다음 액션
 → 022 블로그 SEO 아티클 (키워드 근거 슬롯부터 집필) · 027 OSMU 멀티채널 변환기 (앵커 콘텐츠 확산)
 
-저장 파일: outputs/{날짜}/content/021-content-calendar.csv
+저장 파일: outputs/{날짜}/021-content-calendar/021-content-calendar.csv
 ```
 
 ## Anti-Patterns

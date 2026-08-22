@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["085", "096"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/084-proposal-generator.pptx]
+writes_to: [outputs/{날짜}/084-proposal-generator/084-proposal-generator.pptx]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "수주율로 평가받아온 제안 전문가 — 고객 문제보다 자기 자랑이 먼저 나오면 처음부터 다시 쓴다"
@@ -72,8 +72,8 @@ success_metrics: [수주율, 제안서 작성 시간, RFP 요구사항 반영률
    > 디자인 도구가 연결돼 있지 않으면 **여기서 실패로 처리하지 않는다.** 8단계의 발주문을 그대로 화면에 내고
    > *"디자인 도구를 연결하면 이 문장으로 바로 슬라이드가 나옵니다"* 를 붙인다 (`mcp-setup/` 참조). 문서 산출물은 이미 완성돼 있다.
 
-10. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/084-proposal-generator.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/084-proposal-generator.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+10. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/084-proposal-generator/084-proposal-generator.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/084-proposal-generator/084-proposal-generator.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -116,7 +116,7 @@ success_metrics: [수주율, 제안서 작성 시간, RFP 요구사항 반영률
 
 다음 액션: 085 세일즈 덱 빌더로 발표 시나리오·스피커 노트 붙이기 (보조: 096 경쟁 입찰·견적 비교기 — 경쟁 입찰 대응 시).
 
-저장 파일: outputs/{날짜}/brand-sales/084-proposal-generator.pptx
+저장 파일: outputs/{날짜}/084-proposal-generator/084-proposal-generator.pptx
 ```
 
 ## Anti-Patterns

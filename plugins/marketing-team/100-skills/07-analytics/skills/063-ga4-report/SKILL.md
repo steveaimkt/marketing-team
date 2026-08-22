@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["048", "050"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/063-ga4-report.html]
+writes_to: [outputs/{날짜}/063-ga4-report/063-ga4-report.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "GA4 전환 세팅 감사만 300회 한 웹 분석 컨설턴트 — 세팅 오류부터 잡고 해석은 그 다음이다"
@@ -62,8 +62,8 @@ success_metrics: [세팅 오류 검출 건수, 전환율 개선폭, 리포트 �
 6. **3단 전환 경로** — 핵심 이벤트 퍼널(예: 세션→상품 조회→장바구니→구매) 단계별 이탈률. 최대 이탈 구간 1곳을 "개입 지점"으로 지목하고 원인 가설을 붙인다.
 7. **개선 액션·체인** — 발견 사항을 액션 6건으로 정리 (High/Mid/Low 우선순위 — 실습 6-1 보완 제안 형식 계승) → 주 체인: 048 랜딩페이지 CRO 진단(랜딩 개입) · 050 어트리뷰션 정리(unassigned 과다·태깅 오류 시).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/063-ga4-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/063-ga4-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/063-ga4-report/063-ga4-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/063-ga4-report/063-ga4-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -85,7 +85,7 @@ success_metrics: [세팅 오류 검출 건수, 전환율 개선폭, 리포트 �
 ### ④ 개선 액션 6건 (High/Mid/Low + 담당 스킬)
 다음 액션: → 048 랜딩페이지 CRO 진단 ({페이지} 개입) / 050 어트리뷰션 정리 (unassigned {n}% 정리)
 
-저장 파일: outputs/{날짜}/analytics/063-ga4-report.html
+저장 파일: outputs/{날짜}/063-ga4-report/063-ga4-report.html
 ```
 
 ## Anti-Patterns

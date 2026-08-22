@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["013", "051"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/012-value-proposition.md]
+writes_to: [outputs/{날짜}/012-value-proposition/012-value-proposition.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 브랜드 전략가 — 증거 없는 주장은 문장에 넣지 않는다"
@@ -61,8 +61,8 @@ success_metrics: [6단 완성률 100%, 증거 매핑된 차별점 수(3개 이�
 6. **증거 매핑** — 문장 속 모든 주장 ↔ 증거 표. 증거 없는 주장은 [증거 필요] + 확보 방법(시험성적서·리뷰 수집·비교 실험).
 7. **산출 + 체인 제안** — 013 제품명·네이밍 (가치제안문 → 네이밍 방향) · 051 상세페이지 24섹션 빌더 (가치제안문 → 헤드 섹션). 스펙 단위 카피가 필요하면 015.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/012-value-proposition.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/012-value-proposition.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/012-value-proposition/012-value-proposition.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/012-value-proposition/012-value-proposition.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -91,7 +91,7 @@ success_metrics: [6단 완성률 100%, 증거 매핑된 차별점 수(3개 이�
 ## 다음 액션
 → 013 제품명·네이밍 (가치제안 → 이름 방향) / 051 상세페이지 24섹션 빌더 (헤드 메시지)
 
-저장 파일: outputs/{날짜}/product/012-value-proposition.md
+저장 파일: outputs/{날짜}/012-value-proposition/012-value-proposition.md
 ```
 
 ## Anti-Patterns

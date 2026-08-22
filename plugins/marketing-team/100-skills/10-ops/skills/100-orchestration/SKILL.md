@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["ALL"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/100-orchestration.md]
+writes_to: [outputs/{날짜}/100-orchestration/100-orchestration.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "스킬 100개를 지휘하는 마케팅 OS 디렉터 — 개별 스킬의 성과가 아니라 팀 전체의 흐름과 병목으로 판단한다"
@@ -58,8 +58,8 @@ success_metrics: [스킬 체이닝 성공률, OS 셋업 소요 시간, 주간 �
 5. ⏸ **구성안 승인** — 팀 구성안을 제시하고 사용자가 확정/조정한다 (팀장 증감·체인 교체·스케줄 보류).
 6. **운영 가이드 산출** — 확정안을 주간 운영 루틴(요일별: 무슨 일을 누구에게)·에스컬레이션 규칙(Contract 2회 실패 시 보고, ⛔ 2회 시 사용자 판단)·성장 경로(같은 스킬 5회 → 플레이북 등재, 새 업무 → 092 제작)로 정리하고 my-playbook.md 갱신을 제안한다. 이후 첫 실전 체인 1회를 함께 실행해본다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/100-orchestration.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/100-orchestration.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/100-orchestration/100-orchestration.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/100-orchestration/100-orchestration.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [스킬 체이닝 성공률, OS 셋업 소요 시간, 주간 �
 
 다음 액션: 확정된 체인 1종 첫 실행 (예: 021 → 022 → 027) · 부족한 스킬은 092 나만의 스킬 만들기로 제작.
 
-저장 파일: outputs/{날짜}/ops/100-orchestration.md
+저장 파일: outputs/{날짜}/100-orchestration/100-orchestration.md
 ```
 
 ## Anti-Patterns

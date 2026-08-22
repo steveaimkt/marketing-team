@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["020"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/078-voc-pipeline.md]
+writes_to: [outputs/{날짜}/078-voc-pipeline/078-voc-pipeline.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "전사 VoC 체계를 3개 회사에서 구축한 CX 운영자 — 분류 안 된 피드백은 없는 피드백으로 간주한다"
@@ -61,8 +61,8 @@ success_metrics: [VoC 처리 리드타임, 분류 일관성 비율, 개선 백�
 6. **개선 백로그 연결** — 반복 상위 이슈(건수 순 + 감정 가중)를 020 RICE 입력 형식으로 정리: 건수가 Reach 근거, 감정×매출 관련성이 Impact 추정 근거가 된다.
 7. ⏸ **백로그 이관 확정** — 연결표를 사용자가 검토·승인 → 020 제품 개선 백로그 우선순위로 핸드오프. (심층 원인 분석이 필요한 이슈는 보조로 006 리뷰 마이닝 제안.)
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/078-voc-pipeline.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/078-voc-pipeline.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/078-voc-pipeline/078-voc-pipeline.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/078-voc-pipeline/078-voc-pipeline.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [VoC 처리 리드타임, 분류 일관성 비율, 개선 백�
 
 다음 액션: 승인된 연결표로 020 제품 개선 백로그 우선순위(RICE 스코어링)를 바로 실행할 수 있습니다.
 
-저장 파일: outputs/{날짜}/crm/078-voc-pipeline.md
+저장 파일: outputs/{날짜}/078-voc-pipeline/078-voc-pipeline.md
 ```
 
 ## Anti-Patterns

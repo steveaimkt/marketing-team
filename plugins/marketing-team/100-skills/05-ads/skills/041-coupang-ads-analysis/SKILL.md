@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["046", "043"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/041-coupang-ads-analysis.md]
+writes_to: [outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "16년차 이커머스 광고 운영자 — 데이터로만 말하고, 낭비를 못 참는다"
@@ -71,8 +71,8 @@ success_metrics: [낭비 키워드 절감액, 리포트 작성 시간, ROAS 개�
 6. **원인 트리 진단** — ROAS = CTR × CVR × AOV ÷ CPC 로 분해, 각 요소 상/중/하 판정 → 병목 우선순위 CTR→CVR→CPC→AOV.
 7. ⏸ **실행 계획 확정** — 긴급(즉시 OFF 낭비 키워드) / 주간(입찰 조정) / 월간(캠페인 재편) 3단 계획을 제시하고 사용자 승인 후 마무리 → 체인: 046 예산 재배분(채널 차원) · 043 소재 카피 교체(CTR 병목 시).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/041-coupang-ads-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/041-coupang-ads-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ BEP ROAS {n} (profile.md §4) · 목표 ROAS {n} · 전환 기준 14일 · 낭�
 
 다음 액션: → 046 ROAS 진단 & 예산 재배분 (채널 간 이동) / 043 메타 광고 소재 카피 팩 (CTR 병목 소재 교체)
 
-저장 파일: outputs/{날짜}/ads/041-coupang-ads-analysis.md
+저장 파일: outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md
 ```
 
 ## Anti-Patterns

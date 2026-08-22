@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["008", "012"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/080-customer-interview.md]
+writes_to: [outputs/{날짜}/080-customer-interview/080-customer-interview.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "JTBD 인터뷰 500회 진행한 UX 리서처 — 유도 질문이 하나라도 있으면 질문지를 다시 쓴다"
@@ -60,8 +60,8 @@ success_metrics: [인터뷰당 인사이트 건수, 질문지 준비 시간, 가
 6. **녹취 요약** — (수행 후 녹취 입력) 인터뷰이별 5블록 구조로 요약, 핵심 발언은 원문 인용 보존, 해석은 [해석] 분리. 개인 식별 정보 마스킹.
 7. **인사이트 추출·체인 인계** — 반복 패턴 3개 이상(각 인용 근거 병기) + [단독 신호] 목록 → 008 타깃 페르소나 빌더 입력 형식({상황, JTBD, 대안, 불만, 인용})으로 정리해 핸드오프 (보조: 012 USP·가치제안 정의).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/080-customer-interview.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/080-customer-interview.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/080-customer-interview/080-customer-interview.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/080-customer-interview/080-customer-interview.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -85,7 +85,7 @@ success_metrics: [인터뷰당 인사이트 건수, 질문지 준비 시간, 가
 
 다음 액션: 인사이트를 008 타깃 페르소나 빌더의 입력으로 넘겨 데이터 기반 페르소나를 만들 수 있습니다 (보조: 012 USP·가치제안 정의).
 
-저장 파일: outputs/{날짜}/crm/080-customer-interview.md
+저장 파일: outputs/{날짜}/080-customer-interview/080-customer-interview.md
 ```
 
 ## Anti-Patterns

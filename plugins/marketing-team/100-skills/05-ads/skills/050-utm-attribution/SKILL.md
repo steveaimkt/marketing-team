@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["063"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/050-utm-attribution.csv]
+writes_to: [outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "9년차 마케팅 데이터 엔지니어 — 규칙 없는 UTM은 데이터가 아니라 소음이라 부른다"
@@ -65,8 +65,8 @@ success_metrics: [미분류 유입 비율 감소, 태깅 규칙 준수율, 채�
 5. **채널 기여 해석 가이드** — ① 라스트클릭: 마지막 접점 100% — 상단 퍼널(인지 채널) 과소평가·브랜드 검색 과대평가 ② 보정 관점: 데이터 기반 어트리뷰션(GA4 DDA) 병행 열람 · 매체 자체 리포트의 뷰스루 중복 주의 · 브랜드 검색/직접 유입 증가를 상단 채널 후행 지표로 읽기 ③ 판정: 채널별 ROAS를 profile §4 BEP 대비로만 흑자/적자 판정.
 6. ⏸ **체계 확정** — 규칙 표·매핑표 승인 후 전 채널 적용 시작 → 체인: 063 GA4 분석 리포트 (통일된 태그 기준 4주 후 첫 정합 리포트).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/050-utm-attribution.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/050-utm-attribution.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -81,7 +81,7 @@ success_metrics: [미분류 유입 비율 감소, 태깅 규칙 준수율, 채�
 
 다음 액션: → 063 GA4 분석 리포트 (통일 체계 기준 채널 성과 첫 리포트)
 
-저장 파일: outputs/{날짜}/ads/050-utm-attribution.csv
+저장 파일: outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv
 ```
 
 ## Anti-Patterns

@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["067", "069"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/061-sales-data-analysis.md]
+writes_to: [outputs/{날짜}/061-sales-data-analysis/061-sales-data-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "16년차 리테일 매출 분석가 — 집계보다 원인이 먼저, 가설 없는 숫자는 보고하지 않는다"
@@ -62,8 +62,8 @@ success_metrics: [원인 규명 소요 시간, 이상치 조기 발견 건수, �
 6. **이상치 검출·가설** — 이동평균 기반 스파이크/급락 검출 → 각 건에 원인 가설(프로모션·품절·시즌·데이터 오류)과 확인 방법 제시.
 7. **리포트·체인** — 핵심 차트(추이·채널 비중·파레토)와 함께 정리 → 067 월간 리포트(전 채널 통합 보고) · 069 예측 시뮬레이션(시나리오 전망). 광고 연관 이상치는 041/042/046으로 분기 제안.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/061-sales-data-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/061-sales-data-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/061-sales-data-analysis/061-sales-data-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/061-sales-data-analysis/061-sales-data-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -81,7 +81,7 @@ success_metrics: [원인 규명 소요 시간, 이상치 조기 발견 건수, �
 
 다음 액션: → 067 월간 마케팅 리포트 (경영 보고 통합) / 069 예측 시뮬레이션 (다음 분기 시나리오)
 
-저장 파일: outputs/{날짜}/analytics/061-sales-data-analysis.md
+저장 파일: outputs/{날짜}/061-sales-data-analysis/061-sales-data-analysis.md
 ```
 
 ## Anti-Patterns

@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["032"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/social/036-community-playbook.md]
+writes_to: [outputs/{날짜}/036-community-playbook/036-community-playbook.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "0명에서 500명 커뮤니티를 키운 커뮤니티 빌더 — 빈 채널 20개보다 붐비는 5개를 만든다"
@@ -55,8 +55,8 @@ success_metrics: [가입 24시간 내 첫 액션 비율, 주간 활성 멤버 �
 4. **활성화 룰북 작성** — 주간 리추얼(요일 고정 코너: 월 질문/수 팁/금 자랑), 운영자 개입 기준: ① 메인 채널 48시간 침묵 → 시드 질문 투입 ② 특정 멤버 공격·분쟁 → 1차 경고, DM 중재 ③ 환불·불만 등 위기 키워드 → 032 응대 체인으로 이관 ④ 2주 무게시물 채널 → 통폐합. 멤버 등급(신규→정착→기여자)과 승급 조건 정의.
 5. **성장 로드맵 + 032 체인** — 0~100명: 운영자가 콘텐츠의 80% 공급 / 100~500명: 리추얼 정착·기여자 발굴 / 500+: 모더레이터 위임·주제 채널 분화. 일상 응대·위기 감지 룰은 032 댓글·DM 응대 어시스턴트로 핸드오프.
 
-6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/036-community-playbook.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/036-community-playbook.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+6. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/036-community-playbook/036-community-playbook.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/036-community-playbook/036-community-playbook.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -85,7 +85,7 @@ success_metrics: [가입 24시간 내 첫 액션 비율, 주간 활성 멤버 �
 ## 다음 액션
 → 032 댓글·DM 응대 어시스턴트 (일상 응대 톤·위기 키워드 감지 세팅)
 
-저장 파일: outputs/{날짜}/social/036-community-playbook.md
+저장 파일: outputs/{날짜}/036-community-playbook/036-community-playbook.md
 ```
 
 ## Anti-Patterns

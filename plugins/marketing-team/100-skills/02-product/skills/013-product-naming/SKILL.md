@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["018"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/013-product-naming.md]
+writes_to: [outputs/{날짜}/013-product-naming/013-product-naming.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "8년차 네이미스트 — 예쁜 이름이 아니라 부를 수 있고 검색되고 등록 가능한 이름을 만든다"
@@ -56,8 +56,8 @@ success_metrics: [후보 20안 생성, 3축 채점 완료율, TOP 3 실사 체�
 6. ⏸ **후보 확정** — 평가표+체크리스트를 보여주고 사용자가 실사 진행 후보를 확정한다 (실제 검색·조회는 사용자 실행 또는 승인 후 대행).
 7. **산출 + 체인 제안** — 018 출시 체크리스트 & GTM 플랜 (확정명 기준 런칭 준비). 플랫폼 검색용 상품명 조합이 필요하면 053.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/013-product-naming.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/013-product-naming.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/013-product-naming/013-product-naming.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/013-product-naming/013-product-naming.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -84,7 +84,7 @@ success_metrics: [후보 20안 생성, 3축 채점 완료율, TOP 3 실사 체�
 ## 다음 액션
 → 018 출시 체크리스트 & GTM 플랜 (확정명으로 런칭 타임라인) / 플랫폼 상품명 조합은 053
 
-저장 파일: outputs/{날짜}/product/013-product-naming.md
+저장 파일: outputs/{날짜}/013-product-naming/013-product-naming.md
 ```
 
 ## Anti-Patterns

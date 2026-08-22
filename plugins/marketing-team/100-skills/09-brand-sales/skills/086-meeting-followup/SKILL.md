@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["084"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/086-meeting-followup.md]
+writes_to: [outputs/{날짜}/086-meeting-followup/086-meeting-followup.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "영업 파이프라인을 미팅 노트로 관리해온 세일즈 오퍼레이터 — 미팅 후 24시간 안에 팔로업이 안 나가면 실패로 친다"
@@ -56,8 +56,8 @@ success_metrics: [팔로업 발송 소요 시간, 액션 아이템 누락률, �
 5. **팔로업 메일 초안** — 구조: 감사 1줄 → 결정사항 요약 3줄 이내 → 상대 발언 인용 1회(맞춤성 증명) → 우리가 보낼 것/할 것 → 다음 스텝 제안(일시 2안 제시). 제목 2안. 톤은 `brand/tone.md` 준수.
 6. ⏸ **확인·체인** — `[담당 미정]`·`[확인 필요]` 항목을 사용자에게 확인받아 반영 → 수주 가능성이 확인된 건이면 084 제안서 자동 생성으로 핸드오프 (영업 신호 메모가 Pain Point 입력이 된다).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/086-meeting-followup.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/086-meeting-followup.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/086-meeting-followup/086-meeting-followup.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/086-meeting-followup/086-meeting-followup.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -82,7 +82,7 @@ success_metrics: [팔로업 발송 소요 시간, 액션 아이템 누락률, �
 [확인 필요] {n}건 ⏸
 다음 액션: → 084 제안서 자동 생성 (영업 신호 메모를 Pain Point 입력으로 — 「세일즈파이프라인」 체인 시작점)
 
-저장 파일: outputs/{날짜}/brand-sales/086-meeting-followup.md
+저장 파일: outputs/{날짜}/086-meeting-followup/086-meeting-followup.md
 ```
 
 ## Anti-Patterns

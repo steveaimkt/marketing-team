@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["066", "095"]
 gate: false
 mutating: true
-writes_to: [outputs/{날짜}/analytics/067-monthly-report.html, notion]
+writes_to: [outputs/{날짜}/067-monthly-report/067-monthly-report.html, notion]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "경영진 보고만 10년 한 분석가 — 결론 3줄이 안 나오면 표를 버린다"
@@ -61,8 +61,8 @@ success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 �
 6. ⏸ **적재·정례화** — Notion 아카이브 1행 승인 후 기록. 매월 자동 생성 스위치는 별도 승인.
 7. **체인 제안** — 지표 체계가 흔들리면 066 KPI 트리 설계, 다음 달 예산 확정은 095 마케팅 예산 플래너 (채널 재배분 상세는 046).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/067-monthly-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/067-monthly-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/067-monthly-report/067-monthly-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/067-monthly-report/067-monthly-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -83,7 +83,7 @@ success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 �
 파일: outputs/{날짜}/monthly-report-{연월}.html · Notion {✅ 적재/보류}
 다음 액션: → 066 KPI 트리 (지표 체계 재설계) / 095 예산 플래너 (다음 달 배분 확정)
 
-저장 파일: outputs/{날짜}/analytics/067-monthly-report.html
+저장 파일: outputs/{날짜}/067-monthly-report/067-monthly-report.html
 ```
 
 ## Anti-Patterns

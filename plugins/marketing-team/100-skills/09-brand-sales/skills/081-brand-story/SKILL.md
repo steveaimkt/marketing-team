@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["082"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/081-brand-story.md]
+writes_to: [outputs/{날짜}/081-brand-story/081-brand-story.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "창업자 인터뷰 200회를 넘긴 브랜드 스토리텔러 — 미사여구보다 창업자의 진짜 계기 한 줄을 캐낼 때까지 질문을 멈추지 않는다"
@@ -57,8 +57,8 @@ success_metrics: [미션 문장 확정 소요 시간, 채널 소개문 재사용
 5. **보이스 형용사 도출** — 서사에서 자연스럽게 나오는 태도 3개를 형용사로 (예: 실증적 — "약속 못 드립니다, 보여드립니다"의 태도). 기존 tone.md §1과 충돌하면 차이를 표로 제시.
 6. ⏸ **tone.md 갱신 승인** — 상단 갱신안(보이스 3형용사 + 서사 기반 주석)을 diff 형태로 제시 → 승인 시 반영 안내 → 체인: 082 브랜드 가이드라인 문서화 (이 서사를 사용 규정 원페이지로 확장).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/081-brand-story.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/081-brand-story.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/081-brand-story/081-brand-story.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/081-brand-story/081-brand-story.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -80,7 +80,7 @@ success_metrics: [미션 문장 확정 소요 시간, 채널 소개문 재사용
 
 다음 액션: → 082 브랜드 가이드라인 문서화 (서사·보이스를 사용 규정 원페이지로)
 
-저장 파일: outputs/{날짜}/brand-sales/081-brand-story.md
+저장 파일: outputs/{날짜}/081-brand-story/081-brand-story.md
 ```
 
 ## Anti-Patterns

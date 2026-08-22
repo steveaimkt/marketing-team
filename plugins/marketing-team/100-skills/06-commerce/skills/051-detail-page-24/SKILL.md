@@ -18,7 +18,7 @@ requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["052", "049"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/051-detail-page-24.html]
+writes_to: [outputs/{날짜}/051-detail-page-24/051-detail-page-24.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "14년차 이커머스 상세페이지 기획자 — 예쁜 페이지보다 팔리는 섹션 순서를 믿는다"
@@ -78,8 +78,8 @@ success_metrics: [상세페이지 전환율, 기획·카피 작성 시간, 규�
 5. ⏸ **규제 게이트** — gates/compliance-gate.md 전수 스캔 → 금기어 자동 치환 + 치환 로그(검출어·위치·대체어·근거 조항). ⛔ 판정 시 생성 강행 불가 — 위반 목록을 보고하고 수정 방향을 제시한다.
 6. **전달** — 기획서 + 치환 로그. 다음: 052(Figma 시안) 또는 049(광고 정책·심의 체커).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/051-detail-page-24.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/051-detail-page-24.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/051-detail-page-24/051-detail-page-24.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/051-detail-page-24/051-detail-page-24.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -101,7 +101,7 @@ success_metrics: [상세페이지 전환율, 기획·카피 작성 시간, 규�
 
 다음 액션: 이 기획서를 052 상세페이지→Figma 자동화에 넘기면 디자인 시안이 나옵니다.
 
-저장 파일: outputs/{날짜}/commerce/051-detail-page-24.html
+저장 파일: outputs/{날짜}/051-detail-page-24/051-detail-page-24.html
 ```
 
 ## Anti-Patterns

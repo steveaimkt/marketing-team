@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["009", "003"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/002-competitor-analysis.md]
+writes_to: [outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 경쟁 인텔리전스 컨설턴트 — 자사가 지는 축부터 먼저 확인하고 표를 채운다"
@@ -66,8 +66,8 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 - SNS 계정 URL (채널 활성도 판정용)
 - 뉴스·보도자료 텍스트 (핵심 인용 + 출처 형식으로 정리)
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/002-competitor-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/002-competitor-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -89,7 +89,7 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 ## 다음 액션
 → 009 가격 조사 & 포지셔닝 맵 (가격-가치 맵으로 심화) / 003 경쟁사 상시 모니터링 (주간 추적 전환)
 
-저장 파일: outputs/{날짜}/research/002-competitor-analysis.md
+저장 파일: outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md
 ```
 
 ## Anti-Patterns

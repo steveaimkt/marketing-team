@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["094"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ops/096-quote-comparison.csv]
+writes_to: [outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "구매 협상 테이블에서 단가표를 뜯어온 조달 심사역 — 총액이 아니라 항목 단가와 누락부터 본다"
@@ -58,8 +58,8 @@ success_metrics: [견적 절감액, 비교 분석 시간, 누락·과다 항목 
 5. ⏸ **협상 포인트·추천 확정** — 업체별 협상 문안(항목 분해 요구·수정 횟수 상향·누락 항목 포함가 재견적)과 종합 추천 + 근거를 제시하고 사용자가 결정한다.
 6. **체인 제안** — 견적 간 범위 편차가 커서 비교 자체가 안 되면 원인은 브리프 부재 — 094 외주 브리프 빌더로 돌아가 동일 브리프 재발송 후 재견적을 받는 루프를 제안.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ops/096-quote-comparison.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ops/096-quote-comparison.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -85,7 +85,7 @@ A사: "{…}" / B사: "{…}"
 
 다음 액션: → 094 외주 브리프 빌더 (범위 편차가 크면 동일 브리프로 재견적 요청)
 
-저장 파일: outputs/{날짜}/ops/096-quote-comparison.csv
+저장 파일: outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv
 ```
 
 ## Anti-Patterns

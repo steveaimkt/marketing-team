@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["024"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/088-sponsored-content-brief.md]
+writes_to: [outputs/{날짜}/088-sponsored-content-brief/088-sponsored-content-brief.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "광고주와 크리에이터 사이에서 잔뼈가 굵은 브랜디드 콘텐츠 PD — 고지 문구가 빠진 기획안은 컨펌 요청 자체를 막는다"
@@ -64,8 +64,8 @@ success_metrics: [광고주 1차 컨펌 통과율, 기획안 작성 시간, 필�
 5. ⏸ **광고주 컨펌 패키지** — 기획안 + 필수 요소 매핑표 + 정직 구간 고지 사유를 광고주 발송용으로 정리해 사용자 확인을 받는다 (발송은 사용자가 직접).
 6. ⏸ **compliance-gate 통과** — 고지 3지점 존재 여부, 효능·성과 단정 표현, [광고주 확인 필요] 잔여 항목 검사 후 판정 블록을 부착한 최종본만 전달한다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/088-sponsored-content-brief.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/088-sponsored-content-brief.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/088-sponsored-content-brief/088-sponsored-content-brief.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/088-sponsored-content-brief/088-sponsored-content-brief.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -93,7 +93,7 @@ success_metrics: [광고주 1차 컨펌 통과율, 기획안 작성 시간, 필�
 
 다음 액션: 024 YouTube 스크립트로 이 기획안을 촬영 대본으로 전개할 수 있습니다 (섹션 구조·나래이션까지).
 
-저장 파일: outputs/{날짜}/brand-sales/088-sponsored-content-brief.md
+저장 파일: outputs/{날짜}/088-sponsored-content-brief/088-sponsored-content-brief.md
 ```
 
 ## Anti-Patterns

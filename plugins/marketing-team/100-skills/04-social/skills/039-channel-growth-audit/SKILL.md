@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["031", "040"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/social/039-channel-growth-audit.md]
+writes_to: [outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "정체된 계정 수십 개를 되살린 그로스 컨설턴트 — 위로 대신 병목을 지목한다"
@@ -60,8 +60,8 @@ success_metrics: [병목 구간 지표 개선폭, 우선 액션 3건 중 실행 
 5. **진단 정리** — 강점 2~3(뭐가 작동하나 — 유지 지시), 약점 2~3(어디서 새나), 병목 선언 1줄.
 6. **우선 액션 3가지 → 체인** — 병목 구간 한정, 각 액션에 실행 방법·측정 지표·기대 변화 명시. 콘텐츠 기획 문제면 → 031, 훅 문제면 → 040 핸드오프.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/039-channel-growth-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/039-channel-growth-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -91,7 +91,7 @@ success_metrics: [병목 구간 지표 개선폭, 우선 액션 3건 중 실행 
 ## 다음 액션
 → 040 바이럴 훅 라이브러리 (하위 콘텐츠 훅 교체) · 031 인스타그램 피드 기획 (기획 리셋)
 
-저장 파일: outputs/{날짜}/social/039-channel-growth-audit.md
+저장 파일: outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md
 ```
 
 ## Anti-Patterns

@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["065"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/076-membership-program.md]
+writes_to: [outputs/{날짜}/076-membership-program/076-membership-program.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "로열티 프로그램 설계 10년차 — 마진 시뮬레이션 없이는 혜택을 약속하지 않는다"
@@ -58,8 +58,8 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 6. ⏸ **구조 확정** — 시뮬레이션 3안 중 사용자가 선택·조정 → 최종 구조표 인도.
 7. **체인 제안** — 065 고객 세그먼트 RFM 분석 (분기마다 재실행해 등급 인원 이동·경계 리밸런싱).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/076-membership-program.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/076-membership-program.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/076-membership-program/076-membership-program.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/076-membership-program/076-membership-program.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -84,7 +84,7 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 ### ⑤ 구조 확정 ⏸ (보수/기본/낙관 3안 중 선택)
 다음 액션: 분기마다 065 RFM 분석을 재실행해 등급 인원 이동과 경계를 리밸런싱하세요.
 
-저장 파일: outputs/{날짜}/crm/076-membership-program.md
+저장 파일: outputs/{날짜}/076-membership-program/076-membership-program.md
 ```
 
 ## Anti-Patterns

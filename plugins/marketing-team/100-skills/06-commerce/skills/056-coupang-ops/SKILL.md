@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["041", "057"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/commerce/056-coupang-ops.md]
+writes_to: [outputs/{날짜}/056-coupang-ops/056-coupang-ops.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 쿠팡 셀러 운영 전문가 — 아이템위너와 재고 소진을 매일 의심한다"
@@ -60,8 +60,8 @@ success_metrics: [품절 발생 일수 감소, 아이템위너 유지율, 발주
 5. **월간 시뮬레이션** — 월 매출 예측 = 최근 7일 가중 평균 50% + 전체 평균 50%. 목표 매출 대비 갭과 필요 액션(광고 증액/입고 확대) 산출.
 6. **전달** — 체크리스트 + 전략안. 다음: 광고 딥다이브는 041 쿠팡 광고 성과 분석, 행사 물량 계획은 057 프로모션 캘린더.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/056-coupang-ops.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/056-coupang-ops.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/056-coupang-ops/056-coupang-ops.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/056-coupang-ops/056-coupang-ops.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -89,7 +89,7 @@ success_metrics: [품절 발생 일수 감소, 아이템위너 유지율, 발주
 
 다음 액션: 광고 낭비 키워드는 041로, 다음 행사 물량 계획은 057로 이어가세요.
 
-저장 파일: outputs/{날짜}/commerce/056-coupang-ops.md
+저장 파일: outputs/{날짜}/056-coupang-ops/056-coupang-ops.md
 ```
 
 ## Anti-Patterns

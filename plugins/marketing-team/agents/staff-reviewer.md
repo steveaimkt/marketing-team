@@ -43,7 +43,8 @@ tools: Read, Glob, Grep, Write
 
 ## 착지
 
-- 보고서 : `outputs/{YYYY-MM-DD}/review/reviewer-{관점}-{대상}.md`
+- 보고서 : **검토한 산출물과 같은 폴더 안**에 `review-{관점}.md` 로 남긴다.
+  한 실행의 결과는 한자리에 모인다.
 - 파일을 쓴 뒤에만 요약을 반환한다 (`docs/공통규약.md §H`).
 
 ## 반환 형식

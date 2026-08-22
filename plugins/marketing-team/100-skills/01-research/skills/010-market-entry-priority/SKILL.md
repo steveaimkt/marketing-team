@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["018"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/010-market-entry-priority.md]
+writes_to: [outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "15년차 전략기획 임원 출신 — 채점이 끝난 뒤에는 기준을 절대 바꾸지 않는다"
@@ -59,8 +59,8 @@ success_metrics: [점수 근거 병기율 100%, TOP 3 확정 소요 시간, 90�
 6. **1순위 90일 액션** — 30일(검증: 최소 테스트·기준 지표) / 60일(확장 판단 게이트) / 90일(본 진입 여부 판정 기준)의 3단 액션.
 7. **산출 + 체인 제안** — 018 출시 체크리스트 & GTM 플랜 (1순위 시장의 런칭 타임라인 전개).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/010-market-entry-priority.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/010-market-entry-priority.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -89,7 +89,7 @@ Impact = 시장 크기 × 적합도 / Effort = 진입 비용 + 경쟁 강도 (�
 ## 다음 액션
 → 018 출시 체크리스트 & GTM 플랜 (1순위 시장 런칭 타임라인)
 
-저장 파일: outputs/{날짜}/research/010-market-entry-priority.md
+저장 파일: outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md
 ```
 
 ## Anti-Patterns

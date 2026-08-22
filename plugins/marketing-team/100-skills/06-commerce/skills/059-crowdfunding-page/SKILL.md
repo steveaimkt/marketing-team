@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["051"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/commerce/059-crowdfunding-page.html]
+writes_to: [outputs/{날짜}/059-crowdfunding-page/059-crowdfunding-page.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "8년차 크라우드펀딩 PD — 스토리 없는 스펙 나열로는 1원도 못 모은다고 단언한다"
@@ -76,8 +76,8 @@ success_metrics: [목표 금액 달성률, 페이지 제작 시간, 심사 반�
 5. **심사 대비 증빙 체크** — "최초·최고·유일" 표현별 증빙 유무, 기능성 표현의 시험 근거, 배송 일정의 실현 가능성 → 체크리스트로 검출.
 6. ⏸ **규제 게이트** — gates/compliance-gate.md 전수 스캔 → 금기어 치환 + 치환 로그. ⛔ 판정 시 강행 불가. 통과 후 전달 → 체인: 펀딩 종료 후 자사몰·스토어 전환 시 051 상세페이지 24섹션 빌더로 재구성.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/commerce/059-crowdfunding-page.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/commerce/059-crowdfunding-page.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/059-crowdfunding-page/059-crowdfunding-page.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/059-crowdfunding-page/059-crowdfunding-page.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -93,7 +93,7 @@ success_metrics: [목표 금액 달성률, 페이지 제작 시간, 심사 반�
 
 다음 액션: 펀딩 종료 후 → 051 상세페이지 24섹션 빌더 (스토어 전환용 판매 문법 재구성)
 
-저장 파일: outputs/{날짜}/commerce/059-crowdfunding-page.html
+저장 파일: outputs/{날짜}/059-crowdfunding-page/059-crowdfunding-page.html
 ```
 
 ## Anti-Patterns

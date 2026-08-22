@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["037"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/social/034-influencer-brief-contract.md]
+writes_to: [outputs/{날짜}/034-influencer-brief-contract/034-influencer-brief-contract.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "협업 계약 수백 건을 넘긴 파트너십 매니저 — 구두 합의는 합의로 치지 않는다"
@@ -66,8 +66,8 @@ success_metrics: [브리프 작성 시간, 4대 조항 합의값 기재 완료�
 6. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행. 브리프의 필수 메시지 자체가 규제 위반이면 ⛔ 후 수정.
 7. **전달 → 037 체인** — 2차 활용권 합의 결과를 037 UGC 시스템의 권리 확보 입력으로 넘긴다.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/034-influencer-brief-contract.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/034-influencer-brief-contract.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/034-influencer-brief-contract/034-influencer-brief-contract.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/034-influencer-brief-contract/034-influencer-brief-contract.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -98,7 +98,7 @@ success_metrics: [브리프 작성 시간, 4대 조항 합의값 기재 완료�
 ## 다음 액션
 → 037 UGC 수집·활용 시스템 (2차 활용권 확보 콘텐츠의 재활용 설계)
 
-저장 파일: outputs/{날짜}/social/034-influencer-brief-contract.md
+저장 파일: outputs/{날짜}/034-influencer-brief-contract/034-influencer-brief-contract.md
 ```
 
 ## Anti-Patterns

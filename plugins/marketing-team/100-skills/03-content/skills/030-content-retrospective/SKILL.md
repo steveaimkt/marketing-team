@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["021"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/content/030-content-retrospective.md]
+writes_to: [outputs/{날짜}/030-content-retrospective/030-content-retrospective.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 콘텐츠 데이터 분석가 — 채널 정규화 없는 비교는 리포트로 치지 않는다"
@@ -61,8 +61,8 @@ success_metrics: [회고 리포트 작성 시간, 승자 패턴 재적용 콘텐
 5. **다음 달 주제 5건** — 승자 패턴 × 아직 안 다룬 소재 조합으로 생성. 각 건에 근거("{ID}가 중앙값 2.1배 — 같은 훅 유형") + 추천 채널·포맷 병기.
 6. **021 피드백 루프** — 추천 5건을 021 콘텐츠 캘린더 빌더의 입력(주제 풀)으로 전달 제안. 회고→캘린더→발행→회고가 월간 사이클로 닫히는 구조를 명시.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/030-content-retrospective.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/030-content-retrospective.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/030-content-retrospective/030-content-retrospective.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/030-content-retrospective/030-content-retrospective.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -88,7 +88,7 @@ success_metrics: [회고 리포트 작성 시간, 승자 패턴 재적용 콘텐
 ## 다음 액션
 → 021 콘텐츠 캘린더 빌더 (추천 5건을 주제 풀로 넣어 다음 달 편성 — 회고 루프 마감)
 
-저장 파일: outputs/{날짜}/content/030-content-retrospective.md
+저장 파일: outputs/{날짜}/030-content-retrospective/030-content-retrospective.md
 ```
 
 ## Anti-Patterns

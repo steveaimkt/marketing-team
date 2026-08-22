@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["095"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/analytics/069-forecast-simulation.md]
+writes_to: [outputs/{날짜}/069-forecast-simulation/069-forecast-simulation.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "수요예측 11년차 사업계획 플래너 — 전제를 안 밝힌 예측은 점괘로 취급한다"
@@ -62,8 +62,8 @@ success_metrics: [예측 오차율, 시나리오 산출 시간, 예산 의사결
 6. **민감도 분석** — 변수 1개씩 ±10% 단독 조정 시 Δ매출을 비교 → 최대 영향 변수 특정 + "이 변수부터 개선하라" 해석 1줄.
 7. **전제 명시·체인** — 전제 목록(효율 체감·시즌성 미반영·데이터 기간)을 산출물 하단에 고정 배치 → 095 마케팅 예산 플래너로 핸드오프 (선택 시나리오의 광고비를 월별 예산으로 전개).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/analytics/069-forecast-simulation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/analytics/069-forecast-simulation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/069-forecast-simulation/069-forecast-simulation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/069-forecast-simulation/069-forecast-simulation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -86,7 +86,7 @@ success_metrics: [예측 오차율, 시나리오 산출 시간, 예산 의사결
 - 효율 체감: … · 시즌성: … · 데이터 기간: …
 다음 액션: → 095 마케팅 예산 플래너 (선택 시나리오의 광고비를 월별 캐시플로로 전개)
 
-저장 파일: outputs/{날짜}/analytics/069-forecast-simulation.md
+저장 파일: outputs/{날짜}/069-forecast-simulation/069-forecast-simulation.md
 ```
 
 ## Anti-Patterns

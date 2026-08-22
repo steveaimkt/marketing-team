@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["017", "010"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/product/014-sourcing-evaluation.md]
+writes_to: [outputs/{날짜}/014-sourcing-evaluation/014-sourcing-evaluation.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "13년차 소싱 MD — 명목 마진에 속지 않고 반품·보관비까지 뺀 숫자로 판정한다"
@@ -57,8 +57,8 @@ success_metrics: [실마진 공식 전 항목 반영률, 평가 소요 시간, N
 7. **판정 + 초도 발주량** — 총점 70+ & 실마진율 20%+ → GO / 50~69 → 조건부 GO (조건 명시: 예 "판매가 10% 인상 시") / 50 미만 → NO-GO. GO 시 초도 발주 = 예상 daily_rate × (리드타임 + 30일) + 안전재고(daily_rate×3), MOQ와 비교 제시.
 8. **산출 + 체인 제안** — 017 가격 전략 설계 (판매가 시나리오) · 010 진입 시장 우선순위 (후보 여러 개 비교 시).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/product/014-sourcing-evaluation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/product/014-sourcing-evaluation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/014-sourcing-evaluation/014-sourcing-evaluation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/014-sourcing-evaluation/014-sourcing-evaluation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -88,7 +88,7 @@ daily_rate 5개 [추정] × (리드타임 14 + 30일) + 안전재고 15 = 235개
 ## 다음 액션
 → 017 가격 전략 설계 (인상 시나리오 검증) / 010 진입 시장 우선순위 (후보 비교)
 
-저장 파일: outputs/{날짜}/product/014-sourcing-evaluation.md
+저장 파일: outputs/{날짜}/014-sourcing-evaluation/014-sourcing-evaluation.md
 ```
 
 ## Anti-Patterns

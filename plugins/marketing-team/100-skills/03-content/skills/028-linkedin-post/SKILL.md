@@ -17,7 +17,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["027"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/content/028-linkedin-post.md]
+writes_to: [outputs/{날짜}/028-linkedin-post/028-linkedin-post.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "노출 4만을 만든 B2B 카피라이터 — 훅 없는 글은 발행하지 않는다"
@@ -60,8 +60,8 @@ success_metrics: [포스트 노출 수, 댓글 수, 작성 시간]
 7. **자체 검증** — 훅 형식 / 숫자 대조 ≥1 / 번호 항목 3~5 / 경험 1문장 / 댓글 CTA / 캐주얼 슬랭 0 / 해시태그 기본 미사용.
 8. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 게이트 결과 블록 부착 후에만 전달.
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/content/028-linkedin-post.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/content/028-linkedin-post.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/028-linkedin-post/028-linkedin-post.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/028-linkedin-post/028-linkedin-post.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -96,7 +96,7 @@ Before → After
 ## 다음 액션
 → 027 OSMU 멀티채널 변환기 (같은 소재를 인스타·블로그 버전으로)
 
-저장 파일: outputs/{날짜}/content/028-linkedin-post.md
+저장 파일: outputs/{날짜}/028-linkedin-post/028-linkedin-post.md
 ```
 
 ## Anti-Patterns

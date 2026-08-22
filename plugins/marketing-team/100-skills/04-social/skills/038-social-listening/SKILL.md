@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["089", "006"]
 gate: false
 mutating: true
-writes_to: [outputs/{날짜}/social/038-social-listening.md, notion]
+writes_to: [outputs/{날짜}/038-social-listening/038-social-listening.md, notion]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "위기 신호를 하루 먼저 잡아온 소셜 인텔리전스 애널리스트 — 출처 없는 언급은 리포트에 올리지 않는다"
@@ -58,8 +58,8 @@ success_metrics: [주간 리포트 작성 시간, 수집 언급 건수, 부정 �
 6. ⏸ **Notion 적재** — 주간 리포트 1건을 Notion 아카이브 DB에 적재 (승인 후 실행). 4주 누적 시 월간 추이 비교 자동 포함.
 7. ⏸ **상시 가동 제안** — 주 1회 자동 실행 스케줄 등록 여부 확인 (승인 없이는 1회성 실행으로 종료). 심층 분석이 필요한 부정 테마는 006으로 체인.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/social/038-social-listening.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/social/038-social-listening.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/038-social-listening/038-social-listening.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/038-social-listening/038-social-listening.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -90,7 +90,7 @@ success_metrics: [주간 리포트 작성 시간, 수집 언급 건수, 부정 �
 ## 다음 액션
 ⏸ Notion 적재 승인 → {부정 테마 심층은 006 리뷰 마이닝} · {급증 시 089 위기 플랜}
 
-저장 파일: outputs/{날짜}/social/038-social-listening.md
+저장 파일: outputs/{날짜}/038-social-listening/038-social-listening.md
 ```
 
 ## Anti-Patterns

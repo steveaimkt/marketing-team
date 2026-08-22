@@ -18,7 +18,7 @@ requires: [brand/profile.md]
 chains_to: ["043"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/ads/047-ad-ab-verdict.md]
+writes_to: [outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "8년차 그로스 데이터 분석가 — 표본 부족한 승패 선언을 가장 싫어한다"
@@ -70,8 +70,8 @@ success_metrics: [오판정 방지율, 판정 소요 시간, 승리 패턴 재�
 6. **BEP 대조** — 두 안의 ROAS를 profile §4 BEP와 대조 — 승자가 BEP 미달이면 "채택하되 증액 금지" 단서를 판정문에 부착.
 7. **다음 변형 제안** — 확정승: 승리 요인 가설 기반 변형 3개(승리 축 강화 1 + 인접 축 2) → 043 메타 광고 소재 카피 팩으로 제작. 박빙: 차원 교체 방향 제시. 판정문에는 항상 "다음 행동"이 동반된다.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/ads/047-ad-ab-verdict.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/ads/047-ad-ab-verdict.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [오판정 방지율, 판정 소요 시간, 승리 패턴 재�
 
 다음 액션: → 043 메타 광고 소재 카피 팩 (승리 패턴 반영 다음 변형 제작) / 019 A/B 테스트 설계 (새 차원 테스트)
 
-저장 파일: outputs/{날짜}/ads/047-ad-ab-verdict.md
+저장 파일: outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md
 ```
 
 ## Anti-Patterns

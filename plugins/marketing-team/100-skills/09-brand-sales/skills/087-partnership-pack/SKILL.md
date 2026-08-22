@@ -16,7 +16,7 @@ requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["084"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/brand-sales/087-partnership-pack.pptx]
+writes_to: [outputs/{날짜}/087-partnership-pack/087-partnership-pack.pptx]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "제휴 딜 100건을 성사시킨 BD 전문가 — 상대가 얻는 것이 먼저 계산되지 않은 제안은 보내지 않는다"
@@ -60,8 +60,8 @@ success_metrics: [제안 회신율, 딜 성사율, 제안 팩 준비 시간]
 5. **제안서 작성** — 084 SPARK 구조 축약(5부): 상대에게 의미 있는 기회 → 콜라보 컨셉 → 상대가 얻는 것 → 실행 플랜(역할·일정·브랜드 자산 사용 조건·종료 조항) → 제안 조건(주력 안 제시, 나머지는 "협의 가능 옵션"으로 병기). 협상 카드 3줄(양보 가능/불가/교환 조건)을 내부용으로 별첨.
 6. ⏸ **compliance-gate 통과** — 상대 브랜드 표기·성과 추정 근거·권리 조항 검사 후 판정 블록을 부착한 최종본만 전달한다.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/brand-sales/087-partnership-pack.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/brand-sales/087-partnership-pack.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/087-partnership-pack/087-partnership-pack.pptx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/087-partnership-pack/087-partnership-pack.pptx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -88,7 +88,7 @@ success_metrics: [제안 회신율, 딜 성사율, 제안 팩 준비 시간]
 
 다음 액션: 084 제안서 자동 생성 — 상대가 정식 RFP·상세 제안을 요청하면 풀 파이프라인으로 전환합니다.
 
-저장 파일: outputs/{날짜}/brand-sales/087-partnership-pack.pptx
+저장 파일: outputs/{날짜}/087-partnership-pack/087-partnership-pack.pptx
 ```
 
 ## Anti-Patterns

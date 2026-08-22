@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["010"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/004-market-sizing.md]
+writes_to: [outputs/{날짜}/004-market-sizing/004-market-sizing.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "13년차 시장분석 이코노미스트 — 탑다운과 바텀업이 수렴할 때까지 숫자를 의심한다"
@@ -63,8 +63,8 @@ success_metrics: [탑다운·바텀업 괴리 배율(2배 이내), 계수 출처
    | 5배 초과 | 시장 정의 불일치 | Phase 2로 돌아가 경계 재정의 (다른 시장을 재고 있는 것) |
 7. **산출 + 체인 제안** — 010 진입 시장 우선순위 (SOM 3안을 Impact 축 입력으로).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/004-market-sizing.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/004-market-sizing.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/004-market-sizing/004-market-sizing.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/004-market-sizing/004-market-sizing.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -88,7 +88,7 @@ success_metrics: [탑다운·바텀업 괴리 배율(2배 이내), 계수 출처
 ## 다음 액션
 → 010 진입 시장 우선순위 (SOM 시나리오를 Impact 입력으로)
 
-저장 파일: outputs/{날짜}/research/004-market-sizing.md
+저장 파일: outputs/{날짜}/004-market-sizing/004-market-sizing.md
 ```
 
 ## Anti-Patterns

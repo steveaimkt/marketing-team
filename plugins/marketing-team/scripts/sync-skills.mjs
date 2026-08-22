@@ -38,6 +38,24 @@ const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
 });
 walk(to);
 
+// 산출 경로를 스킬별 폴더로 (2026-08-22 결정 · docs/공통규약.md §H)
+//   정본은 outputs/{날짜}/{카테고리}/파일 이지만, 우리는 한 실행의 결과를 한 폴더에 모은다.
+//   outputs/{날짜}/{번호}-{슬러그}/파일  ← gate.md · 첨부가 같이 들어간다
+{
+  let c = 0;
+  const w2 = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return w2(q);
+    if (e.name !== 'SKILL.md') return;
+    const slug = path.basename(path.dirname(q));
+    const t = fs.readFileSync(q, 'utf8');
+    const out = t.replace(/outputs\/\{날짜\}\/[a-z-]+\//g, `outputs/{날짜}/${slug}/`);
+    if (out !== t) { fs.writeFileSync(q, out); c++; }
+  });
+  w2(to);
+  console.log(`산출 경로 스킬별 폴더로 · ${c}개 파일`);
+}
+
 const count = (() => { let c = 0; const w = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => { const p = path.join(d, e.name); if (e.isDirectory()) w(p); else if (e.name === 'SKILL.md') c++; }); w(to); return c; })();
 console.log(`스킬 ${count}개 동기화 · 이름 치환 ${n}개 파일\n`);
 

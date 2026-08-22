@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["074", "048"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/073-customer-journey-map.md]
+writes_to: [outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CX 컨설팅 9년차 여정 설계자 — 데이터 근거 없는 여정 단계는 맵에서 지운다"
@@ -59,8 +59,8 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
 5. **이탈점 TOP 3 특정** — 마찰 중 이탈 규모×감정 낙폭이 큰 순으로 3개. 각각 근거 1줄 + 개입 스킬 + 기대 효과 방향.
 6. ⏸ **개입 우선순위 확정** — TOP 3 중 먼저 실행할 1~2개를 사용자가 선택 → 074 이메일 시퀀스 빌더(관계·재구매 마찰) 또는 048 랜딩페이지 CRO 진단(구매 전환 마찰)으로 핸드오프.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/073-customer-journey-map.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/073-customer-journey-map.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```
@@ -87,7 +87,7 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
 
 다음 액션: 선택한 이탈점으로 074 이메일 시퀀스 빌더 또는 048 랜딩페이지 CRO 진단을 바로 시작할 수 있습니다.
 
-저장 파일: outputs/{날짜}/crm/073-customer-journey-map.md
+저장 파일: outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md
 ```
 
 ## Anti-Patterns

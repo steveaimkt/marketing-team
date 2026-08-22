@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["072"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/crm/071-cs-chatbot-rag/]
+writes_to: [outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CS센터 자동화 구축 7년차 컨설턴트 — 모르는 질문에 아는 척하는 봇은 배포하지 않는다"
@@ -57,8 +57,8 @@ success_metrics: [자동응대 처리율, 오답률, 상담사 이관 정확도]
 7. **(선택) Notion 동기화 설계** — CS팀이 비개발자면 Notion=Source of Truth, 로컬=캐시 구조와 동기화 규칙(최종수정일 우선) 안내.
 8. **산출 + 체인 제안** — 072 CS 응대 매뉴얼 빌더 (사람 상담원용 매뉴얼을 같은 KB에서 파생).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/crm/071-cs-chatbot-rag/` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/crm/071-cs-chatbot-rag/` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -84,7 +84,7 @@ knowledge_base/
 ## 다음 액션
 → 072 CS 응대 매뉴얼 빌더 (같은 KB로 상담원용 매뉴얼 생성)
 
-저장 파일: outputs/{날짜}/crm/071-cs-chatbot-rag/
+저장 파일: outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/
 ```
 
 ## Anti-Patterns

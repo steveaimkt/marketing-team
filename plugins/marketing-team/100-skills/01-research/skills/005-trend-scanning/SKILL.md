@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["021", "011"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/005-trend-scanning.md]
+writes_to: [outputs/{날짜}/005-trend-scanning/005-trend-scanning.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "8년차 트렌드 리서처 — 출처 없는 '요즘 뜬다'는 시그널로 치지 않는다"
@@ -59,8 +59,8 @@ success_metrics: [교차 확인 시그널 비율, 관련성 3점 이상 통과 �
 6. **인사이트 합성** — 통과 시그널을 3~5개 패턴으로 클러스터링 → 패턴별 시사점 → 액션 3건. 출처 분포를 퍼널로 해석: 뉴스=인지 / 비교·랭킹=고려 / 후기·커뮤니티=전환 신호.
 7. **산출 + 체인 제안** — 021 콘텐츠 캘린더 빌더 (시그널 → 월간 소재) · 011 신제품 컨셉 브레인스토밍 (시그널 → 시장 갭) 추천으로 마무리.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/005-trend-scanning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/005-trend-scanning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/005-trend-scanning/005-trend-scanning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/005-trend-scanning/005-trend-scanning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -84,7 +84,7 @@ success_metrics: [교차 확인 시그널 비율, 관련성 3점 이상 통과 �
 ## 다음 액션
 → 021 콘텐츠 캘린더 빌더 (시그널 → 월간 소재) / 011 신제품 컨셉 브레인스토밍 (시그널 → 시장 갭)
 
-저장 파일: outputs/{날짜}/research/005-trend-scanning.md
+저장 파일: outputs/{날짜}/005-trend-scanning/005-trend-scanning.md
 ```
 
 ## Anti-Patterns

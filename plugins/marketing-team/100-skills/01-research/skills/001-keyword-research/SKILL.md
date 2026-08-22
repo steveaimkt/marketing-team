@@ -17,7 +17,7 @@ requires: [brand/profile.md]
 chains_to: ["002", "022"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/research/001-keyword-research.csv]
+writes_to: [outputs/{날짜}/001-keyword-research/001-keyword-research.csv]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "12년차 검색 데이터 분석가 — 검색량의 크기가 아니라 경쟁도 대비 효율로만 키워드를 줄 세운다"
@@ -75,8 +75,8 @@ success_metrics: [확장 키워드 수(50개 이상), 수치 출처 표기율, �
 | 경쟁도 | CPC 상위 25% 또는 광고주 다수 | 중간 | 광고 거의 없음 |
 | 브랜드 적합성 | profile.md 카테고리·페르소나 일치 | 인접 카테고리 | 무관 (-50% 보정) |
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/research/001-keyword-research.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/research/001-keyword-research.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/001-keyword-research/001-keyword-research.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/001-keyword-research/001-keyword-research.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 ## Output Format
 ```markdown
@@ -97,7 +97,7 @@ success_metrics: [확장 키워드 수(50개 이상), 수치 출처 표기율, �
 → 002 경쟁사 분석 리포트 (TOP 키워드의 경쟁 지형 확인) / 022 블로그 SEO 아티클 (TOP 3 키워드로 초안)
 · 보조: 021 콘텐츠 캘린더 빌더 (TOP 20 소재화)
 
-저장 파일: outputs/{날짜}/research/001-keyword-research.csv
+저장 파일: outputs/{날짜}/001-keyword-research/001-keyword-research.csv
 ```
 
 ## Anti-Patterns
