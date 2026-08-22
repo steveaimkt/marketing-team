@@ -12,6 +12,7 @@ triggers:
   - "터치포인트 정리해줘"
   - "여정 맵 만들어줘"
 inputs: [터치포인트 목록, 고객 데이터·VoC(리뷰·CS·설문), 065 세그먼트 리포트(선택)]
+sample_fallback: sample-data/A브랜드-퍼널-가입구매-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행 (산출물에 [샘플])
 outputs: [여정 매트릭스(4단계×4행), 이탈점 TOP 3, 개입 우선순위 제안, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["074", "048"]

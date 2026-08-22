@@ -75,6 +75,11 @@ for (const s of skills) {
     if (toks.length && !toks.some(x => flatOf.includes(x)))
       add(id, 'WARN', `산출물 미반영: "${o.slice(0, 22)}"`);
   }
+  // 4-b 파일·데이터를 요구하면서 샘플 폴백이 없으면 사용자가 막힌다 (2026-08-22)
+  const inp = fld(f, 'inputs');
+  if (/이력 데이터|구매 데이터|주문일|고객ID|VoC\(|CSV 업로드/.test(inp) && !/^sample_fallback:/m.test(f))
+    add(id, 'WARN', `파일이 필요한데 sample_fallback 없음 — 데이터 없는 사용자가 막힌다`);
+
   // 5 게이트 스킬은 판정 블록 필수
   if (fld(f, 'gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|🛡/.test(body)) add(id, 'ERR', 'gate:true 인데 판정 블록 없음');
   // 6 mutating 은 승인 문구 필수

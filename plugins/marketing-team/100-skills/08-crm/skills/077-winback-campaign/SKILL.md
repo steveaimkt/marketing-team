@@ -11,6 +11,7 @@ triggers:
   - "떠난 고객 다시 불러오자"
   - "안 사는 고객한테 뭐라도 보내자"
 inputs: [구매 데이터 또는 065·064 산출물, 가용 오퍼(할인·적립·증정), 마진 구조]
+sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행 (산출물에 [샘플])
 outputs: [휴면 세그먼트 정의(기준 명시), 윈백 시퀀스 3단 설계+카피, 오퍼 수익성 검증표, 게이트 결과 블록, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074", "075"]
