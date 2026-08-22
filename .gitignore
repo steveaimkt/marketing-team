@@ -19,7 +19,7 @@ codex/
 .claude/
 
 # 작업 폴더는 저장소에 넣지 않는다 — 「팀 점검하자」가 만들어 준다.
-# 템플릿 정본은 plugins/marketing-team/brand/ 한 곳뿐이다 (중복이 있으면 조용히 어긋난다).
+# 템플릿 정본은 plugins/marketing-team/brand-templates/ 한 곳뿐이다 (중복이 있으면 조용히 어긋난다).
 brand/
 logs/
 outputs/

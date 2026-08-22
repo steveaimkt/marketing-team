@@ -132,7 +132,7 @@ description: |
 | 담당 | 언제 부르나 | 권한 |
 |---|---|---|
 | `staff-gate-auditor` = **CCO(규제)** | **대외 발행물을 완성했을 때** (`gate: true` · 100개 중 32개) | ⛔ 를 찍는 유일한 담당 |
-| `staff-reviewer` = **CSO(검수)** | 판정이 갈릴 산출물 · 관점을 지정해 부른다 (CEO·CFO·고객·CLO·CBO) | 판정만 · 제작 금지 |
+| `staff-reviewer` = **CSO(검수)** | **가격·할인율 / 예산 배분 / 우선순위 / 포지셔닝 / 계약·법적 표현**이 나오면 (§G2) · 관점을 지정해 병렬로 | 판정만 · 제작 금지 |
 
 > **화면에 쓸 때는 괄호를 붙인다** — `CCO(규제)` · `CSO(검수)`.
 > 마케팅 문맥에서 CCO 는 Chief Content Officer 로, CSO 는 Chief Sales Officer 로 먼저 읽힌다.

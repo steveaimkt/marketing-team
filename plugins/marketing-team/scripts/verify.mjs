@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { spawnSync } from 'node:child_process';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -319,18 +320,55 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   else if (lic) ok.push(`LICENSE (${lic})`);
 }
 
-// ⑥-i 생성 수치가 문서와 같나 (build-stats --check 와 같은 계산)
+// ⑥-i 생성 수치가 문서와 **같은 값인가**
+//   마커 존재만 보던 판은 README 의 「스킬 100」을 「스킬 999」로 바꿔도 통과했다
+//   (2026-08-22 · 코덱스가 실제로 뚫어 보고 지적). build-stats 를 직접 돌려 비교한다.
 {
   const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
     ? path.resolve(ROOT, '..', '..') : null;
+  const gen = path.join(ROOT, 'scripts', 'build-stats.mjs');
+  if (!fs.existsSync(gen)) warn('scripts/build-stats.mjs 없음 — 수치 드리프트를 못 잡는다');
+  else {
+    const r = spawnSync(process.execPath, [gen, '--check'], { encoding: 'utf8' });
+    if (r.status !== 0) {
+      err('생성 수치가 문서와 다르다 — `node scripts/build-stats.mjs`');
+      for (const l of (r.stdout || '').split('\n').filter(x => x.includes('어긋남'))) err(`  ${l.trim()}`);
+    } else ok.push('생성 수치 일치 (build-stats --check)');
+  }
   const targets = [path.join(ROOT, 'docs', '공통규약.md')];
   if (repoRoot) targets.push(path.join(repoRoot, 'README.md'));
-  let miss = 0;
-  for (const t of targets) {
-    if (!fs.existsSync(t)) continue;
-    if (!fs.readFileSync(t, 'utf8').includes('<!-- STATS:START -->')) { warn(`${path.basename(t)} 에 STATS 블록이 없다 — 숫자가 손으로 적혀 어긋난다`); miss++; }
+  for (const t of targets)
+    if (fs.existsSync(t) && !fs.readFileSync(t, 'utf8').includes('<!-- STATS:START -->'))
+      err(`${path.basename(t)} 에 STATS 블록이 없다 — 숫자가 손으로 적히면 어긋난다`);
+}
+
+// ⑥-i2 배포 대상 마크다운의 내부 상대 링크가 실재하나
+//   깨진 링크가 지금은 0개지만 회귀를 자동으로 막지 못했다 (2026-08-22)
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  const files = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    if (e.name.startsWith('.') || e.name === 'node_modules') return;
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) return walk(p);
+    if (e.name.endsWith('.md')) files.push(p);
+  });
+  for (const sub of ['agents', 'skills', 'docs', '100-skills', 'brand-templates', 'scripts']) walk(path.join(ROOT, sub));
+  if (repoRoot && fs.existsSync(path.join(repoRoot, 'README.md'))) files.push(path.join(repoRoot, 'README.md'));
+  let bad = 0, seen = 0;
+  for (const p of files) {
+    const t = fs.readFileSync(p, 'utf8');
+    for (const m of t.matchAll(/\]\(([^)\s#]+\.(?:md|html|csv|json|mjs|py))(?:#[^)]*)?\)/g)) {
+      const href = m[1];
+      if (/^(https?:|mailto:|\$\{)/.test(href) || /[{}…*]/.test(href)) continue;
+      seen++;
+      if (!fs.existsSync(path.resolve(path.dirname(p), href))) {
+        err(`깨진 내부 링크: ${href}  ← ${path.relative(repoRoot || ROOT, p)}`); bad++;
+      }
+    }
   }
-  if (!miss) ok.push('생성 수치 블록 존재 (build-stats.mjs)');
+  if (!bad) ok.push(`내부 상대 링크 ${seen}건 실재 확인`);
 }
 
 // ⑥-j writes_to 가 파일인가 디렉터리인가
