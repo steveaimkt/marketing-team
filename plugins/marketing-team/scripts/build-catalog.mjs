@@ -25,6 +25,20 @@ for (const ln of t.split('\n')) {
 }
 const total = cats.reduce((a, c) => a + c.rows.length, 0);
 
+// 각 스킬의 「하는 일」 — SKILL.md description 의 첫 문장
+const DO = {};
+for (const c of cats) {
+  const sd = path.join(M, c.id, 'skills');
+  if (!fs.existsSync(sd)) continue;
+  for (const dir of fs.readdirSync(sd)) {
+    const f = path.join(sd, dir, 'SKILL.md');
+    if (!fs.existsSync(f)) continue;
+    const fm = (fs.readFileSync(f, 'utf8').match(/^---\n([\s\S]*?)\n---/) || [, ''])[1];
+    const d = ((fm.match(/^description:\s*(.*)$/m) || [, ''])[1] || '').trim().replace(/^"|"$/g, '');
+    DO[dir.slice(0, 3)] = d.split(/\.\s|\. /)[0].replace(/\.$/, '').trim();
+  }
+}
+
 // 2) 체인 — 카테고리 10 (PLUGIN.md) + 교차 5 (CHAINS.md)
 const chains = [];
 for (const c of cats) {
@@ -53,13 +67,15 @@ const secs = cats.map(c => {
     let chip = '';
     if (r.g.includes('G')) chip += '<span class="chip g">게이트</span>';
     if (r.g.includes('!')) chip += '<span class="chip m">상태변경</span>';
-    return `<tr data-s="${e(r.n + ' ' + r.name + ' ' + tg)}"><td class="n">${r.n}</td>`
-      + `<td class="nm">${e(r.name)}${chip}</td><td class="tg">${e(tg)}</td>`
-      + `<td class="nx">${r.next.trim() ? e(r.next) : '—'}</td></tr>`;
+    const does = DO[r.n] || '';
+    return `<tr data-s="${e(r.n + ' ' + r.name + ' ' + tg + ' ' + does)}"><td class="n">${r.n}</td>`
+      + `<td class="nm">${e(r.name)}${chip}</td>`
+      + `<td class="do">${e(does)}</td>`
+      + `<td class="tg">${tg.split(' · ').map(x => `<span class="t">${e(x)}</span>`).join('')}</td></tr>`;
   }).join('');
   return `<section id="c${num}"><h2><span class="cn">${num}</span>${e(c.name)}`
     + `<span class="rng">${c.rows[0].n}–${c.rows.at(-1).n}</span></h2>`
-    + `<div class="tw"><table><thead><tr><th>번호</th><th>스킬</th><th>이렇게 부릅니다</th><th>다음</th></tr></thead>`
+    + `<div class="tw"><table><thead><tr><th>번호</th><th>스킬</th><th>하는 일</th><th>부르는 말 · 트리거</th></tr></thead>`
     + `<tbody>${rows}</tbody></table></div></section>`;
 }).join('');
 const chHtml = chains.map(([n, s, d]) =>
@@ -96,11 +112,22 @@ th,td{text-align:left;padding:9px 14px;border-bottom:1px solid var(--rule);verti
 thead th{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);font-family:ui-monospace,monospace;font-weight:500;background:var(--bg)}
 tbody tr:last-child td{border-bottom:none}tbody tr:hover{background:var(--acc-w)}
 td.n{font-family:ui-monospace,monospace;color:var(--acc);font-variant-numeric:tabular-nums;white-space:nowrap}
-td.nm{font-weight:500;white-space:nowrap}td.tg{color:var(--soft);font-size:.84rem}
-td.nx{font-family:ui-monospace,monospace;color:var(--faint);font-size:.8rem;white-space:nowrap}
+td.nm{font-weight:500;white-space:nowrap}
+td.do{color:var(--ink);font-size:.85rem;min-width:220px}
+td.tg{font-size:.8rem;min-width:230px}
+.t{display:inline-block;background:var(--bg);border:1px solid var(--rule);color:var(--soft);
+border-radius:12px;padding:1px 9px;margin:2px 3px 2px 0;white-space:nowrap;font-size:.76rem}
+tbody tr:hover .t{border-color:var(--acc);color:var(--acc)}
 .chip{display:inline-block;font-size:.62rem;padding:1px 6px;border-radius:3px;margin-left:6px;font-family:ui-monospace,monospace;vertical-align:middle}
 .chip.g{background:var(--g-w);color:var(--g)}.chip.m{background:var(--m-w);color:var(--m)}
-.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:.8rem;color:var(--soft)}
+.gates{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:16px}
+.gk{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:14px 18px}
+.gk b{font-family:ui-monospace,monospace;margin-left:8px;color:var(--ink)}
+.gk p{margin:8px 0 0;font-size:.83rem;color:var(--soft);line-height:1.65}
+.gk p b{font-family:inherit;margin:0;color:var(--ink)}
+.both{margin:12px 0 0;font-size:.83rem;color:var(--soft);background:var(--acc-w);
+border-left:3px solid var(--acc);padding:10px 16px;border-radius:0 4px 4px 0}
+.both b{color:var(--ink)}
 .how{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:18px 22px;margin-top:34px}
 .how code{font-family:ui-monospace,monospace;font-size:.85em;background:var(--bg);padding:2px 7px;border-radius:3px}
 .none{display:none;padding:24px;text-align:center;color:var(--faint);font-size:.9rem}
@@ -112,8 +139,16 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-si
 <span>상태 변경 <b>${mut}</b></span><span>체인 <b>${chains.length}</b></span></div></header>
 <div class="bar"><input id="q" type="search" placeholder="검색 — 번호 · 스킬 이름 · 부르는 말  (예: 광고, 046, 리뷰)" autocomplete="off">
 <div class="nav">${nav}<a href="#chains">체인 ${chains.length}</a></div></div>
-<div class="legend"><span><span class="chip g">게이트</span> 대외 발행물 · 발행 전 규제 검토</span>
-<span><span class="chip m">상태변경</span> 예약·발행·예산 · 실행 전 ⏸ 승인</span></div>
+<div class="gates"><div class="gk"><span class="chip g">게이트</span><b>${gate}개</b>
+<p><b>틀린 말이 밖으로 나가는 것</b>을 막는다. 산출물이 완성된 뒤 전달 전에
+규제 감사관이 표시광고법·업종 법령으로 전수 검사한다. <b>판정은 AI가</b> 하고,
+통과 못 하면 전달 자체가 중단된다.</p></div>
+<div class="gk"><span class="chip m">상태변경</span><b>${mut}개</b>
+<p><b>되돌릴 수 없는 일이 벌어지는 것</b>을 막는다. 발송·예약·자동화 등록처럼
+바깥 세상을 바꾸는 일이다. 실행 직전에 멈추고 <b>사람이 ⏸ 승인</b>해야 간다.
+AI가 대신 눌러 주지 않는다.</p></div></div>
+<p class="both">둘 다 붙은 것이 <b>2개</b> 있다 — <b>074 이메일 시퀀스</b>와 <b>079 리뷰 요청</b>.
+고객에게 나가는 글이면서 실제로 발송까지 하니, <b>규제 검사와 사람 승인을 둘 다</b> 거친다.</p>
 ${secs}
 <section id="chains"><h2><span class="cn">체인</span>한 줄로 한 바퀴<span class="rng">${chains.length}종</span></h2>
 <div class="tw"><table><thead><tr><th>이름</th><th>순서</th><th>무엇을 하나</th></tr></thead><tbody>${chHtml}</tbody></table></div></section>

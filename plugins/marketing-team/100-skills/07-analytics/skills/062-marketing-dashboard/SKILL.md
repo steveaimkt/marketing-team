@@ -30,6 +30,9 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 > 멀티채널 데이터 → 단일 파일 HTML 대시보드. KPI 카드 → 추이 → 채널 비교 3층 구조, 폰에서 열리고 인쇄되고 다크모드까지.
 > 계승: marketing-os 「html-report-template」 표준 템플릿 **그대로** — 단일 파일·모바일 우선·인쇄 가능·다크모드 자동 + 표준 섹션 골격(header/kpi/highlights/charts/tables/actions/footer).
 
+> **내 일이 아닌 것** · **매일 여는 화면**이다. 한 번 내는 문서는 045(주간)·067(월간).
+> 가르는 말은 `docs/헷갈리는-쌍.md` 에 있다.
+
 ## Contract
 - 대시보드는 **KPI 카드 → 추이 → 채널 비교** 3층 구조를 따른다 (html-report-template 표준 섹션 순서 준수).
 - 산출물은 단일 .html 파일 — CSS/JS 인라인, 외부 CDN·폰트·이미지 의존 0건. 첨부만 받아도 오프라인에서 열린다.

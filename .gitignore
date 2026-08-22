@@ -24,3 +24,6 @@ brand/
 logs/
 outputs/
 inputs/
+
+# 사용자가 꺼내 본 카탈로그 사본 (정본은 plugins/…/100-skills/카탈로그.html)
+마케팅-스킬-100.html
