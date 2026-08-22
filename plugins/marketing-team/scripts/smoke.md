@@ -116,3 +116,6 @@ logs/smoke-v0.14.0.md
 ```
 
 **밟지 않은 항목을 ✅ 로 적지 않는다.** 「미실행」이라고 적는다.
+
+릴리스마다 결과를 **`scripts/smoke-results/v{버전}.md`** 로 남긴다 (`logs/` 는 gitignore 대상이라 사라진다).
+지난 기록 — [v0.14.0](smoke-results/v0.14.0.md) · 경로까지 정확 84/98 (86%)
