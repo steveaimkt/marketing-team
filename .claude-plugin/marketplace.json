@@ -10,7 +10,7 @@
       "source": "./plugins/marketing-team",
       "description": "마케팅 스킬 100개를 바로 쓴다. 브랜드 정보를 채우면 100개를 우리 것 15~30개로 줄여 내 에이전트로 조립한다. 발행물은 독립 감사관을 거친다.",
       "category": "productivity",
-      "version": "0.8.1",
+      "version": "0.9.0",
       "author": {
         "name": "WMBB"
       },
