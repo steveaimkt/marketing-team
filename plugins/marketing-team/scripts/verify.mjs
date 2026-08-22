@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const issues = [];
@@ -147,7 +148,7 @@ else {
   walk(M);
   if (n.length !== 100) warn(`스킬 ${n.length}개 (기준 100)`);
   else ok.push('마케팅 스킬 100개');
-  for (const f of ['ROUTING.md', 'CHAINS.md', 'compliance.md', 'gates/compliance-gate.md', 'gates/quality-checklist.md'])
+  for (const f of ['ROUTING.md', 'CHAINS.md', 'SPEC.md', 'compliance.md', 'gates/compliance-gate.md', 'gates/quality-checklist.md'])
     if (!fs.existsSync(path.join(M, f))) err(`100-skills/${f} 없음`);
 }
 
@@ -407,6 +408,12 @@ for (const link of ['agents', 'skills']) {
   if (!fs.existsSync(cat)) err('100-skills/카탈로그.html 없음 — `node scripts/build-catalog.mjs`');
   if (!fs.existsSync(routing)) err('100-skills/ROUTING.md 없음 — `node scripts/build-routing.mjs`');
   else {
+    try {
+      execFileSync(process.execPath, [path.join(ROOT, 'scripts', 'build-routing.mjs'), '--check'], { stdio: 'pipe' });
+      ok.push('ROUTING.md 전체 생성물 = 스킬·체인 정본');
+    } catch {
+      err('ROUTING.md 전체 생성물이 정본과 다르다 — `node scripts/build-routing.mjs`');
+    }
     // SKILL.md(정본) → ROUTING.md 전수 대조
     const rows = Object.fromEntries([...fs.readFileSync(routing, 'utf8')
       .matchAll(/^\| (\d{3}) \| (.+?) \| (.+?) \|/gm)].map(m => [m[1], { name: m[2].trim(), trig: m[3].trim() }]));

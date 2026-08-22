@@ -66,7 +66,7 @@
 ## SKILL.md (발췌)
 
 ```yaml
-id: "C01"
+id: "u01"
 name: 경쟁 인스타 주간 변화
 slug: competitor-ig-weekly
 category: custom
@@ -86,11 +86,11 @@ mutating: false
 ## routing-eval.jsonl (5줄)
 
 ```json
-{"q":"경쟁사 인스타 확인해줘","expect":"C01"}
-{"q":"이번 주 경쟁 계정 뭐 올렸나","expect":"C01"}
-{"q":"경쟁사 전체 모니터링 돌려줘","expect":"003"}
-{"q":"경쟁사 가격 바뀌었나","expect":"003"}
-{"q":"경쟁사 분석 리포트 만들어줘","expect":"002"}
+{"intent":"경쟁사 인스타 확인해줘","expected_skill":"u01"}
+{"intent":"이번 주 경쟁 계정 뭐 올렸나","expected_skill":"u01"}
+{"intent":"경쟁 계정 인스타 주간 변화 정리해줘","expected_skill":"u01"}
+{"intent":"경쟁사 전체 모니터링 돌려줘","expected_skill":"003"}
+{"intent":"경쟁사 분석 리포트 만들어줘","expected_skill":"002"}
 ```
 
 > 3~5번은 **이 스킬이 잡으면 안 되는 질문**이다. 오발동 검사가 절반이다.
@@ -105,7 +105,7 @@ mutating: false
 | **판정** | ✅ **편입** |
 
 ## 다음 액션
-→ `skills/` 에 등록 후 첫 실행 · 4주 뒤 098 에서 실제 절감 확인
+→ `brand/my-skills/u01-competitor-ig-weekly/`에 등록 후 첫 실행 · `INDEX.md`에 한 줄 추가 · 4주 뒤 098에서 실제 절감 확인
 
 ---
 

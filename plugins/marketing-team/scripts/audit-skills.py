@@ -20,6 +20,10 @@ for p in sorted(glob.glob(f"{ROOT}/*/skills/*/SKILL.md")):
         chains=lst(fld(f,'chains_to')), trig=len(re.findall(r'^\s+- "', f, re.M)),
         body=body, lines=len(body.split('\n')), f=f))
 
+if len(S) != 100:
+    print(f"🔴 스킬 수가 100개가 아닙니다: {len(S)}개 · {ROOT}")
+    sys.exit(1)
+
 I=collections.defaultdict(list)
 def add(sev,cat,s,msg): I[cat].append((sev,s['id'],s['name'],msg))
 

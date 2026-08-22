@@ -37,12 +37,25 @@ for (const cat of fs.readdirSync(M).filter(d => /^\d\d-/.test(d)).sort())
 const ids = new Set(skills.map(s => fld(fmOf(s.raw), 'id')));
 const issues = [];
 const add = (id, sev, msg) => issues.push({ id, sev, msg });
+const REQUIRED_HEADER = [
+  'id', 'name', 'description', 'slug', 'category', 'tier', 'triggers', 'inputs', 'outputs',
+  'requires', 'chains_to', 'gate', 'mutating', 'writes_to', 'builder', 'version', 'persona',
+  'when_to_use', 'success_metrics',
+];
+
+if (skills.length !== 100) add('COUNT', 'ERR', `스킬 수가 100개가 아니다: ${skills.length}`);
+for (let n = 1; n <= 100; n++) {
+  const id = String(n).padStart(3, '0');
+  if (!ids.has(id)) add(id, 'ERR', '공식 ID 001–100 중 누락');
+}
 
 for (const s of skills) {
   const f = fmOf(s.raw), body = s.raw.slice(f.length + 10);
   // 코드펜스 안의 '## ' 는 섹션 경계가 아니다 (오탐 방지)
   const flat = body.replace(/```[\s\S]*?```/g, m => m.replace(/^## /gm, '@@ '));
   const id = fld(f, 'id'), slug = fld(f, 'slug');
+  for (const key of REQUIRED_HEADER)
+    if (!new RegExp(`^${key}:`, 'm').test(f)) add(id || s.dir, 'ERR', `필수 헤더 없음: ${key}`);
   // 1 폴더명 정합
   if (!s.dir.startsWith(id + '-')) add(id, 'ERR', `폴더명 불일치: ${s.dir}`);
   if (slug && !s.dir.endsWith(slug)) add(id, 'WARN', `slug 불일치: ${slug} vs ${s.dir}`);

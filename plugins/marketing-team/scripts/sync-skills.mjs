@@ -59,7 +59,7 @@ walk(to);
 const count = (() => { let c = 0; const w = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => { const p = path.join(d, e.name); if (e.isDirectory()) w(p); else if (e.name === 'SKILL.md') c++; }); w(to); return c; })();
 console.log(`스킬 ${count}개 동기화 · 이름 치환 ${n}개 파일\n`);
 
-for (const s of ['build-catalog.mjs', 'validate-skills.mjs', 'verify.mjs']) {
+for (const s of ['build-routing.mjs', 'build-catalog.mjs', 'validate-skills.mjs', 'verify.mjs']) {
   console.log(`--- ${s}`);
   try { execFileSync(process.execPath, [path.join(ROOT, 'scripts', s)], { stdio: 'inherit' }); }
   catch { console.error(`  ⚠️ ${s} 가 실패했습니다. 위 내용을 고친 뒤 다시 돌리세요.`); process.exitCode = 1; }

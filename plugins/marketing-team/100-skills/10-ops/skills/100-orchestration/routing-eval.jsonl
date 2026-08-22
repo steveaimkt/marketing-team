@@ -1,6 +1,6 @@
-{"intent": "이 스킬 100개가 전체적으로 어떻게 굴러가는 거야?", "expected_skill": "100"}
-{"intent": "마케팅 OS 구조 좀 설명해줘", "expected_skill": "100"}
-{"intent": "내 업무에 맞게 에이전트 팀 구성 설계해줘", "expected_skill": "100", "ambiguous_with": ["091"]}
-{"intent": "스킬들을 하나로 묶어서 상시 운영하고 싶어", "expected_skill": "100"}
-{"intent": "부서장이랑 커맨드 조합 어떻게 짜면 좋을까", "expected_skill": "100"}
-{"intent": "오케스트레이터가 뭐 하는 건지 알려주고 내 걸로 세팅해줘", "expected_skill": "100", "ambiguous_with": ["092"]}
+{"intent": "나만의 마케팅 에이전트 하나를 만들어줘", "expected_skill": "100"}
+{"intent": "내 업무에 맞게 100개 스킬을 배선해줘", "expected_skill": "100", "ambiguous_with": ["091"]}
+{"intent": "내가 자주 쓰는 마케팅 스킬을 하나의 운영 흐름으로 묶고 싶어", "expected_skill": "100"}
+{"intent": "마케팅 에이전트의 주간 루틴과 승인 지점을 설계해줘", "expected_skill": "100"}
+{"intent": "업무 진단 결과를 바탕으로 내 개인 에이전트를 구축해줘", "expected_skill": "100", "ambiguous_with": ["091"]}
+{"intent": "공식 스킬과 내가 만든 스킬을 함께 쓰는 구조를 짜줘", "expected_skill": "100", "ambiguous_with": ["092"]}
