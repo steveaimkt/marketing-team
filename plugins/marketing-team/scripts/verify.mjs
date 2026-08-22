@@ -389,6 +389,25 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   if (!dirs) ok.push('writes_to 전부 파일 경로');
 }
 
+// ⑥-k 저장소에 작업 산출물이 샜나
+//   2026-08-23 · 어떤 실행이 저장소 루트에 _백업/ 을 만들었다. 쓰는 곳은 넷뿐이다.
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  const BAD = [/^_?백업/, /^backup/i, /^_bak/i, /^temp$/i, /^tmp$/i];
+  let hit = 0;
+  for (const base of [repoRoot, ROOT].filter(Boolean)) {
+    for (const e of fs.readdirSync(base, { withFileTypes: true })) {
+      if (!e.isDirectory()) continue;
+      if (BAD.some(r => r.test(e.name))) { err(`작업 산출물이 샜다: ${path.relative(repoRoot || ROOT, path.join(base, e.name))}/ — 쓰는 곳은 brand·outputs·logs·inputs 넷뿐이다`); hit++; }
+    }
+  }
+  // 패키지 안에 작업 폴더가 생겼나
+  for (const d of ['brand', 'outputs', 'logs', 'inputs'])
+    if (fs.existsSync(path.join(ROOT, d))) { err(`패키지 안에 ${d}/ 이 있다 — 업데이트에 날아간다. 작업 폴더에 두어야 한다`); hit++; }
+  if (!hit) ok.push('작업 산출물 유출 없음 (패키지·저장소 깨끗)');
+}
+
 // ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
 //   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
 //   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)
