@@ -12,6 +12,7 @@ triggers:
   - "이 콘텐츠 다른 플랫폼용으로도 만들어줘"
   - "원소스 멀티유즈로 확산해줘"
 inputs: [원본 콘텐츠 1개(글·스크립트·링크), 대상 채널 목록(기본 링크드인·스레드·뉴스레터·블로그)]
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [채널별 변환본 세트, 코어 메시지 카드, 게시 시차 전략표, 게이트 결과 블록(일괄), 저장 파일(.md)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["030"]

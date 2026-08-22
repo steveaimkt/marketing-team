@@ -99,6 +99,23 @@ for (const s of skills) {
     }
     if (w.length && !fileTargets) add(id, 'WARN', `writes_to 에 파일 경로가 없다 (외부 대상만): ${w.join(' · ')}`);
   }
+  // 5-c 외부 데이터를 요구하면 sample_fallback 이 있어야 완주한다
+  //     2026-08-22 전수 검수: 5개가 없어 데이터 없는 사용자에겐 멈췄다
+  {
+    const inp = fld(f, 'inputs');
+    // 「(선택)」이 붙은 항목과 말로 답하는 항목(목록·현황·정의)은 파일 입력이 아니다
+    const fileish = inp.split(',').filter(x => !/\(선택\)/.test(x))
+      .some(x => /CSV|csv|엑셀|\.xlsx|성과 데이터|구매 분포|근거 데이터|원본 콘텐츠|센터 통계|판매분석/.test(x));
+    const needsData = fileish;
+    if (needsData && !fld(f, 'sample_fallback'))
+      add(id, 'WARN', `외부 데이터를 요구하는데 sample_fallback 없음 — 데이터 없으면 멈춘다`);
+  }
+  // 5-d 크롤링 전제 · 로그인 뒤 데이터를 URL 로 받겠다고 적으면 실행 시 막힌다
+  {
+    const inp = fld(f, 'inputs');
+    if (/URL/.test(inp) && !/크롤링 불가|공개|캡처|열릴 때만|스크린샷|랜딩 URL|CTA/.test(inp))
+      add(id, 'WARN', `inputs 에 URL 인데 크롤링 가능 여부가 안 적혀 있다 — docs/데이터-가져오기.md §0`);
+  }
   // 6 mutating 은 승인 문구 필수
   if (fld(f, 'mutating') === 'true' && !/승인|⏸|확인 ?후/.test(body)) add(id, 'ERR', 'mutating:true 인데 승인 게이트 없음');
   // 7 절차 최소 3단

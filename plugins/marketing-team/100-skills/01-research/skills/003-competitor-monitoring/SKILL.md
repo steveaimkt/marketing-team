@@ -10,7 +10,7 @@ triggers:
   - "경쟁사 계속 지켜봐줘"
   - "경쟁사 변동 알림 걸어줘"
   - "경쟁사 뭐 바뀌었는지 봐줘"
-inputs: [경쟁사 URL·SNS 목록(최대 10개), 추적 주기(기본 주 1회)]
+inputs: [경쟁사 URL·SNS 목록(최대 10개 — SNS·로그인 뒤 페이지는 크롤링 불가, 캡처를 inputs/ 에), 추적 주기(기본 주 1회)]
 sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [주간 변화 리포트(5분류 diff + 인사이트 3~5건), 스냅샷 아카이브, 변경 감지 로그, 저장 파일(.md)]
 requires: [brand/profile.md]

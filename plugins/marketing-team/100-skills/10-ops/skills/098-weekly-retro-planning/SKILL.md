@@ -12,6 +12,7 @@ triggers:
   - "한 주 마무리 정리해줘"
   - "다음 주 뭐부터 할지 정해줘"
 inputs: [logs/build-log.md 주간 기록(자동 조회), 이번 주 완료·미완료 업무 보완 입력, 주요 지표(선택)]
+sample_fallback: sample-data/A브랜드-반복업무-15건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [주간 회고(완료·성과·배움 3구획), 미완료 처분표(이월/폐기/위임), 다음 주 우선순위 TOP 3, my-playbook 루틴 갱신 제안, 저장 파일(.md)]
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["095"]

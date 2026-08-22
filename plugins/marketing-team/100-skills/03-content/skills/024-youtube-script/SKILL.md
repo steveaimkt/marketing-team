@@ -12,6 +12,7 @@ triggers:
   - "유튜브 나레이션 원고 써줘"
   - "영상 대본 타임코드까지 정리해줘"
 inputs: [주제·시연 소재, 목표 시청자, 근거 데이터(Before/After 수치·결과물), 목표 길이(기본 10분)]
+sample_fallback: sample-data/A브랜드-콘텐츠성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [6섹션 스크립트(타임코드·화면 지시 포함), 섹션별 글자 수 검산표, 게이트 결과 블록, 저장 파일(.md)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["025", "026"]

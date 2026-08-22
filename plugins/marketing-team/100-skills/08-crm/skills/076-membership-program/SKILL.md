@@ -11,6 +11,7 @@ triggers:
   - "VIP 혜택 구조 짜줘"
   - "등급별 혜택이 남는 장사인지 계산해줘"
 inputs: [065 세그먼트 리포트(권장) 또는 고객 구매 분포, 마진 구조(원가율·배송비), 목표 리텐션]
+sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [등급 구조표(기준·혜택), 등급별 마진 시뮬레이션, 승급·강등·유지 규칙, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["065"]
