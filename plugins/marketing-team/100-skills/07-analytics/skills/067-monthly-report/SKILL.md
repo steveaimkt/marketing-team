@@ -11,7 +11,7 @@ triggers:
   - "경영진 보고서 뽑아줘"
   - "월말 마케팅 보고 정리해줘"
 inputs: [전 채널 월간 데이터(선행 스킬 산출물·CSV·시트), 전월 리포트, 월 목표]
-sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [월간 통합 보고서(HTML), 경영진용 요약 1페이지(결론 3줄 우선), 다음 달 액션, 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["066", "095"]

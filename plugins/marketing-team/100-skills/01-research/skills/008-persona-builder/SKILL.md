@@ -11,7 +11,7 @@ triggers:
   - "우리 고객이 누군지 정리해줘"
   - "고객 유형 나눠줘"
 inputs: [고객 데이터(리뷰·구매·설문·인터뷰 자료 중 1종 이상), 제품 정보]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [페르소나 카드 3~5종(프로필+JTBD+채널·메시지 방향), 대표 페르소나 구매 여정, 근거 매핑표, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["012", "043"]

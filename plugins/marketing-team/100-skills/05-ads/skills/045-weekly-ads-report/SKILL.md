@@ -11,7 +11,7 @@ triggers:
   - "주간 광고 리포트 자동으로 돌려줘"
   - "매체별 광고 성과 한 장으로 모아줘"
 inputs: [매체별 광고 데이터 소스(메타·구글·네이버 등), 리포트 수신 채널]
-sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [주간 성과 HTML 리포트(KPI 카드+인라인 SVG 차트), 매체 비교 요약, 전주 대비 해석, 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["046"]

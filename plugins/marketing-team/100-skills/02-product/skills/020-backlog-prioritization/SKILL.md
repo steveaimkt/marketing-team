@@ -11,7 +11,7 @@ triggers:
   - "개선 과제 RICE로 정리해줘"
   - "고객 요청 쌓였는데 순서 매겨줘"
 inputs: [VoC·개선 요청 목록(078 산출물 권장), 데이터 근거(판매·리뷰·CS 수치), 가용 리소스(월 인주, 선택)]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [RICE 스코어링 표(근거 병기), 우선순위 백로그 TOP 10, 보류 목록 + 사유, 저장 파일(.csv)]
 requires: [brand/profile.md]
 chains_to: ["078"]

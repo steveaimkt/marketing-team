@@ -12,7 +12,7 @@ triggers:
   - "이 소식 기사화하고 싶어"
   - "프레스 릴리스 작성"
 inputs: [알릴 소식 1건 (출시·성과·제휴·수상 등), 근거 수치·인용 가능한 담당자, brand/profile.md]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [뉴스 가치 앵글 3안, 표준 보도자료 완성본, 배포 리스트 + 피칭 메일 1통, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["028"]

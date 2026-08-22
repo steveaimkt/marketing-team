@@ -11,7 +11,7 @@ triggers:
   - "응대 가이드 문서 만들어줘"
   - "리뷰 답변 템플릿 만들어줘"
 inputs: [자주 오는 문의·리뷰 목록(로그·캡처), 정책 문서(배송·반품·환불), 고객센터 연락처·영업시간]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [3분류 응대 스크립트 세트(악성·문의·칭찬), FAQ, 에스컬레이션 기준표(수치화), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["071"]

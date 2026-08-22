@@ -11,7 +11,7 @@ triggers:
   - "설문 결과 세그먼트로 나눠줘"
   - "고객 조사 질문 설계해줘"
 inputs: [조사 목적, 타깃 응답자, (분석 시) 응답 데이터(CSV/시트)]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [가설-문항 매핑표, 설문 문항 세트(스크리닝→본문→인구통계), (분석 시) 세그먼트 교차표 + 가설 판정, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["008", "070"]

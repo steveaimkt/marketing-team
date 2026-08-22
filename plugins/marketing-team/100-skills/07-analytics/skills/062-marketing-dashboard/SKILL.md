@@ -11,7 +11,7 @@ triggers:
   - "마케팅 현황판 만들어줘"
   - "HTML 리포트 대시보드로 뽑아줘"
 inputs: [멀티채널 데이터 소스(CSV·시트·선행 스킬 산출물), 핵심 지표 정의]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [단일 파일 HTML 대시보드, 지표 정의 문서(계산식), 데이터 갱신 가이드, 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["067"]

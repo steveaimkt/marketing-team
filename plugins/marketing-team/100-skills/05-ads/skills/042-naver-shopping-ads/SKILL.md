@@ -12,7 +12,7 @@ triggers:
   - "브랜드 키워드 빼고 ROAS 얼마야"
   - "네이버 검색광고 어디가 적자야"
 inputs: [네이버 광고 데이터(광고주센터 보고서 CSV 또는 REST API), 자사 브랜드 키워드 목록, 기간]
-sample_fallback: sample-data/naver-ads-sample-report.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/naver-ads-sample-report.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [브랜드/일반 분리 ROAS 리포트, 키워드·소재·입찰 3축 진단, 조정 제안, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["046"]

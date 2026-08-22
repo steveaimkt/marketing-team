@@ -12,7 +12,7 @@ triggers:
   - "부정 리뷰 대응해줘"
   - "리뷰 답변 관리해줘"
 inputs: [리뷰 목록 (텍스트·CSV·캡처 이미지), brand/tone.md]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [감정 분류표, 리뷰별 답변 초안 (복붙 가능), 에스컬레이션 리스트, 저장 파일(.md)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["006", "079"]

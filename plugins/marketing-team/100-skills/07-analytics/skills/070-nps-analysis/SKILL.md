@@ -12,7 +12,7 @@ triggers:
   - "만족도 조사 결과 해석해줘"
   - "추천 안 한다는 고객들 이유 알려줘"
 inputs: [설문·NPS 응답 데이터(CSV·시트 — 점수 열 + 주관식 열), 문항 구조(어느 열이 점수/주관식인지)]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [NPS 산출·그룹 분포, 주관식 테마 분류표(대표 인용 포함), 그룹별 사유 분석, 불만 고객 후속 플로우 제안, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["078"]

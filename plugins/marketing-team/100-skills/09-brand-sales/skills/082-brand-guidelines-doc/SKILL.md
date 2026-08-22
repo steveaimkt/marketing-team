@@ -12,7 +12,7 @@ triggers:
   - "외주에 줄 브랜드 규정집 만들어줘"
   - "톤앤매너 문서로 정리해줘"
 inputs: [로고·컬러·폰트 자산(파일·컬러코드), 보이스 톤 자료(081 산출물 우선), brand/profile.md]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [브랜드 가이드라인 원페이지, 허용/금지 사용 규정 체크리스트, brand/tone.md 전체 갱신안, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["081"]

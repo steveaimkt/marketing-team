@@ -11,7 +11,7 @@ triggers:
   - "불만 유형 분류 체계 만들어줘"
   - "고객 피드백 관리 시스템 잡아줘"
 inputs: [채널별 VoC 소스(리뷰·CS메일·SNS·설문), 분류 기준(선택 — 기본 4+1 카테고리), 070 설문 분석 산출물(선택)]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [채널별 수집 표준, VoC 분류 집계표(카테고리×감정×긴급도), 개선 백로그 연결표(020 RICE 입력 형식), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["020"]

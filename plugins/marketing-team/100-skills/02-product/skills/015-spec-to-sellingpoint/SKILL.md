@@ -11,7 +11,7 @@ triggers:
   - "기능을 혜택으로 번역해줘"
   - "셀링포인트 뽑아줘"
 inputs: [제품 스펙 문서(사양서·상세 스펙표), 타깃 고객(페르소나 또는 한 줄 정의), 리뷰·VoC 자료(선택)]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [기업 언어↔고객 언어 매핑표, 우선순위 셀링포인트 TOP 5~7, 근거 없는 주장 제외 목록, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["051", "043"]

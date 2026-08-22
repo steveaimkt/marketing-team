@@ -12,7 +12,7 @@ triggers:
   - "상세페이지 24섹션으로 짜줘"
   - "상세페이지 구조 잡아줘"
 inputs: [제품 정보·셀링포인트, 타깃 페르소나, VoC·리뷰 자료(선택), brand/tone.md]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [24섹션 구조 기획서, 섹션별 카피, 규제 치환 로그, 저장 파일(.html)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["052", "049"]

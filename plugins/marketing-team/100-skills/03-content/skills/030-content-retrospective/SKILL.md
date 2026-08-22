@@ -12,7 +12,7 @@ triggers:
   - "다음 달 뭐 만들지 성과 보고 정해줘"
   - "발행한 것들 성적표 뽑아줘"
 inputs: [발행 콘텐츠 목록·성과 데이터(또는 연동 채널), 회고 기간(기본 지난 1개월)]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [3계층(도달·참여·전환) 성과 리포트, 승자·패자 패턴 분석, 다음 달 주제 추천 5건(근거 병기), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["021"]

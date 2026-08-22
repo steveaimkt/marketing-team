@@ -12,7 +12,7 @@ triggers:
   - "어느 매체에 돈을 더 써야 해"
   - "광고 예산 재배분 시나리오 만들어줘"
 inputs: [채널별 지출·성과 데이터(041·042·045 산출물 또는 CSV), 총 예산]
-sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [채널 기여 분석, 예산 재배분 시나리오 3안(보수·중립·공격), 추천안+근거, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["043", "095"]

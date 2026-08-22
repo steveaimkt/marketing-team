@@ -12,7 +12,7 @@ triggers:
   - "어디서 들어와서 뭘 하다 나가는지 알려줘"
   - "애널리틱스 리포트 만들어줘"
 inputs: [GA4 데이터(API·MCP 연결 또는 탐색 보고서 CSV 내보내기), 분석 기간(기본 최근 28일), 핵심 전환 이벤트 정의]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [유입→랜딩→전환 3단 해석 리포트, 세팅 오류 검출 목록, 개선 액션 6건(담당 스킬 매핑), 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["048", "050"]

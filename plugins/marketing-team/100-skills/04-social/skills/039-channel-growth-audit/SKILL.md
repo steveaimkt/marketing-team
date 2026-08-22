@@ -11,7 +11,7 @@ triggers:
   - "팔로워가 안 느는 이유 찾아줘"
   - "이 콘텐츠 왜 조회수가 낮았을까"
 inputs: [계정 데이터(도달·팔로워·참여), 기간]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [성장 진단 리포트(강점·약점·병목), 저성과 콘텐츠 훅 분석, 우선 액션 3가지, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["031", "040"]

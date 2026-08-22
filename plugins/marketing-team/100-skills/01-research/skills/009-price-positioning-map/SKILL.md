@@ -11,7 +11,7 @@ triggers:
   - "우리 가격이 적당한지 봐줘"
   - "가격대별로 경쟁 제품 정리해줘"
 inputs: [자사 제품·판매가, 경쟁 제품 목록(또는 카테고리 키워드), 옵션 기준(용량·구성 등)]
-sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [정규화 가격 수집표, 가격-가치 포지셔닝 맵(4사분면), 갭 분석 3줄 + 자사 위치 판정, 저장 파일(.csv)]
 requires: [brand/profile.md]
 chains_to: ["017"]

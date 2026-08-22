@@ -12,7 +12,7 @@ triggers:
   - "채널별로 뭐가 잘 팔리는지 알려줘"
   - "이번 달 매출 뜯어봐줘"
 inputs: [매출 로우데이터(CSV·XLSX·구글시트 — 날짜·상품·채널·수량·단가·매출 열 권장), 분석 기간]
-sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [성장 동인 분해 리포트, 채널·상품·지역 집계표, 이상치 목록+원인 가설, 핵심 차트, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["067", "069"]

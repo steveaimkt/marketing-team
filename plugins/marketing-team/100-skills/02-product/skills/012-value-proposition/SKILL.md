@@ -11,7 +11,7 @@ triggers:
   - "우리 제품 가치제안 만들어줘"
   - "누구한테 왜 팔리는지 문장으로 정리해줘"
 inputs: [제품 정보(011 컨셉 카드 또는 기존 제품), 타깃 페르소나(008 산출물 권장), 경쟁 비교 자료(002 산출물 권장)]
-sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [6단 JTBD 가치제안문 + 원라이너, 차별점-증거 매핑표, 차별점 요약 1페이지, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["013", "051"]

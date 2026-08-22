@@ -12,7 +12,7 @@ triggers:
   - "이 댓글에 뭐라고 답하지"
   - "인스타 문의 답장 초안 써줘"
 inputs: [수신 댓글·DM 목록(원문), 채널(인스타/유튜브/스레드 등), brand/tone.md]
-sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [건별 분류 태그(3분류·감정점수·긴급도), 공개 댓글·DM 이원화 응대 초안, 위기 검출 목록(→089), 게이트 결과 블록, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["038", "089"]

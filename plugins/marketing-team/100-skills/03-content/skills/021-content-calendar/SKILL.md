@@ -12,7 +12,7 @@ triggers:
   - "다음 주 콘텐츠 기획해줘"
   - "월간 팀 명단 짜줘"
 inputs: [운영 채널 목록, 핵심 주제·캠페인 일정, 월 발행 목표(캐파), 글감 소스(트렌드·VoC·키워드 — 선택)]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [월간 캘린더 표(일자×채널×주제×퍼널×실행 스킬), 채널 믹스 요약, 주차별 발행 플랜, 저장 파일(.csv)]
 requires: [brand/profile.md, brand/tone.md]
 chains_to: ["022", "027"]

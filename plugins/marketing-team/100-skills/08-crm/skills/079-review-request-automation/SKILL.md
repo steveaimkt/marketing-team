@@ -11,7 +11,7 @@ triggers:
   - "리뷰 리마인드 메시지 만들어줘"
   - "후기 이벤트 설계해줘"
 inputs: [구매 데이터(주문일·채널·제품), 인센티브 정책(적립·쿠폰 예산), 제품 사용주기(모르면 업종 표준)]
-sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [시점별 요청 플로우(D+3/D+10/D+17), 요청 메시지 세트, 인센티브 설계(대가성 표기 포함), 게이트 결과 블록, 발송 로그, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["054"]

@@ -12,7 +12,7 @@ triggers:
   - "아이템위너 뺏겼어"
   - "발주 시점 잡아줘"
 inputs: [쿠팡 Wing 셀러 인사이트 데이터(일별·상품별 판매, 재고), 가격·마진 정보, 광고 리포트(선택)]
-sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [노출 로직 대응 체크리스트(위험 신호 판정), 가격 전략안, 재고·입고 전략안(ROP 포함), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["041", "057"]

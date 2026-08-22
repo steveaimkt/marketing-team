@@ -12,7 +12,7 @@ triggers:
   - "이 카피 네이버 광고 통과돼?"
   - "광고 반려당했는데 왜 그런지 봐줘"
 inputs: [광고 소재(카피·이미지 설명), 게재 매체(메타·네이버·쿠팡·구글), 업종]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 한 번 묻고 이 파일로 진행한다 (회사 규칙 · 산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [매체별 위반 위험 목록(3단 판정), 대체 표현 제안, 치환 로그, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["099"]
