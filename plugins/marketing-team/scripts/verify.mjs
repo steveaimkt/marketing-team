@@ -204,7 +204,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 }
 
 // ⑥-c 유령 담당 · CMO 파일뿐 아니라 skills/ · docs/ 전체를 본다
-//   실제로 스킬-100-보기 가 없는 담당을 부르고 있었다 (2026-08-22 발견)
+//   실제로 마케팅팀-업무리스트 가 없는 담당을 부르고 있었다 (2026-08-22 발견)
 {
   let bad = 0;
   const files = [];
