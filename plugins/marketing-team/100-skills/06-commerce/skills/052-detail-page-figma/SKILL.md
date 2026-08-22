@@ -67,6 +67,7 @@ success_metrics: [시안 제작 시간 단축, 기획-시안 불일치 건수, �
 > ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `<!doctype html>` + `charset=utf-8` 완전 문서 · **자체 완결**(CDN·외부 폰트 금지) · 아티팩트로 발행하지 않는다 (`docs/공통규약.md §H`)
 
 ## Output Format
 ```

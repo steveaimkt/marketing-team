@@ -129,6 +129,15 @@ for (const s of skills) {
     if (/URL/.test(inp) && !/크롤링 불가|공개|캡처|열릴 때만|스크린샷|랜딩 URL|CTA/.test(inp))
       add(id, 'WARN', `inputs 에 URL 인데 크롤링 가능 여부가 안 적혀 있다 — docs/데이터-가져오기.md §0`);
   }
+  // 5-e 비-md 산출물은 파일 직렬화 계약이 있어야 한다
+  //     2026-08-22 외부 검토 — writes_to 가 .csv 인데 Output Format 은 마크다운 표였다.
+  //     실행자가 마크다운을 .csv 로 저장하고 규칙을 지켰다고 오해한다.
+  {
+    const w = list(fld(f, 'writes_to'));
+    const ext = (w.find(x => x.includes('/')) || '').split('.').pop();
+    if (['csv', 'html', 'pptx', 'xlsx'].includes(ext) && !/\*\*형식\*\* ·/.test(body))
+      add(id, 'ERR', `writes_to 가 .${ext} 인데 착지 블록에 「형식」 줄이 없다 (docs/공통규약.md §H)`);
+  }
   // 6 mutating 은 승인 문구 필수
   if (fld(f, 'mutating') === 'true' && !/승인|⏸|확인 ?후/.test(body)) add(id, 'ERR', 'mutating:true 인데 승인 게이트 없음');
   // 7 절차 최소 3단

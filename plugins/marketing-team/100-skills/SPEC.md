@@ -4,15 +4,26 @@
 > `092 나만의 스킬 만들기` 와 `gates/quality-checklist.md` 가 이 문서를 따른다.
 > 실측 기준 — 100개 전부가 아래를 지키고 있다 (`node scripts/validate-skills.mjs`).
 
+## 0. 공식 스킬과 사용자 스킬 · 두 가지만 다르다
+
+| | 공식 100개 | 사용자 스킬 (092 로 만든 것) |
+|---|---|---|
+| `id` | `001` ~ `100` | **`u01` ~ `u99`** |
+| `category` | `01-research` 등 폴더명 | **`custom`** |
+| 어디 사나 | `100-skills/{카테고리}/skills/` (패키지 · 읽기 전용) | **`brand/my-skills/`** (작업 폴더) |
+| 검사 | `node scripts/validate-skills.mjs` | `node scripts/validate-my-skills.mjs {폴더}` |
+
+**나머지는 전부 같다** — 필수 19 + 선택 1 · 따옴표 · 착지 규칙 · 게이트 · 본문 섹션.
+
 ## 1. frontmatter · 필수 19 + 선택 1
 
 | # | 필드 | 무엇 | 예 |
 |---|---|---|---|
-| 1 | `id` | 3자리 · **따옴표 필수** | `"043"` |
+| 1 | `id` | **공식** 3자리 `001~100` · **사용자** `u01~u99` · 따옴표 필수 | `"043"` · `"u01"` |
 | 2 | `name` | 사람이 읽는 이름 | `메타 광고 카피 팩` |
 | 3 | `description` | 한 줄 + 「~할 때 사용」 | `"…. 카피를 여러 안으로 뽑아야 할 때 사용."` |
 | 4 | `slug` | 영문 케밥 | `meta-ad-copy` |
-| 5 | `category` | 폴더명과 같아야 한다 | `05-ads` |
+| 5 | `category` | **공식** 폴더명과 같아야 한다 · **사용자** 는 `custom` | `05-ads` · `custom` |
 | 6 | `tier` | `EXPERT` · `SPECIALIST` · `CORE` | `EXPERT` |
 | 7 | `triggers` | **3~6개** · 부르는 말 · 리스트 | `- "광고 카피 만들어줘"` |
 | 8 | `inputs` | 무엇이 있어야 하나 · 없으면 어떻게 되나 | `[리뷰 CSV(내보내서 inputs/ 에), 기간]` |
@@ -84,12 +95,12 @@ example/output.md   무엇이 나왔나
 
 ```
 outputs/{날짜}/092-skill-builder-meta/     초안·검증 결과
-brand/my-skills/{u01}-{slug}/SKILL.md      채택본
+brand/my-skills/u{NN}-{slug}/SKILL.md      채택본
 brand/my-skills/INDEX.md                   명부 — CMO 가 공식 100개보다 먼저 본다
 ```
 
-- **ID 는 `u01` 부터.** 공식 `001~100` 과 겹치지 않게
-- `writes_to` 는 `outputs/{날짜}/{u01}-{slug}/…`
+- **ID 는 `u01` 부터** (`u01`~`u99`) · `category: custom`
+- `writes_to` 는 `outputs/{날짜}/u{NN}-{slug}/…`
 - ⛔ **`gate:` 가 없으면 `true` 로 본다.** 내부 문서임이 `gate: false` 로 명시됐을 때만 건너뛴다.
   명부 밖 스킬일수록 검사가 없어지면 안 된다
 

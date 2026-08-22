@@ -69,6 +69,7 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 > ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 같은 폴더에 `-해설.md` 로 따로 (`docs/공통규약.md §H`)
 
 ## Output Format
 ```markdown
