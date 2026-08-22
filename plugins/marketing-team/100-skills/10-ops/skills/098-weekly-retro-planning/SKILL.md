@@ -6,6 +6,7 @@ slug: weekly-retro-planning
 category: 10-ops
 tier: PRO
 triggers:
+  - "이번 주 마케팅 회고하자"
   - "이번 주 회고하자"
   - "주간 회고 정리해줘"
   - "다음 주 우선순위 짜줘"

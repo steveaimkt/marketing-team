@@ -6,6 +6,7 @@ slug: marketing-dashboard
 category: 07-analytics
 tier: SPECIALIST
 triggers:
+  - "마케팅 대시보드 만들어줘"
   - "대시보드 만들어줘"
   - "지표 한눈에 보게 해줘"
   - "마케팅 현황판 만들어줘"

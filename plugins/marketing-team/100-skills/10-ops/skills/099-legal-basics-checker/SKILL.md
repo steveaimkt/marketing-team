@@ -6,6 +6,7 @@ slug: legal-basics-checker
 category: 10-ops
 tier: EXPERT
 triggers:
+  - "이 문구 법적으로 문제없어?"
   - "법적으로 문제없어?"
   - "표시광고법 위반인지 봐줘"
   - "개인정보 고지 점검해줘"

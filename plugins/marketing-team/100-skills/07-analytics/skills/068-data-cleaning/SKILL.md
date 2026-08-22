@@ -6,6 +6,7 @@ slug: data-cleaning
 category: 07-analytics
 tier: PRO
 triggers:
+  - "마케팅 데이터 정리해줘"
   - "데이터 정리해줘"
   - "로우데이터 전처리해줘"
   - "엑셀 데이터 지저분한데 정리해줘"

@@ -6,6 +6,7 @@ slug: linkedin-post
 category: 03-content
 tier: PRO
 triggers:
+  - "링크드인 마케팅 글 써줘"
   - "링크드인 글 써줘"
   - "링크드인 포스트 작성해줘"
   - "B2B 포스트 써줘"

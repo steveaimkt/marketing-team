@@ -6,6 +6,7 @@ slug: backlog-prioritization
 category: 02-product
 tier: PRO
 triggers:
+  - "제품 개선 우선순위 정해줘"
   - "개선 뭐부터 하지?"
   - "백로그 우선순위 정해줘"
   - "개선 과제 RICE로 정리해줘"

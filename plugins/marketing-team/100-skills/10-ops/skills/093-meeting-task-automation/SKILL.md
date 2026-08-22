@@ -6,6 +6,7 @@ slug: meeting-task-automation
 category: 10-ops
 tier: PRO
 triggers:
+  - "회의록 정리하고 업무 나눠줘"
   - "회의록 정리해줘"
   - "회의 내용 태스크로 나눠줘"
   - "업무 배분 정리해줘"

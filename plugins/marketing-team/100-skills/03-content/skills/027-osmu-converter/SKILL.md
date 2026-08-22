@@ -6,6 +6,7 @@ slug: osmu-converter
 category: 03-content
 tier: SPECIALIST
 triggers:
+  - "콘텐츠 채널별로 바꿔줘"
   - "채널별로 바꿔줘"
   - "이 글 여러 채널용으로 변환해줘"
   - "OSMU 돌려줘"

@@ -6,6 +6,7 @@ slug: value-proposition
 category: 02-product
 tier: PRO
 triggers:
+  - "제품 차별점 정리해줘"
   - "차별점 정리해줘"
   - "USP 뽑아줘"
   - "우리 제품 가치제안 만들어줘"

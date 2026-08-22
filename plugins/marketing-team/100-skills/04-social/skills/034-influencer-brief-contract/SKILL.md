@@ -6,6 +6,7 @@ slug: influencer-brief-contract
 category: 04-social
 tier: PRO
 triggers:
+  - "인플루언서 브리프 만들어줘"
   - "협업 브리프 만들어줘"
   - "인플루언서 계약서 체크해줘"
   - "협찬 가이드 문서 만들어줘"

@@ -6,6 +6,7 @@ slug: channel-growth-audit
 category: 04-social
 tier: EXPERT
 triggers:
+  - "채널 성장이 왜 멈췄어?"
   - "채널 뭐가 문제야?"
   - "계정 성장 진단해줘"
   - "팔로워가 안 느는 이유 찾아줘"

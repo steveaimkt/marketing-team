@@ -6,6 +6,7 @@ slug: ab-test-design
 category: 02-product
 tier: EXPERT
 triggers:
+  - "A/B 테스트 설계해줘"
   - "테스트 설계해줘"
   - "AB 테스트 어떻게 하지"
   - "실험 설계안 만들어줘"

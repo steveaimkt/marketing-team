@@ -6,6 +6,7 @@ slug: survey-design
 category: 01-research
 tier: PRO
 triggers:
+  - "고객 설문 만들어줘"
   - "설문 만들어줘"
   - "설문지 문항 짜줘"
   - "설문 결과 세그먼트로 나눠줘"

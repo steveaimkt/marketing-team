@@ -6,6 +6,7 @@ slug: product-naming
 category: 02-product
 tier: PRO
 triggers:
+  - "제품 이름 지어줘"
   - "이름 지어줘"
   - "제품 네이밍 해줘"
   - "브랜드명 후보 뽑아줘"

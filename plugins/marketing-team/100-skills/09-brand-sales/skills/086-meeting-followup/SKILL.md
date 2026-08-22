@@ -6,6 +6,7 @@ slug: meeting-followup
 category: 09-brand-sales
 tier: PRO
 triggers:
+  - "미팅 노트 정리해줘"
   - "미팅 정리해줘"
   - "상담 녹취 요약해줘"
   - "미팅 후속 메일 써줘"
