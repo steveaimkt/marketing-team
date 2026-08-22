@@ -1,4 +1,4 @@
-import re, os, glob, json, collections
+import re, os, glob, json, collections, sys
 ROOT="100-skills"
 def fm(t):
     m=re.match(r'^---\n(.*?)\n---\n', t, re.S); return m.group(1) if m else ""
@@ -64,3 +64,5 @@ for cat,v in sorted(I.items(), key=lambda x:-len(x[1])):
     print(f"  {'🔴' if r else '🟡'} {cat:20s} {len(v):3d}건")
 print(f"\n  합계 {tot}건")
 json.dump({k:[list(x) for x in v] for k,v in I.items()}, open('/tmp/audit.json','w'), ensure_ascii=False)
+
+sys.exit(1 if any(x[0]=='🔴' for v in I.values() for x in v) else 0)

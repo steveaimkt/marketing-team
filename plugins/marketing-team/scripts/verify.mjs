@@ -238,6 +238,60 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-e 100-skills 내부 참조 · 여기가 통째로 사각지대였다
+//   ⑥ 은 agents/ · skills/ 만 훑는다. 그래서 TEAM.md · data/connections.md ·
+//   mcp-setup/ 같은 없는 문서를 22곳이 가리키는 걸 못 봤다 (2026-08-22 외부 검토에서 발견).
+{
+  const M2 = path.join(ROOT, '100-skills');
+  let bad = 0, seen = 0;
+  if (fs.existsSync(M2)) {
+    const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p);
+      if (!e.name.endsWith('.md')) return;
+      const t = fs.readFileSync(p, 'utf8');
+      // 백틱 안의 패키지 상대경로만 본다 (자리표시자·URL 제외)
+      for (const m of t.matchAll(/`((?:docs|100-skills|gates|sample-data|brand-templates|scripts|data|mcp-setup)\/[^`\s)]+?\.(?:md|csv|json|mjs|html))`/g)) {
+        const tgt = m[1];
+        if (/[{}…*]/.test(tgt)) continue;
+        seen++;
+        const cands = [path.join(ROOT, tgt), path.join(M2, tgt)];
+        if (!cands.some(c => fs.existsSync(c))) { err(`100-skills 가 없는 파일을 참조한다: ${tgt}  ← ${path.relative(ROOT, p)}`); bad++; }
+      }
+      // TEAM.md 처럼 백틱 없이 쓰인 죽은 문서
+      for (const dead of ['TEAM.md', 'data/connections.md', 'mcp-setup/'])
+        if (t.includes(dead)) { err(`100-skills 에 죽은 참조 「${dead}」  ← ${path.relative(ROOT, p)}`); bad++; }
+    });
+    walk(M2);
+  }
+  if (!bad) ok.push(`100-skills 내부 참조 ${seen}건 검사`);
+}
+
+// ⑥-f gate:true 스킬의 실습 예시에 판정 블록이 있나
+//   053 이 gate:true 인데 예시에 CCO 판정이 없었다 (2026-08-22 발견)
+{
+  let bad = 0, n = 0;
+  for (const p of fs.existsSync(path.join(ROOT, '100-skills')) ?
+       fs.readdirSync(path.join(ROOT, '100-skills'), { withFileTypes: true })
+         .filter(e => e.isDirectory() && /^\d\d-/.test(e.name))
+         .flatMap(c => {
+           const sd = path.join(ROOT, '100-skills', c.name, 'skills');
+           return fs.existsSync(sd) ? fs.readdirSync(sd).map(x => path.join(sd, x)) : [];
+         }) : []) {
+    const sk = path.join(p, 'SKILL.md');
+    if (!fs.existsSync(sk)) continue;
+    if (!/^gate:\s*true/m.test(fs.readFileSync(sk, 'utf8'))) continue;
+    n++;
+    const ex = path.join(p, 'example', 'output.md');
+    if (!fs.existsSync(ex)) continue;
+    const t = fs.readFileSync(ex, 'utf8');
+    if (!/🛡|CCO\(규제\)|게이트 판정|컴플라이언스 게이트/.test(t)) {
+      err(`gate:true 인데 실습 예시에 판정 블록이 없다: ${path.basename(p)}`); bad++;
+    }
+  }
+  if (!bad && n) ok.push(`gate:true ${n}개 · 실습 예시에 판정 블록 있음`);
+}
+
 // ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
 //   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
 //   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)
