@@ -234,6 +234,15 @@ for (const link of ['agents', 'skills']) {
   if (d.includes('완주 조건')) ok.push('완주 조건 셋 명시 (단축 요청에도 생략 불가)');
 }
 
+// ⑪ 카탈로그 · 100개를 한 장으로 보는 파일이 있고 명부보다 최신인가
+{
+  const cat = path.join(M, '카탈로그.html'), routing = path.join(M, 'ROUTING.md');
+  if (!fs.existsSync(cat)) err('100-skills/카탈로그.html 없음 — `node scripts/build-catalog.mjs`');
+  else if (fs.existsSync(routing) && fs.statSync(routing).mtimeMs > fs.statSync(cat).mtimeMs)
+    warn('카탈로그가 ROUTING.md 보다 오래됐다 — `node scripts/build-catalog.mjs` 로 다시 만든다');
+  else ok.push('카탈로그 최신');
+}
+
 // 출력
 console.log('\n마케팅 팀 패키지 점검\n');
 for (const o of ok) console.log(`  ✅ ${o}`);
