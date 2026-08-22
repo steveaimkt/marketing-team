@@ -66,6 +66,10 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
+> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv`
+> 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
+> 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+
 ## Output Format
 ```markdown
 # 🔍 인플루언서 스코어카드: {카테고리} × {타깃}
