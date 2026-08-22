@@ -292,6 +292,22 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   if (!bad && n) ok.push(`gate:true ${n}개 · 실습 예시에 판정 블록 있음`);
 }
 
+// ⑥-g 구축 스킬의 점검표 숫자가 실물과 맞나
+//   「skills/ 4개 전부」가 3개인 상태로 남아 온보딩 점검이 항상 실패 판정을 냈다
+{
+  const p = path.join(sdir, '마케팅팀-구축하기', 'SKILL.md');
+  if (fs.existsSync(p)) {
+    const t = fs.readFileSync(p, 'utf8');
+    const nSkills = fs.readdirSync(sdir, { withFileTypes: true }).filter(e => e.isDirectory()).length;
+    const nAgents = fs.readdirSync(adir).filter(f => f.endsWith('.md')).length;
+    const m = t.match(/`skills\/` 폴더마다 `SKILL\.md` \| \*\*(\d+)\*\*/);
+    if (m && Number(m[1]) !== nSkills) err(`구축 스킬 점검표의 스킬 수 ${m[1]} ≠ 실제 ${nSkills}`);
+    const a2 = t.match(/`agents\/` 의 `\.md` 개수 \| \*\*(\d+)\*\*/);
+    if (a2 && Number(a2[1]) !== nAgents) err(`구축 스킬 점검표의 담당 수 ${a2[1]} ≠ 실제 ${nAgents}`);
+    if (m || a2) ok.push(`구축 스킬 점검표 숫자 = 실물 (스킬 ${nSkills} · 담당 ${nAgents})`);
+  }
+}
+
 // ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
 //   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
 //   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)
