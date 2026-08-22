@@ -1,5 +1,8 @@
 import re, os, glob, json, collections, sys
-ROOT="100-skills"
+from pathlib import Path
+# 실행 위치가 아니라 스크립트 위치를 기준으로 잡는다.
+# 저장소 루트에서 돌리면 0개를 찾고도 성공으로 끝났다 (2026-08-22 발견).
+ROOT = str(Path(__file__).resolve().parent.parent / "100-skills")
 def fm(t):
     m=re.match(r'^---\n(.*?)\n---\n', t, re.S); return m.group(1) if m else ""
 def fld(f,k):
@@ -57,6 +60,8 @@ for s in S:
 for s in S:
     if inc[s['id']]==0 and not s['chains']: add('🟡','체인 고립',s,'들어오지도 나가지도 않는다')
 
+if len(S) != 100:
+    print(f"🔴 스킬 {len(S)}개 — 100개여야 한다 (경로: {ROOT})"); sys.exit(1)
 print(f"스킬 {len(S)}개 감사\n")
 tot=0
 for cat,v in sorted(I.items(), key=lambda x:-len(x[1])):

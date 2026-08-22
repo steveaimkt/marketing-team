@@ -400,11 +400,41 @@ for (const link of ['agents', 'skills']) {
 
 // ⑪ 카탈로그 · 100개를 한 장으로 보는 파일이 있고 명부보다 최신인가
 {
+  // ⚠️ 시각(mtime) 비교로는 「둘 다 낡은」 상태를 못 잡는다.
+  //    2026-08-22 · ROUTING.md 가 SKILL.md 와 16개 어긋났는데 카탈로그도 같이 낡아서 통과했다.
+  //    CMO 는 명부를 먼저 읽으므로, 정본을 고쳐도 구형 이름·트리거로 판단한다.
   const cat = path.join(M, '카탈로그.html'), routing = path.join(M, 'ROUTING.md');
   if (!fs.existsSync(cat)) err('100-skills/카탈로그.html 없음 — `node scripts/build-catalog.mjs`');
-  else if (fs.existsSync(routing) && fs.statSync(routing).mtimeMs > fs.statSync(cat).mtimeMs)
-    warn('카탈로그가 ROUTING.md 보다 오래됐다 — `node scripts/build-catalog.mjs` 로 다시 만든다');
-  else ok.push('카탈로그 최신');
+  if (!fs.existsSync(routing)) err('100-skills/ROUTING.md 없음 — `node scripts/build-routing.mjs`');
+  else {
+    // SKILL.md(정본) → ROUTING.md 전수 대조
+    const rows = Object.fromEntries([...fs.readFileSync(routing, 'utf8')
+      .matchAll(/^\| (\d{3}) \| (.+?) \| (.+?) \|/gm)].map(m => [m[1], { name: m[2].trim(), trig: m[3].trim() }]));
+    let drift = 0;
+    for (const cdir of fs.readdirSync(M).filter(d => /^\d\d-/.test(d))) {
+      const sd = path.join(M, cdir, 'skills');
+      if (!fs.existsSync(sd)) continue;
+      for (const d of fs.readdirSync(sd)) {
+        const p = path.join(sd, d, 'SKILL.md');
+        if (!fs.existsSync(p)) continue;
+        const t = fs.readFileSync(p, 'utf8');
+        const f2 = (t.match(/^---\n([\s\S]*?)\n---\n/) || [, ''])[1];
+        const id = ((f2.match(/^id:\s*(.*)$/m) || [, ''])[1] || '').trim().replace(/"/g, '');
+        const nm = ((f2.match(/^name:\s*(.*)$/m) || [, ''])[1] || '').trim().replace(/"/g, '');
+        const tg = [...f2.matchAll(/^\s+- "(.+?)"$/gm)].map(m => `"${m[1]}"`).join(' · ');
+        const r = rows[id];
+        if (!r) { err(`ROUTING.md 에 ${id} 이 없다`); drift++; continue; }
+        if (r.name !== nm) { err(`ROUTING.md ${id} 이름 불일치 · 명부「${r.name}」≠ 정본「${nm}」`); drift++; }
+        else if (r.trig !== tg) { err(`ROUTING.md ${id} 부르는 말 불일치 — SKILL.md 가 정본이다`); drift++; }
+      }
+    }
+    if (drift) err(`총 ${drift}개 어긋남 — \`node scripts/build-routing.mjs\` 로 다시 만든다`);
+    else ok.push(`ROUTING.md = SKILL.md 100개 전수 일치`);
+    // 카탈로그는 ROUTING 의 파생물이라 시각 비교로 충분하다
+    if (fs.existsSync(cat) && fs.statSync(routing).mtimeMs > fs.statSync(cat).mtimeMs)
+      warn('카탈로그가 ROUTING.md 보다 오래됐다 — `node scripts/build-catalog.mjs`');
+    else if (fs.existsSync(cat)) ok.push('카탈로그 최신');
+  }
 }
 
 // 출력

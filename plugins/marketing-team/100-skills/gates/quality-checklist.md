@@ -18,7 +18,9 @@
 | 진단 | 점수/등급 → 강점 2 · 약점 2 → 처방 (스킬 체인 제안) |
 
 ## C. 스킬 제작 심사 5항 (plugins/ 편입 심사용)
-- [ ] 표준 YAML 헤더 완비 (id~version 15필드 — SPEC.md §2, id·chains_to 따옴표 필수)
+- [ ] 표준 YAML 헤더 완비 (**필수 19 + 선택 `sample_fallback`** — `SPEC.md §1` · id·chains_to 따옴표 필수)
+- [ ] `inputs` 가 파일(CSV·엑셀)을 요구하면 `sample_fallback` 이 있다 (없으면 데이터 없는 사용자에겐 멈춘다)
+- [ ] `## Phases` 끝에 **착지 블록**이 있다 (`SPEC.md §4`)
 - [ ] STEP이 재현 가능 — 같은 입력이면 누가 돌려도 같은 구조의 산출물
 - [ ] profile.md 참조가 명시돼 있고 브랜드 재질문이 없다
 - [ ] gate 판정이 정확하다 (대외 발행물인데 gate: false면 반려)
