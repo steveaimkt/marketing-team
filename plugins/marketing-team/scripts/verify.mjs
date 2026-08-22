@@ -309,6 +309,48 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-h LICENSE · 매니페스트가 MIT 라면 파일이 있어야 한다
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  const lic = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude-plugin/plugin.json'), 'utf8')).license;
+  if (lic && repoRoot && !fs.existsSync(path.join(repoRoot, 'LICENSE')))
+    err(`plugin.json 이 ${lic} 인데 저장소에 LICENSE 파일이 없다`);
+  else if (lic) ok.push(`LICENSE (${lic})`);
+}
+
+// ⑥-i 생성 수치가 문서와 같나 (build-stats --check 와 같은 계산)
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  const targets = [path.join(ROOT, 'docs', '공통규약.md')];
+  if (repoRoot) targets.push(path.join(repoRoot, 'README.md'));
+  let miss = 0;
+  for (const t of targets) {
+    if (!fs.existsSync(t)) continue;
+    if (!fs.readFileSync(t, 'utf8').includes('<!-- STATS:START -->')) { warn(`${path.basename(t)} 에 STATS 블록이 없다 — 숫자가 손으로 적혀 어긋난다`); miss++; }
+  }
+  if (!miss) ok.push('생성 수치 블록 존재 (build-stats.mjs)');
+}
+
+// ⑥-j writes_to 가 파일인가 디렉터리인가
+{
+  let dirs = 0;
+  for (const c of fs.readdirSync(M).filter(d => /^\d\d-/.test(d))) {
+    const sd = path.join(M, c, 'skills');
+    if (!fs.existsSync(sd)) continue;
+    for (const d of fs.readdirSync(sd)) {
+      const p = path.join(sd, d, 'SKILL.md');
+      if (!fs.existsSync(p)) continue;
+      const f2 = (fs.readFileSync(p, 'utf8').match(/^---\n([\s\S]*?)\n---\n/) || [, ''])[1];
+      const w = ((f2.match(/^writes_to:\s*(.*)$/m) || [, ''])[1] || '').replace(/^\[|\]$/g, '')
+        .split(',').map(x => x.trim()).filter(x => x.includes('/'))[0] || '';
+      if (w && w.endsWith('/')) { err(`writes_to 가 디렉터리다 (파일이어야 한다): ${d} → ${w}`); dirs++; }
+    }
+  }
+  if (!dirs) ok.push('writes_to 전부 파일 경로');
+}
+
 // ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
 //   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
 //   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)

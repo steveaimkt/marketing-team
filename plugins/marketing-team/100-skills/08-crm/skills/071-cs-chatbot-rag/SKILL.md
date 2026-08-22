@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["072"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/]
+writes_to: [outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CS센터 자동화 구축 7년차 컨설턴트 — 모르는 질문에 아는 척하는 봇은 배포하지 않는다"
@@ -63,9 +63,11 @@ success_metrics: [자동응대 처리율, 오답률, 상담사 이관 정확도]
 9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag/`
+> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **함께 나오는 것** · 같은 폴더에 `knowledge_base/_index.md` 와 `knowledge_base/{카테고리}/{주제}.md`.
+> 주 산출물(`.md`)에 구축 결과·응대 정책·테스트 요약을 담고, 지식베이스는 그 아래 폴더로 둔다.
 
 ## Output Format
 ```markdown
