@@ -130,7 +130,7 @@ for (const c of chains) {
 }
 if (chains.length !== 15) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 15종)`);
 
-// 10 배포판 디렉터가 팀장 10명을 전부 알고 있는가 · 2026-08-04
+// 10 배포판 CMO가 팀장 10명을 전부 알고 있는가 · 2026-08-04
 //   왜: 배포판 orchestrator.md 에 저자 개인 인스턴스가 실려 나간 적이 있다.
 //       팀장 셋(social·ads·commerce)을 아예 부르지 않는 문서였는데 게이트를 통과했다.
 //       감사는 개인정보 '문자열'만 봤지 '내용이 배포용인지'는 안 봤다.
@@ -140,10 +140,9 @@ const IS_DIST = fs.existsSync(path.join(ROOT, '.dist-only'));
 const orch = path.join(ROOT, 'agents', 'orchestrator.md');
 if (IS_DIST && fs.existsSync(orch)) {
   const t = fs.readFileSync(orch, 'utf8');
-  const leads = fs.existsSync(path.join(ROOT, 'agents', 'leads'))
-    ? fs.readdirSync(path.join(ROOT, 'agents', 'leads')).filter(f => f.endsWith('.md')).map(f => f.replace(/\.md$/, ''))
-    : [];
-  for (const l of leads) if (!t.includes(l)) add('orchestrator', 'ERR', `디렉터가 모르는 팀장: ${l}`);
+  // agents/leads/ 는 v0.6.0 에서 사라졌다 (팀장 10명 → 판정 전담 2명). 검사도 함께 지운다.
+  for (const a of ['staff-gate-auditor', 'staff-reviewer'])
+    if (!t.includes(a)) add('orchestrator', 'ERR', `CMO가 모르는 담당: ${a}`);
   for (const w of ['기억 저장소', '트루먼']) {
     if (t.includes(w)) add('orchestrator', 'WARN', `배포판에 개인 인스턴스 흔적: ${w}`);
   }

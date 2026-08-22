@@ -91,27 +91,27 @@ else {
     const desc = (fm.match(/^description:\s*(.+)$/m) || [, ''])[1].trim();
     if (!name) err(`agents/${e.name} · name 없음`);
     else if (name !== base) err(`agents/${e.name} · 파일명과 name 불일치 (${name})`);
-    if (!desc) err(`agents/${e.name} · description 없음 — 디렉터가 언제 부를지 모른다`);
+    if (!desc) err(`agents/${e.name} · description 없음 — CMO가 언제 부를지 모른다`);
     agents.push(base);
   }
-  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비) · 디렉터는 스킬`);
+  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비) · CMO는 스킬`);
 }
 
-// ③ 디렉터가 전원을 알고 있나 · 유령이 없나
-// 디렉터는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
+// ③ CMO가 전원을 알고 있나 · 유령이 없나
+// CMO는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
 //   서브에이전트가 다시 위임하면 맥락이 두 겹으로 접힌다. 내려가는 단계는 언제나 한 단이다.
 if (fs.existsSync(path.join(adir, 'marketing-director.md')))
-  err('agents/marketing-director.md 가 있다 — 디렉터는 skills/마케팅-디렉터 여야 한다 (중첩 위임 방지)');
-const dpath = path.join(ROOT, 'skills', '마케팅-디렉터', 'SKILL.md');
-if (!fs.existsSync(dpath)) err('skills/마케팅-디렉터/SKILL.md 없음 — 입구가 없다');
+  err('agents/marketing-director.md 가 있다 — CMO는 skills/마케팅-CMO 여야 한다 (중첩 위임 방지)');
+const dpath = path.join(ROOT, 'skills', '마케팅-CMO', 'SKILL.md');
+if (!fs.existsSync(dpath)) err('skills/마케팅-CMO/SKILL.md 없음 — 입구가 없다');
 else {
   const d = fs.readFileSync(dpath, 'utf8');
-  for (const a of agents) if (!d.includes(a)) err(`디렉터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
+  for (const a of agents) if (!d.includes(a)) err(`CMO가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
   // 담당은 「내가 나를 검사할 수 없는 자리」에만 둔다 (2026-08-22 결정). 실행자는 두지 않는다.
   const exec = agents.filter(a => !a.startsWith('staff-'));
-  if (exec.length) err(`실행 담당이 있다: ${exec.join(', ')} — 실행은 디렉터가 메인에서 한다. 담당은 판정 전담만`);
+  if (exec.length) err(`실행 담당이 있다: ${exec.join(', ')} — 실행은 CMO가 메인에서 한다. 담당은 판정 전담만`);
   for (const m of d.matchAll(/`(lead-[a-z-]+|staff-[a-z-]+)`/g))
-    if (!agents.includes(m[1])) err(`디렉터가 없는 담당을 부른다: ${m[1]}`);
+    if (!agents.includes(m[1])) err(`CMO가 없는 담당을 부른다: ${m[1]}`);
 }
 
 // ④ 스킬 · 바로 아래 한 단계
@@ -173,21 +173,115 @@ for (const r of REFD) {
 }
 if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs·logs 는 실행 중 생기므로 제외)`);
 
-// ⑦ 개인 인스턴스 흔적
-const TRACES = ['트루먼', '/private/tmp/claude-', '/Users/'];
-// 배포되는 면만 본다 · 작업 메모 폴더까지 뒤지면 오탐이 난다
-const SHIPPED = ['agents', 'skills', 'docs', '100-skills', '.claude-plugin', 'README.md'];
-const scan = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
-  if (d === ROOT && !SHIPPED.includes(e.name)) return;
-  if (e.name.startsWith('.') && d !== ROOT) return;
-  if (e.name === 'node_modules') return;
-  const p = path.join(d, e.name);
-  if (e.isDirectory()) return scan(p);
-  if (!/\.(md|json)$/.test(e.name)) return;
-  const t = fs.readFileSync(p, 'utf8');
-  for (const w of TRACES) if (t.includes(w)) warn(`개인 인스턴스 흔적 "${w}" · ${path.relative(ROOT, p)}`);
-});
-scan(ROOT);
+// ⑥-b 스킬 이름 참조 대조 · 개명하면 여기서 죽는다
+//   ⑥ 은 백틱 안이 docs/ · 100-skills/ … 로 시작할 때만 본다. 스킬 「이름」은 검사 대상이 아니었다.
+{
+  const real = fs.existsSync(sdir)
+    ? fs.readdirSync(sdir, { withFileTypes: true }).filter(e => e.isDirectory()).map(e => e.name) : [];
+  const looksLikeSkill = tok => /^[0-9]-|보기$|하기$|^마케팅-/.test(tok) && !tok.includes('/') && !tok.includes('.');
+  let bad = 0;
+  const files = [];
+  for (const dir of [adir, sdir, path.join(ROOT, 'docs')]) {
+    if (!fs.existsSync(dir)) continue;
+    const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p);
+      if (e.name.endsWith('.md')) files.push(p);
+    });
+    walk(dir);
+  }
+  for (const p of files) {
+    const t = fs.readFileSync(p, 'utf8');
+    for (const m of t.matchAll(/`([^`\s\/]{2,30})`/g)) {
+      const tok = m[1];
+      if (!looksLikeSkill(tok)) continue;
+      if (real.includes(tok)) continue;
+      err(`없는 스킬 이름을 가리킨다: \`${tok}\`  ← ${path.relative(ROOT, p)}`);
+      bad++;
+    }
+  }
+  if (!bad && real.length) ok.push(`스킬 이름 참조 대조 (${real.join(' · ')})`);
+}
+
+// ⑥-c 유령 담당 · CMO 파일뿐 아니라 skills/ · docs/ 전체를 본다
+//   실제로 스킬-100-보기 가 없는 담당을 부르고 있었다 (2026-08-22 발견)
+{
+  let bad = 0;
+  const files = [];
+  for (const dir of [sdir, path.join(ROOT, 'docs'), adir]) {
+    if (!fs.existsSync(dir)) continue;
+    const walk = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p);
+      if (e.name.endsWith('.md')) files.push(p);
+    });
+    walk(dir);
+  }
+  for (const p of files) {
+    const t = fs.readFileSync(p, 'utf8');
+    for (const m of t.matchAll(/`(lead-[a-z-]+|staff-[a-z-]+|marketing-director)`/g))
+      if (!agents.includes(m[1])) { err(`없는 담당을 부른다: ${m[1]}  ← ${path.relative(ROOT, p)}`); bad++; }
+  }
+  if (!bad) ok.push('유령 담당 없음 (skills · docs · agents 전역)');
+}
+
+// ⑥-d 버전이 두 곳에 있다 · 한쪽만 올리면 코워크가 「새것 없음」으로 판정한다
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  if (repoRoot) {
+    const pv = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude-plugin/plugin.json'), 'utf8')).version;
+    const mv = JSON.parse(fs.readFileSync(path.join(repoRoot, '.claude-plugin/marketplace.json'), 'utf8'))
+      ?.plugins?.[0]?.version;
+    if (pv !== mv) err(`버전 불일치 · plugin.json ${pv} vs marketplace.json ${mv} — 한쪽만 올리면 업데이트가 안 뜬다`);
+    else ok.push(`버전 두 곳 일치 (${pv})`);
+  }
+}
+
+// ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
+//   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
+//   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)
+{
+  const bwPath = path.join(ROOT, 'scripts', 'banned-words.json');
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  if (!fs.existsSync(bwPath)) warn('scripts/banned-words.json 없음 — 금칙어 검사를 건너뛴다');
+  else {
+    const bw = JSON.parse(fs.readFileSync(bwPath, 'utf8'));
+    const groups = Object.entries(bw).filter(([k]) => !k.startsWith('_'));
+    const files = [];
+    const SHIPPED = ['agents', 'skills', 'docs', '100-skills', '.claude-plugin', 'scripts', 'brand-templates'];
+    const walk = (d, root, top) => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      if (d === root && top && !top.includes(e.name)) return;
+      if (e.name.startsWith('.') && d !== root) return;
+      if (e.name === 'node_modules') return;
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p, root, null);
+      if (/\.(md|json|mjs|html)$/.test(e.name)) files.push(p);
+    });
+    walk(ROOT, ROOT, SHIPPED);
+    if (repoRoot) {
+      for (const n of ['README.md']) {
+        const p = path.join(repoRoot, n); if (fs.existsSync(p)) files.push(p);
+      }
+      const mk = path.join(repoRoot, '.claude-plugin', 'marketplace.json');
+      if (fs.existsSync(mk)) files.push(mk);
+    }
+    let hits = 0;
+    for (const p of files) {
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      if (rel.includes('/100-skills/')) continue;        // persona 직함 등 오탐 구역
+      if (rel === 'scripts/banned-words.json') continue;  // 금칙어 목록 자신 — 여기 없으면 검사가 성립 안 한다
+      const t = fs.readFileSync(p, 'utf8');
+      for (const [g, cfg] of groups) {
+        if ((cfg.allow || []).some(a => rel.endsWith(a))) continue;
+        for (const w of cfg.words) if (t.includes(w)) { warn(`${g} 「${w}」 잔존 · ${rel}`); hits++; }
+      }
+    }
+    if (!hits) ok.push(`금칙어 ${groups.length}군 · ${files.length}개 파일 깨끗`);
+  }
+}
+
 
 
 // ⑧ 폴더로 열어 쓰는 경로 · .claude/ 연결 고리
@@ -226,11 +320,11 @@ for (const link of ['agents', 'skills']) {
   else ok.push('경로 규칙 전원 명시 (패키지 안 vs 작업 폴더)');
 }
 
-// ⑩ 디렉터에 완주 조건이 살아 있나 (2026-08-22 시뮬에서 「짧게」 한마디에 게이트·착지가 빠졌다)
+// ⑩ CMO에 완주 조건이 살아 있나 (2026-08-22 시뮬에서 「짧게」 한마디에 게이트·착지가 빠졌다)
 {
   const d = fs.existsSync(dpath) ? fs.readFileSync(dpath, 'utf8') : '';
   for (const k of ['완주 조건', '파일 착지', '규제 게이트', '원장'])
-    if (!d.includes(k)) { err(`디렉터에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
+    if (!d.includes(k)) { err(`CMO에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
   if (d.includes('완주 조건')) ok.push('완주 조건 셋 명시 (단축 요청에도 생략 불가)');
 }
 

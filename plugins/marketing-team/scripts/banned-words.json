@@ -1,0 +1,18 @@
+{
+  "_why": "verify.mjs 가 이 목록을 읽어 배포면을 훑는다. 검색어를 코드에 리터럴로 쓰면 verify.mjs 자신이 걸려 영구 🔴 가 된다. 그래서 데이터로 분리한다.",
+  "retired_roles": {
+    "_why": "v0.14.0 에서 CMO · CCO(규제) · CSO(검수) 로 바꿨다. 옛 이름이 남으면 문서마다 다른 직함이 돌아다닌다.",
+    "words": ["감사관", "검수관", "마케팅-디렉터"],
+    "allow": ["docs/팀-헌장.md", "docs/도메인-금기.md", "scripts/sync-skills.mjs", "scripts/smoke.md"]
+  },
+  "dead_skills": {
+    "_why": "삭제된 스킬을 가리키면 사용자가 그 이름을 입력하고 아무것도 안 뜬다.",
+    "words": ["0-사용가이드", "2-브랜드-등록하기", "3-내-에이전트-만들기", "3-팀-짜기"],
+    "allow": ["scripts/smoke.md"]
+  },
+  "personal_traces": {
+    "_why": "개인 인스턴스 흔적이 배포물에 섞이면 안 된다.",
+    "words": ["트루먼", "/private/tmp/claude-", "/Users/"],
+    "allow": ["scripts/sync-skills.mjs", "scripts/validate-skills.mjs"]
+  }
+}
