@@ -1,7 +1,7 @@
 {
   "name": "marketing-team",
   "description": "마케팅 스킬 100개를 바로 쓰고, 브랜드 정보를 채우면 그 정보로 100개를 골라 내 에이전트가 조립된다.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": {
     "name": "WMBB"
   },
