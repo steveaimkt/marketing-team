@@ -492,10 +492,31 @@ CCO가 반려하면 **내가 고치고 다시 CCO에게 보낸다** — CCO는 �
 
 **파일로 남기지 않으면 안 한 것이다** (`docs/공통규약.md §H`). 경로는 위에서부터 이긴다.
 
+⛔ **경로를 조합하지 않는다. 스킬의 `writes_to` 를 그대로 쓴다.**
+
 ```
-① brand/profile.md §7 산출물 저장   ← 사용자가 바꿔 뒀으면 그것
-② 스킬의 writes_to                  ← 파일 이름과 확장자
-③ outputs/{YYYY-MM-DD}/{번호}-{슬러그}/   ← 폴더는 이 규칙이 정한다
+스킬 frontmatter          writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.csv]
+                                      └──────────── 이것을 그대로 ────────────┘
+{날짜} 만 오늘로 채운다     outputs/2026-08-22/006-review-mining/006-review-mining.csv
+```
+
+100개 중 **99개가 `writes_to` 를 갖고 있다.** 규칙을 다시 계산할 일이 없다.
+
+| 순서 | 언제 |
+|---|---|
+| ① `brand/profile.md §7` | 사용자가 저장 위치를 바꿔 뒀을 때만 |
+| ② **스킬의 `writes_to`** | **거의 항상 여기서 끝난다** |
+| ③ `outputs/{YYYY-MM-DD}/{번호}-{슬러그}/` | `writes_to` 가 **없을 때만** 만들어 쓴다 |
+
+⛔ **다음은 전부 위반이다** — 한 번이라도 하면 산출물이 사라진 것과 같다.
+
+```
+✗  output/…              폴더 이름은 outputs (복수)
+✗  input/…               inputs (복수)
+✗  outputs/{카테고리}/…    카테고리 축은 없앴다
+✗  LEDGER.md             원장은 logs/build-log.md 하나다
+✗  english_file_name.md  파일 이름은 writes_to 가 정한다. 지어내지 않는다
+✗  .csv → .md            확장자를 바꾸면 쓸 수 없는 산출물이 된다
 ```
 
 **스킬 하나를 돌리면 폴더 하나를 만든다.** 그 실행의 결과가 전부 거기 모인다.

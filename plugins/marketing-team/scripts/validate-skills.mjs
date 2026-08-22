@@ -82,6 +82,23 @@ for (const s of skills) {
 
   // 5 게이트 스킬은 판정 블록 필수
   if (fld(f, 'gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|🛡/.test(body)) add(id, 'ERR', 'gate:true 인데 판정 블록 없음');
+  // 5-b writes_to 는 착지 경로의 정본이다 — CMO 가 이걸 그대로 쓴다
+  //     2026-08-22 실측: CMO 가 경로를 조합하다 output/ · LEDGER.md 같은 없는 곳에 냈다.
+  //     정본이 틀리면 조합이 아니라 원본이 틀린 것이 된다.
+  {
+    const w = list(fld(f, 'writes_to'));
+    if (!w.length) add(id, 'ERR', 'writes_to 없음 — 착지 경로의 정본이 없다');
+    let fileTargets = 0;
+    for (const p of w) {
+      if (!p.includes('/')) continue;            // notion · figma · email — 외부 대상이지 경로가 아니다
+      fileTargets++;
+      if (!/^outputs\/\{날짜\}\//.test(p))
+        add(id, 'ERR', `writes_to 가 outputs/{날짜}/ 로 시작하지 않는다: ${p}`);
+      else if (!new RegExp(`^outputs/\\{날짜\\}/${id}-`).test(p))
+        add(id, 'ERR', `writes_to 폴더가 {번호}-{슬러그} 가 아니다: ${p}`);
+    }
+    if (w.length && !fileTargets) add(id, 'WARN', `writes_to 에 파일 경로가 없다 (외부 대상만): ${w.join(' · ')}`);
+  }
   // 6 mutating 은 승인 문구 필수
   if (fld(f, 'mutating') === 'true' && !/승인|⏸|확인 ?후/.test(body)) add(id, 'ERR', 'mutating:true 인데 승인 게이트 없음');
   // 7 절차 최소 3단
