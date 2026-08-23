@@ -408,6 +408,32 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   if (!hit) ok.push('작업 산출물 유출 없음 (패키지·저장소 깨끗)');
 }
 
+// ⑥-l 실존 기업·브랜드 실명이 예시에 있나
+//   2026-08-23 · 샘플은 B사·C사·D사 로 익명인데 실행 산출물이 화장품 3사를 실명으로 썼다.
+//   열위 비교·배제 기준·가상 발언에 쓰이면 비방적 표시·광고(표시광고법 §3①4) 소지다.
+{
+  const bp = path.join(ROOT, 'scripts', 'banned-brands.json');
+  if (!fs.existsSync(bp)) warn('scripts/banned-brands.json 없음 — 실존 브랜드 검사를 건너뛴다');
+  else {
+    const bb = JSON.parse(fs.readFileSync(bp, 'utf8'));
+    const files = [];
+    const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) return walk(p);
+      if (/\.(md|csv|json|html)$/.test(e.name)) files.push(p);
+    });
+    for (const sub of ['100-skills', 'sample-data', 'docs', 'brand-templates']) walk(path.join(ROOT, sub));
+    let hit = 0;
+    for (const p of files) {
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      if ((bb.allow || []).some(a => rel.endsWith(a))) continue;
+      const t = fs.readFileSync(p, 'utf8');
+      for (const b2 of bb.brands) if (t.includes(b2)) { err(`실존 브랜드 「${b2}」 · ${rel} — 지어낸 이름이면 B사·C사·D사 로 (docs/공통규약.md §L)`); hit++; }
+    }
+    if (!hit) ok.push(`실존 브랜드 ${bb.brands.length}종 · ${files.length}개 파일 깨끗`);
+  }
+}
+
 // ⑦ 금칙어 · 옛 직함 · 죽은 스킬 이름 · 개인 인스턴스 흔적
 //   검색어를 여기 리터럴로 쓰면 이 파일 자신이 걸려 영구 🔴 가 된다 → scripts/banned-words.json 으로 분리
 //   그리고 스캔 뿌리가 둘이다: 플러그인(ROOT) 과 저장소 루트(REPO_ROOT · README·marketplace.json 이 거기 있다)
