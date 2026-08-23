@@ -87,7 +87,9 @@ node plugins/marketing-team/scripts/bootstrap.mjs
 
 스킬 파일과 산출물이 **한 폴더에 다 보이는** 것이 장점이지만, **기본 경로는 ①·②(플러그인 설치)** 다.
 
-다만 **코워크에서는 이 방법이 없다.** 코워크에는 「내 폴더를 연다」가 없어서 플러그인이라야 한다.
+다만 **코워크에서는 클론 방식을 못 쓴다.** 터미널이 없어서 `git clone` 과 `bootstrap.mjs` 를 돌릴 수 없다.
+**폴더를 여는 것 자체는 코워크도 된다** — 입력창의 「Work in a project or folder」로 작업 폴더를 고르면
+그 안의 `brand/` · `inputs/` · `outputs/` · `logs/` 를 그대로 읽고 쓴다. 다만 플러그인은 마켓플레이스로 설치해야 한다.
 그리고 오래 쓰면 `git pull` 이 내가 채운 `brand/profile.md` 와 부딪힌다.
 
 > ⚠️ **윈도우에서 클론했다면 점검이 특히 중요하다.** 깃이 연결 고리를 텍스트 파일로 받아 오는 일이 있고,
@@ -97,6 +99,7 @@ node plugins/marketing-team/scripts/bootstrap.mjs
 |---|---|---|---|
 | 플러그인 설치 **(기본)** | ✅ | ✅ | ✅ |
 | 클론 + bootstrap (고급) | ❌ 터미널이 없다 | ✅ | ⚠️ 심링크 대신 복사 |
+| 작업 폴더 열기 | ✅ Work in a project or folder | ✅ 폴더에서 실행 | ✅ |
 
 **제품(팀·스킬)과 내 데이터(브랜드·산출물)가 분리돼 있어서** 플러그인이 성립한다.
 경로 규칙은 [docs/공통규약.md §0](plugins/marketing-team/docs/공통규약.md).
