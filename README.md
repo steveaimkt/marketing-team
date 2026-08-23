@@ -186,13 +186,28 @@ node plugins/marketing-team/scripts/eval-routing.mjs    # 부를 말이 아직 �
 | 층 | 무엇을 | 돈 | 언제 |
 |---|---|---|---|
 | **A** (기본) | 케이스 596건의 구조·모순·트리거 충돌 + 어휘 기준선 회귀 | 0 | push 마다 |
-| **B** (`--live`) | 실제 모델에게 `ROUTING.md` 를 주고 596건을 라우팅시킨다 | 유료 | 손으로 누를 때 |
+| **B** | 실제 모델에게 `ROUTING.md` 를 주고 596건을 라우팅시킨다 | 아래 참조 | 손으로 |
 
 ```bash
 node plugins/marketing-team/scripts/eval-routing.mjs --report          # 틀리는 케이스 전부
 node plugins/marketing-team/scripts/eval-routing.mjs --update-baseline # 의도한 변경일 때만
-npm i @anthropic-ai/sdk && node plugins/…/eval-routing.mjs --live      # B층
 ```
+
+**B층은 길이 둘이다. 재는 것은 같고 계산서가 다르다.**
+
+| | 무엇으로 | 계산서 | CI |
+|---|---|---|---|
+| `--live-cc` | 이미 깔린 `claude` 를 헤드리스(`-p`)로 부른다 | **구독 사용량 · 추가 결제 없음** | ❌ 사람이 로컬에서 |
+| `--live` | 공식 SDK 로 API 를 부른다 | 토큰 과금 (별도 결제) | ✅ 키를 시크릿에 넣으면 |
+
+```bash
+node plugins/marketing-team/scripts/eval-routing.mjs --live-cc --limit 40   # 맥스 구독 · 짧게
+node plugins/marketing-team/scripts/eval-routing.mjs --live-cc              # 596건 전부
+npm i --no-save @anthropic-ai/sdk && node plugins/…/eval-routing.mjs --live # API
+```
+
+`--live-cc` 는 프롬프트 캐시를 못 써서 `ROUTING.md` 를 매번 다시 보낸다. 그래서 느리고,
+대신 묶음을 40건으로 크게 잡는다. `--live` 는 캐시가 먹어서 빠르지만 돈이 든다.
 
 > A층의 어휘 기준선은 **진짜 라우팅이 아니다.** 글자 2-gram 으로 고른 1등일 뿐이라
 > 절대 점수(지금 316/596)는 의미가 없다. 의미 있는 것은 **어제 맞던 것이 오늘 틀리는가** 하나다.

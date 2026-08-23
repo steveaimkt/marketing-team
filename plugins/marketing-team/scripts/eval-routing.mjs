@@ -20,9 +20,13 @@
  *   node scripts/eval-routing.mjs                     A층
  *   node scripts/eval-routing.mjs --report            틀린 케이스를 전부 본다
  *   node scripts/eval-routing.mjs --update-baseline   A층 기준선 갱신 (의도한 변경일 때만)
- *   node scripts/eval-routing.mjs --live              B층 · ANTHROPIC_API_KEY 필요
- *   node scripts/eval-routing.mjs --live --limit 50   B층을 50건만 (싸게 확인)
- *   node scripts/eval-routing.mjs --live --model claude-sonnet-5
+ *   node scripts/eval-routing.mjs --live-cc           B층 · 맥스 구독 (claude CLI · 추가 결제 없음)
+ *   node scripts/eval-routing.mjs --live             B층 · API 키 (별도 과금 · CI 용)
+ *   node scripts/eval-routing.mjs --live-cc --limit 50   50건만 짧게
+ *
+ * B층은 두 길이 있다. **재는 것은 같고 계산서가 다르다.**
+ *   --live-cc  이미 깔린 claude CLI 를 헤드리스(-p)로 부른다 → 구독 사용량. 사람이 로컬에서 돌린다
+ *   --live     공식 SDK 로 API 를 부른다 → 토큰 과금. 키를 시크릿에 넣으면 CI 에서도 돈다
  *
  * 종료 0=통과 1=위반
  */
@@ -39,7 +43,8 @@ const has = (f) => argv.includes(f);
 const val = (f, d) => { const i = argv.indexOf(f); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const REPORT = has('--report');
 const UPDATE = has('--update-baseline');
-const LIVE = has('--live');
+const LIVE = has('--live');          // API · 토큰 과금
+const LIVE_CC = has('--live-cc');    // 맥스 구독 · claude CLI
 const MODEL = val('--model', 'claude-opus-5');
 const LIMIT = Number(val('--limit', '0')) || 0;
 
@@ -230,29 +235,110 @@ if (UPDATE) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. B층 — 실제 모델 라우팅 (--live)
+// 4. B층 — 실제 모델 라우팅
+//    길은 둘, 재는 것은 하나다. 아래 SYSTEM/USER 와 채점은 두 길이 공유한다.
 // ─────────────────────────────────────────────────────────────
-const BATCH = 20;
+const SYSTEM = (routing) =>
+  '너는 이 마케팅 팀의 CMO 다. 아래는 스킬 100개의 라우팅 명부다.\n' +
+  '사용자 요청 문장마다 열어야 할 스킬 ID 를 정확히 하나 고른다.\n' +
+  '고를 수 없으면 "000" 을 쓴다.\n\n' +
+  '답은 오직 JSON 하나다. 설명·머리말·코드펜스를 붙이지 않는다.\n' +
+  '{"picks":[{"n":1,"id":"043"},{"n":2,"id":"006"}]}\n\n' + routing;
+
+const USER = (batch) =>
+  `아래 ${batch.length}개 요청을 각각 라우팅해라.\n\n` +
+  batch.map((c, i) => `${i + 1}. ${c.intent}`).join('\n');
+
+// 모델이 코드펜스를 붙이거나 앞뒤로 말을 얹어도 JSON 만 건져 낸다
+function picksOf(text) {
+  const t = String(text).replace(/```(?:json)?/g, '').trim();
+  const i = t.indexOf('{'), j = t.lastIndexOf('}');
+  if (i < 0 || j <= i) return null;
+  try { return JSON.parse(t.slice(i, j + 1)).picks || null; } catch { return null; }
+}
+
+function chunk(pool, n) {
+  const out = [];
+  for (let i = 0; i < pool.length; i += n) out.push(pool.slice(i, i + n));
+  return out;
+}
+
+function score(out) {
+  if (!out.length) { console.log('\n  🔴 한 건도 못 받았다 — 위 경고를 보라. 검사가 돌지 않았다.\n'); return 1; }
+  let hit = 0; const near = [], bad = [];
+  for (const { c, got } of out) {
+    if (got === c.id) hit++;
+    else if (c.ambiguous.includes(got)) near.push({ c, got });
+    else bad.push({ c, got });
+  }
+  const rate = ((hit / out.length) * 100).toFixed(1);
+  console.log(`\n  정확 ${hit}/${out.length} (${rate}%) · 헷갈릴 만한 것 ${near.length} · 틀림 ${bad.length}\n`);
+  if (near.length && REPORT)
+    for (const { c, got } of near) console.log(`  🟡 ${c.id} ↔ ${got} · "${c.intent}"  (ambiguous_with 에 적혀 있음)`);
+  for (const { c, got } of bad.slice(0, REPORT ? 9999 : 15))
+    console.log(`  🔴 ${c.id} 여야 하는데 ${got} · "${c.intent}"`);
+  if (!REPORT && bad.length > 15) console.log(`  … 외 ${bad.length - 15}건 (--report 로 전부)`);
+  console.log('');
+  return bad.length;
+}
+
+// ── 길 ① 맥스 구독 · 이미 깔린 claude CLI 를 헤드리스로 부른다 ──────────
+//    프롬프트 캐시를 못 쓰니 ROUTING.md 를 매번 다시 보낸다. 그래서 묶음을 크게 잡는다.
+async function liveCC() {
+  const { spawn } = await import('node:child_process');
+  const routing = fs.readFileSync(path.join(M, 'ROUTING.md'), 'utf8');
+  const pool = LIMIT ? cases.slice(0, LIMIT) : cases;
+  const batches = chunk(pool, 40);
+
+  console.log(`\n🔵 B층 · 맥스 구독 (claude CLI) · ${pool.length}건 / ${batches.length}회`);
+  console.log('   추가 결제가 없다. 구독 사용량만 쓴다. API 보다 느리다.\n');
+
+  const ask = (batch, bi) =>
+    new Promise((resolve) => {
+      const args = ['-p', '--output-format', 'text', '--tools', '', '--strict-mcp-config',
+                    '--system-prompt', SYSTEM(routing)];
+      if (argv.includes('--model')) args.push('--model', MODEL);
+      // cwd 를 /tmp 로 둔다 — 작업 폴더의 CLAUDE.md·스킬이 딸려 들어가면 순수한 라우팅이 아니다
+      const cp = spawn('claude', args, { cwd: '/tmp', stdio: ['pipe', 'pipe', 'pipe'] });
+      let out = '', errb = '';
+      cp.stdout.on('data', (d) => (out += d));
+      cp.stderr.on('data', (d) => (errb += d));
+      cp.on('error', (e) => {
+        console.log(`\n  🔴 claude 를 못 부른다 (${e.message}) · 클로드 코드가 깔려 있어야 한다\n`);
+        process.exit(1);
+      });
+      cp.on('close', (code) => {
+        if (code !== 0) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · claude 종료코드 ${code} ${errb.trim().slice(0, 120)}`); return resolve([]); }
+        const picks = picksOf(out);
+        if (!picks) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · 파싱 실패`); return resolve([]); }
+        process.stdout.write(`  ${bi + 1}/${batches.length}\r`);
+        resolve(picks.map((p) => ({ c: batch[p.n - 1], got: String(p.id).padStart(3, '0') })).filter((x) => x.c));
+      });
+      cp.stdin.end(USER(batch));
+    });
+
+  // 2개씩만 · 구독 한도를 밀어붙이지 않는다
+  const out = [];
+  for (let i = 0; i < batches.length; i += 2)
+    out.push(...(await Promise.all(batches.slice(i, i + 2).map((b, j) => ask(b, i + j)))).flat());
+  return score(out);
+}
+
+// ── 길 ② API · 토큰 과금 · CI 에서도 돈다 ─────────────────────────────
 async function live() {
   let Anthropic;
   try { ({ default: Anthropic } = await import('@anthropic-ai/sdk')); }
   catch {
     console.log('\n🔴 --live 에는 공식 SDK 가 필요하다:  npm i @anthropic-ai/sdk');
-    console.log('   A층(기본)은 의존성 없이 돈다. B층만 이 패키지를 쓴다.\n');
+    console.log('   추가 결제 없이 재려면 --live-cc (맥스 구독) 를 써라.\n');
     process.exit(1);
   }
   const routing = fs.readFileSync(path.join(M, 'ROUTING.md'), 'utf8');
-  let client;
-  try { client = new Anthropic(); }
-  catch {
-    console.log('\n🔴 자격 증명이 없다.  export ANTHROPIC_API_KEY=sk-ant-…  (console.anthropic.com)\n');
-    process.exit(1);
-  }
+  const client = new Anthropic();
   const pool = LIMIT ? cases.slice(0, LIMIT) : cases;
-  const batches = [];
-  for (let i = 0; i < pool.length; i += BATCH) batches.push(pool.slice(i, i + BATCH));
+  const batches = chunk(pool, 20);
 
-  console.log(`\n🔵 B층 · ${pool.length}건 / ${batches.length}회 호출 · ${MODEL}`);
+  console.log(`\n🔵 B층 · API (토큰 과금) · ${pool.length}건 / ${batches.length}회 · ${MODEL}`);
   console.log('   ROUTING.md 를 프롬프트 캐시에 올린다. 첫 호출만 비싸다.\n');
 
   const SCHEMA = {
@@ -273,29 +359,20 @@ async function live() {
   };
 
   const run = async (batch, bi) => {
-    const list = batch.map((c, i) => `${i + 1}. ${c.intent}`).join('\n');
     let res;
     try {
       res = await client.messages.create({
-      model: MODEL,
-      max_tokens: 4000,
-      output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
-      system: [
-        {
-          type: 'text',
-          text:
-            '너는 이 마케팅 팀의 CMO 다. 아래는 스킬 100개의 라우팅 명부다.\n' +
-            '사용자 요청 문장마다 열어야 할 스킬 ID 를 정확히 하나 고른다.\n' +
-            '고를 수 없으면 "000" 을 쓴다. 설명하지 않는다.\n\n' + routing,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-        messages: [{ role: 'user', content: `아래 ${batch.length}개 요청을 각각 라우팅해라.\n\n${list}` }],
+        model: MODEL,
+        max_tokens: 4000,
+        output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
+        system: [{ type: 'text', text: SYSTEM(routing), cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: USER(batch) }],
       });
     } catch (e) {
       // 키 오타 하나에 스택 트레이스가 쏟아지지 않게 한다. 무엇을 고쳐야 하는지만 말한다.
       if (e instanceof Anthropic.AuthenticationError) {
-        console.log('\n  🔴 API 키가 틀렸다 · ANTHROPIC_API_KEY 를 확인해라 (console.anthropic.com)\n');
+        console.log('\n  🔴 API 키가 틀렸다 · ANTHROPIC_API_KEY 를 확인해라 (console.anthropic.com)');
+        console.log('     추가 결제 없이 재려면 --live-cc (맥스 구독).\n');
         process.exit(1);
       }
       if (e instanceof Anthropic.NotFoundError) {
@@ -306,41 +383,24 @@ async function live() {
       if (e instanceof Anthropic.APIError) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · API ${e.status} ${e.message}`); return []; }
       // SDK 는 키가 아예 없으면 요청 전에 여기서 걸린다 (APIError 가 아니다)
       if (/authentication method/i.test(e.message)) {
-        console.log('\n  🔴 자격 증명이 없다.  export ANTHROPIC_API_KEY=sk-ant-…  (console.anthropic.com)\n');
+        console.log('\n  🔴 자격 증명이 없다.  export ANTHROPIC_API_KEY=sk-ant-…  (console.anthropic.com)');
+        console.log('     추가 결제 없이 재려면 --live-cc (맥스 구독).\n');
         process.exit(1);
       }
       console.log(`  ⚠️ ${bi + 1}번째 묶음 · ${e.message}`);
       return [];
     }
     if (res.stop_reason === 'refusal') { console.log(`  ⚠️ ${bi + 1}번째 묶음 거절됨`); return []; }
-    const text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
-    let picks = [];
-    try { picks = JSON.parse(text).picks || []; } catch { console.log(`  ⚠️ ${bi + 1}번째 묶음 파싱 실패`); }
+    const picks = picksOf(res.content.filter((b) => b.type === 'text').map((b) => b.text).join(''));
+    if (!picks) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · 파싱 실패`); return []; }
     process.stdout.write(`  ${bi + 1}/${batches.length}\r`);
     return picks.map((p) => ({ c: batch[p.n - 1], got: String(p.id).padStart(3, '0') })).filter((x) => x.c);
   };
 
-  // 4개씩 동시에
   const out = [];
   for (let i = 0; i < batches.length; i += 4)
     out.push(...(await Promise.all(batches.slice(i, i + 4).map((b, j) => run(b, i + j)))).flat());
-
-  // 한 건도 못 받았으면 「틀림 0」이 아니라 검사가 안 된 것이다. 통과로 세면 안 된다.
-  if (!out.length) { console.log('\n  🔴 한 건도 못 받았다 — 위 경고를 보라. 검사가 돌지 않았다.\n'); return 1; }
-
-  let hit = 0; const near = [], bad = [];
-  for (const { c, got } of out) {
-    if (got === c.id) hit++;
-    else if (c.ambiguous.includes(got)) near.push({ c, got });
-    else bad.push({ c, got });
-  }
-  const rate = ((hit / out.length) * 100).toFixed(1);
-  console.log(`\n  정확 ${hit}/${out.length} (${rate}%) · 헷갈릴 만한 것 ${near.length} · 틀림 ${bad.length}\n`);
-  for (const { c, got } of bad.slice(0, REPORT ? 999 : 15))
-    console.log(`  🔴 ${c.id} 여야 하는데 ${got} · "${c.intent}"`);
-  if (!REPORT && bad.length > 15) console.log(`  … 외 ${bad.length - 15}건 (--report 로 전부)`);
-  console.log('');
-  return bad.length;
+  return score(out);
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -357,6 +417,8 @@ for (const [s, m] of issues) console.log(`  ${s} ${m}`);
 
 let fail = issues.filter((i) => i[0] === '🔴').length;
 console.log(`\n🔴 ${fail} · 🟡 ${issues.length - fail}`);
-if (!LIVE) console.log('   B층(실제 모델 라우팅)은 `--live`. 이 검사는 모델을 부르지 않는다.\n');
-if (LIVE) fail += await live();
+if (!LIVE && !LIVE_CC)
+  console.log('   B층(실제 모델 라우팅)은 `--live-cc` (맥스 구독) 또는 `--live` (API). 이 검사는 모델을 부르지 않는다.\n');
+if (LIVE_CC) fail += await liveCC();
+else if (LIVE) fail += await live();
 process.exit(fail ? 1 : 0);
