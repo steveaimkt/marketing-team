@@ -163,7 +163,11 @@ CMO 가 직접 검토자 모드로 도는 **6관점 절차**는 따로 있다
 ```bash
 node plugins/marketing-team/scripts/verify.mjs          # 설치해도 그대로 뜨는가
 node plugins/marketing-team/scripts/validate-skills.mjs # 스킬 100개가 계약대로 생겼는가
+node plugins/marketing-team/scripts/eval-routing.mjs    # 부를 말이 아직 그 스킬로 가는가
 ```
+
+**셋 다 push 할 때 자동으로 돈다** — [.github/workflows/verify.yml](.github/workflows/verify.yml).
+손으로 치는 것을 기억할 필요가 없다. 안 돌면 병합이 막힌다.
 
 `verify.mjs` 가 보는 것은 **"폴더로 열면 되는데 플러그인으로 설치하면 안 되는"** 함정들이다.
 
@@ -175,6 +179,24 @@ node plugins/marketing-team/scripts/validate-skills.mjs # 스킬 100개가 계�
 | `skills/` 가 한 단계인가 | 2단계 아래는 스캔되지 않는다 |
 | 담당·스킬이 가리키는 문서가 실재하는가 | 없는 파일을 가리켜도 아무 에러가 안 난다 |
 | 두 곳의 버전이 같은가 | 한쪽만 올리면 코워크가 「새것 없음」으로 판정한다 |
+
+`eval-routing.mjs` 가 보는 것은 **「부를 말 469개가 아직 제 스킬로 가는가」**다.
+진입로가 자연어 하나뿐이라, 트리거 한 줄을 고치면 엉뚱한 스킬이 열려도 아무 에러가 안 난다.
+
+| 층 | 무엇을 | 돈 | 언제 |
+|---|---|---|---|
+| **A** (기본) | 케이스 596건의 구조·모순·트리거 충돌 + 어휘 기준선 회귀 | 0 | push 마다 |
+| **B** (`--live`) | 실제 모델에게 `ROUTING.md` 를 주고 596건을 라우팅시킨다 | 유료 | 손으로 누를 때 |
+
+```bash
+node plugins/marketing-team/scripts/eval-routing.mjs --report          # 틀리는 케이스 전부
+node plugins/marketing-team/scripts/eval-routing.mjs --update-baseline # 의도한 변경일 때만
+npm i @anthropic-ai/sdk && node plugins/…/eval-routing.mjs --live      # B층
+```
+
+> A층의 어휘 기준선은 **진짜 라우팅이 아니다.** 글자 2-gram 으로 고른 1등일 뿐이라
+> 절대 점수(지금 316/596)는 의미가 없다. 의미 있는 것은 **어제 맞던 것이 오늘 틀리는가** 하나다.
+> 라우팅 품질 자체를 재려면 B층을 돌려야 한다.
 
 정적 검사로 못 잡는 것 — 「문서는 고쳤는데 실제로 안 도는」 회귀 — 은
 [scripts/smoke.md](plugins/marketing-team/scripts/smoke.md) 를 사람이 밟아 확인한다.
@@ -193,7 +215,8 @@ plugins/marketing-team/           ← 플러그인 본체 (설치되는 것은 �
   100-skills/   스킬 100개 카탈로그 + ROUTING.md 명부
   brand-templates/  빈 템플릿 원본 — 작업 폴더의 brand/ 와 이름이 겹치면 안 된다
   sample-data/  브랜드 정보가 없어도 완주하게 하는 샘플
-  scripts/      verify · validate-skills · build-catalog · sync-skills · smoke.md
+  scripts/      verify · validate-skills · eval-routing · build-catalog · sync-skills · smoke.md
+.github/workflows/verify.yml      push 마다 위 검사를 자동으로 돌린다
 .claude/                          클론해서 폴더로 열 때의 연결 고리
 brand/ outputs/ logs/ inputs/     작업 폴더 (실행할 때 생긴다)
 ```
