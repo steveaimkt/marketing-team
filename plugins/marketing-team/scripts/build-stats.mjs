@@ -12,6 +12,16 @@
  *   <!-- STATS:START --> ... <!-- STATS:END -->
  */
 import fs from 'node:fs';
+// ⚠️ 윈도우에서 클론하면 .md 가 CRLF 로 온다 (git 기본값 core.autocrlf=true).
+//    그러면 frontmatter 파서(`/^---\n…\n---\n/`)가 통째로 실패해 이 스크립트가 조용히 오작동한다.
+//    .gitattributes 가 새 클론을 막지만, 이미 CRLF 가 된 파일과 윈도우 에디터가 저장한 파일도 있다.
+//    정규식을 11군데 고치면 빠뜨린다. **읽는 즉시 눕힌다.** (실측 2026-08-23)
+const _readFileSync = fs.readFileSync;
+fs.readFileSync = (p, o) =>
+  (o === 'utf8' || o?.encoding === 'utf8')
+    ? String(_readFileSync(p, o)).replace(/\r\n/g, '\n')
+    : _readFileSync(p, o);
+
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
