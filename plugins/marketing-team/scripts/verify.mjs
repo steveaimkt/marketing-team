@@ -320,6 +320,33 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-g1 버전 · 배포되는 파일이 바뀌었는데 버전이 그대로면 기존 사용자에게 안 간다
+//   왜: 2026-08-23 · plugins/ 안에서 12개 파일 +930줄을 고쳐 놓고 0.14.0 을 그대로 뒀다.
+//       코워크는 버전으로 「새것이 있나」를 판정한다. 그대로면 이미 깐 사람은 업데이트를 못 받는다.
+//       윈도우 CRLF 수정도 라우팅 개선도 안 갔을 뻔했다.
+//   검사: 마지막 버전 변경 커밋 이후에 plugins/ 가 바뀌었나 (저장소 안에서만 · git 이 있을 때만)
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  const git = (a) => spawnSync('git', a, { cwd: repoRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+  if (repoRoot && fs.existsSync(path.join(repoRoot, '.git')) && git(['rev-parse', '--git-dir']).status === 0) {
+    const ver = JSON.parse(fs.readFileSync(path.join(ROOT, '.claude-plugin/plugin.json'), 'utf8')).version;
+    // 지금 버전 문자열이 처음 들어온 커밋
+    const bump = git(['log', '-S', `"${ver}"`, '--reverse', '--format=%H', '--',
+                      'plugins/marketing-team/.claude-plugin/plugin.json']).stdout?.trim().split('\n')[0];
+    if (!bump) {
+      notes.push(`버전 ${ver} · 아직 커밋되지 않았다 (올리는 중이면 정상)`);
+    } else {
+      const after = git(['diff', '--name-only', `${bump}..HEAD`, '--', 'plugins/']).stdout?.trim();
+      const dirty = git(['status', '--porcelain', '--', 'plugins/']).stdout?.trim();
+      const n = [after, dirty].filter(Boolean).join('\n').split('\n').filter(Boolean).length;
+      if (n) err(`버전이 ${ver} 인 채로 배포 파일 ${n}개가 바뀌었다 — 코워크가 「새것 없음」으로 판정해 ` +
+                 '기존 사용자에게 안 간다. plugin.json 과 marketplace.json 을 함께 올려라');
+      else ok.push(`버전 ${ver} · 그 뒤로 배포 파일 변경 없음`);
+    }
+  }
+}
+
 // ⑥-g2 줄바꿈 · 윈도우에서 클론하면 CRLF 로 오고, 그러면 frontmatter 를 아무도 못 읽는다
 //   스크립트는 읽을 때 눕혀서 견디지만(각 스크립트 머리의 _readFileSync), 그건 우리 코드만이다.
 //   작업본 자체가 CRLF 인 것은 알려 준다 — 안 보이는 상태로 두면 나중에 원인을 못 찾는다.
