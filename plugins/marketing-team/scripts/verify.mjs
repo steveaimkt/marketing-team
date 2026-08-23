@@ -340,9 +340,15 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       const after = git(['diff', '--name-only', `${bump}..HEAD`, '--', 'plugins/']).stdout?.trim();
       const dirty = git(['status', '--porcelain', '--', 'plugins/']).stdout?.trim();
       const n = [after, dirty].filter(Boolean).join('\n').split('\n').filter(Boolean).length;
-      if (n) err(`버전이 ${ver} 인 채로 배포 파일 ${n}개가 바뀌었다 — 코워크가 「새것 없음」으로 판정해 ` +
-                 '기존 사용자에게 안 간다. plugin.json 과 marketplace.json 을 함께 올려라');
-      else ok.push(`버전 ${ver} · 그 뒤로 배포 파일 변경 없음`);
+      // ⚠️ 여기서 막는 자리를 틀리면 아무 일도 못 한다 (2026-08-23 · 실제로 그랬다).
+      //    버전은 **릴리스 때** 올리는 것이지 커밋마다 올리는 게 아니다.
+      //    그래서 개발 중(로컬)에는 알려만 주고, CI 에서만 막는다 — 거기가 나가는 자리다.
+      if (n) {
+        const m = `버전이 ${ver} 인 채로 배포 파일 ${n}개가 바뀌었다 — 이대로 나가면 코워크가 ` +
+                  '「새것 없음」으로 판정해 기존 사용자에게 안 간다';
+        if (process.env.CI) err(m + '. plugin.json 과 marketplace.json 을 함께 올려라');
+        else warn(m + '. **릴리스 전에** 두 곳을 함께 올려라 (지금 커밋은 막지 않는다)');
+      } else ok.push(`버전 ${ver} · 그 뒤로 배포 파일 변경 없음`);
     }
   }
 }
