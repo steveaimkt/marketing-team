@@ -11,6 +11,16 @@
  * 사용: node scripts/verify.mjs   ·  종료 0=통과 1=위반
  */
 import fs from 'node:fs';
+// ⚠️ 윈도우에서 클론하면 .md 가 CRLF 로 온다 (git 기본값 core.autocrlf=true).
+//    그러면 frontmatter 파서(`/^---\n…\n---\n/`)가 통째로 실패해 이 스크립트가 조용히 오작동한다.
+//    .gitattributes 가 새 클론을 막지만, 이미 CRLF 가 된 파일과 윈도우 에디터가 저장한 파일도 있다.
+//    정규식을 11군데 고치면 빠뜨린다. **읽는 즉시 눕힌다.** (실측 2026-08-23)
+const _readFileSync = fs.readFileSync;
+fs.readFileSync = (p, o) =>
+  (o === 'utf8' || o?.encoding === 'utf8')
+    ? String(_readFileSync(p, o)).replace(/\r\n/g, '\n')
+    : _readFileSync(p, o);
+
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -308,6 +318,37 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     if (a2 && Number(a2[1]) !== nAgents) err(`구축 스킬 점검표의 담당 수 ${a2[1]} ≠ 실제 ${nAgents}`);
     if (m || a2) ok.push(`구축 스킬 점검표 숫자 = 실물 (스킬 ${nSkills} · 담당 ${nAgents})`);
   }
+}
+
+// ⑥-g2 줄바꿈 · 윈도우에서 클론하면 CRLF 로 오고, 그러면 frontmatter 를 아무도 못 읽는다
+//   스크립트는 읽을 때 눕혀서 견디지만(각 스크립트 머리의 _readFileSync), 그건 우리 코드만이다.
+//   작업본 자체가 CRLF 인 것은 알려 준다 — 안 보이는 상태로 두면 나중에 원인을 못 찾는다.
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  if (repoRoot && !fs.existsSync(path.join(repoRoot, '.gitattributes')))
+    err('.gitattributes 가 없다 — 윈도우에서 클론하면 .md 가 CRLF 로 바뀌어 frontmatter 파서가 전부 실패한다 ' +
+        '(실측 2026-08-23 · verify 🔴 128건). `* text=auto eol=lf` 한 줄이면 막힌다');
+
+  let crlf = 0, seen = 0;
+  const walk = (d) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      if (e.name === 'node_modules' || e.name.startsWith('.')) continue;
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (e.name.endsWith('.md')) {
+        seen++;
+        // 읽는 즉시 눕히는 패치를 우회해야 원본 줄바꿈이 보인다
+        if (fs.readFileSync(p).includes('\r\n')) crlf++;
+      }
+    }
+  };
+  walk(path.join(ROOT, '100-skills'));
+  walk(path.join(ROOT, 'skills'));
+  walk(path.join(ROOT, 'docs'));
+  if (crlf) warn(`.md ${crlf}/${seen}개가 CRLF 다 — 작업본이 윈도우 줄바꿈이다. ` +
+                 '스크립트는 견디지만 되돌리길 권한다: `git config core.autocrlf input` 뒤 다시 클론');
+  else ok.push(`줄바꿈 LF (.md ${seen}개)`);
 }
 
 // ⑥-h LICENSE · 매니페스트가 MIT 라면 파일이 있어야 한다

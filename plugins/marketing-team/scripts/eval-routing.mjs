@@ -31,6 +31,16 @@
  * 종료 0=통과 1=위반
  */
 import fs from 'node:fs';
+// ⚠️ 윈도우에서 클론하면 .md 가 CRLF 로 온다 (git 기본값 core.autocrlf=true).
+//    그러면 frontmatter 파서(`/^---\n…\n---\n/`)가 통째로 실패해 이 스크립트가 조용히 오작동한다.
+//    .gitattributes 가 새 클론을 막지만, 이미 CRLF 가 된 파일과 윈도우 에디터가 저장한 파일도 있다.
+//    정규식을 11군데 고치면 빠뜨린다. **읽는 즉시 눕힌다.** (실측 2026-08-23)
+const _readFileSync = fs.readFileSync;
+fs.readFileSync = (p, o) =>
+  (o === 'utf8' || o?.encoding === 'utf8')
+    ? String(_readFileSync(p, o)).replace(/\r\n/g, '\n')
+    : _readFileSync(p, o);
+
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -238,12 +248,20 @@ if (UPDATE) {
 // 4. B층 — 실제 모델 라우팅
 //    길은 둘, 재는 것은 하나다. 아래 SYSTEM/USER 와 채점은 두 길이 공유한다.
 // ─────────────────────────────────────────────────────────────
+// CMO 는 후보가 갈리면 docs/헷갈리는-쌍.md 를 먼저 연다 (skills/마케팅-CMO/SKILL.md §526).
+// 명부만 주고 재면 실제보다 harsh 하게 나온다 — 사용자가 겪는 것과 같은 것을 재야 한다.
+const PAIRS = (() => {
+  const p = path.join(ROOT, 'docs', '헷갈리는-쌍.md');
+  return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '';
+})();
+
 const SYSTEM = (routing) =>
   '너는 이 마케팅 팀의 CMO 다. 아래는 스킬 100개의 라우팅 명부다.\n' +
   '사용자 요청 문장마다 열어야 할 스킬 ID 를 정확히 하나 고른다.\n' +
   '고를 수 없으면 "000" 을 쓴다.\n\n' +
   '답은 오직 JSON 하나다. 설명·머리말·코드펜스를 붙이지 않는다.\n' +
-  '{"picks":[{"n":1,"id":"043"},{"n":2,"id":"006"}]}\n\n' + routing;
+  '{"picks":[{"n":1,"id":"043"},{"n":2,"id":"006"}]}\n\n' + routing +
+  (PAIRS ? '\n\n---\n\n' + PAIRS : '');
 
 const USER = (batch) =>
   `아래 ${batch.length}개 요청을 각각 라우팅해라.\n\n` +
@@ -286,6 +304,8 @@ function score(out) {
 //    프롬프트 캐시를 못 쓰니 ROUTING.md 를 매번 다시 보낸다. 그래서 묶음을 크게 잡는다.
 async function liveCC() {
   const { spawn } = await import('node:child_process');
+  const os = await import('node:os');
+  const WIN = process.platform === 'win32';
   const routing = fs.readFileSync(path.join(M, 'ROUTING.md'), 'utf8');
   const pool = LIMIT ? cases.slice(0, LIMIT) : cases;
   const batches = chunk(pool, 40);
@@ -299,7 +319,9 @@ async function liveCC() {
                     '--system-prompt', SYSTEM(routing)];
       if (argv.includes('--model')) args.push('--model', MODEL);
       // cwd 를 /tmp 로 둔다 — 작업 폴더의 CLAUDE.md·스킬이 딸려 들어가면 순수한 라우팅이 아니다
-      const cp = spawn('claude', args, { cwd: '/tmp', stdio: ['pipe', 'pipe', 'pipe'] });
+      // cwd 를 임시 폴더로 둔다 — 작업 폴더의 CLAUDE.md·스킬이 딸려 들어가면 순수한 라우팅이 아니다.
+      //   ⚠️ '/tmp' 를 박으면 윈도우에서 깨진다. shell:true 도 윈도우에서만 — claude 가 .cmd 라서다.
+      const cp = spawn('claude', args, { cwd: os.tmpdir(), shell: WIN, stdio: ['pipe', 'pipe', 'pipe'] });
       let out = '', errb = '';
       cp.stdout.on('data', (d) => (out += d));
       cp.stderr.on('data', (d) => (errb += d));
