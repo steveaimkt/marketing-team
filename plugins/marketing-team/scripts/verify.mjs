@@ -416,6 +416,73 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       err(`${path.basename(t)} 에 STATS 블록이 없다 — 숫자가 손으로 적히면 어긋난다`);
 }
 
+// ⑥-i3 원장 임계값이 기계와 문서에서 같은 값인가
+//   800행·90일을 ledger-stats.mjs 가 세는데 규약·구축 스킬에도 손으로 적혀 있다.
+//   한쪽만 고치면 「기계는 안 걸렸는데 문서는 걸렸다고 한다」가 된다 — 숫자가 갈리는 고전적 자리다.
+{
+  const gen = path.join(ROOT, 'scripts', 'ledger-stats.mjs');
+  if (!fs.existsSync(gen)) warn('scripts/ledger-stats.mjs 없음 — 원장 부피·진단을 사람이 세게 된다');
+  else {
+    const src = fs.readFileSync(gen, 'utf8');
+    const konst = (k) => (src.match(new RegExp(`^const ${k} = (\\d+)`, 'm')) || [])[1];
+    const 임계 = { ROLLOVER_ROWS: konst('ROLLOVER_ROWS'), STALE_DAYS: konst('STALE_DAYS') };
+    if (!임계.ROLLOVER_ROWS || !임계.STALE_DAYS) err('ledger-stats.mjs 에서 임계 상수를 못 읽었다 — 이름이 바뀌었나');
+    else {
+      const 문서 = [
+        [path.join(ROOT, 'docs', '공통규약.md'), '공통규약.md'],
+        [path.join(ROOT, 'skills', '마케팅팀-구축하기', 'SKILL.md'), '마케팅팀-구축하기'],
+      ];
+      let drift = 0;
+      for (const [p, name] of 문서) {
+        if (!fs.existsSync(p)) continue;
+        const t = fs.readFileSync(p, 'utf8');
+        // 「800행」·「90일」이 그대로 적혀 있어야 한다 (천단위 쉼표 표기도 허용)
+        const rows = new RegExp(`${Number(임계.ROLLOVER_ROWS).toLocaleString('en-US')}행|${임계.ROLLOVER_ROWS}행`);
+        if (!rows.test(t)) { err(`${name} 의 롤오버 임계가 기계와 다르다 — ledger-stats.mjs 는 ${임계.ROLLOVER_ROWS}행`); drift++; }
+        if (!new RegExp(`${임계.STALE_DAYS}일`).test(t)) { err(`${name} 의 무호출 임계가 기계와 다르다 — ledger-stats.mjs 는 ${임계.STALE_DAYS}일`); drift++; }
+      }
+      const r = spawnSync(process.execPath, [gen, '--dir', ROOT], { encoding: 'utf8' });
+      if (r.status !== 0) err(`ledger-stats.mjs 가 돌지 않는다 — ${(r.stderr || '').split('\n')[0]}`);
+      else if (!drift) ok.push(`원장 임계 일치 (롤오버 ${임계.ROLLOVER_ROWS}행 · 무호출 ${임계.STALE_DAYS}일)`);
+    }
+  }
+}
+
+// ⑥-i4 자동 점검 훅이 실제로 도나
+//   훅은 깨져도 조용하다 — 세션마다 아무 일도 안 일어나는데 아무도 모른다. 여기서 실제로 돌려 본다.
+{
+  const hp = path.join(ROOT, 'hooks', 'hooks.json');
+  if (!fs.existsSync(hp)) warn('hooks/hooks.json 없음 — 원장 자동 점검이 배포되지 않는다');
+  else {
+    let h; try { h = JSON.parse(fs.readFileSync(hp, 'utf8')); } catch (e) { err(`hooks/hooks.json 파싱 실패: ${e.message}`); }
+    if (h) {
+      const cmds = (h.hooks?.SessionStart || []).flatMap(g => (g.hooks || []).map(x => x.command || ''));
+      if (!cmds.length) err('hooks.json 에 SessionStart 훅이 없다 — 자동 점검이 돌지 않는다');
+      else {
+        // 훅이 가리키는 스크립트가 실재하나 (${CLAUDE_PLUGIN_ROOT} 는 설치 시 플러그인 루트로 치환된다)
+        let broken = 0;
+        for (const c of cmds)
+          for (const m of c.matchAll(/\$\{CLAUDE_PLUGIN_ROOT\}\/([^\s"']+)/g))
+            if (!fs.existsSync(path.join(ROOT, m[1]))) { err(`훅이 없는 파일을 부른다: ${m[1]}`); broken++; }
+        // 가리키는 파일이 없으면 돌려 볼 것도 없다
+        if (!broken) {
+          // --hook 모드가 조용한가 · 뭔가 낸다면 그것이 올바른 JSON 인가
+          const r = spawnSync(process.execPath, [path.join(ROOT, 'scripts', 'ledger-stats.mjs'), '--hook', '--dir', ROOT], { encoding: 'utf8' });
+          const out = (r.stdout || '').trim();
+          if (r.status !== 0) err(`훅 모드가 실패한다 (종료 ${r.status}) — 세션마다 조용히 죽는다`);
+          else if (out) {
+            try {
+              const j = JSON.parse(out);
+              if (j.hookSpecificOutput?.hookEventName !== 'SessionStart') err('훅 출력의 hookEventName 이 SessionStart 가 아니다');
+              else ok.push('원장 자동 점검 훅 (SessionStart · 출력 JSON 유효)');
+            } catch { err('훅이 JSON 이 아닌 것을 뱉는다 — 훅 출력은 파싱된다'); }
+          } else ok.push('원장 자동 점검 훅 (SessionStart · 이상 없으면 조용함 확인)');
+        }
+      }
+    }
+  }
+}
+
 // ⑥-i2 배포 대상 마크다운의 내부 상대 링크가 실재하나
 //   깨진 링크가 지금은 0개지만 회귀를 자동으로 막지 못했다 (2026-08-22)
 {
@@ -496,7 +563,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       if (e.isDirectory()) return walk(p);
       if (/\.(md|csv|json|html)$/.test(e.name)) files.push(p);
     });
-    for (const sub of ['100-skills', 'sample-data', 'docs', 'brand-templates']) walk(path.join(ROOT, sub));
+    for (const sub of ['100-skills', 'sample-data', 'docs', 'brand-templates', 'hooks']) walk(path.join(ROOT, sub));
     let hit = 0;
     for (const p of files) {
       const rel = path.relative(ROOT, p).replace(/\\/g, '/');
@@ -520,7 +587,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const bw = JSON.parse(fs.readFileSync(bwPath, 'utf8'));
     const groups = Object.entries(bw).filter(([k]) => !k.startsWith('_'));
     const files = [];
-    const SHIPPED = ['agents', 'skills', 'docs', '100-skills', '.claude-plugin', 'scripts', 'brand-templates'];
+    const SHIPPED = ['agents', 'skills', 'docs', '100-skills', '.claude-plugin', 'scripts', 'brand-templates', 'hooks'];
     const walk = (d, root, top) => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
       if (d === root && top && !top.includes(e.name)) return;
       if (e.name.startsWith('.') && d !== root) return;

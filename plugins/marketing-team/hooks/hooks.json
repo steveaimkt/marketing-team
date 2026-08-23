@@ -1,0 +1,17 @@
+{
+  "description": "세션이 열릴 때 실적 원장을 조용히 점검한다 — 부피가 넘쳤거나 진단 신호가 있을 때만 말한다 (7일 주기 · 마케팅 작업 폴더에서만).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs\" --hook 2>/dev/null || true",
+            "timeout": 10,
+            "statusMessage": "실적 원장 점검"
+          }
+        ]
+      }
+    ]
+  }
+}
