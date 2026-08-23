@@ -242,7 +242,12 @@ async function live() {
     process.exit(1);
   }
   const routing = fs.readFileSync(path.join(M, 'ROUTING.md'), 'utf8');
-  const client = new Anthropic();
+  let client;
+  try { client = new Anthropic(); }
+  catch {
+    console.log('\n🔴 자격 증명이 없다.  export ANTHROPIC_API_KEY=sk-ant-…  (console.anthropic.com)\n');
+    process.exit(1);
+  }
   const pool = LIMIT ? cases.slice(0, LIMIT) : cases;
   const batches = [];
   for (let i = 0; i < pool.length; i += BATCH) batches.push(pool.slice(i, i + BATCH));
@@ -269,7 +274,9 @@ async function live() {
 
   const run = async (batch, bi) => {
     const list = batch.map((c, i) => `${i + 1}. ${c.intent}`).join('\n');
-    const res = await client.messages.create({
+    let res;
+    try {
+      res = await client.messages.create({
       model: MODEL,
       max_tokens: 4000,
       output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
@@ -283,8 +290,28 @@ async function live() {
           cache_control: { type: 'ephemeral' },
         },
       ],
-      messages: [{ role: 'user', content: `아래 ${batch.length}개 요청을 각각 라우팅해라.\n\n${list}` }],
-    });
+        messages: [{ role: 'user', content: `아래 ${batch.length}개 요청을 각각 라우팅해라.\n\n${list}` }],
+      });
+    } catch (e) {
+      // 키 오타 하나에 스택 트레이스가 쏟아지지 않게 한다. 무엇을 고쳐야 하는지만 말한다.
+      if (e instanceof Anthropic.AuthenticationError) {
+        console.log('\n  🔴 API 키가 틀렸다 · ANTHROPIC_API_KEY 를 확인해라 (console.anthropic.com)\n');
+        process.exit(1);
+      }
+      if (e instanceof Anthropic.NotFoundError) {
+        console.log(`\n  🔴 모델을 못 찾는다: ${MODEL} · --model 로 바꿔라\n`);
+        process.exit(1);
+      }
+      if (e instanceof Anthropic.RateLimitError) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · 한도 초과`); return []; }
+      if (e instanceof Anthropic.APIError) { console.log(`  ⚠️ ${bi + 1}번째 묶음 · API ${e.status} ${e.message}`); return []; }
+      // SDK 는 키가 아예 없으면 요청 전에 여기서 걸린다 (APIError 가 아니다)
+      if (/authentication method/i.test(e.message)) {
+        console.log('\n  🔴 자격 증명이 없다.  export ANTHROPIC_API_KEY=sk-ant-…  (console.anthropic.com)\n');
+        process.exit(1);
+      }
+      console.log(`  ⚠️ ${bi + 1}번째 묶음 · ${e.message}`);
+      return [];
+    }
     if (res.stop_reason === 'refusal') { console.log(`  ⚠️ ${bi + 1}번째 묶음 거절됨`); return []; }
     const text = res.content.filter((b) => b.type === 'text').map((b) => b.text).join('');
     let picks = [];
@@ -297,6 +324,9 @@ async function live() {
   const out = [];
   for (let i = 0; i < batches.length; i += 4)
     out.push(...(await Promise.all(batches.slice(i, i + 4).map((b, j) => run(b, i + j)))).flat());
+
+  // 한 건도 못 받았으면 「틀림 0」이 아니라 검사가 안 된 것이다. 통과로 세면 안 된다.
+  if (!out.length) { console.log('\n  🔴 한 건도 못 받았다 — 위 경고를 보라. 검사가 돌지 않았다.\n'); return 1; }
 
   let hit = 0; const near = [], bad = [];
   for (const { c, got } of out) {
