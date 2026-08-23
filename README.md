@@ -224,6 +224,28 @@ npm i --no-save @anthropic-ai/sdk && node plugins/…/eval-routing.mjs --live # 
 > 절대 점수(지금 316/596)는 의미가 없다. 의미 있는 것은 **어제 맞던 것이 오늘 틀리는가** 하나다.
 > 라우팅 품질 자체를 재려면 B층을 돌려야 한다.
 
+### 커밋 훅 · 저장소를 고치는 사람에게만
+
+B층은 **GitHub Actions 에서 못 돈다** — 거기엔 구독 로그인이 없다.
+그래서 커밋하는 사람의 컴퓨터에서 잡는다. `.githooks/pre-commit` 이 그 자리다.
+
+```
+라우팅 파일을 안 건드렸다   → A층만 (3초)
+SKILL.md·routing-eval·docs/ 를 건드렸다 → A층 + B층 60건 (약 2분 · 구독)
+급할 때                    → SKIP_LIVE=1 git commit …
+```
+
+⛔ **깃 훅은 배포되지 않는다.** `.git/hooks/` 는 클론에 안 따라온다 (`.claude/` 와 같은 문제).
+그래서 훅을 **추적되는 `.githooks/`** 에 두고 `core.hooksPath` 로 가리킨다.
+**`bootstrap.mjs` 가 이 연결을 대신 해 준다** — 클론한 사람이 어차피 한 번 돌리는 명령이다.
+
+| 누구 | 훅이 오나 |
+|---|---|
+| 코워크·클로드 코드 **플러그인 설치자** | ❌ 저장소가 없다 · 훅과 무관 |
+| 저장소를 **클론한 사람** | 🟡 파일은 따라오지만 `bootstrap.mjs` 를 한 번 돌려야 켜진다 |
+
+훅은 **제품이 아니라 개발 도구**다. 스킬 100개를 쓰는 사용자에게는 아무 영향이 없다.
+
 정적 검사로 못 잡는 것 — 「문서는 고쳤는데 실제로 안 도는」 회귀 — 은
 [scripts/smoke.md](plugins/marketing-team/scripts/smoke.md) 를 사람이 밟아 확인한다.
 
@@ -243,6 +265,7 @@ plugins/marketing-team/           ← 플러그인 본체 (설치되는 것은 �
   sample-data/  브랜드 정보가 없어도 완주하게 하는 샘플
   scripts/      verify · validate-skills · eval-routing · build-catalog · sync-skills · smoke.md
 .github/workflows/verify.yml      push 마다 위 검사를 자동으로 돌린다
+.githooks/pre-commit              커밋 전 · 라우팅을 건드렸으면 B층까지 (bootstrap 이 켜 준다)
 .claude/                          클론해서 폴더로 열 때의 연결 고리
 brand/ outputs/ logs/ inputs/     작업 폴더 (실행할 때 생긴다)
 ```

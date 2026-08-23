@@ -64,6 +64,40 @@ for (const [name, target] of LINKS) {
   }
 }
 
+// ── 커밋 훅 · 저장소를 고치는 사람에게만 해당한다 ──────────────────────
+//   왜: 깃 훅은 .git/hooks/ 에 사는데 그 폴더는 배포되지 않는다. 클론해도 안 따라온다.
+//       그래서 추적되는 .githooks/ 에 두고, 여기서 core.hooksPath 로 가리킨다.
+//   무엇을 막나: 부를 말을 고치고 재보지 않은 채 커밋하는 것.
+//       B층(실측)은 GitHub Actions 에서 못 돈다 — 구독 로그인이 없어서다. 여기가 유일한 자리다.
+{
+  const hooks = path.join(REPO, '.githooks');
+  const isGit = fs.existsSync(path.join(REPO, '.git'));
+  if (!isGit) {
+    // 플러그인으로 설치한 사용자는 여기 안 온다. 저장소가 아니면 훅은 의미가 없다
+  } else if (!fs.existsSync(hooks)) {
+    console.log(`\n  ⚠️  .githooks/ 가 없다 — 커밋 훅을 못 켠다`);
+  } else {
+    const { spawnSync } = await import('node:child_process');
+    const cur = spawnSync('git', ['config', '--get', 'core.hooksPath'],
+      { cwd: REPO, encoding: 'utf8', shell: process.platform === 'win32' }).stdout?.trim();
+    if (cur === '.githooks') {
+      console.log(`\n  ✅ 커밋 훅 · 이미 켜져 있다`);
+    } else if (cur) {
+      console.log(`\n  ⚠️  커밋 훅 · 이미 다른 곳을 쓴다 (${cur}) — 덮어쓰지 않는다`);
+      console.log(`      켜려면: git config core.hooksPath .githooks`);
+    } else {
+      const r = spawnSync('git', ['config', 'core.hooksPath', '.githooks'],
+        { cwd: REPO, encoding: 'utf8', shell: process.platform === 'win32' });
+      if (r.status === 0) {
+        console.log(`\n  ✅ 커밋 훅 · 켰다 (라우팅 파일을 고치면 커밋 전에 60건을 재본다)`);
+        console.log(`      끄려면: git config --unset core.hooksPath`);
+      } else {
+        console.log(`\n  ⚠️  커밋 훅 · 못 켰다. 손으로: git config core.hooksPath .githooks`);
+      }
+    }
+  }
+}
+
 const okAgents = fs.existsSync(path.join(DOT, 'agents'));
 const okSkills = fs.existsSync(path.join(DOT, 'skills'));
 const nSkills = okSkills ? fs.readdirSync(path.join(DOT, 'skills')).length : 0;

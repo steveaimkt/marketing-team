@@ -1,0 +1,64 @@
+#!/bin/sh
+# 부를 말을 고치고 재보지 않은 채 커밋하는 것을 막는다.
+#
+# 왜: A층(무료·CI)은 목록이 깨졌는지만 본다. 뜻이 헷갈려 엉뚱한 스킬이 열리는 것은
+#     B층(실측)만 잡는데, B층은 GitHub Actions 에서 못 돈다 — 구독 로그인이 없어서다.
+#     그래서 커밋하는 사람의 컴퓨터에서 잡는다. 여기가 유일한 자리다.
+#
+# 켜기:  git config core.hooksPath .githooks     (bootstrap.mjs 가 대신 해 준다)
+# 끄기:  git config --unset core.hooksPath
+# 한 번 건너뛰기:  git commit --no-verify
+#
+# 윈도우 · Git for Windows 는 sh 를 함께 깔아 이 스크립트를 그대로 돌린다.
+
+set -e
+ROOT=$(git rev-parse --show-toplevel)
+S="$ROOT/plugins/marketing-team/scripts"
+
+# ── ① A층 · 항상 · 3초 ────────────────────────────────────────
+node "$S/verify.mjs"          >/dev/null || { node "$S/verify.mjs";          exit 1; }
+node "$S/validate-skills.mjs" >/dev/null || { node "$S/validate-skills.mjs"; exit 1; }
+node "$S/eval-routing.mjs"    >/dev/null || { node "$S/eval-routing.mjs";    exit 1; }
+
+# ── ② B층 · 부를 말이나 가르는 말을 건드렸을 때만 ──────────────
+#    라우팅에 영향을 주는 파일이 아니면 15분을 쓸 이유가 없다.
+# ⚠️ core.quotepath=false 가 없으면 한글 파일명이 \355\227\267… 로 나와 grep 이 못 잡는다.
+#    헷갈리는-쌍.md · 마케팅-CMO/SKILL.md 가 전부 한글이라 조용히 통과했다 (실측 2026-08-23).
+#    그래서 패턴도 한글에 기대지 않고 ASCII 경로로만 잡는다.
+CHANGED=$(git -c core.quotepath=false diff --cached --name-only)
+TOUCHED=$(printf '%s\n' "$CHANGED" | grep -E \
+  -e 'SKILL\.md$' \
+  -e 'routing-eval\.jsonl$' \
+  -e 'ROUTING\.md$' \
+  -e '/docs/.*\.md$' \
+  || true)
+
+if [ -z "$TOUCHED" ]; then
+  echo "✅ A층 통과 · 라우팅 파일은 안 건드렸다 (B층 생략)"
+  exit 0
+fi
+
+if [ -n "$SKIP_LIVE" ]; then
+  echo "⏭  SKIP_LIVE · B층을 건너뛴다. 커밋 전에 한 번은 돌려라:"
+  echo "   node plugins/marketing-team/scripts/eval-routing.mjs --live-cc"
+  exit 0
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "⚠️  라우팅 파일을 고쳤는데 claude 가 없어 B층을 못 돌린다."
+  echo "   목록 검사(A층)만 통과한 상태다. 실제로 제 스킬이 열리는지는 확인되지 않았다."
+  exit 0
+fi
+
+echo ""
+echo "🔵 라우팅 파일이 바뀌었다 — B층 60건으로 확인한다 (맥스 구독 · 추가 결제 없음 · 약 2분)"
+printf '%s\n' "$TOUCHED" | sed 's/^/     /'
+echo "   급하면  SKIP_LIVE=1 git commit …"
+echo ""
+
+node "$S/eval-routing.mjs" --live-cc --limit 60 || {
+  echo ""
+  echo "🔴 라우팅이 틀렸다. 위 목록이 지금 엉뚱한 곳으로 가는 말이다."
+  echo "   고치거나, 알고 넘어가려면  SKIP_LIVE=1 git commit …"
+  exit 1
+}
