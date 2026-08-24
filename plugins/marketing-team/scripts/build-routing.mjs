@@ -115,7 +115,7 @@ const mutatingCount = all.filter(s => s.mutating).length;
 const lines = [
   '# 스킬 100 · 라우팅 테이블 (정본)',
   '',
-  '> CMO가 상시로 들고 있는 명부. **본문은 매칭된 순간에만 연다** (Progressive Disclosure).',
+  '> AI 마케터가 상시로 들고 있는 명부. **본문은 매칭된 순간에만 연다** (Progressive Disclosure).',
   '> 자동 생성 · `node scripts/build-routing.mjs` · **손으로 고치지 않는다** (`SKILL.md` frontmatter가 정본).',
   `> 100개 · 부를 말 ${triggerCount}개 · 게이트 ${gateCount}개 · 상태변경 ${mutatingCount}개`,
   '',
@@ -133,7 +133,7 @@ for (const category of categories) {
 }
 
 lines.push(
-  `> **G** = 대외 발행물 · 발행 전 CCO(규제) 판정 (${gateCount}개)`,
+  `> **G** = 대외 발행물 · 발행 전 AI 규제검토자 판정 (${gateCount}개)`,
   `> **!** = 상태를 바꾼다 (예약·발행·예산) · ⏸ 승인 필수 (${mutatingCount}개)`,
   '',
   '## 체인 15종 (여러 스킬을 한 번에 잇는 말)',
@@ -160,7 +160,7 @@ for (const c of crossChains)
 lines.push(
   '',
   '> ⚠️ **슬래시 명령이 아니다.** `commands/` 폴더는 2026-08-04에 없앴다.',
-  '> 그냥 말하면 CMO가 순서대로 태운다. 중간에 ⏸가 뜨면 답을 주고 이어 간다.',
+  '> 그냥 말하면 AI 마케터가 순서대로 태운다. 중간에 ⏸가 뜨면 답을 주고 이어 간다.',
   '> 정본은 각 카테고리의 `PLUGIN.md`와 `CHAINS.md`다.',
   '',
   '',

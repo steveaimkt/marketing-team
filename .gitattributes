@@ -3,7 +3,7 @@
 # 왜: 윈도우 git 의 기본값은 core.autocrlf=true 다. 그대로 두면 클론하는 순간
 #     모든 .md 가 CRLF 로 바뀌고, frontmatter 파서(`/^---\n…\n---\n/`)가 통째로 실패한다.
 #     verify · validate-skills · eval-routing · build-routing 이 전부 오작동하고,
-#     CMO 가 SKILL.md 의 frontmatter 를 못 읽는다. 파일은 멀쩡해 보여서 원인이 안 보인다.
+#     AI 마케터가 SKILL.md 의 frontmatter 를 못 읽는다. 파일은 멀쩡해 보여서 원인이 안 보인다.
 #     (실측 2026-08-23 · CRLF 를 먹이면 fmOf() 가 빈 문자열을 돌려준다)
 
 * text=auto eol=lf

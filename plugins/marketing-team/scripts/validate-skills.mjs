@@ -105,8 +105,8 @@ for (const s of skills) {
 
   // 5 게이트 스킬은 판정 블록 필수
   if (fld(f, 'gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|🛡/.test(body)) add(id, 'ERR', 'gate:true 인데 판정 블록 없음');
-  // 5-b writes_to 는 착지 경로의 정본이다 — CMO 가 이걸 그대로 쓴다
-  //     2026-08-22 실측: CMO 가 경로를 조합하다 output/ · LEDGER.md 같은 없는 곳에 냈다.
+  // 5-b writes_to 는 착지 경로의 정본이다 — AI 마케터가 이걸 그대로 쓴다
+  //     2026-08-22 실측: AI 마케터가 경로를 조합하다 output/ · LEDGER.md 같은 없는 곳에 냈다.
   //     정본이 틀리면 조합이 아니라 원본이 틀린 것이 된다.
   {
     const w = list(fld(f, 'writes_to'));
@@ -196,7 +196,7 @@ for (const c of chains) {
 }
 if (chains.length !== 15) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 15종)`);
 
-// 10 배포판 CMO가 팀장 10명을 전부 알고 있는가 · 2026-08-04
+// 10 배포판 AI 마케터가 팀장 10명을 전부 알고 있는가 · 2026-08-04
 //   왜: 배포판 orchestrator.md 에 저자 개인 인스턴스가 실려 나간 적이 있다.
 //       팀장 셋(social·ads·commerce)을 아예 부르지 않는 문서였는데 게이트를 통과했다.
 //       감사는 개인정보 '문자열'만 봤지 '내용이 배포용인지'는 안 봤다.
@@ -208,7 +208,7 @@ if (IS_DIST && fs.existsSync(orch)) {
   const t = fs.readFileSync(orch, 'utf8');
   // agents/leads/ 는 v0.6.0 에서 사라졌다 (팀장 10명 → 판정 전담 2명). 검사도 함께 지운다.
   for (const a of ['staff-gate-auditor', 'staff-reviewer'])
-    if (!t.includes(a)) add('orchestrator', 'ERR', `CMO가 모르는 담당: ${a}`);
+    if (!t.includes(a)) add('orchestrator', 'ERR', `AI 마케터가 모르는 담당: ${a}`);
   for (const w of ['기억 저장소', '트루먼']) {
     if (t.includes(w)) add('orchestrator', 'WARN', `배포판에 개인 인스턴스 흔적: ${w}`);
   }

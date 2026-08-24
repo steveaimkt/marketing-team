@@ -1,7 +1,7 @@
 {
   "_why": "verify.mjs 가 이 목록을 읽어 배포면을 훑는다. 검색어를 코드에 리터럴로 쓰면 verify.mjs 자신이 걸려 영구 🔴 가 된다. 그래서 데이터로 분리한다.",
   "retired_roles": {
-    "_why": "v0.14.0 에서 CMO · CCO(규제) · CSO(검수) 로 바꿨다. 옛 이름이 남으면 문서마다 다른 직함이 돌아다닌다.",
+    "_why": "v0.14.0 에서 AI 마케터 · AI 규제검토자 · AI 사업검토자로 바꿨다. 옛 이름이 남으면 문서마다 다른 직함이 돌아다닌다.",
     "words": ["감사관", "검수관", "마케팅-디렉터"],
     "allow": ["docs/팀-헌장.md", "docs/도메인-금기.md", "scripts/sync-skills.mjs", "scripts/smoke.md"]
   },

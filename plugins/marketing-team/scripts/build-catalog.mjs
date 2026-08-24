@@ -151,7 +151,7 @@ footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-si
 <div class="nav">${nav}<a href="#chains">체인 ${chains.length}</a></div></div>
 <div class="gates"><div class="gk"><span class="chip g">게이트</span><b>${gate}개</b>
 <p><b>틀린 말이 밖으로 나가는 것</b>을 막는다. 산출물이 완성된 뒤 전달 전에
-CCO(규제)이 표시광고법·업종 법령으로 전수 검사한다. <b>판정은 AI가</b> 하고,
+AI 규제검토자가 표시광고법·업종 법령으로 전수 검사한다. <b>판정은 AI가</b> 하고,
 ⛔ 이면 전달하지 않도록 지시한다. 다만 <b>기술적 강제 차단은 아니다</b> — 절차 규약과 사람 승인에 기댄다.</p></div>
 <div class="gk"><span class="chip m">상태변경</span><b>${mut}개</b>
 <p><b>되돌릴 수 없는 일이 벌어지는 것</b>을 막는다. 발송·예약·자동화 등록처럼

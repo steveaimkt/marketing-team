@@ -103,27 +103,27 @@ else {
     const desc = (fm.match(/^description:\s*(.+)$/m) || [, ''])[1].trim();
     if (!name) err(`agents/${e.name} · name 없음`);
     else if (name !== base) err(`agents/${e.name} · 파일명과 name 불일치 (${name})`);
-    if (!desc) err(`agents/${e.name} · description 없음 — CMO가 언제 부를지 모른다`);
+    if (!desc) err(`agents/${e.name} · description 없음 — AI 마케터가 언제 부를지 모른다`);
     agents.push(base);
   }
-  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비) · CMO는 스킬`);
+  ok.push(`담당 ${agents.length}명 (평탄 · 전원 frontmatter 완비) · AI 마케터는 스킬`);
 }
 
-// ③ CMO가 전원을 알고 있나 · 유령이 없나
-// CMO는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
+// ③ AI 마케터가 전원을 알고 있나 · 유령이 없나
+// AI 마케터는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
 //   서브에이전트가 다시 위임하면 맥락이 두 겹으로 접힌다. 내려가는 단계는 언제나 한 단이다.
 if (fs.existsSync(path.join(adir, 'marketing-director.md')))
-  err('agents/marketing-director.md 가 있다 — CMO는 skills/마케팅-CMO 여야 한다 (중첩 위임 방지)');
-const dpath = path.join(ROOT, 'skills', '마케팅-CMO', 'SKILL.md');
-if (!fs.existsSync(dpath)) err('skills/마케팅-CMO/SKILL.md 없음 — 입구가 없다');
+  err('agents/marketing-director.md 가 있다 — AI 마케터는 skills/AI-마케터 여야 한다 (중첩 위임 방지)');
+const dpath = path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md');
+if (!fs.existsSync(dpath)) err('skills/AI-마케터/SKILL.md 없음 — 입구가 없다');
 else {
   const d = fs.readFileSync(dpath, 'utf8');
-  for (const a of agents) if (!d.includes(a)) err(`CMO가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
+  for (const a of agents) if (!d.includes(a)) err(`AI 마케터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
   // 담당은 「내가 나를 검사할 수 없는 자리」에만 둔다 (2026-08-22 결정). 실행자는 두지 않는다.
   const exec = agents.filter(a => !a.startsWith('staff-'));
-  if (exec.length) err(`실행 담당이 있다: ${exec.join(', ')} — 실행은 CMO가 메인에서 한다. 담당은 판정 전담만`);
+  if (exec.length) err(`실행 담당이 있다: ${exec.join(', ')} — 실행은 AI 마케터가 메인에서 한다. 담당은 판정 전담만`);
   for (const m of d.matchAll(/`(lead-[a-z-]+|staff-[a-z-]+)`/g))
-    if (!agents.includes(m[1])) err(`CMO가 없는 담당을 부른다: ${m[1]}`);
+    if (!agents.includes(m[1])) err(`AI 마케터가 없는 담당을 부른다: ${m[1]}`);
 }
 
 // ④ 스킬 · 바로 아래 한 단계
@@ -215,7 +215,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   if (!bad && real.length) ok.push(`스킬 이름 참조 대조 (${real.join(' · ')})`);
 }
 
-// ⑥-c 유령 담당 · CMO 파일뿐 아니라 skills/ · docs/ 전체를 본다
+// ⑥-c 유령 담당 · AI 마케터 파일뿐 아니라 skills/ · docs/ 전체를 본다
 //   실제로 마케팅팀-업무리스트 가 없는 담당을 부르고 있었다 (2026-08-22 발견)
 {
   let bad = 0;
@@ -280,7 +280,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 }
 
 // ⑥-f gate:true 스킬의 실습 예시에 판정 블록이 있나
-//   053 이 gate:true 인데 예시에 CCO 판정이 없었다 (2026-08-22 발견)
+//   053 이 gate:true 인데 예시에 AI 규제검토자 판정이 없었다 (2026-08-22 발견)
 {
   let bad = 0, n = 0;
   for (const p of fs.existsSync(path.join(ROOT, '100-skills')) ?
@@ -297,7 +297,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const ex = path.join(p, 'example', 'output.md');
     if (!fs.existsSync(ex)) continue;
     const t = fs.readFileSync(ex, 'utf8');
-    if (!/🛡|CCO\(규제\)|게이트 판정|컴플라이언스 게이트/.test(t)) {
+    if (!/🛡|AI 규제검토자\(규제\)|게이트 판정|컴플라이언스 게이트/.test(t)) {
       err(`gate:true 인데 실습 예시에 판정 블록이 없다: ${path.basename(p)}`); bad++;
     }
   }
@@ -657,11 +657,11 @@ for (const link of ['agents', 'skills']) {
   else ok.push('경로 규칙 전원 명시 (패키지 안 vs 작업 폴더)');
 }
 
-// ⑩ CMO에 완주 조건이 살아 있나 (2026-08-22 시뮬에서 「짧게」 한마디에 게이트·착지가 빠졌다)
+// ⑩ AI 마케터에 완주 조건이 살아 있나 (2026-08-22 시뮬에서 「짧게」 한마디에 게이트·착지가 빠졌다)
 {
   const d = fs.existsSync(dpath) ? fs.readFileSync(dpath, 'utf8') : '';
   for (const k of ['완주 조건', '파일 착지', '규제 게이트', '원장'])
-    if (!d.includes(k)) { err(`CMO에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
+    if (!d.includes(k)) { err(`AI 마케터에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
   if (d.includes('완주 조건')) ok.push('완주 조건 셋 명시 (단축 요청에도 생략 불가)');
 }
 
@@ -669,7 +669,7 @@ for (const link of ['agents', 'skills']) {
 {
   // ⚠️ 시각(mtime) 비교로는 「둘 다 낡은」 상태를 못 잡는다.
   //    2026-08-22 · ROUTING.md 가 SKILL.md 와 16개 어긋났는데 카탈로그도 같이 낡아서 통과했다.
-  //    CMO 는 명부를 먼저 읽으므로, 정본을 고쳐도 구형 이름·트리거로 판단한다.
+  //    AI 마케터는 명부를 먼저 읽으므로, 정본을 고쳐도 구형 이름·트리거로 판단한다.
   const cat = path.join(M, '카탈로그.html'), routing = path.join(M, 'ROUTING.md');
   if (!fs.existsSync(cat)) err('100-skills/카탈로그.html 없음 — `node scripts/build-catalog.mjs`');
   if (!fs.existsSync(routing)) err('100-skills/ROUTING.md 없음 — `node scripts/build-routing.mjs`');

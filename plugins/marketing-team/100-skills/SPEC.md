@@ -30,7 +30,7 @@
 | 9 | `outputs` | 무엇이 나오나 · **끝에 `저장 파일(.확장자)`** | `[…, 저장 파일(.md)]` |
 | 10 | `requires` | 읽어야 하는 정본 | `[brand/profile.md]` |
 | 11 | `chains_to` | 다음 스킬 · **따옴표 필수** | `["047", "049"]` |
-| 12 | `gate` | 대외 발행물인가 (CCO 필수) | `true` / `false` |
+| 12 | `gate` | 대외 발행물인가 (AI 규제검토자 필수) | `true` / `false` |
 | 13 | `mutating` | 상태를 바꾸나 (⏸ 필수) | `true` / `false` |
 | 14 | `writes_to` | **착지 경로의 정본** (§2) | `[outputs/{날짜}/043-meta-ad-copy/043-meta-ad-copy.md]` |
 | 15 | `builder` | 누가 만들었나 | `사용자 (이 회사)` |
@@ -86,7 +86,7 @@ example/input.md    무엇을 넣었나
 example/output.md   무엇이 나왔나
 ```
 
-⛔ **`gate: true` 면 `output.md` 에 CCO(규제) 판정 블록이 있어야 한다.**
+⛔ **`gate: true` 면 `output.md` 에 AI 규제검토자 판정 블록이 있어야 한다.**
 없으면 독자가 게이트를 안 거쳐도 되는 줄 안다. `verify.mjs` 가 검사한다.
 
 ## 6. 사용자가 만든 스킬 · `brand/my-skills/`
@@ -96,7 +96,7 @@ example/output.md   무엇이 나왔나
 ```
 outputs/{날짜}/092-skill-builder-meta/     초안·검증 결과
 brand/my-skills/u{NN}-{slug}/SKILL.md      채택본
-brand/my-skills/INDEX.md                   명부 — CMO 가 공식 100개보다 먼저 본다
+brand/my-skills/INDEX.md                   명부 — AI 마케터가 공식 100개보다 먼저 본다
 ```
 
 - **ID 는 `u01` 부터** (`u01`~`u99`) · `category: custom`
@@ -104,7 +104,7 @@ brand/my-skills/INDEX.md                   명부 — CMO 가 공식 100개보�
 - ⛔ **`gate:` 가 없으면 `true` 로 본다.** 내부 문서임이 `gate: false` 로 명시됐을 때만 건너뛴다.
   명부 밖 스킬일수록 검사가 없어지면 안 된다
 
-`INDEX.md`는 아래 네 열을 유지한다. CMO는 이 한 장으로 사용자 스킬을 먼저 찾고, 매칭된 파일만 연다.
+`INDEX.md`는 아래 네 열을 유지한다. AI 마케터는 이 한 장으로 사용자 스킬을 먼저 찾고, 매칭된 파일만 연다.
 
 ```markdown
 | ID | 이름 | 부르는 말 | 경로 |

@@ -59,7 +59,7 @@ for (const d of dirs) {
 
   // 게이트 · 없으면 true 로 본다
   if (!/^gate:/m.test(f)) warn(`${d.name} · gate 미기재 — true 로 간주된다`);
-  else if (g('gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|CCO|🛡/.test(t)) err(`${d.name} · gate:true 인데 판정 블록 없음`);
+  else if (g('gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|AI 규제검토자|🛡/.test(t)) err(`${d.name} · gate:true 인데 판정 블록 없음`);
 
   for (const sec of SEC) if (!t.includes(sec)) err(`${d.name} · ${sec} 없음`);
   if (!fs.existsSync(path.join(DIR, d.name, 'routing-eval.jsonl'))) warn(`${d.name} · routing-eval.jsonl 없음`);
@@ -67,7 +67,7 @@ for (const d of dirs) {
 
 // INDEX 대조
 const idx = path.join(DIR, 'INDEX.md');
-if (!fs.existsSync(idx)) { if (n) err('INDEX.md 없음 — CMO 가 G1 에서 이 명부를 읽는다'); }
+if (!fs.existsSync(idx)) { if (n) err('INDEX.md 없음 — AI 마케터가 G1 에서 이 명부를 읽는다'); }
 else {
   const t = fs.readFileSync(idx, 'utf8');
   for (const d of dirs) if (!t.includes(d.name.split('-')[0])) err(`INDEX.md 에 ${d.name} 이 없다 — 등록해도 안 불린다`);
