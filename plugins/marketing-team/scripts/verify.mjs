@@ -495,6 +495,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     if (e.isDirectory()) return walk(p);
     if (!/\.(md|mjs|json|html)$/.test(e.name)) return;
     if (e.name === 'verify.mjs') return;                        // 검사 자신 — 여기 없으면 검사가 성립 안 한다
+    if (/ \d+\.\w+$/.test(e.name)) return;                      // iCloud 충돌 사본 (`… 2.mjs`) — 아래 ⑥-i6 이 따로 잡는다
     fs.readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
       if (/^\s*persona:/.test(line)) return;                    // 업계 직함 — 우리 조직도가 아니다
       for (const a of 약어)
@@ -507,6 +508,24 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     err(`영문 C레벨 약어가 ${hits.length}곳 남았다 — 우리말 직함으로 바꿔라 (AI 마케터 · AI 규제검토자 · AI 사업검토자 · 경영/재무/고객/법무/브랜드)`);
     for (const h of hits.slice(0, 5)) err(`  ${h}`);
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
+}
+
+// ⑥-i6 iCloud 충돌 사본이 패키지 안에 있나
+//   `eval-routing 2.mjs` 같은 파일은 동기화가 만든 낡은 사본이다. git 은 무시하지만
+//   **`directory` 소스로 설치하면 폴더째 복사되어 설치본에 딸려 간다.** (실측 2026-08-25)
+{
+  const dups = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    if (e.name === 'node_modules') return;
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) return walk(p);
+    if (/ \d+(\.\w+)?$/.test(e.name)) dups.push(path.relative(ROOT, p));
+  });
+  walk(ROOT);
+  if (dups.length) {
+    warn(`iCloud 충돌 사본 ${dups.length}개가 패키지 안에 있다 — 지워라 (git 은 추적 안 하지만 directory 설치본에는 딸려 간다)`);
+    for (const d of dups.slice(0, 5)) warn(`  ${d}`);
+  } else ok.push('충돌 사본 없음');
 }
 
 // ⑥-i2 배포 대상 마크다운의 내부 상대 링크가 실재하나
