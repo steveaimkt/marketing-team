@@ -102,7 +102,8 @@ description: |
 거기에 넷이 없으면 **묻고 만든다** (⏸).
 
 ```
-brand/     내 브랜드 정보 · 내 에이전트     ← 빈 템플릿을 brand-templates/ 에서 복사
+brand/     내 브랜드 정보 · 우리 보완       ← 빈 템플릿을 brand-templates/ 에서 복사
+           └ skill-notes/  스킬을 우리에 맞춘 것 (필요할 때 생긴다 · 미리 안 만든다)
 outputs/   산출물이 떨어지는 곳
 logs/      실적 원장
 inputs/    내 파일을 넣어 두는 곳
