@@ -483,6 +483,32 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-i5 영문 C레벨 약어가 다시 새지 않았나
+//   0.17.0 에서 우리말로 바꿨는데 5관점 목록만 고치고 개별 언급 17곳을 놓쳤다 (실측 2026-08-25).
+//   ⚠️ CFO 는 실제 업계 직함으로도 쓰인다 — persona 줄은 우리 팀 C레벨이 아니므로 예외다.
+{
+  const 약어 = ['CMO', 'CCO', 'CSO', 'CEO', 'CFO', 'CLO', 'CBO'];
+  const hits = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    if (e.name.startsWith('.') || e.name === 'node_modules') return;
+    const p = path.join(d, e.name);
+    if (e.isDirectory()) return walk(p);
+    if (!/\.(md|mjs|json|html)$/.test(e.name)) return;
+    if (e.name === 'verify.mjs') return;                        // 검사 자신 — 여기 없으면 검사가 성립 안 한다
+    fs.readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
+      if (/^\s*persona:/.test(line)) return;                    // 업계 직함 — 우리 조직도가 아니다
+      for (const a of 약어)
+        if (new RegExp(`\\b${a}\\b`).test(line))
+          hits.push(`${path.relative(ROOT, p)}:${i + 1} ${a}`);
+    });
+  });
+  for (const sub of ['agents', 'skills', 'docs', '100-skills', 'brand-templates', 'scripts', 'hooks']) walk(path.join(ROOT, sub));
+  if (hits.length) {
+    err(`영문 C레벨 약어가 ${hits.length}곳 남았다 — 우리말 직함으로 바꿔라 (AI 마케터 · AI 규제검토자 · AI 사업검토자 · 경영/재무/고객/법무/브랜드)`);
+    for (const h of hits.slice(0, 5)) err(`  ${h}`);
+  } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
+}
+
 // ⑥-i2 배포 대상 마크다운의 내부 상대 링크가 실재하나
 //   깨진 링크가 지금은 0개지만 회귀를 자동으로 막지 못했다 (2026-08-22)
 {

@@ -165,6 +165,30 @@ for (const s of skills) {
     신호.push(['💾 저장실패', s.스킬, `${s.저장실패}건`, '착지가 실패했다 — 회수 가능한지 본다']);
 }
 
+// ── 완주 조건 사후 대조 ────────────────────────────────────────────────────
+//   문서는 「파일 착지 · 규제 게이트 · 원장 1행」을 33·5·23회 강조하는데 재는 곳이 없었다.
+//   원장 1행은 이 파일이 있다는 것 자체가 증거다. 나머지 둘은 **원장과 실물을 대조**해 뒤늦게 잰다.
+//   ⚠️ 최근 것만 본다 — 오래된 건 회수도 안 되고, 통독은 §A 위반이다.
+{
+  const 최근 = all.filter(r => days(day(r.일시)) <= 56 && r.상태 === '완료');   // 최근 8주 · 완료만
+  const abs = q => path.resolve(WORK, q);
+  const 착지실패 = [], 게이트없음 = [];
+  for (const r of 최근) {
+    const q = (r.경로 || '').trim();
+    if (!q || q.startsWith('(')) continue;                    // (차단됨) · (저장 실패) 는 경로가 아니다
+    if (!fs.existsSync(abs(q))) { 착지실패.push(r); continue; }
+    // 발행물이면 같은 폴더에 gate.md 가 있어야 한다 (게이트 열이 채워진 행 = 게이트를 탄 행)
+    if (['✅', '⚠️', '⛔'].includes(r.게이트) && !fs.existsSync(path.join(path.dirname(abs(q)), 'gate.md')))
+      게이트없음.push(r);
+  }
+  if (착지실패.length)
+    신호.push(['📁 착지실패', `${착지실패.length}건`, 착지실패.slice(0, 2).map(r => day(r.일시)).join(' · '),
+               '원장엔 있는데 파일이 없다 — 「저장 안 된 거 있어?」로 회수한다']);
+  if (게이트없음.length)
+    신호.push(['🚪 게이트기록', `${게이트없음.length}건`, 게이트없음.slice(0, 2).map(r => r.스킬).join(' · '),
+               '게이트는 탔는데 gate.md 가 없다 — 근거가 안 남았다']);
+}
+
 // 같은 말이 다른 스킬로 간 자리 = 라우팅이 흔들리는 자리
 const 요청별 = new Map();
 for (const r of all) {

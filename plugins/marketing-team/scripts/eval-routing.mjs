@@ -242,6 +242,12 @@ if (UPDATE) {
   }
   if (fixed.length) ok.push(`전에 틀리던 ${fixed.length}건이 이제 맞는다 — \`--update-baseline\` 으로 기준선을 내린다`);
   if (!regressions.length) ok.push(`어휘 기준선 회귀 0건 (top1 ${top1}/${cases.length} · top5 ${top5}/${cases.length})`);
+  // ⚠️ 「회귀 0건」은 **새로 나빠지지 않았다**는 뜻일 뿐이다. 이미 틀린 것이 몇 건인지 함께 말하지 않으면
+  //    초록 한 줄이 부채를 가린다 (실측 2026-08-25 · 280/596 = 47% 가 박제돼 있었다).
+  const 부채 = nowMiss.size, 비율 = Math.round((부채 / cases.length) * 100);
+  const 변화 = fixed.length ? ` · 이번에 ${fixed.length}건 갚음` : '';
+  ok.push(`어휘층 부채 ${부채}/${cases.length} (${비율}%)${변화} — 회귀가 아니라 **줄어야 할 빚**이다 ` +
+          `(실사용 라우팅은 B층 \`--live-cc\` 가 잰다)`);
 }
 
 // ─────────────────────────────────────────────────────────────
