@@ -539,6 +539,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const 읽는곳 = [
       [path.join(ROOT, 'docs', '공통규약.md'), '공통규약 §0-b'],
       [path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'AI-마케터 §0'],
+      [path.join(ROOT, '100-skills', 'SPEC.md'), '100-skills/SPEC.md (requires 폴백)'],
     ];
     let miss = 0;
     for (const [f, name] of 읽는곳)
