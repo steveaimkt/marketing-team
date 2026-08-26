@@ -250,7 +250,7 @@ SKILL.md·routing-eval·docs/ 를 건드렸다 → A층 + B층 60건 (약 2분 �
 훅은 **제품이 아니라 개발 도구**다. 스킬 100개를 쓰는 사용자에게는 아무 영향이 없다.
 
 정적 검사로 못 잡는 것 — 「문서는 고쳤는데 실제로 안 도는」 회귀 — 은
-[scripts/smoke.md](plugins/marketing-team/scripts/smoke.md) 를 사람이 밟아 확인한다.
+[scripts/실제확인.md](plugins/marketing-team/scripts/실제확인.md) 를 사람이 밟아 확인한다.
 
 ---
 
@@ -310,7 +310,7 @@ plugins/marketing-team/           ← 플러그인 본체 (설치되는 것은 �
   100-skills/   스킬 100개 카탈로그 + ROUTING.md 명부
   brand-templates/  빈 템플릿 원본 — 작업 폴더의 brand/ 와 이름이 겹치면 안 된다
   sample-data/  브랜드 정보가 없어도 완주하게 하는 샘플
-  scripts/      verify · validate-skills · eval-routing · build-catalog · sync-skills · smoke.md
+  scripts/      verify · validate-skills · eval-routing · build-catalog · sync-skills · 실제확인.md
 .github/workflows/verify.yml      push 마다 위 검사를 자동으로 돌린다
 .githooks/pre-commit              커밋 전 · 라우팅을 건드렸으면 B층까지 (bootstrap 이 켜 준다)
 .claude/                          클론해서 폴더로 열 때의 연결 고리
