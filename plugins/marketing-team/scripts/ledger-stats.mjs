@@ -172,7 +172,30 @@ for (const s of skills) {
 {
   const 최근 = all.filter(r => days(day(r.일시)) <= 56 && r.상태 === '완료');   // 최근 8주 · 완료만
   const abs = q => path.resolve(WORK, q);
-  const 착지실패 = [], 게이트없음 = [];
+  const 착지실패 = [], 게이트없음 = [], 형식위반 = [];
+
+  // 스킬이 정한 확장자(writes_to)와 실제로 떨어진 것이 다른가
+  //   실측 2026-08-27 · 052 는 writes_to 가 .html 인데 .md 로 냈다.
+  //   「대시보드로 낼 것을 문서로 냈다」는 대화 안의 판단이라 훅으로는 못 잡는다.
+  //   그러나 **확장자가 다른 것은 확실한 위반**이라 여기서 잰다.
+  const 정본형식 = new Map();
+  try {
+    const SK = path.resolve(process.env.CLAUDE_PLUGIN_ROOT || path.join(path.dirname(new URL(import.meta.url).pathname), '..'), '100-skills');
+    const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const q = path.join(d, e.name);
+      if (e.isDirectory()) return walk(q);
+      if (e.name !== 'SKILL.md') return;
+      const t = fs.readFileSync(q, 'utf8');
+      const id = (t.match(/^id:\s*"?(\d+)/m) || [])[1];
+      const w = (t.match(/^writes_to:\s*\[([^\]]+)/m) || [])[1];
+      if (id && w) {
+        const ext = (w.split(',')[0].trim().match(/\.(\w+)$/) || [])[1];
+        if (ext) 정본형식.set(id, ext);
+      }
+    });
+    walk(SK);
+  } catch { /* 패키지를 못 찾으면 이 신호만 건너뛴다 */ }
+
   for (const r of 최근) {
     const q = (r.경로 || '').trim();
     if (!q || q.startsWith('(')) continue;                    // (차단됨) · (저장 실패) 는 경로가 아니다
@@ -180,6 +203,11 @@ for (const s of skills) {
     // 발행물이면 같은 폴더에 gate.md 가 있어야 한다 (게이트 열이 채워진 행 = 게이트를 탄 행)
     if (['✅', '⚠️', '⛔'].includes(r.게이트) && !fs.existsSync(path.join(path.dirname(abs(q)), 'gate.md')))
       게이트없음.push(r);
+    // 형식 대조 — 스킬 ID 에서 번호를 뽑아 정본 확장자와 비교
+    const num = (r.스킬 || '').match(/\((\d{3})\)/);
+    const want = num && 정본형식.get(num[1]);
+    const got = (q.match(/\.(\w+)$/) || [])[1];
+    if (want && got && want !== got) 형식위반.push({ ...r, want, got });
   }
   if (착지실패.length)
     신호.push(['📁 착지실패', `${착지실패.length}건`, 착지실패.slice(0, 2).map(r => day(r.일시)).join(' · '),
@@ -187,6 +215,10 @@ for (const s of skills) {
   if (게이트없음.length)
     신호.push(['🚪 게이트기록', `${게이트없음.length}건`, 게이트없음.slice(0, 2).map(r => r.스킬).join(' · '),
                '게이트는 탔는데 gate.md 가 없다 — 근거가 안 남았다']);
+  if (형식위반.length)
+    신호.push(['📊 형식위반', `${형식위반.length}건`,
+               형식위반.slice(0, 2).map(r => `${r.스킬} .${r.got}→.${r.want}`).join(' · '),
+               '스킬이 정한 형식과 다르게 냈다 — 다음 스킬이 그 경로를 못 찾는다']);
 }
 
 // 같은 말이 다른 스킬로 간 자리 = 라우팅이 흔들리는 자리
