@@ -47,6 +47,26 @@ jobs:
             exit 1
           fi
 
+  # ── 릴리스 관문 · 손으로 누를 때만 ───────────────────────────
+  #    사람이 밟는 「실제 확인」이 미완이면 여기서 막는다.
+  #    ⚠️ A층(정본 검사)에 두면 안 된다 — 그건 **푸시마다** 돌아서
+  #       사람이 밟기 전까지 main 이 영구히 빨개진다 (실측 2026-08-27).
+  #       버전 게이트는 버전을 올리면 스스로 풀리지만 이 게이트는 사람만 풀 수 있다.
+  release:
+    name: 릴리스 관문 (수동)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: 실제 확인을 밟았는가
+        env:
+          RELEASE: '1'
+        run: node plugins/marketing-team/scripts/verify.mjs
+
   # ── B층 · 유료 · 손으로 누를 때만 ────────────────────────────
   #    Actions 탭 → verify → Run workflow.  ANTHROPIC_API_KEY 시크릿이 있어야 돈다.
   live:

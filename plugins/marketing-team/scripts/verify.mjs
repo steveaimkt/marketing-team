@@ -573,13 +573,16 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const m = `이 버전(v${ver})의 실제 확인 기록이 ${기록.length ? '미완이다' : '없다'} — ` +
               '기계 검사로는 「스킬이 실제로 열리는가」를 못 잡는다 (scripts/실제확인.md)';
     if (!기록.length) {
-      if (process.env.CI) err(m + '. 밟고 scripts/실제확인-기록/{커밋}.md 로 남겨라');
-      else warn(m + '. **릴리스 전에** 밟아라 (지금 커밋은 막지 않는다)');
+      // ⚠️ CI 가 아니라 RELEASE 로 가른다. CI 는 **푸시마다** 돌기 때문에
+      //    CI 에서 🔴 로 두면 사람이 밟기 전까지 main 이 영구히 빨갛다 (실측 2026-08-27 · 내가 그렇게 만들었다).
+      //    버전 게이트는 버전을 올리면 스스로 풀리지만 이 게이트는 **사람만 풀 수 있다.**
+      if (process.env.RELEASE) err(m + '. 밟고 scripts/실제확인-기록/{커밋}.md 로 남겨라');
+      else warn(m + '. **릴리스 전에** 밟아라 (푸시는 막지 않는다)');
     } else {
       const 미완 = 기록.filter(x => x.t.includes('⬜'));
       if (미완.length) {
         const 개수 = 미완.reduce((a, x) => a + (x.t.match(/⬜/g) || []).length, 0);
-        if (process.env.CI) err(`${m} · 미완 ${개수}칸 (${미완[0].f})`);
+        if (process.env.RELEASE) err(`${m} · 미완 ${개수}칸 (${미완[0].f})`);
         else warn(`${m} · 미완 ${개수}칸 (${미완[0].f}) — **릴리스 전에** 채워라`);
       } else ok.push(`실제 확인 실측 있음 (v${ver} · ${기록[0].f})`);
     }
