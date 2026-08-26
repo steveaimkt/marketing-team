@@ -496,6 +496,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     if (!/\.(md|mjs|json|html)$/.test(e.name)) return;
     if (e.name === 'verify.mjs') return;                        // 검사 자신 — 여기 없으면 검사가 성립 안 한다
     if (/ \d+\.\w+$/.test(e.name)) return;                      // iCloud 충돌 사본 (`… 2.mjs`) — 아래 ⑥-i6 이 따로 잡는다
+    if (d.endsWith('smoke-results')) return;                    // 지난 실측 기록 — **과거를 고쳐 쓰지 않는다**
     fs.readFileSync(p, 'utf8').split('\n').forEach((line, i) => {
       if (/^\s*persona:/.test(line)) return;                    // 업계 직함 — 우리 조직도가 아니다
       for (const a of 약어)
@@ -508,6 +509,34 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     err(`영문 C레벨 약어가 ${hits.length}곳 남았다 — 우리말 직함으로 바꿔라 (AI 마케터 · AI 규제검토자 · AI 사업검토자 · 경영/재무/고객/법무/브랜드)`);
     for (const h of hits.slice(0, 5)) err(`  ${h}`);
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
+}
+
+// ⑥-i9 이 버전의 스모크(사람이 밟는 확인)를 실제로 밟았나
+//   ⚠️ 정적 검사로 원리적으로 못 잡는 것이 있다 — 스킬이 **실제로 열리는가**, 화면에 그 문장이 나오는가.
+//   실측 2026-08-26 · 기계 검사 35종을 전부 통과한 상태에서 실패 3건이 「써 보고」 나왔다.
+//   마지막 실측은 v0.14.0 이고 그 뒤로 버전이 여덟 번 올랐다. **안 밟으면 아무도 모른다.**
+//   기록 이름은 커밋 해시다(smoke.md). 그래서 파일 **안에 적힌 버전**으로 찾는다.
+{
+  const dir = path.join(ROOT, 'scripts', 'smoke-results');
+  const ver = fs.existsSync(mpath) ? JSON.parse(fs.readFileSync(mpath, 'utf8')).version : null;
+  if (ver && fs.existsSync(dir)) {
+    const 기록 = fs.readdirSync(dir).filter(f => f.endsWith('.md') && !f.startsWith('_폐기'))
+      .map(f => ({ f, t: fs.readFileSync(path.join(dir, f), 'utf8') }))
+      .filter(x => new RegExp(`\\bv?${ver.replace(/\./g, '\\.')}\\b`).test(x.t));
+    const m = `이 버전(v${ver})의 스모크 기록이 ${기록.length ? '미완이다' : '없다'} — ` +
+              '기계 검사로는 「스킬이 실제로 열리는가」를 못 잡는다 (scripts/smoke.md)';
+    if (!기록.length) {
+      if (process.env.CI) err(m + '. 밟고 scripts/smoke-results/{커밋}.md 로 남겨라');
+      else warn(m + '. **릴리스 전에** 밟아라 (지금 커밋은 막지 않는다)');
+    } else {
+      const 미완 = 기록.filter(x => x.t.includes('⬜'));
+      if (미완.length) {
+        const 개수 = 미완.reduce((a, x) => a + (x.t.match(/⬜/g) || []).length, 0);
+        if (process.env.CI) err(`${m} · 미완 ${개수}칸 (${미완[0].f})`);
+        else warn(`${m} · 미완 ${개수}칸 (${미완[0].f}) — **릴리스 전에** 채워라`);
+      } else ok.push(`스모크 실측 있음 (v${ver} · ${기록[0].f})`);
+    }
+  }
 }
 
 // ⑥-i8 배포 대상 파일이 git 에 실제로 들어가 있나
