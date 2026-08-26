@@ -511,7 +511,30 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
-// ⑥-i9 이 버전의 실제 확인(사람이 밟는 확인)를 실제로 밟았나
+// ⑥-i10 D1~D5 가 규약·런타임·예시 셋에 다 있나
+//   ⚠️ 규칙만 바꾸면 **예시가 이긴다.** AI 는 example/output.md 를 보고 흉내 낸다.
+//   실측 2026-08-26 · G4 에 「경로·결론 3줄·부족한 것」이 적혀 있는데도
+//   실제로는 「.md 파일 나왔습니다」로 끝났다 — 예시 100개 중 그 형태를 보여주는 것이 0개였다.
+{
+  for (const [f, name, 표식] of [
+    [path.join(ROOT, 'docs', '공통규약.md'), '공통규약 §0-c', '그냥 클로드'],
+    [path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'AI-마케터', 'D2'],
+  ]) if (fs.existsSync(f) && !fs.readFileSync(f, 'utf8').includes(표식))
+    err(`${name} 에 D1~D5 가 없다 — 정체성 규칙이 빠지면 그냥 클로드와 같아진다`);
+
+  const ex = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return walk(q);
+    if (e.name === 'output.md') ex.push(q);
+  });
+  walk(path.join(ROOT, '100-skills'));
+  const 계약 = ex.filter(q => fs.readFileSync(q, 'utf8').includes('HANDOFF → 사용자'));
+  if (!계약.length) err('예시 산출물에 「HANDOFF → 사용자」 본보기가 0개다 — 규칙만 있고 흉내 낼 것이 없다');
+  else ok.push(`D1~D5 배선 · 계약 본보기 ${계약.length}/${ex.length}개`);
+}
+
+// ⑥-i9 이 버전의 실제 확인을 실제로 밟았나
 //   ⚠️ 정적 검사로 원리적으로 못 잡는 것이 있다 — 스킬이 **실제로 열리는가**, 화면에 그 문장이 나오는가.
 //   실측 2026-08-26 · 기계 검사 35종을 전부 통과한 상태에서 실패 3건이 「써 보고」 나왔다.
 //   마지막 실측은 v0.14.0 이고 그 뒤로 버전이 여덟 번 올랐다. **안 밟으면 아무도 모른다.**
