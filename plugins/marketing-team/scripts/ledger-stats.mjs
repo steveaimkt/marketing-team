@@ -221,6 +221,56 @@ for (const s of skills) {
                '스킬이 정한 형식과 다르게 냈다 — 다음 스킬이 그 경로를 못 찾는다']);
 }
 
+// ── 재방문 · 원장이 **먼저** 말을 거는 자리 ────────────────────────────────
+//   위 신호 9종은 전부 「이상」이라 정상적으로 쓰는 사람에겐 평생 안 뜬다.
+//   실측 2026-08-26 · 시스템이 먼저 말을 거는 자리 1개, 실효 0.
+//   재방문은 이상이 아니라 **때가 된 것**이다. 그래서 이 둘만 훅이 먼저 꺼낸다.
+//   ⚠️ 주기는 선언하지 않는다 — **원장에서 잰다.** 실제로 반복한 것만 잡힌다.
+const 재방문 = [];
+const CYCLE_MIN_DAYS = 3;     // 하루에 몇 번씩 도는 것은 주기가 아니다
+const CYCLE_OVERDUE = 1.5;    // 평소 간격의 이 배를 넘으면 「때가 지났다」
+
+for (const s of skills) {
+  // ⏰ 주기 도래 — 평소 간격을 넘겼다
+  if (s.무호출일 < STALE_DAYS) {                       // 🔕 가 이긴다 — 그건 내릴지 묻는 자리다
+    const ds = s.rows.filter(완료).map(r => day(r.일시)).filter(Boolean).sort();
+    const gaps = ds.slice(1).map((d, i) => days(ds[i]) - days(d)).filter(g => g > 0).sort((a, b) => a - b);
+    if (gaps.length >= 2) {
+      const 중앙값 = gaps[Math.floor(gaps.length / 2)];   // 평균은 한 번의 긴 공백에 끌려간다
+      if (중앙값 >= CYCLE_MIN_DAYS && s.무호출일 >= 중앙값 * CYCLE_OVERDUE)
+        재방문.push(['⏰ 주기도래', s.스킬, `평소 ${중앙값}일 간격 · ${s.무호출일}일째`,
+                     '때가 됐다 — 이번에도 돌릴지 먼저 묻는다']);
+    }
+  }
+  // 📌 미완 — 중단·차단된 뒤 같은 스킬로 완료된 적이 없다
+  const 열림 = s.rows
+    .filter(r => r.상태 === '중단' || r.상태 === '차단됨')
+    .filter(r => days(day(r.일시)) <= STALE_DAYS)          // 90일 넘으면 대기열이 아니라 과거다
+    .filter(r => !s.rows.some(x => 완료(x) && x.일시 > r.일시))
+    .sort((a, b) => a.일시.localeCompare(b.일시));
+  if (열림.length)
+    재방문.push(['📌 미완', s.스킬, `${열림.length}건 · ${day(열림[열림.length - 1].일시)}`,
+                 열림.some(r => r.상태 === '차단됨')
+                   ? '게이트에 막힌 채 끝났다 — 고쳐서 다시 낼지 묻는다'
+                   : '재료가 없어 멈춘 채다 — 그 재료가 왔는지 묻는다']);
+}
+
+// 📎 플레이북이 빈 채로 일만 쌓인다
+//   실측 2026-08-26 · `brand/my-playbook.md` 를 채우는 경로는 **091 하나뿐**인데
+//   091 은 어떤 chains_to 에도 없고 온보딩도 언급하지 않는다. 그래서 097·098 이 함께 죽는다.
+//   ⚠️ 온보딩 3분째에 권할 것이 아니다 — 그때 사용자는 아직 설명할 업무가 없다.
+//   **몇 건 해 본 뒤**가 그 자리다. 그래서 여기서 잰다.
+{
+  const PLAYBOOK_MIN = 5;      // 이만큼 해 봤으면 「내가 뭘 반복하는지」가 말이 된다
+  const 완료수 = all.filter(완료).length;
+  const pb = path.join(WORK, 'brand', 'my-playbook.md');
+  let 빈채 = false;
+  try { 빈채 = fs.readFileSync(pb, 'utf8').includes('(진단 후 자동 기록)'); } catch { /* 없으면 온보딩이 먼저다 */ }
+  if (빈채 && 완료수 >= PLAYBOOK_MIN)
+    재방문.push(['📎 플레이북', `완료 ${완료수}건`, 'my-playbook 이 빈 템플릿 그대로',
+                 '091 업무 자동화 진단을 돌리면 채워진다 — 097·098 이 이걸 읽는다']);
+}
+
 // 같은 말이 다른 스킬로 간 자리 = 라우팅이 흔들리는 자리
 const 요청별 = new Map();
 for (const r of all) {
@@ -243,8 +293,17 @@ if (신호.length) {
   say(`\n  ✅ 진단 신호 없음 (무호출 ${STALE_DAYS}일 · 재작업 ${REWORK_AVG}회 · 차단 ${BLOCK_RATE * 100}% · 샘플 ${SAMPLE_RATE * 100}%)`);
 }
 
+if (재방문.length) {
+  say(`\n  재방문 ${재방문.length}건 — 이상이 아니라 **때가 된 것**\n`);
+  for (const [종류, 대상, 수치, 처방] of 재방문) say(`    ${종류}  ${대상}  ${수치}  → ${처방}`);
+}
+
 // ── 4. 요약 원장 갱신 ──────────────────────────────────────────────────────
-if (SUMMARY) {
+//   ⛔ 훅도 만든다. 예전엔 롤오버(800행 = 수년)만 만들었는데
+//   규약 §A 는 「스킬별 마지막 실행일이 궁금하면 이 파일을 읽어라」고 한다 —
+//   **읽으라는 파일이 몇 년간 없었다.** 그러면 원장을 통독하게 되고, 그게 §A 가 막으려던 것이다.
+//   훅은 7일에 한 번만 도니까 비용도 거기서 끝난다.
+if (SUMMARY || HOOK) {
   const src = [...archiveFiles.map(f => `logs/archive/${path.basename(f)}`), 'logs/build-log.md'].join(' + ');
   const rows = [...by.values()].sort((a, b) => day(b.최종).localeCompare(day(a.최종)))
     .map(s => `| ${s.스킬} | ${day(s.최초)} | ${day(s.최종)} | ${s.누적} | ${s.보완평균.toFixed(1)} | ${s.차단} |`);
@@ -272,24 +331,44 @@ ${rows.join('\n')}
 if (HOOK) {
   // 봤다는 사실을 먼저 남긴다 — 사용자가 처방을 미뤄도 7일간은 다시 묻지 않는다.
   try { fs.mkdirSync(LOGS, { recursive: true }); fs.writeFileSync(STAMP, today()); } catch { /* 못 써도 진행 */ }
-  if (!needRollover && !신호.length) process.exit(0);        // 이상 없음 — 조용히 끝낸다
+  if (!needRollover && !신호.length && !재방문.length) process.exit(0);   // 말할 것이 없다 — 조용히 끝낸다
 
-  const 줄 = [];
-  if (needRollover) 줄.push(`🟡 원장 ${current.length}행 — 롤오버가 필요합니다`);
-  for (const [종류, 대상, 수치] of 신호.slice(0, 3)) 줄.push(`${종류} ${대상} · ${수치}`);
-  const 더 = 신호.length > 3 ? ` (신호 ${신호.length}건 중 3건)` : '';
+  // ⛔ 둘을 섞지 않는다. **이상**은 물을 때만, **재방문**은 먼저 꺼낸다.
+  //   예전엔 전부 「먼저 꺼내지 말 것」이라 재방문이 일어날 수가 없었다.
+  const 이상 = [];
+  if (needRollover) 이상.push(`🟡 원장 ${current.length}행 — 롤오버가 필요합니다`);
+  for (const [종류, 대상, 수치] of 신호.slice(0, 3)) 이상.push(`${종류} ${대상} · ${수치}`);
+  // ⚠️ 종류별로 묶는다. 앞에서 자르면 같은 종류만 둘 나오고 **다른 종류가 잘린다**
+  //   (실측 · 📌 미완 3건이 자리를 다 먹어 📎 플레이북이 안 보였다).
+  const 종류별 = new Map();
+  for (const r of 재방문) { if (!종류별.has(r[0])) 종류별.set(r[0], []); 종류별.get(r[0]).push(r); }
+  const 한줄 = ([종류, xs]) => xs.length === 1
+    ? `${종류} ${xs[0][1]} · ${xs[0][2]}`
+    : `${종류} ${xs.length}건 · ${xs.slice(0, 2).map(x => x[1]).join(' · ')}${xs.length > 2 ? ' 외' : ''}`;
+  const 먼저 = [...종류별].slice(0, 3).map(한줄);
+  const 더 = 신호.length > 3 ? ` (이상 ${신호.length}건 중 3건)` : '';
+
+  const 화면 = [
+    먼저.length ? `📌 이어서 할 것\n  ${먼저.join('\n  ')}` : '',
+    이상.length ? `📒 실적 원장 점검${더}\n  ${이상.join('\n  ')}\n  → 「점검해줘」 하면 처방까지 냅니다` : '',
+  ].filter(Boolean).join('\n\n');
+
+  const 맥락 = ['[마케팅팀 원장 자동 점검] 이 작업 폴더의 logs/build-log.md 에서 나온 것이다.'];
+  if (먼저.length) 맥락.push(
+    `■ 재방문 — **첫 답에서 먼저 꺼낸다.** 이상이 아니라 「때가 된 것」이라 물어봐 주기를 기다리면 영영 안 일어난다.\n` +
+    [...종류별].slice(0, 3).map(([종류, xs]) =>
+      `- ${한줄([종류, xs])} → ${xs[0][3]}`).join('\n') +
+    `\n  ⚠️ 꺼내되 **가로채지 않는다.** 사용자가 다른 일을 말했으면 그 일을 먼저 하고, 끝에 한 줄로 붙인다.` +
+    `\n  ⚠️ 멋대로 실행하지 않는다. 「돌릴까요?」로 묻는다 (⏸).`);
+  if (이상.length) 맥락.push(
+    `■ 이상 — **먼저 꺼내지 말 것.** 사용자가 원장·점검을 물으면 이것부터 답한다.\n` +
+    이상.map(l => `- ${l}`).join('\n'));
+  맥락.push('전체는 `node ${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs` · 처방은 「마케팅팀 구축하자」.');
 
   process.stdout.write(JSON.stringify({
-    systemMessage: `📒 실적 원장 점검${더}\n  ${줄.join('\n  ')}\n  → 「점검해줘」 하면 처방까지 냅니다`,
+    systemMessage: 화면,
     suppressOutput: true,
-    hookSpecificOutput: {
-      hookEventName: 'SessionStart',
-      additionalContext:
-        `[마케팅팀 원장 자동 점검] 이 작업 폴더의 logs/build-log.md 에서 아래가 나왔다. ` +
-        `사용자가 원장·점검을 물으면 이것부터 답하고, 아니면 먼저 꺼내지 말 것.\n` +
-        줄.map(l => `- ${l}`).join('\n') +
-        `\n전체는 \`node \${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs\` · 처방은 「마케팅팀 구축하자」.`,
-    },
+    hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: 맥락.join('\n') },
   }));
   process.exit(0);
 }
