@@ -53,7 +53,7 @@ success_metrics: [일반 키워드 ROAS 개선폭, 적자 키워드 절감액, �
 | 멈추는 곳 | 묻는 것 | 기본값 (답 없으면) |
 |---|---|---|
 | Phase 2 | 보고서 CSV 도 API 도 없으면 묻고 멈춘다 | `sample-data/naver-ads-sample-report.csv` |
-| Phase 3 | 브랜드 키워드 판별 시드가 없으면 "브랜드명·제품명을 알려 주세요" | `brand/profile.md` §1 · 없으면 묻고 멈춘다 |
+| Phase 3 | 브랜드 키워드 판별 시드가 없으면 "브랜드명·제품명을 알려 주세요" | `brand/profile.md` §1 → 없으면 `sample-data/profile-sample.md`(A브랜드) · **멈추지 않는다** |
 | Phase 6 ⏸ | "조정안입니다. 어느 키워드부터 손볼까요?" | 지출 큰 순 3개만 제시하고 종료 |
 
 ## Phases

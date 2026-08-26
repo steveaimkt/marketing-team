@@ -12,7 +12,7 @@ triggers:
   - "광고 클릭은 나오는데 구매가 안 돼"
   - "상세페이지 전환 안 나와 점검해줘"
 inputs: [랜딩 URL(자사 공개 페이지면 직접 조회) 또는 스크린샷, 전환 데이터(선택), 유입 광고 소재(선택)]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [4축 진단표(첫 화면·신뢰·마찰·CTA), 24섹션 결손 맵, 우선순위 처방 TOP 5, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["019", "051"]

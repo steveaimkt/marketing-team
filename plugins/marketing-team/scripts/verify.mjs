@@ -511,6 +511,30 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i11 선언한 폴백과 게이트 표가 같은 파일을 가리키나
+//   실측 2026-08-26 · 065 RFM 은 `고객ID·주문일·주문금액` 3열이 필요한데
+//   선언은 매출.xlsx 였고 게이트·예시는 고객마스터.csv 를 썼다. **선언이 틀렸다.**
+//   046·048 도 같았다. 선언만 보고 도는 실행은 엉뚱한 파일을 집는다.
+{
+  const 어긋남 = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return walk(q);
+    if (e.name !== 'SKILL.md') return;
+    const t = fs.readFileSync(q, 'utf8');
+    const dec = (t.match(/^sample_fallback:\s*sample-data\/(\S+)/m) || [])[1];
+    if (!dec) return;
+    const g = (t.match(/\| 멈추는 곳 \| 묻는 것 \| 기본값[^\n]*\n\|[-| ]+\n((?:\|.*\n)+)/) || [])[1];
+    if (g && g.includes('sample-data/') && !g.includes(dec))
+      어긋남.push(path.basename(path.dirname(q)));
+  });
+  walk(path.join(ROOT, '100-skills'));
+  if (어긋남.length) {
+    err(`선언한 폴백과 게이트 표가 다른 파일을 가리킨다 ${어긋남.length}개 — 선언만 보고 도는 실행이 엉뚱한 파일을 집는다`);
+    for (const n of 어긋남.slice(0, 5)) err(`  ${n}`);
+  } else ok.push('폴백 선언 = 게이트 표 (100개)');
+}
+
 // ⑥-i10 D1~D5 가 규약·런타임·예시 셋에 다 있나
 //   ⚠️ 규칙만 바꾸면 **예시가 이긴다.** AI 는 example/output.md 를 보고 흉내 낸다.
 //   실측 2026-08-26 · G4 에 「경로·결론 3줄·부족한 것」이 적혀 있는데도
