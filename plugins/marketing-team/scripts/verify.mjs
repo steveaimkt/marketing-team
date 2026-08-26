@@ -510,6 +510,31 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i7 프로필 폴백이 배선돼 있나
+//   「프로필 비었으면 샘플로 완주」는 규약에 있었지만 **어느 파일을 읽는지**가 어디에도 없었다.
+//   그래서 프로필 없이 설치하면 업종·마진율·타깃·금기어가 통째로 빠진 채 돌았다 (실측 2026-08-25).
+{
+  const sp = path.join(ROOT, 'sample-data', 'profile-sample.md');
+  if (!fs.existsSync(sp)) err('sample-data/profile-sample.md 없음 — 프로필 없는 사용자가 맥락 없이 돈다');
+  else {
+    const 읽는곳 = [
+      [path.join(ROOT, 'docs', '공통규약.md'), '공통규약 §0-b'],
+      [path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'AI-마케터 §0'],
+    ];
+    let miss = 0;
+    for (const [f, name] of 읽는곳)
+      if (fs.existsSync(f) && !fs.readFileSync(f, 'utf8').includes('profile-sample.md')) {
+        err(`${name} 이 profile-sample.md 를 가리키지 않는다 — 폴백이 말로만 있고 경로가 없다`); miss++;
+      }
+    // 빈 템플릿과 샘플의 절 구조가 같아야 읽는 쪽이 안 바뀐다
+    const secs = f => [...fs.readFileSync(f, 'utf8').matchAll(/^## (\d)\. (.+)$/gm)].map(m => m[1]).join(',');
+    const tpl = path.join(ROOT, 'brand-templates', 'profile.md');
+    if (fs.existsSync(tpl) && !secs(tpl).startsWith(secs(sp)))
+      err(`profile-sample.md 와 brand-templates/profile.md 의 절 번호가 어긋난다 (샘플 ${secs(sp)} · 템플릿 ${secs(tpl)})`);
+    else if (!miss) ok.push('프로필 폴백 배선 (샘플 ↔ 템플릿 절 구조 일치)');
+  }
+}
+
 // ⑥-i6 iCloud 충돌 사본이 패키지 안에 있나
 //   `eval-routing 2.mjs` 같은 파일은 동기화가 만든 낡은 사본이다. git 은 무시하지만
 //   **`directory` 소스로 설치하면 폴더째 복사되어 설치본에 딸려 간다.** (실측 2026-08-25)
