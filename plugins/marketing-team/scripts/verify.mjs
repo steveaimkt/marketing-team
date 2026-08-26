@@ -511,6 +511,37 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i12 정당한 정지 스킬은 자료 요청(HANDOFF)을 가지나
+//   ⛔ 지어내면 위법이라 멈추는 스킬은 **「못 합니다」로 끝나면 안 된다.**
+//   막힌 자리에서 해야 할 첫 일은 **재료를 구체적으로 요청하는 것**이다 (규약 §0-c D2·D3).
+//   실측 2026-08-27 · 024 를 형식 전환으로 넓히면서 **그 자리에 있던 요청을 지웠다.**
+//   대안(형식 전환·샘플·추정)은 요청을 대체하지 않는다 — 갈아탄 순간 요청이 사라지면
+//   사용자는 더 나은 결과를 영영 못 받는다. 검사가 없어 지운 줄도 몰랐다.
+{
+  const 정지 = ['024', '032', '037', '040', '058', '064', '070', '075', '080', '083', '089', '090'];
+  const 없음 = [];
+  const 찾기 = n => {
+    let hit = null;
+    const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+      const q = path.join(d, e.name);
+      if (e.isDirectory()) { if (e.name.startsWith(n + '-')) hit = path.join(q, 'SKILL.md'); return walk(q); }
+    });
+    walk(path.join(ROOT, '100-skills'));
+    return hit;
+  };
+  for (const n of 정지) {
+    const f = 찾기(n);
+    if (!f || !fs.existsSync(f)) { 없음.push(`${n} (파일 없음)`); continue; }
+    const t = fs.readFileSync(f, 'utf8');
+    if (!t.includes('HANDOFF → 사용자')) 없음.push(`${n} 사용자 계약 없음`);
+    else if (!t.includes('여기서 막혔습니다')) 없음.push(`${n} ①②③ 없음`);
+  }
+  if (없음.length) {
+    err(`정당한 정지 스킬에 자료 요청이 없다 ${없음.length}건 — 「못 합니다」로 끝나면 그냥 클로드다`);
+    for (const n of 없음) err(`  ${n}`);
+  } else ok.push(`정당한 정지 = 자료 요청 (${정지.length}개)`);
+}
+
 // ⑥-i11 선언한 폴백과 게이트 표가 같은 파일을 가리키나
 //   실측 2026-08-26 · 065 RFM 은 `고객ID·주문일·주문금액` 3열이 필요한데
 //   선언은 매출.xlsx 였고 게이트·예시는 고객마스터.csv 를 썼다. **선언이 틀렸다.**
