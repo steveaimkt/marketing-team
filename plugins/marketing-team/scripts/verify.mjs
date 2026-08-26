@@ -510,6 +510,25 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i8 배포 대상 파일이 git 에 실제로 들어가 있나
+//   ⚠️ 이 검사들은 **디스크**를 본다. 그런데 사용자에게 가는 것은 **git 이 추적하는 것**이다.
+//   실측 2026-08-26 · brand-templates/skill-notes.md 를 만들고 규약이 「정본 템플릿」이라 가리켰는데
+//   add 가 안 돼 추적 밖이었다. 로컬은 멀쩡, 배포본에는 없음 — 참조 검사도 통과했다.
+{
+  const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
+    ? path.resolve(ROOT, '..', '..') : null;
+  if (repoRoot && fs.existsSync(path.join(repoRoot, '.git'))) {
+    const r = spawnSync('git', ['ls-files', '--others', '--exclude-standard', '--', 'plugins/'],
+                        { cwd: repoRoot, encoding: 'utf8', shell: process.platform === 'win32' });
+    const 미추적 = (r.stdout || '').split('\n').filter(Boolean)
+      .filter(f => !/ \d+(\.\w+)?$/.test(f));          // iCloud 충돌 사본은 ⑥-i6 이 따로 잡는다
+    if (미추적.length) {
+      err(`배포 폴더에 git 이 모르는 파일이 ${미추적.length}개 있다 — 로컬에만 있고 사용자에게는 안 간다`);
+      for (const f of 미추적.slice(0, 5)) err(`  ${f}`);
+    } else ok.push('배포 대상 전부 git 추적됨 (디스크 ≠ 배포본 어긋남 없음)');
+  }
+}
+
 // ⑥-i7 프로필 폴백이 배선돼 있나
 //   「프로필 비었으면 샘플로 완주」는 규약에 있었지만 **어느 파일을 읽는지**가 어디에도 없었다.
 //   그래서 프로필 없이 설치하면 업종·마진율·타깃·금기어가 통째로 빠진 채 돌았다 (실측 2026-08-25).
