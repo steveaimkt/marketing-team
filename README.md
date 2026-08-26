@@ -33,7 +33,7 @@
 
 <!-- STATS:START -->
 스킬 100 · 부를 말 472 · 게이트 32 · 상태변경 7 · 체인 15
-저장 형식 md 76 · csv 13 · html 8 · pptx 3 · `writes_to` 보유 100 · 샘플 폴백 48
+저장 형식 md 76 · csv 13 · html 8 · pptx 3 · `writes_to` 보유 100 · 샘플 폴백 49
 <!-- STATS:END -->
 
 > 위 숫자는 `node plugins/marketing-team/scripts/build-stats.mjs` 가 정본에서 계산한다. 손으로 고치지 않는다.
