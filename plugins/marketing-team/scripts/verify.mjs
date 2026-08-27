@@ -511,6 +511,41 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i16 사전에 없는 업종을 공통만으로 끝내지 않나 · 그리고 세팅이 판정을 겸하지 않나
+//   실측 2026-08-27 · 정본 사전은 다섯 업종만 덮는다(화장품·건기식·일반식품·의약품·금융).
+//   필라테스·학원·병원·법률·부동산은 공통(표시광고법)으로만 걸리는데,
+//   이 업종들의 진짜 위험(「치료」·「합격 보장」·「수익 확정」)은 **공통으로 안 잡힌다.**
+//   사전을 무한히 늘릴 수 없으니 담당을 둔다 — 다만 ⛔ **만드는 담당이 찍으면 §F 가 무너진다.**
+{
+  const 빠짐 = [];
+  const A = path.join(ROOT, 'agents', 'staff-compliance-setup.md');
+  if (!fs.existsSync(A)) 빠짐.push('AI 규제세팅 담당이 없다');
+  else {
+    const a = fs.readFileSync(A, 'utf8');
+    if (!a.includes('법조문 번호를 지어내지 않는다'))
+      빠짐.push('담당이 법조문 생성을 금지하지 않는다 — 지어낸 조문은 틀린 안전감을 준다');
+    if (!a.includes('⛔ 를 찍지 않는다'))
+      빠짐.push('담당이 ⛔ 를 못 찍는다는 선언이 없다 — 만드는 담당이 찍으면 권한 분리가 무너진다');
+    if (!a.includes('내가 모르는 것'))
+      빠짐.push('담당 산출물에 「내가 모르는 것」 절이 없다 — 얕은 업종을 아는 척하게 된다');
+  }
+  for (const [f, 문구, 이유] of [
+    ['100-skills/compliance.md', '사전에 없는 업종', '사전이 다섯만 덮는다는 사실이 안 적혀 있다'],
+    ['100-skills/gates/compliance-gate.md', '우리 업종 규제 세팅해줘', '게이트가 사전 밖 업종에 다음 수를 권하지 않는다'],
+    ['skills/마케팅팀-구축하기/SKILL.md', 'staff-compliance-setup', '온보딩이 담당을 부르지 않는다'],
+    ['docs/공통규약.md', '만드는 담당과 찍는 담당을 겹치지 않는다', '권한 분리가 규약에 없다'],
+    ['brand-templates/compliance-custom.md', '법률 자문이 아니다', '템플릿에 면책이 없다'],
+  ]) {
+    const q = path.join(ROOT, f);
+    if (!fs.existsSync(q)) { 빠짐.push(`${f} 없음`); continue; }
+    if (!fs.readFileSync(q, 'utf8').includes(문구)) 빠짐.push(`${f} — ${이유}`);
+  }
+  if (빠짐.length) {
+    err(`규제 세팅 배선이 끊겼다 ${빠짐.length}건 — 사전 밖 업종이 공통만으로 끝난다`);
+    for (const n of 빠짐) err(`  ${n}`);
+  } else ok.push('규제 세팅 (담당 · 사전 밖 업종 · 권한 분리 · 면책)');
+}
+
 // ⑥-i15 우리 맥락 두 층 · 쓰기만 배선하고 읽기를 빠뜨리지 않았나
 //   실측 2026-08-27 · 규약은 「원본 → 도메인 금기 → 우리 보완 순으로 겹쳐 읽는다」고
 //   적어 두었는데 **skill-notes 를 실제로 읽는 스킬은 051 하나**였다.
