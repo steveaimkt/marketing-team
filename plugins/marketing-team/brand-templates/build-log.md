@@ -10,7 +10,7 @@
 > ```
 >
 > **이 파일은 현재 연도만 담는다.** 지난 연도는 `logs/archive/build-log-{연도}.md` ·
-> 스킬별 누적은 `logs/build-log-summary.md` (`docs/공통규약.md` 「원장 롤오버」).
+> 스킬별 누적은 `logs/build-log-summary.md` (`docs/원장-운영.md` §2).
 > 옮기는 것이지 **지우는 것이 아니다.**
 
 | 일시 | 스킬 ID | 요청 | 데이터 모드 | 산출물 경로 | 게이트 | 보완 횟수 | 상태 |

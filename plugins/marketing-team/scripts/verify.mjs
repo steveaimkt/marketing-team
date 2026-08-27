@@ -428,8 +428,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const 임계 = { ROLLOVER_ROWS: konst('ROLLOVER_ROWS'), STALE_DAYS: konst('STALE_DAYS') };
     if (!임계.ROLLOVER_ROWS || !임계.STALE_DAYS) err('ledger-stats.mjs 에서 임계 상수를 못 읽었다 — 이름이 바뀌었나');
     else {
+      //   ⚠️ 원장 세부(스키마·롤오버·진단)는 v0.45.0 에 docs/원장-운영.md 로 갈라졌다.
+      //   임계 숫자의 정본은 이제 그쪽이다 — 규약에는 한 줄 포인터만 남았다.
       const 문서 = [
-        [path.join(ROOT, 'docs', '공통규약.md'), '공통규약.md'],
+        [path.join(ROOT, 'docs', '원장-운영.md'), '원장-운영.md'],
         [path.join(ROOT, 'skills', '마케팅팀-구축하기', 'SKILL.md'), '마케팅팀-구축하기'],
       ];
       let drift = 0;
@@ -651,6 +653,17 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       if (!G3.includes(절)) 빠짐.push(`갈라진 파일에 「${절}」 절이 없다`);
     // 색인이 가리키는 경로가 실제 파일과 맞나
     if (!R.includes('docs/G3-분기절차.md')) 빠짐.push('색인이 파일 경로를 안 가리킨다');
+  }
+  //   ⚠️ 원장 운영(스키마·롤오버·진단 128줄)도 같은 방식으로 갈랐다 (v0.45.0).
+  //   매 업무에 필요한 것은 「1행 적는다」뿐이고 나머지는 점검할 때만 쓴다.
+  {
+    const G2 = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
+    const LF = path.join(ROOT, 'docs', '원장-운영.md');
+    if (!fs.existsSync(LF)) 빠짐.push('docs/원장-운영.md 가 없다');
+    else for (const 절 of ['스키마', '롤오버', '진단'])
+      if (!fs.readFileSync(LF, 'utf8').includes(절)) 빠짐.push(`원장-운영.md 에 「${절}」 절이 없다`);
+    if (!G2.includes('docs/원장-운영.md')) 빠짐.push('규약이 원장-운영.md 를 안 가리킨다 — 갈라진 절이 고아가 된다');
+    if (!G2.includes('업무 한 건 = 원장 한 행')) 빠짐.push('규약에서 매 업무 규칙(1행)까지 사라졌다 — 이건 남아야 한다');
   }
   // ⛔ 규제 게이트는 내리지 않는다 — 안 읽히면 발행물이 검사 없이 나간다
   if (!/### 규제 게이트/.test(R))

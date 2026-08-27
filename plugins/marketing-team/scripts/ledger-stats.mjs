@@ -5,7 +5,7 @@
  * 왜: 원장은 지우지 않고 쌓는다. 그런데 쌓기만 하면 무거워지기만 하고 아무것도 나아지지 않는다.
  *     원장에는 이미 답이 들어 있다 — 어느 스킬이 죽었고, 어느 스킬이 한 번에 안 나오고,
  *     어디서 규제에 걸리고, 어디서 파일이 안 남는지. 사람이 세면 안 센다. **기계가 센다.**
- *     (부피 규칙 정본 — docs/공통규약.md 「원장 롤오버」)
+ *     (부피 규칙 정본 — docs/원장-운영.md §2)
  *
  * 사용: node scripts/ledger-stats.mjs                작업 폴더의 원장을 재고 진단한다
  *       node scripts/ledger-stats.mjs --check        롤오버가 필요하면 종료코드 1
@@ -40,7 +40,7 @@ const LOGS = path.join(WORK, 'logs');
 const LEDGER = path.join(LOGS, 'build-log.md');
 const ARCHIVE = path.join(LOGS, 'archive');
 
-// 정본 임계 — docs/공통규약.md 「원장 롤오버」와 같아야 한다. verify.mjs 가 드리프트를 잡는다.
+// 정본 임계 — docs/원장-운영.md §2와 같아야 한다. verify.mjs 가 드리프트를 잡는다.
 const ROLLOVER_ROWS = 800;
 const STALE_DAYS = 90;
 const REWORK_AVG = 2;      // 평균 보완 횟수가 이 이상이면 한 번에 안 나오는 스킬
