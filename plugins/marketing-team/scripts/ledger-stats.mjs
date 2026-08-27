@@ -279,8 +279,25 @@ for (const r of all) {
   if (!요청별.has(k)) 요청별.set(k, new Set());
   요청별.get(k).add(r.스킬);
 }
+// ⛔ 체인은 오탐이다. 「시장리서치」 한 마디가 001→002→006→009 로 가는 것은 **설계**다.
+//   실측 2026-08-28 · 시뮬레이션에서 정상 체인 실행이 🗣 로 떴다.
+//   그래서 ROUTING.md 의 체인 순서와 대조해, 그 조합이면 신호를 내지 않는다.
+const 체인조합 = [];
+try {
+  const RT = fs.readFileSync(path.join(
+    process.env.CLAUDE_PLUGIN_ROOT || path.join(path.dirname(new URL(import.meta.url).pathname), '..'),
+    '100-skills', 'ROUTING.md'), 'utf8');
+  for (const m of RT.matchAll(/`(\d{3}(?:\s*→\s*[\d()|]+)+)`/g))
+    체인조합.push(new Set((m[1].match(/\d{3}/g) || [])));
+} catch { /* 명부를 못 찾으면 대조를 건너뛴다 — 신호는 그대로 낸다 */ }
+const 체인인가 = set => {
+  const ids = [...set].map(s => (s.match(/\((\d{3})\)/) || [])[1]).filter(Boolean);
+  if (ids.length !== set.size) return false;                 // 번호를 못 뽑으면 판정 불가
+  return 체인조합.some(c => ids.every(i => c.has(i)));        // 어느 체인의 부분집합인가
+};
 for (const [요청, set] of 요청별)
-  if (set.size > 1) 신호.push(['🗣 라우팅', 요청, `${set.size}개 스킬로 갈렸다`, [...set].join(' · ')]);
+  if (set.size > 1 && !체인인가(set))
+    신호.push(['🗣 라우팅', 요청, `${set.size}개 스킬로 갈렸다`, [...set].join(' · ')]);
 
 if (신호.length) {
   say(`\n  진단 신호 ${신호.length}건 — 원장이 말해 주는 고칠 자리\n`);
