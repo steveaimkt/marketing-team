@@ -303,6 +303,7 @@ if (재방문.length) {
 //   규약 §A 는 「스킬별 마지막 실행일이 궁금하면 이 파일을 읽어라」고 한다 —
 //   **읽으라는 파일이 몇 년간 없었다.** 그러면 원장을 통독하게 되고, 그게 §A 가 막으려던 것이다.
 //   훅은 7일에 한 번만 도니까 비용도 거기서 끝난다.
+//   ⚠️ 원장이 0행이면 위쪽에서 먼저 빠진다 — 요약할 것이 없어서다. 첫 작업 뒤부터 생긴다.
 if (SUMMARY || HOOK) {
   const src = [...archiveFiles.map(f => `logs/archive/${path.basename(f)}`), 'logs/build-log.md'].join(' + ');
   const rows = [...by.values()].sort((a, b) => day(b.최종).localeCompare(day(a.최종)))
