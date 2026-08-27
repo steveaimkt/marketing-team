@@ -630,6 +630,38 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('큰 입력 (통째로 안 읽음 · 스크립트 집계 · 근거 실재)');
 }
 
+// ⑥-i21 갈라진 절이 실제로 이어져 있나 (gstack Section index 패턴)
+//   ⛔ 쪼개면 **「문서엔 있는데 안 읽는다」**가 하나 더 생긴다 — 오늘만 여섯 번 겪었다.
+//   그래서 셋을 함께 잰다 — ① 색인이 있나 ② 대상 파일이 실재하나 ③ 절이 다 들어갔나.
+//   참고 · gstack(garrytan/gstack) 이 20개 명령에서 쓰는 방식이고,
+//   핵심 문장은 「Read a section in full before doing its step; do not work from memory」다.
+{
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const F = path.join(ROOT, 'docs', 'G3-분기절차.md');
+  const 빠짐 = [];
+
+  if (!R.includes('갈라진 절 · **조건이 걸렸을 때만 읽는다**'))
+    빠짐.push('런타임에 Section index 가 없다 — 갈라진 절로 가는 길이 끊긴다');
+  if (!R.includes('기억으로 하지 않는다'))
+    빠짐.push('「기억으로 하지 않는다」가 없다 — 쪼갠 절은 안 읽으면 통째로 빠진다');
+  if (!fs.existsSync(F)) 빠짐.push('docs/G3-분기절차.md 가 없다');
+  else {
+    const G3 = fs.readFileSync(F, 'utf8');
+    for (const 절 of ['물어서 좁힌다', '스킬 밖이면', '회수'])
+      if (!G3.includes(절)) 빠짐.push(`갈라진 파일에 「${절}」 절이 없다`);
+    // 색인이 가리키는 경로가 실제 파일과 맞나
+    if (!R.includes('docs/G3-분기절차.md')) 빠짐.push('색인이 파일 경로를 안 가리킨다');
+  }
+  // ⛔ 규제 게이트는 내리지 않는다 — 안 읽히면 발행물이 검사 없이 나간다
+  if (!/### 규제 게이트/.test(R))
+    빠짐.push('규제 게이트가 본체에서 사라졌다 — 조건부로 내리면 검사 없이 발행된다');
+
+  if (빠짐.length) {
+    err(`갈라진 절 배선이 끊겼다 ${빠짐.length}건`);
+    for (const x of 빠짐) err(`  ${x}`);
+  } else ok.push('갈라진 절 (색인 · 기억금지 · 3절 실재 · 게이트는 본체)');
+}
+
 // ⑥-i17 사업검토자를 부르는 것이 **플래그인가 AI 판단인가**
 //   실측 2회 · 「판단이 갈리면 부른다」 → 호출 0회. 「주제로 부른다」로 고친 뒤에도 → **또 0회.**
 //   2026-08-27 · 012 USP·가치제안(=포지셔닝)을 돌렸는데 안 불렀고 **「미호출」 표기도 없었다.**
