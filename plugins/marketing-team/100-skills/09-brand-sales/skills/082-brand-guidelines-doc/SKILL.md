@@ -17,6 +17,7 @@ outputs: [브랜드 가이드라인 원페이지, 허용/금지 사용 규정 �
 requires: [brand/profile.md]
 chains_to: ["081"]
 gate: false
+review: 브랜드
 mutating: false
 writes_to: [outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md]
 builder: 사용자 (이 회사)

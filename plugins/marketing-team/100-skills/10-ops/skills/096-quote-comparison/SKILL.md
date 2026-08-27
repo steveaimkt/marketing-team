@@ -16,6 +16,7 @@ outputs: [항목 정렬 비교표(VAT 통일), 누락·과다 항목 리스트, 
 requires: [brand/profile.md]
 chains_to: ["094"]
 gate: false
+review: 법무·재무
 mutating: false
 writes_to: [outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv]
 builder: 사용자 (이 회사)

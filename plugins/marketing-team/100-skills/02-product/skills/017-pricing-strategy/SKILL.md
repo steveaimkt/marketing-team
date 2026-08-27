@@ -15,6 +15,7 @@ outputs: [원가 구조표(항목·수량·단가), 가격 시나리오 3안(침
 requires: [brand/profile.md]
 chains_to: ["016"]
 gate: false
+review: 재무·경영
 mutating: false
 writes_to: [outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md]
 builder: 사용자 (이 회사)

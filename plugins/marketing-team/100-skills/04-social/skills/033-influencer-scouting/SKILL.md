@@ -15,6 +15,7 @@ outputs: [후보 스코어카드(진성도 50+적합도 50), TOP 5 추천, 예�
 requires: [brand/profile.md]
 chains_to: ["034"]
 gate: false
+review: 재무
 mutating: false
 writes_to: [outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv]
 builder: 사용자 (이 회사)

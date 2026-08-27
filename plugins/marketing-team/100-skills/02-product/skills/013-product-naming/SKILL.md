@@ -16,6 +16,7 @@ outputs: [네이밍 20안(4유형×5) + 3축 평가표, TOP 3 추천, 상표(키
 requires: [brand/profile.md]
 chains_to: ["018"]
 gate: false
+review: 브랜드·고객
 mutating: false
 writes_to: [outputs/{날짜}/013-product-naming/013-product-naming.md]
 builder: 사용자 (이 회사)

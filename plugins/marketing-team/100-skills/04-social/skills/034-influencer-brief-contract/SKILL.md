@@ -16,6 +16,7 @@ outputs: [협업 브리프, 계약 조항 체크리스트, 게이트 결과 블�
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["037"]
 gate: true
+review: 법무
 mutating: false
 writes_to: [outputs/{날짜}/034-influencer-brief-contract/034-influencer-brief-contract.md]
 builder: 사용자 (이 회사)

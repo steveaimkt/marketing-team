@@ -17,6 +17,7 @@ outputs: [RICE 스코어링 표(근거 병기), 우선순위 백로그 TOP 10, �
 requires: [brand/profile.md]
 chains_to: ["078"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv]
 builder: 사용자 (이 회사)

@@ -16,6 +16,7 @@ outputs: [Win Theme 3개, SPARK-6 목차, 섹션별 초안 (Action Title 포함)
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["085", "096"]
 gate: true
+review: 법무
 mutating: false
 writes_to: [outputs/{날짜}/084-proposal-generator/084-proposal-generator.pptx]
 builder: 사용자 (이 회사)

@@ -16,6 +16,7 @@ outputs: [시장 갭 요약표, 제품 컨셉 5안 카드(타깃·차별점·검
 requires: [brand/profile.md]
 chains_to: ["012"]
 gate: false
+review: 브랜드·고객
 mutating: false
 writes_to: [outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md]
 builder: 사용자 (이 회사)

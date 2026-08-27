@@ -15,6 +15,7 @@ outputs: [번들 구성안 3종(객단가형/재고소진형/락인형), 번들�
 requires: [brand/profile.md]
 chains_to: ["057"]
 gate: false
+review: 재무·경영
 mutating: false
 writes_to: [outputs/{날짜}/016-bundle-promotion/016-bundle-promotion.md]
 builder: 사용자 (이 회사)

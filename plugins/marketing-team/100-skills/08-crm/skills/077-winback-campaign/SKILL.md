@@ -16,6 +16,7 @@ outputs: [휴면 세그먼트 정의(기준 명시), 윈백 시퀀스 3단 설�
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074", "075"]
 gate: true
+review: 재무
 mutating: false
 writes_to: [outputs/{날짜}/077-winback-campaign/077-winback-campaign.md]
 builder: 사용자 (이 회사)

@@ -15,6 +15,7 @@ outputs: [D-30~D+30 채널별 런칭 타임라인, 간이 RACI 책임 매트릭�
 requires: [brand/profile.md]
 chains_to: ["021", "083"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md]
 builder: 사용자 (이 회사)

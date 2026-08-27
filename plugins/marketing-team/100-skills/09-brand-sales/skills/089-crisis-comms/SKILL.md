@@ -16,6 +16,7 @@ outputs: [이슈 유형·심각도 분류, 의사결정 트리(대응/무대응/
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["032", "083"]
 gate: true
+review: 법무
 mutating: false
 writes_to: [outputs/{날짜}/089-crisis-comms/089-crisis-comms.md]
 builder: 사용자 (이 회사)

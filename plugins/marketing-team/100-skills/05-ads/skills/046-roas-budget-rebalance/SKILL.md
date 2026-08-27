@@ -17,6 +17,7 @@ outputs: [채널 기여 분석, 예산 재배분 시나리오 3안(보수·중�
 requires: [brand/profile.md]
 chains_to: ["043", "095"]
 gate: false
+review: 재무
 mutating: false
 writes_to: [outputs/{날짜}/046-roas-budget-rebalance/046-roas-budget-rebalance.md]
 builder: 사용자 (이 회사)

@@ -16,6 +16,7 @@ outputs: [채널별 예산 배분안(목표 역산 산식 포함), 월별 캐시
 requires: [brand/profile.md]
 chains_to: ["046", "069"]
 gate: false
+review: 재무
 mutating: false
 writes_to: [outputs/{날짜}/095-budget-planner/095-budget-planner.csv]
 builder: 사용자 (이 회사)

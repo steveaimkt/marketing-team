@@ -511,6 +511,67 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('영문 C레벨 약어 0곳 (persona 의 업계 직함은 예외)');
 }
 
+// ⑥-i18 100개를 그냥 던지지 않나 · 「내 것이 뭔지」에 답하나
+//   실측 2026-08-27 · 업무리스트는 100개를 업태와 무관하게 똑같이 편다.
+//   B2B SaaS 마케터에게 「051~060 커머스」는 자기 것이 아닌데 그걸 말해 주지 않는다.
+//   온보딩 첫 결과물도 업태 불문 001 이었다 — B2B 마케터에겐 「내 일이 아니네」로 읽힌다.
+//   ⛔ 다만 **접거나 지우지 않는다.** 업태를 잘못 읽었을 수 있고, 근거 없이 접으면 틀린 걸 접는다.
+{
+  const L = fs.readFileSync(path.join(ROOT, 'skills', '마케팅팀-업무리스트', 'SKILL.md'), 'utf8');
+  const B = fs.readFileSync(path.join(ROOT, 'skills', '마케팅팀-구축하기', 'SKILL.md'), 'utf8');
+  const 빠짐 = [];
+  if (!L.includes('100개를 그냥 던지지 않는다'))
+    빠짐.push('업무리스트가 100개를 업태 무관하게 편다 — 「내 것이 뭔지」에 답을 못 한다');
+  if (!L.includes('접거나 지우지 않는다'))
+    빠짐.push('업무리스트에 「접지 않는다」가 없다 — 잘못 읽은 업태로 스킬을 숨기게 된다');
+  if (!L.includes('프로필이 비어 있으면 순서를 바꾸지 않는다'))
+    빠짐.push('프로필이 비었을 때 규칙이 없다 — 근거 없이 접는다');
+  if (!B.includes('업태 불문 `001` 로 보내지 않는다'))
+    빠짐.push('온보딩 첫 결과물이 업태를 안 탄다 — B2B 마케터에게 키워드 리서치가 첫 결과물이 된다');
+  if (빠짐.length) {
+    err(`업태별 안내 배선이 끊겼다 ${빠짐.length}건 — 프로필을 넣어도 「뭘 쓸지」를 모른다`);
+    for (const x of 빠짐) err(`  ${x}`);
+  } else ok.push('업태별 안내 (목록 순서 · 접지 않음 · 첫 결과물)');
+}
+
+// ⑥-i17 사업검토자를 부르는 것이 **플래그인가 AI 판단인가**
+//   실측 2회 · 「판단이 갈리면 부른다」 → 호출 0회. 「주제로 부른다」로 고친 뒤에도 → **또 0회.**
+//   2026-08-27 · 012 USP·가치제안(=포지셔닝)을 돌렸는데 안 불렀고 **「미호출」 표기도 없었다.**
+//   산출물만 보면 검토를 거친 것처럼 보인다 — 안 부른 것보다 이게 더 나쁘다.
+//   규제검토자는 잘 돈다. 차이는 하나 — **`gate: true` 는 플래그고 사업검토자는 판단이었다.**
+{
+  const 빠짐 = [];
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
+
+  // review: 를 단 스킬이 실재하나 · 관점이 §F 다섯 안인가
+  const 관점 = ['경영', '재무', '고객', '법무', '브랜드'];
+  let n = 0; const 이상 = [];
+  const walk = d => fs.existsSync(d) && fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return walk(q);
+    if (e.name !== 'SKILL.md') return;
+    const v = (fs.readFileSync(q, 'utf8').match(/^review:\s*(.+)$/m) || [])[1];
+    if (!v) return;
+    n++;
+    for (const k of v.trim().split('·')) if (!관점.includes(k.trim()))
+      이상.push(`${path.basename(path.dirname(q))} — 알 수 없는 관점 「${k.trim()}」`);
+  });
+  walk(path.join(ROOT, '100-skills'));
+
+  if (n === 0) 빠짐.push('review: 를 단 스킬이 0개 — 사업검토자는 다시 호출 0회가 된다');
+  else if (n < 10) 빠짐.push(`review: 가 ${n}개뿐 — 가격·예산·우선순위·포지셔닝·계약을 덮지 못한다`);
+  빠짐.push(...이상);
+  if (!R.includes('`review:` 가 정한다')) 빠짐.push('런타임이 review: 를 읽지 않는다 — 플래그를 달아도 안 부른다');
+  if (!R.includes('미호출')) 빠짐.push('못 불렀을 때 표기 규칙이 없다 — 안 부른 것을 안 부른 줄도 모른다');
+  if (!G.includes('플래그가 정한다')) 빠짐.push('규약에 「플래그가 정한다」가 없다 — 다시 AI 판단으로 돌아간다');
+
+  if (빠짐.length) {
+    err(`사업검토자 호출 배선이 끊겼다 ${빠짐.length}건 — 실측 2회 모두 호출 0이었다`);
+    for (const x of 빠짐) err(`  ${x}`);
+  } else ok.push(`사업검토자 호출 (review: ${n}개 · 플래그 기반 · 미호출 표기)`);
+}
+
 // ⑥-i16 사전에 없는 업종을 공통만으로 끝내지 않나 · 그리고 세팅이 판정을 겸하지 않나
 //   실측 2026-08-27 · 정본 사전은 다섯 업종만 덮는다(화장품·건기식·일반식품·의약품·금융).
 //   필라테스·학원·병원·법률·부동산은 공통(표시광고법)으로만 걸리는데,

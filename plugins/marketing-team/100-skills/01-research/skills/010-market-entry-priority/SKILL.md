@@ -15,6 +15,7 @@ outputs: [Impact×Effort 평가 매트릭스(4분면), 우선순위 TOP 3 + 점�
 requires: [brand/profile.md]
 chains_to: ["018"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md]
 builder: 사용자 (이 회사)

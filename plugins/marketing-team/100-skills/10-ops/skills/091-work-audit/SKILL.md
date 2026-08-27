@@ -16,6 +16,7 @@ outputs: [업무 인벤토리표, 자동화 매트릭스 (효과×난이도 4분
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["092", "100"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/091-work-audit/091-work-audit.md]
 builder: 사용자 (이 회사)

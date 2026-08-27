@@ -15,6 +15,7 @@ outputs: [상호 자산 맵, 수익 구조 옵션 3안 (고정/성과/혼합), �
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["084"]
 gate: true
+review: 법무·재무
 mutating: false
 writes_to: [outputs/{날짜}/087-partnership-pack/087-partnership-pack.pptx]
 builder: 사용자 (이 회사)

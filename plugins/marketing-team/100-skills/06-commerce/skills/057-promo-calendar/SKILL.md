@@ -15,6 +15,7 @@ outputs: [연간/분기 프로모션 캘린더, 참여 판정표(실마진 계�
 requires: [brand/profile.md]
 chains_to: ["016"]
 gate: false
+review: 재무·경영
 mutating: false
 writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv]
 builder: 사용자 (이 회사)

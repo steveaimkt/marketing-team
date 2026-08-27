@@ -16,6 +16,7 @@ outputs: [정규화 가격 수집표, 가격-가치 포지셔닝 맵(4사분면)
 requires: [brand/profile.md]
 chains_to: ["017"]
 gate: false
+review: 재무·브랜드
 mutating: false
 writes_to: [outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv]
 builder: 사용자 (이 회사)

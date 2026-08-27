@@ -17,6 +17,7 @@ outputs: [6단 JTBD 가치제안문 + 원라이너, 차별점-증거 매핑표, 
 requires: [brand/profile.md]
 chains_to: ["013", "051"]
 gate: false
+review: 브랜드·고객
 mutating: false
 writes_to: [outputs/{날짜}/012-value-proposition/012-value-proposition.md]
 builder: 사용자 (이 회사)
