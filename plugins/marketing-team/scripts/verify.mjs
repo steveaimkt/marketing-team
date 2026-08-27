@@ -600,6 +600,36 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('샘플 업종 (규제는 안 건다 · 업종 한 줄 중간 경로)');
 }
 
+// ⑥-i20 큰 입력을 통째로 읽지 않나 · 그리고 그 규칙이 실제로 필요한가
+//   실측 2026-08-28 · sample-data/A브랜드-고객마스터.csv = 3,507행 · **약 11만 토큰**.
+//   이 파일을 쓰는 스킬이 5개다 (064·065·076·077·079). 실사용 고객이 3만이면 열 배다.
+//   규약은 **원장**에만 「통째로 읽지 않는다」를 정했고 **입력 데이터에는 규칙이 없었다.**
+//   ⛔ 서브에이전트로 돌려도 그 안에서 통째로 읽으면 똑같다 — 격리는 해결이 아니다.
+{
+  const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const 빠짐 = [];
+  if (!G.includes('큰 입력은 통째로 읽지 않는다'))
+    빠짐.push('규약에 큰 입력 규칙이 없다 — 고객마스터 한 장이 11만 토큰이다');
+  if (!G.includes('읽지 말고 집계한다'))
+    빠짐.push('「읽지 말고 센다」가 없다 — 눈으로 세면 안 센다');
+  if (!R.includes('큰 입력은 통째로 읽지 않는다'))
+    빠짐.push('런타임에 큰 입력 규칙이 없다');
+
+  // 규칙이 필요한 근거가 실재하나 — 샘플이 작아졌으면 규칙도 재검토 대상이다
+  const SD = path.join(ROOT, 'sample-data');
+  if (fs.existsSync(SD)) {
+    const 큰 = fs.readdirSync(SD).filter(f => {
+      try { return fs.statSync(path.join(SD, f)).size > 100 * 1024; } catch { return false; }
+    });
+    if (!큰.length) 빠짐.push('100KB 넘는 샘플이 사라졌다 — 규칙의 근거가 바뀌었으니 다시 재라');
+  }
+  if (빠짐.length) {
+    err(`큰 입력 배선이 끊겼다 ${빠짐.length}건 — 컨텍스트가 통째로 먹힌다`);
+    for (const x of 빠짐) err(`  ${x}`);
+  } else ok.push('큰 입력 (통째로 안 읽음 · 스크립트 집계 · 근거 실재)');
+}
+
 // ⑥-i17 사업검토자를 부르는 것이 **플래그인가 AI 판단인가**
 //   실측 2회 · 「판단이 갈리면 부른다」 → 호출 0회. 「주제로 부른다」로 고친 뒤에도 → **또 0회.**
 //   2026-08-27 · 012 USP·가치제안(=포지셔닝)을 돌렸는데 안 불렀고 **「미호출」 표기도 없었다.**
