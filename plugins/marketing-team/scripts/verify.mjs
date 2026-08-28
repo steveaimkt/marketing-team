@@ -675,6 +675,43 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   } else ok.push('갈라진 절 (색인 · 기억금지 · 3절 실재 · 게이트는 본체)');
 }
 
+// ⑥-i22 PLUGIN.md 의 스킬명이 SKILL.md 와 같나
+//   실측 2026-08-28 · 024 를 「YouTube 스크립트」로 바꿨는데(v0.28.0)
+//   03-content/PLUGIN.md 는 「YouTube 스크립트 (성과 증명형)」 옛 이름 그대로였다.
+//   052 도 PLUGIN 은 「상세페이지 → Figma 자동화」, SKILL 은 「상세페이지 디자인 시안」이었다.
+//   ⚠️ ROUTING.md 는 자동 생성이라 항상 맞는데 **PLUGIN.md 는 손으로 쓴다.**
+//   이름을 바꿀 때 여기를 같이 안 고치면 카테고리 안내가 조용히 옛것을 말한다.
+{
+  const 어긋남 = [];
+  const cats = fs.existsSync(path.join(ROOT, '100-skills'))
+    ? fs.readdirSync(path.join(ROOT, '100-skills'), { withFileTypes: true }).filter(e => e.isDirectory()) : [];
+  for (const c of cats) {
+    const pf = path.join(ROOT, '100-skills', c.name, 'PLUGIN.md');
+    const sd = path.join(ROOT, '100-skills', c.name, 'skills');
+    if (!fs.existsSync(pf) || !fs.existsSync(sd)) continue;
+    const txt = fs.readFileSync(pf, 'utf8');
+    for (const d of fs.readdirSync(sd)) {
+      const sf = path.join(sd, d, 'SKILL.md');
+      if (!fs.existsSync(sf)) continue;
+      const t = fs.readFileSync(sf, 'utf8');
+      const id = (t.match(/^id:\s*"?(\d+)/m) || [])[1];
+      const nm = (t.match(/^name:\s*(.+)$/m) || [])[1];
+      if (!id || !nm) continue;
+      const re = new RegExp(`\\|\\s*${id}\\s*\\|\\s*([^|]+?)\\s*\\|`, 'g');
+      let m;
+      while ((m = re.exec(txt))) {
+        const v = m[1].trim();
+        if (v && !/^\d+$/.test(v) && v !== nm.trim())
+          어긋남.push(`${c.name} ${id} — PLUGIN「${v}」 vs SKILL「${nm.trim()}」`);
+      }
+    }
+  }
+  if (어긋남.length) {
+    err(`PLUGIN.md 의 스킬명이 SKILL.md 와 다르다 ${어긋남.length}건 — 카테고리 안내가 옛 이름을 말한다`);
+    for (const x of 어긋남.slice(0, 6)) err(`  ${x}`);
+  } else ok.push('PLUGIN.md = SKILL.md 스킬명 (10 카테고리)');
+}
+
 // ⑥-i17 사업검토자를 부르는 것이 **플래그인가 AI 판단인가**
 //   실측 2회 · 「판단이 갈리면 부른다」 → 호출 0회. 「주제로 부른다」로 고친 뒤에도 → **또 0회.**
 //   2026-08-27 · 012 USP·가치제안(=포지셔닝)을 돌렸는데 안 불렀고 **「미호출」 표기도 없었다.**
