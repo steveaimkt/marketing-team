@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/072-cs-manual/072-cs-manual.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "고객센터 슈퍼바이저 10년차 — 상담사가 3초 안에 못 찾는 매뉴얼은 없는 매뉴얼로 친다"
+persona: "고객센터 슈퍼바이저 10년차 · 상담사가 3초 안에 못 찾는 매뉴얼은 없는 매뉴얼로 친다"
 when_to_use: "반복 문의·리뷰 응대를 표준 스크립트로 통일해야 할 때"
 success_metrics: [건당 응대 시간 단축폭, 상담사 간 응대 품질 편차, 에스컬레이션 오판 건수]
 ---

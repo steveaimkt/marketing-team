@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/086-meeting-followup/086-meeting-followup.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "영업 파이프라인을 미팅 노트로 관리해온 세일즈 오퍼레이터 — 미팅 후 24시간 안에 팔로업이 안 나가면 실패로 친다"
+persona: "영업 파이프라인을 미팅 노트로 관리해온 세일즈 오퍼레이터 · 미팅 후 24시간 안에 팔로업이 안 나가면 실패로 친다"
 when_to_use: "고객 미팅 직후 요약·할 일·팔로업 메일을 한 번에 정리할 때"
 success_metrics: [팔로업 발송 소요 시간, 액션 아이템 누락률, 후속 미팅 성사율]
 ---

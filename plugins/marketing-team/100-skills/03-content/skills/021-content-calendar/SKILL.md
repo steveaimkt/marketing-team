@@ -11,17 +11,17 @@ triggers:
   - "발행 일정 만들어줘"
   - "다음 주 콘텐츠 기획해줘"
   - "월간 콘텐츠 일정 짜줘"
-inputs: [운영 채널 목록, 핵심 주제·캠페인 일정, 월 발행 목표(캐파), 글감 소스(트렌드·VoC·키워드 — 선택)]
+inputs: [운영 채널 목록, 핵심 주제·캠페인 일정, 월 발행 목표(캐파), 글감 소스(트렌드·VoC·키워드 · 선택)]
 sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [월간 캘린더 표(일자×채널×주제×퍼널×실행 스킬), 채널 믹스 요약, 주차별 발행 플랜, 저장 파일(.csv)]
 requires: [brand/profile.md, brand/tone.md]
 chains_to: ["022", "027"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/021-content-calendar/021-content-calendar.csv]
+writes_to: [outputs/{날짜}/021-content-calendar/021-content-calendar.csv, outputs/{날짜}/021-content-calendar/021-content-calendar-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 콘텐츠 전략 디렉터 — 근거를 못 대는 글감은 캘린더에 올리지 않는다"
+persona: "10년차 콘텐츠 전략 디렉터 · 근거를 못 대는 글감은 캘린더에 올리지 않는다"
 when_to_use: "월간·주간 콘텐츠 발행 계획을 채널 믹스와 퍼널 균형까지 잡아 세울 때"
 success_metrics: [캘린더 작성 시간, 슬롯 발행 이행률, 퍼널 3단계 배분 준수율]
 ---
@@ -71,10 +71,15 @@ success_metrics: [캘린더 작성 시간, 슬롯 발행 이행률, 퍼널 3단�
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/021-content-calendar/021-content-calendar.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 발행 슬롯별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+날짜,채널,포맷,제목가안,퍼널,기획근거,실행스킬,상태
+{YYYY-MM-DD},{채널},{포맷},{제목},{TOFU|MOFU|BOFU},{근거},{스킬번호},{계획|제작중|완료}
+```
+설명·판정·다음 액션은 같은 폴더의 `021-content-calendar-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
-# 🗓 {YYYY-MM} 콘텐츠 캘린더 — {브랜드}
+# 🗓 {YYYY-MM} 콘텐츠 캘린더 · {브랜드}
 **국면**: {모집기/판매기/브랜딩기} · **캐파**: 월 {25}건 · **믹스**: IG 7 · Blog 4 · LinkedIn 4 · Threads 8 · NL 2
 
 ## 입력 근거 요약
@@ -98,7 +103,7 @@ IG {7} + Blog {4} + LinkedIn {4} + Threads {8} + NL {2} = {25} ✅ (캐파 일�
 ## 다음 액션
 → 022 블로그 SEO 아티클 (키워드 근거 슬롯부터 집필) · 027 OSMU 멀티채널 변환기 (앵커 콘텐츠 확산)
 
-저장 파일: outputs/{날짜}/021-content-calendar/021-content-calendar.csv
+저장 파일: outputs/{날짜}/021-content-calendar/021-content-calendar.csv · 021-content-calendar-해설.md
 ```
 
 ## Anti-Patterns

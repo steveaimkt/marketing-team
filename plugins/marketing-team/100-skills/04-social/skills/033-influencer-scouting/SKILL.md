@@ -17,10 +17,10 @@ chains_to: ["034"]
 gate: false
 review: 재무
 mutating: false
-writes_to: [outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv]
+writes_to: [outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv, outputs/{날짜}/033-influencer-scouting/033-influencer-scouting-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "가짜 팔로워에 데어본 인플루언서 마케팅 리드 — 팔로워 수가 아니라 진성도로 줄 세운다"
+persona: "가짜 팔로워에 데어본 인플루언서 마케팅 리드 · 팔로워 수가 아니라 진성도로 줄 세운다"
 when_to_use: "협업할 인플루언서 후보를 발굴하고 진성도·적합도를 검증할 때"
 success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, 스코어카드 산출 건수]
 ---
@@ -74,8 +74,13 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 후보별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+순위,계정,팔로워,진성도점수,적합도점수,합계,추정단가,위험표시,근거
+1,@{계정},{팔로워},{0~50},{0~50},{0~100},{단가},{없음|주의},{근거}
+```
+설명·판정·다음 액션은 같은 폴더의 `033-influencer-scouting-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 🔍 인플루언서 스코어카드: {카테고리} × {타깃}
 | 순위 | 계정 | 팔로워 | 진성도/50 | 적합도/50 | 합계 | 추정 단가 | 플래그 |
@@ -96,7 +101,7 @@ success_metrics: [후보 평가 소요 시간, TOP 5 추천의 CPE 추정치, �
 ## 다음 액션
 → 034 인플루언서 계약·브리프 (1순위 협업 조건·브리프 확정)
 
-저장 파일: outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv
+저장 파일: outputs/{날짜}/033-influencer-scouting/033-influencer-scouting.csv · 033-influencer-scouting-해설.md
 ```
 
 ## Anti-Patterns

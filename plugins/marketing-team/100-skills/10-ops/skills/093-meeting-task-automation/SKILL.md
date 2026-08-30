@@ -12,7 +12,7 @@ triggers:
   - "업무 배분 정리해줘"
   - "회의 녹취에서 할 일 뽑아줘"
   - "지난 회의 미결 사항 뭐였지?"
-inputs: [회의 녹취·메모, 참석자·역할, 이전 회의록(미결 추적용 — 선택)]
+inputs: [회의 녹취·메모, 참석자·역할, 이전 회의록(미결 추적용 · 선택)]
 outputs: [회의 요약(결정·보류·액션 3구획), 담당자별 태스크 배분표(담당·기한·완료 기준), 미결 사항 추적표, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["098"]
@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/093-meeting-task-automation/093-meeting-task-automation.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "PMO에서 회의를 실행으로 바꿔온 프로젝트 매니저 — 담당자와 기한 없는 액션 아이템은 할 일로 인정하지 않는다"
+persona: "PMO에서 회의를 실행으로 바꿔온 프로젝트 매니저 · 담당자와 기한 없는 액션 아이템은 할 일로 인정하지 않는다"
 when_to_use: "회의 직후 결정 사항과 태스크·미결 사항을 배분표로 정리할 때"
 success_metrics: [회의록 정리 시간, 액션 아이템 완료율, 미결 사항 재발 건수]
 ---

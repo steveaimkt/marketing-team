@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/100-orchestration/100-orchestration.md]
 builder: 사용자 (이 회사)
 version: 2.0
-persona: "15년차 마케터 — 개별 산출물이 아니라 흐름과 병목으로 판단한다"
+persona: "15년차 마케터 · 개별 산출물이 아니라 흐름과 병목으로 판단한다"
 when_to_use: "보유 스킬을 내 업무에 배선하고 주간 루틴·승인 정책을 정할 때"
 success_metrics: [배선된 체인 수, 주간 루틴 가동률, 게이트 지점 명시 여부]
 ---

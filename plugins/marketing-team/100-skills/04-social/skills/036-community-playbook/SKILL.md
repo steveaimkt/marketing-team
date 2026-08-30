@@ -19,7 +19,7 @@ mutating: false
 writes_to: [outputs/{날짜}/036-community-playbook/036-community-playbook.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "0명에서 500명 커뮤니티를 키운 커뮤니티 빌더 — 빈 채널 20개보다 붐비는 5개를 만든다"
+persona: "0명에서 500명 커뮤니티를 키운 커뮤니티 빌더 · 빈 채널 20개보다 붐비는 5개를 만든다"
 when_to_use: "디스코드·카페·오픈채팅 커뮤니티를 새로 열거나 구조를 재설계할 때"
 success_metrics: [가입 24시간 내 첫 액션 비율, 주간 활성 멤버 수, 구조 설계 소요 시간]
 ---

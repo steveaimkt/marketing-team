@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/049-ad-policy-checker/049-ad-policy-checker.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 광고 심의 검수자 — 반려 한 번이 집행 일주일보다 비싸다고 믿는다"
+persona: "10년차 광고 심의 검수자 · 반려 한 번이 집행 일주일보다 비싸다고 믿는다"
 when_to_use: "광고 소재를 매체에 올리기 전 심의·정책 위반 위험을 걸러낼 때"
 success_metrics: [광고 반려율 감소, 재심사 대기일 절감, 검수 소요 시간]
 ---

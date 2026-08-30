@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/042-naver-shopping-ads/042-naver-shopping-ads.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "12년차 네이버 검색광고 운영자 — 합산 ROAS를 믿지 않고 브랜드와 일반을 반드시 갈라 본다"
+persona: "12년차 네이버 검색광고 운영자 · 합산 ROAS를 믿지 않고 브랜드와 일반을 반드시 갈라 본다"
 when_to_use: "네이버 쇼핑검색광고의 진짜 수익성을 확인하고 키워드·입찰을 손봐야 할 때"
 success_metrics: [일반 키워드 ROAS 개선폭, 적자 키워드 절감액, 진단 소요 시간]
 ---

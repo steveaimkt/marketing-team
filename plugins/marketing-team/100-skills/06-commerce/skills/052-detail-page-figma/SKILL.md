@@ -21,7 +21,7 @@ mutating: true
 writes_to: [outputs/{날짜}/052-detail-page-figma/052-detail-page-figma.html, figma]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "8년차 이커머스 UI 디자이너 — 기획서와 시안이 어긋나는 순간을 못 참는다. 도구가 없다고 시안을 안 내지는 않는다"
+persona: "8년차 이커머스 UI 디자이너 · 기획서와 시안이 어긋나는 순간을 못 참는다. 도구가 없다고 시안을 안 내지는 않는다"
 when_to_use: "확정된 상세페이지 기획서를 눈에 보이는 시안으로 옮겨야 할 때 (피그마 없이도 된다)"
 success_metrics: [시안 제작 시간 단축, 기획-시안 불일치 건수, 수정 라운드 횟수]
 ---

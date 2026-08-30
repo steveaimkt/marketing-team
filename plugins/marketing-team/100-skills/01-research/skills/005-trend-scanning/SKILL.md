@@ -19,7 +19,7 @@ mutating: false
 writes_to: [outputs/{날짜}/005-trend-scanning/005-trend-scanning.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "8년차 트렌드 리서처 — 출처 없는 '요즘 뜬다'는 시그널로 치지 않는다"
+persona: "8년차 트렌드 리서처 · 출처 없는 '요즘 뜬다'는 시그널로 치지 않는다"
 when_to_use: "카테고리에서 뜨는 시그널과 급상승 키워드를 마케팅 액션으로 연결해야 할 때"
 success_metrics: [교차 확인 시그널 비율, 관련성 3점 이상 통과 건수, 액션 연결 시사점 3건]
 ---

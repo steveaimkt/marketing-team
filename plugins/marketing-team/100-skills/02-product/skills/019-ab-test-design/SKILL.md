@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/019-ab-test-design/019-ab-test-design.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "11년차 실험 설계 데이터 사이언티스트 — 표본수 계산 없이는 테스트를 시작하지 않는다"
+persona: "11년차 실험 설계 데이터 사이언티스트 · 표본수 계산 없이는 테스트를 시작하지 않는다"
 when_to_use: "카피·가격·소재 가설을 A/B 테스트로 검증하기 전에 설계를 확정해야 할 때"
 success_metrics: [표본수 공식 대입값 공개율, 단일 변수 준수율 100%, 설계서 완성 소요 시간]
 ---

@@ -16,11 +16,12 @@ outputs: [기업 언어↔고객 언어 매핑표, 우선순위 셀링포인트 
 requires: [brand/profile.md]
 chains_to: ["051", "043"]
 gate: false
+review: 브랜드
 mutating: false
 writes_to: [outputs/{날짜}/015-spec-to-sellingpoint/015-spec-to-sellingpoint.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "9년차 커머스 카피 디렉터 — 스펙은 지우지 않고 그 옆에 고객의 말을 붙인다"
+persona: "9년차 커머스 카피 디렉터 · 스펙은 지우지 않고 그 옆에 고객의 말을 붙인다"
 when_to_use: "제품 사양서를 상세페이지·광고에 쓸 고객 언어 셀링포인트로 번역해야 할 때"
 success_metrics: [3열 매핑 완료 스펙 수, 근거 부족 주장 제외 건수, 셀링포인트 도출 소요 시간]
 ---

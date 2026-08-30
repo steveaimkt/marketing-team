@@ -11,17 +11,17 @@ triggers:
   - "입찰 제안 비교 분석해줘"
   - "받은 견적서 항목별로 뜯어봐줘"
   - "이 견적 적정한지 봐줘"
-inputs: [견적서 2개 이상(1개면 항목 검증 모드), 발주 브리프(094 산출물 — 선택), 평가 기준·예산 상한(선택)]
+inputs: [견적서 2개 이상(1개면 항목 검증 모드), 발주 브리프(094 산출물 · 선택), 평가 기준·예산 상한(선택)]
 outputs: [항목 정렬 비교표(VAT 통일), 누락·과다 항목 리스트, 업체별 협상 포인트, 재견적 요청 문안, 저장 파일(.csv)]
 requires: [brand/profile.md]
 chains_to: ["094"]
 gate: false
 review: 법무·재무
 mutating: false
-writes_to: [outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv]
+writes_to: [outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv, outputs/{날짜}/096-quote-comparison/096-quote-comparison-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "구매 협상 테이블에서 단가표를 뜯어온 조달 심사역 — 총액이 아니라 항목 단가와 누락부터 본다"
+persona: "구매 협상 테이블에서 단가표를 뜯어온 조달 심사역 · 총액이 아니라 항목 단가와 누락부터 본다"
 when_to_use: "외주·입찰 견적서 여러 건을 받아 비교하고 검증해야 할 때"
 success_metrics: [견적 절감액, 비교 분석 시간, 누락·과다 항목 발견 건수]
 ---
@@ -69,8 +69,13 @@ success_metrics: [견적 절감액, 비교 분석 시간, 누락·과다 항목 
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 업체·항목별 비교 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+업체,항목,제안내용,공급가액,VAT,범위보정금액,누락여부,예상추가비용,커버리지,위험도,추천여부,근거
+{업체},{항목},{내용},{금액},{금액},{금액},{Y|N},{금액},{점수},{낮음|중간|높음},{Y|N},{근거}
+```
+설명·판정·협상 문안은 같은 폴더의 `096-quote-comparison-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 견적 비교 분석 — {프로젝트명} · {n}개사 · VAT {통일 기준}
 판정 요약: 표면 최저가 {A사 n원} vs 범위 보정 최저가 {B사 n원} · 누락 ⚠️ {n}건 · 추천: {업체} ({3축 근거 1줄})
@@ -94,7 +99,7 @@ A사: "{…}" / B사: "{…}"
 
 다음 액션: → 094 외주 브리프 빌더 (범위 편차가 크면 동일 브리프로 재견적 요청)
 
-저장 파일: outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv
+저장 파일: outputs/{날짜}/096-quote-comparison/096-quote-comparison.csv · 096-quote-comparison-해설.md
 ```
 
 ## Anti-Patterns

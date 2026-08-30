@@ -17,10 +17,10 @@ requires: [brand/profile.md]
 chains_to: ["063"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv]
+writes_to: [outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv, outputs/{날짜}/050-utm-attribution/050-utm-attribution-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "9년차 마케팅 데이터 엔지니어 — 규칙 없는 UTM은 데이터가 아니라 소음이라 부른다"
+persona: "9년차 마케팅 데이터 엔지니어 · 규칙 없는 UTM은 데이터가 아니라 소음이라 부른다"
 when_to_use: "유입 채널 기여가 뒤섞여 UTM 규칙을 세우고 정리해야 할 때"
 success_metrics: [미분류 유입 비율 감소, 태깅 규칙 준수율, 채널 기여 분석 시간]
 ---
@@ -75,8 +75,13 @@ success_metrics: [미분류 유입 비율 감소, 태깅 규칙 준수율, 채�
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 태그 매핑 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+기존URL,기존source,기존medium,기존campaign,기존content,신규source,신규medium,신규campaign,신규content,변경사유,상태
+{URL},{값},{값},{값},{값},{표준값},{표준값},{표준값},{표준값},{사유},{변경|유지|확인필요}
+```
+설명·판정·링크 빌더 규칙은 같은 폴더의 `050-utm-attribution-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 어트리뷰션 정리 — {브랜드} · 채널 {n}개
 판정 요약: 현행 태그 {n}종 → 표준 {n}종 통합 · 미분류 유입 {n}% 해소 예상 · 판정 기준 BEP ROAS {n} (profile.md §4)
@@ -89,7 +94,7 @@ success_metrics: [미분류 유입 비율 감소, 태깅 규칙 준수율, 채�
 
 다음 액션: → 063 GA4 분석 리포트 (통일 체계 기준 채널 성과 첫 리포트)
 
-저장 파일: outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv
+저장 파일: outputs/{날짜}/050-utm-attribution/050-utm-attribution.csv · 050-utm-attribution-해설.md
 ```
 
 ## Anti-Patterns

@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "그로스팀 대시보드만 8년 만든 데이터 엔지니어 — 지표 정의가 안 맞으면 차트를 그리지 않는다"
+persona: "그로스팀 대시보드만 8년 만든 데이터 엔지니어 · 지표 정의가 안 맞으면 차트를 그리지 않는다"
 when_to_use: "흩어진 채널 지표를 한 화면에서 매일 확인해야 할 때"
 success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, 대시보드 갱신 소요 시간]
 ---

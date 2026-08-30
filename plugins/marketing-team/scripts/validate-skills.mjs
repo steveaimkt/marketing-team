@@ -104,7 +104,7 @@ for (const s of skills) {
     add(id, 'WARN', `파일이 필요한데 sample_fallback 없음 — 데이터 없는 사용자가 막힌다`);
 
   // 5 게이트 스킬은 판정 블록 필수
-  if (fld(f, 'gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|🛡/.test(body)) add(id, 'ERR', 'gate:true 인데 판정 블록 없음');
+  if (fld(f, 'gate') === 'true' && !/규제 검사|컴플라이언스 게이트|게이트 판정|🛡/.test(body)) add(id, 'ERR', 'gate:true 인데 판정 블록 없음');
   // 5-b writes_to 는 착지 경로의 정본이다 — AI 마케터가 이걸 그대로 쓴다
   //     2026-08-22 실측: AI 마케터가 경로를 조합하다 output/ · LEDGER.md 같은 없는 곳에 냈다.
   //     정본이 틀리면 조합이 아니라 원본이 틀린 것이 된다.
@@ -147,6 +147,12 @@ for (const s of skills) {
     const ext = (w.find(x => x.includes('/')) || '').split('.').pop();
     if (['csv', 'html', 'pptx', 'xlsx'].includes(ext) && !/\*\*형식\*\* ·/.test(body))
       add(id, 'ERR', `writes_to 가 .${ext} 인데 착지 블록에 「형식」 줄이 없다 (docs/공통규약.md §H)`);
+    if (ext === 'csv') {
+      if (!/```csv\s*\n[^\n]*,[^\n]*/.test(of))
+        add(id, 'ERR', 'writes_to 가 .csv 인데 Output Format 에 쉼표로 구분된 CSV 헤더가 없다');
+      if (!/마크다운 제목·표·설명을 넣지 않는다/.test(of))
+        add(id, 'ERR', 'CSV 본문에 마크다운을 넣지 말라는 직렬화 금지가 없다');
+    }
   }
   // 6 mutating 은 승인 문구 필수
   if (fld(f, 'mutating') === 'true' && !/승인|⏸|확인 ?후/.test(body)) add(id, 'ERR', 'mutating:true 인데 승인 게이트 없음');

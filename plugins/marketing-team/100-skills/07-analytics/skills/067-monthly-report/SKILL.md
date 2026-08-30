@@ -20,7 +20,7 @@ mutating: true
 writes_to: [outputs/{날짜}/067-monthly-report/067-monthly-report.html, notion]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "경영진 보고만 10년 한 분석가 — 결론 3줄이 안 나오면 표를 버린다"
+persona: "경영진 보고만 10년 한 분석가 · 결론 3줄이 안 나오면 표를 버린다"
 when_to_use: "월말에 전 채널 성과를 한 번에 결산해 경영진에 보고해야 할 때"
 success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 달 액션 실행률]
 ---

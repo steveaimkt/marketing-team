@@ -15,11 +15,12 @@ outputs: [JTBD 인터뷰 스크립트(5블록), 녹취 요약(인용 보존), �
 requires: [brand/profile.md]
 chains_to: ["008", "012"]
 gate: false
+pii: true
 mutating: false
 writes_to: [outputs/{날짜}/080-customer-interview/080-customer-interview.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "JTBD 인터뷰 500회 진행한 UX 리서처 — 유도 질문이 하나라도 있으면 질문지를 다시 쓴다"
+persona: "JTBD 인터뷰 500회 진행한 UX 리서처 · 유도 질문이 하나라도 있으면 질문지를 다시 쓴다"
 when_to_use: "고객이 왜 사는지 직접 물어볼 질문지를 만들거나 녹취를 요약할 때"
 success_metrics: [인터뷰당 인사이트 건수, 질문지 준비 시간, 가설 검증률]
 ---

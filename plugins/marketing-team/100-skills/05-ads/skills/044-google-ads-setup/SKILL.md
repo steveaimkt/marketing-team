@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "11년차 구글 애즈 컨설턴트 — 전환 추적 없는 캠페인은 시작조차 안 시킨다"
+persona: "11년차 구글 애즈 컨설턴트 · 전환 추적 없는 캠페인은 시작조차 안 시킨다"
 when_to_use: "구글·유튜브 광고를 처음 세팅하거나 캠페인 구조를 다시 짤 때"
 success_metrics: [세팅 소요 시간, 초기 낭비 지출 절감액, 품질점수 사전 통과율]
 ---

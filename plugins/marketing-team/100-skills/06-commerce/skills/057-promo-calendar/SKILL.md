@@ -17,10 +17,10 @@ chains_to: ["016"]
 gate: false
 review: 재무·경영
 mutating: false
-writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv]
+writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv, outputs/{날짜}/057-promo-calendar/057-promo-calendar-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "9년차 프로모션 MD — 실마진 계산 없는 행사 참여를 도박이라 부른다"
+persona: "9년차 프로모션 MD · 실마진 계산 없는 행사 참여를 도박이라 부른다"
 when_to_use: "분기·시즌 행사 일정을 잡고 참여 여부를 마진으로 판정할 때"
 success_metrics: [행사 실마진율, 역마진 딜 차단 건수, 기획 소요 시간]
 ---
@@ -74,8 +74,13 @@ success_metrics: [행사 실마진율, 역마진 딜 차단 건수, 기획 소�
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 행사·상품별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+월,행사,플랫폼,태그,참여판정,상품,행사가,실마진,재고여력,신청마감,근거
+{월},{행사},{플랫폼},{확정|예상},{참여|보류|제외},{상품},{가격},{마진},{수량},{날짜},{근거}
+```
+설명·판정·준비 일정은 같은 폴더의 `057-promo-calendar-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 프로모션 캘린더 — {브랜드} · {기간}
 
@@ -98,7 +103,7 @@ D-21 신청 → D-14 재고 발주 → D-7 소재 → D-3 가격·쿠폰 세팅 
 
 다음 액션: 016 번들·프로모션 설계로 행사용 번들을 짜면 객단가까지 잡을 수 있습니다.
 
-저장 파일: outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv
+저장 파일: outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv · 057-promo-calendar-해설.md
 ```
 
 ## Anti-Patterns

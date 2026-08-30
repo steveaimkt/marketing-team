@@ -18,10 +18,10 @@ chains_to: ["046", "069"]
 gate: false
 review: 재무
 mutating: false
-writes_to: [outputs/{날짜}/095-budget-planner/095-budget-planner.csv]
+writes_to: [outputs/{날짜}/095-budget-planner/095-budget-planner.csv, outputs/{날짜}/095-budget-planner/095-budget-planner-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "CFO 앞에서 마케팅 예산을 방어해온 퍼포먼스 전략가 — 산식 없는 배분안은 숫자가 아니라 희망사항으로 취급한다"
+persona: "CFO 앞에서 마케팅 예산을 방어해온 퍼포먼스 전략가 · 산식 없는 배분안은 숫자가 아니라 희망사항으로 취급한다"
 when_to_use: "분기·월별 마케팅 예산을 채널별로 배분하고 계획할 때"
 success_metrics: [예산 대비 집행 오차율, 플랜 수립 시간, 목표 매출 달성률]
 ---
@@ -67,8 +67,13 @@ success_metrics: [예산 대비 집행 오차율, 플랜 수립 시간, 목표 �
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/095-budget-planner/095-budget-planner.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 월·채널별 예산 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+월,채널,안,과거ROAS,손익분기ROAS,과거배분비,제안배분비,예산,예상회수,순현금흐름,추정여부,근거
+{YYYY-MM},{채널},{보수|중립|공격},{값},{값},{비율},{비율},{금액},{금액},{금액},{Y|N},{근거}
+```
+설명·판정·가정은 같은 폴더의 `095-budget-planner-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 마케팅 예산 플랜 — {기간} · [실데이터|추정]
 판정 요약: 목표 매출 {n}원 ÷ 목표 ROAS {n} = 필요 예산 {n}원 · 실험 예산 {n}% · 캐시플로 ⚠️ {n}개월
@@ -91,7 +96,7 @@ success_metrics: [예산 대비 집행 오차율, 플랜 수립 시간, 목표 �
 
 다음 액션: → 069 예측 시뮬레이션 (배분안 변수 검증) / 046 ROAS 진단 & 재배분 (집행 4주 후 교정)
 
-저장 파일: outputs/{날짜}/095-budget-planner/095-budget-planner.csv
+저장 파일: outputs/{날짜}/095-budget-planner/095-budget-planner.csv · 095-budget-planner-해설.md
 ```
 
 ## Anti-Patterns

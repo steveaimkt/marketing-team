@@ -12,7 +12,7 @@ triggers:
   - "위클리 레터 만들어줘"
   - "구독자 메일 콘텐츠 써줘"
 inputs: [주제 1개 또는 소스 자료 3~7개, CTA 텍스트·URL(선택)]
-outputs: [본문 약 800자(HTML), 제목 5종, preheader 1줄, 요약 1줄, 게이트 결과 블록, 저장 파일(.html)]
+outputs: [본문 약 800자(HTML), 제목 5종, preheader 1줄, 요약 1줄, 규제 검사 결과 블록, 저장 파일(.html)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["074"]
 gate: true
@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "오픈율 40%대를 유지해온 이메일 마케터 — CTA는 한 통에 하나뿐이다"
+persona: "오픈율 40%대를 유지해온 이메일 마케터 · CTA는 한 통에 하나뿐이다"
 when_to_use: "주제 하나 또는 소스 자료 묶음으로 구독자 뉴스레터 초안을 빠르게 완성할 때"
 success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 ---
@@ -41,7 +41,7 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 
 > 사람이 부르면 아래에서 멈춰 답을 받는다. 대시보드·cron 에서는 기본값으로 완주하고
 > 산출물에 "물어보지 못해 기본값으로 갔다"를 밝힌다.
-> ⚠️ **컴플라이언스 게이트와 다른 것이다.** 그쪽은 마지막에 자동으로 돌고 사람을 안 부른다.
+> ⚠️ **규제 검사와 다른 것이다.** 그쪽은 마지막에 자동으로 돌고 사람을 안 부른다.
 > 걸리면 ⛔ 로 전달을 막을 뿐이다. 아래는 **사람에게 묻는 자리**다.
 
 | 멈추는 곳 | 묻는 것 | 기본값 (답 없으면) |
@@ -56,7 +56,7 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 3. **본문 작성 (~800자)** — 두괄식 · 2인칭("당신의") · 숫자 구체화("더 좋아진" → "21일 후 -38%") · CTA 1개 · 이모지는 주제어 옆 1개 원칙.
 4. **제목 5종 + preheader** — 5패턴 각 1개, preheader는 제목과 중복 금지. 예상 오픈율을 "추정" 라벨로 병기.
 5. **자체 검증** — 글자 수 700~900 / 두괄식 / CTA 1개 / 금기어 0 / 5패턴 각 1개 / preheader 비중복.
-6. **컴플라이언스 게이트** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 산출물 하단에 게이트 결과 블록 부착. ⛔ 차단이면 수정·재통과 전 전달 금지.
+6. **규제 검사** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 산출물 하단에 게이트 결과 블록 부착. ⛔ 차단이면 수정·재통과 전 전달 금지.
 7. **체인 제안** — 074 이메일 시퀀스 빌더 (발송은 그쪽의 ⏸ HITL 승인 영역).
 
 8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/023-newsletter-automation/023-newsletter-automation.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
@@ -92,7 +92,7 @@ success_metrics: [제작 시간, 오픈율, CTA 클릭률]
 <h2>{소주제 1}</h2> …
 <p>{CTA 1개}</p>
 
-─── 🛡 컴플라이언스 게이트 ───
+─── 🛡 규제 검사 ───
 판정: ✅ 통과 | ⚠️ 수정 후 통과 (n건 치환) | ⛔ 차단
 ──────────────────────────
 

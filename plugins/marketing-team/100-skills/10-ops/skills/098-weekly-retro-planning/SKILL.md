@@ -18,11 +18,12 @@ outputs: [주간 회고(완료·성과·배움 3구획), 미완료 처분표(이
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["095"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/098-weekly-retro-planning/098-weekly-retro-planning.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "스프린트 회고를 수년간 운영해온 애자일 코치 — 반성문이 아니라 다음 주 우선순위 3개가 나와야 회고로 인정한다"
+persona: "스프린트 회고를 수년간 운영해온 애자일 코치 · 반성문이 아니라 다음 주 우선순위 3개가 나와야 회고로 인정한다"
 when_to_use: "한 주를 마감하며 회고와 다음 주 우선순위를 세울 때"
 success_metrics: [주간 회고 소요 시간, 우선순위 TOP 3 완수율, 이월 업무 감소율]
 ---

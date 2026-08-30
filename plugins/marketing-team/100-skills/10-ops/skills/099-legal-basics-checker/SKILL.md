@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/099-legal-basics-checker/099-legal-basics-checker.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "마케팅 법무 검토를 전담해온 컴플라이언스 심사역 — 애매하면 통과가 아니라 전문가 확인으로 넘긴다"
+persona: "마케팅 법무 검토를 전담해온 규제 검사 심사역 · 애매하면 통과가 아니라 전문가 확인으로 넘긴다"
 when_to_use: "이벤트·광고·수집 양식을 공개하기 전 법적 리스크를 점검할 때"
 success_metrics: [위반 사전 적발 건수, 점검 소요 시간, 공개 후 시정 요구 건수]
 ---

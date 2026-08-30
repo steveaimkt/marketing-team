@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/097-onboarding-docs/097-onboarding-docs.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "인수인계 실패 사고를 수습해본 오퍼레이션 매니저 — 물어봐야만 아는 내용이 남아 있으면 문서로 인정하지 않는다"
+persona: "인수인계 실패 사고를 수습해본 오퍼레이션 매니저 · 물어봐야만 아는 내용이 남아 있으면 문서로 인정하지 않는다"
 when_to_use: "신규 입사·퇴사·업무 이관 전에 업무 매뉴얼을 표준화할 때"
 success_metrics: [온보딩 소요 기간, 문서 작성 시간, 인수인계 후 질문 건수]
 ---

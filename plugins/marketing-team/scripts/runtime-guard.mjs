@@ -1,0 +1,242 @@
+#!/usr/bin/env node
+/** AI 마케터의 G2 승인을 Claude Code PreToolUse 단계에서 강제한다. */
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { approvalState } from './plan-compiler.mjs';
+
+const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
+const PLAN_MARKER = /\[실행 계획\][\s\S]*?\[승인 요청\]/;
+const APPROVAL = /^\s*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?)\s*[.!]?\s*$/;
+const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/AI-마케터/SKILL.md', '\\skills\\AI-마케터\\SKILL.md'];
+const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
+
+function deny(reason) {
+  process.stdout.write(`${JSON.stringify({
+    hookSpecificOutput: {
+      hookEventName: 'PreToolUse',
+      permissionDecision: 'deny',
+      permissionDecisionReason: reason,
+    },
+  })}\n`);
+}
+
+function readStdin() {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', chunk => { body += chunk; });
+    process.stdin.on('end', () => resolve(body));
+    process.stdin.on('error', reject);
+  });
+}
+
+function textOfContent(content) {
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return '';
+  return content
+    .filter(block => block && block.type === 'text' && typeof block.text === 'string')
+    .map(block => block.text)
+    .join('\n');
+}
+
+function transcriptRows(file) {
+  if (!file || !fs.existsSync(file)) return [];
+  const stat = fs.statSync(file);
+  const start = Math.max(0, stat.size - MAX_TRANSCRIPT_BYTES);
+  const fd = fs.openSync(file, 'r');
+  try {
+    const buffer = Buffer.alloc(stat.size - start);
+    fs.readSync(fd, buffer, 0, buffer.length, start);
+    const raw = buffer.toString('utf8');
+    const body = start ? raw.slice(raw.indexOf('\n') + 1) : raw;
+    const rows = [];
+    for (const line of body.split('\n')) {
+      if (!line.trim()) continue;
+      try {
+        const event = JSON.parse(line);
+        const role = event?.message?.role;
+        if (role !== 'assistant' && role !== 'user') continue;
+        const text = textOfContent(event.message.content);
+        if (text) rows.push({ role, text });
+      } catch {
+        // 손상된 한 줄 때문에 훅 전체를 무력화하지 않는다.
+      }
+    }
+    return rows;
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+function isActive(rows, rawTranscript) {
+  return ACTIVE_MARKERS.some(marker => rawTranscript.includes(marker)) ||
+    rows.some(row => row.text.includes('# 마케팅 AI 마케터'));
+}
+
+function approved(rows) {
+  let latestPlan = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].role === 'assistant' && PLAN_MARKER.test(rows[i].text)) latestPlan = i;
+  }
+  if (latestPlan < 0) return { ok: false, reason: '실행 계획 표식이 없습니다.' };
+  for (let i = latestPlan + 1; i < rows.length; i++) {
+    if (rows[i].role === 'user' && APPROVAL.test(rows[i].text)) return { ok: true, plan: rows[latestPlan].text };
+  }
+  return { ok: false, reason: '사용자의 명시적 진행 승인이 없습니다.' };
+}
+
+function inside(base, target) {
+  const rel = path.relative(base, target);
+  return rel === '' || (!rel.startsWith(`..${path.sep}`) && rel !== '..' && !path.isAbsolute(rel));
+}
+
+function validateWrite(input) {
+  const toolInput = input.tool_input || {};
+  const raw = input.tool_name === 'NotebookEdit'
+    ? toolInput.notebook_path || toolInput.file_path
+    : toolInput.file_path || toolInput.path;
+  if (!raw) return '쓰기 대상 경로를 확인할 수 없습니다.';
+  const cwd = path.resolve(input.cwd || process.cwd());
+  const target = path.resolve(cwd, raw);
+  if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw}`;
+  const [root] = path.relative(cwd, target).split(path.sep);
+  if (!WRITE_ROOTS.has(root))
+    return `AI 마케터가 쓸 수 있는 곳은 brand/ · outputs/ · logs/ · inputs/뿐입니다: ${raw}`;
+  return '';
+}
+
+function validateBash(input) {
+  const command = String(input.tool_input?.command || '');
+  const fallbackRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+  const pluginRoot = path.resolve(process.env.CLAUDE_PLUGIN_ROOT || fallbackRoot);
+  if (/(?:^|[;&|]\s*)find\s+(?:\/|~|\/Users)(?:\s|$)/m.test(command))
+    return '루트·홈 전체에서 설치본을 찾지 마세요. 현재 ${CLAUDE_PLUGIN_ROOT}만 사용하세요.';
+
+  const cacheMatches = command.match(/(?:~|\/[^\s"']+)?\/\.claude\/plugins\/cache\/[^\s"']+/g) || [];
+  for (const raw of cacheMatches) {
+    const expanded = raw.startsWith('~/') ? path.join(process.env.HOME || '', raw.slice(2)) : raw;
+    if (!inside(pluginRoot, path.resolve(expanded)))
+      return '다른 캐시·설치본을 참조하지 마세요. 현재 ${CLAUDE_PLUGIN_ROOT}만 사용하세요.';
+  }
+  return '';
+}
+
+function isReadOnlyBash(input) {
+  const raw = String(input.tool_input?.command || '');
+  const command = raw.replace(/\d?>\s*\/dev\/null/g, '');
+  if (/(?:^|\s)(?:rm|mv|cp|mkdir|touch|tee|chmod|chown|install|patch|apply_patch|node|python\d*|ruby|perl|npm|npx|pnpm|yarn|bun|deno|curl|wget|osascript)(?:\s|$)/.test(command))
+    return false;
+  if (/(?:^|\s)sed\s+[^;&|]*\s-i(?:\s|$)/.test(command)) return false;
+  if (/(?:^|\s)find\s+[^;&|]*(?:-delete|-exec|-ok)(?:\s|$)/.test(command)) return false;
+  if (/(^|[^<])>{1,2}(?!&)/.test(command) || /<(?!(?:=|<))/.test(command)) return false;
+
+  const allowed = new Set(['cd', 'pwd', 'ls', 'rg', 'grep', 'head', 'tail', 'sed', 'cat', 'wc', 'stat', 'find', 'jq', 'test', '[', 'echo', 'printf']);
+  const segments = command.split(/&&|\|\||;|\||\n/).map(item => item.trim()).filter(Boolean);
+  return segments.length > 0 && segments.every(segment => {
+    if (/^[A-Za-z_][A-Za-z0-9_]*=(?:"[^"]*"|'[^']*'|[^\s]+)$/.test(segment) &&
+        !/^(?:HOME|CODEX_HOME)=/.test(segment) && !/`|\$\(/.test(segment)) return true;
+    const name = segment.match(/^([^\s]+)/)?.[1];
+    return allowed.has(name);
+  });
+}
+
+function validateSkill(input, plan) {
+  const skill = String(input.tool_input?.skill || input.tool_input?.name || '').trim();
+  if (!skill) return '호출할 스킬 이름을 확인할 수 없습니다.';
+  if (!plan.includes(skill))
+    return `실행 계획에 없는 추가 스킬은 호출할 수 없습니다: ${skill} · 필요하면 새 [실행 계획]에 추가해 다시 승인받으세요.`;
+  return '';
+}
+
+async function main() {
+  let input;
+  try {
+    input = JSON.parse(await readStdin());
+  } catch (error) {
+    deny(`실행 보호 훅 입력을 읽지 못했습니다: ${error.message}`);
+    return;
+  }
+
+  let rawTranscript = '';
+  try {
+    if (input.transcript_path && fs.existsSync(input.transcript_path))
+      rawTranscript = fs.readFileSync(input.transcript_path, 'utf8').slice(-MAX_TRANSCRIPT_BYTES);
+  } catch {
+    // 아래 rows가 비면 안전하게 승인 실패로 처리한다.
+  }
+  const rows = transcriptRows(input.transcript_path);
+  if (!isActive(rows, rawTranscript)) return;
+
+  if (input.tool_name === 'Bash') {
+    const issue = validateBash(input);
+    if (issue) {
+      deny(issue);
+      return;
+    }
+  }
+
+/**
+ * 승인의 대상은 문장이 아니라 **계획 해시**다.
+ *
+ * 실측 2026-08-30 — 중급 실행이 승인 전에 계획에 없던 HTML 을 만들었고,
+ * 고급 실행이 사용자가 지정한 순서를 바꿔 돌았다. 대화에서 「진행 승인」을 받았는지만 보면
+ * 그 뒤에 계획이 바뀌어도 알 수 없다.
+ *
+ * `plan.json` 이 있을 때만 본다. 없으면 예전 문장 게이트 그대로다 (하위 호환).
+ * 읽지 못하면 막지 않는다 — 훅이 세션을 잠그는 쪽이 더 나쁘다. 문장 게이트가 남아 있다.
+ */
+function planApproval(cwd) {
+  if (!cwd) return null;
+  const root = path.join(cwd, 'outputs');
+  let newest = null;
+  const walk = dir => {
+    let entries;
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const entry of entries) {
+      const target = path.join(dir, entry.name);
+      if (entry.isDirectory()) walk(target);
+      else if (entry.name === 'plan.json') {
+        try {
+          const at = fs.statSync(target).mtimeMs;
+          if (!newest || at > newest.at) newest = { file: target, at };
+        } catch { /* 건너뛴다 */ }
+      }
+    }
+  };
+  try { if (fs.existsSync(root)) walk(root); } catch { return null; }
+  if (!newest) return null;
+  let plan;
+  try { plan = JSON.parse(fs.readFileSync(newest.file, 'utf8')); } catch { return null; }
+  try {
+    const state = approvalState(plan);
+    if (state.ok) return null;
+    return `${state.reason} (${path.relative(cwd, newest.file)})`;
+  } catch { return null; }
+}
+
+  const approval = approved(rows);
+  if (!approval.ok) {
+    if (input.tool_name === 'Bash' && isReadOnlyBash(input)) return;
+    deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
+    return;
+  }
+
+  const planIssue = planApproval(input.cwd);
+  if (planIssue) {
+    deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
+    return;
+  }
+
+  if (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name)) {
+    const issue = validateWrite(input);
+    if (issue) deny(issue);
+  } else if (input.tool_name === 'Bash') {
+    // 설치본 경로 검사는 승인 여부보다 앞에서 이미 수행했다.
+  } else if (input.tool_name === 'Skill') {
+    const issue = validateSkill(input, approval.plan);
+    if (issue) deny(issue);
+  }
+}
+
+await main();

@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/094-outsourcing-brief/094-outsourcing-brief.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "발주와 검수 양쪽을 다 겪은 프로덕션 디렉터 — 브리프에 검수 기준이 없으면 발주 자체를 보류시킨다"
+persona: "발주와 검수 양쪽을 다 겪은 프로덕션 디렉터 · 브리프에 검수 기준이 없으면 발주 자체를 보류시킨다"
 when_to_use: "디자인·영상·개발 외주를 맡기기 전 요구사항을 브리프로 정리할 때"
 success_metrics: [수정 왕복 횟수, 브리프 작성 시간, 일정 내 납품률]
 ---

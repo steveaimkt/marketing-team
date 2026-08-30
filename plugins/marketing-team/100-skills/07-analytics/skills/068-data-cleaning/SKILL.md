@@ -12,16 +12,16 @@ triggers:
   - "엑셀 데이터 지저분한데 정리해줘"
   - "분석 전에 데이터부터 손봐줘"
 inputs: [로우데이터 파일(CSV·XLSX·구글시트), 목표 스키마(선택)]
-sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [정리된 데이터셋(사본), 클리닝 로그(변경 내역 전수), 품질 진단 요약, 저장 파일(.csv)]
 requires: [brand/profile.md]
 chains_to: ["061"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv]
+writes_to: [outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv, outputs/{날짜}/068-data-cleaning/068-data-cleaning-log.csv, outputs/{날짜}/068-data-cleaning/068-data-cleaning-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "금융권 데이터 품질관리 9년차 엔지니어 — 원본은 절대 건드리지 않고 변경은 전수 기록한다"
+persona: "금융권 데이터 품질관리 9년차 엔지니어 · 원본은 절대 건드리지 않고 변경은 전수 기록한다"
 when_to_use: "분석 전에 지저분한 로우데이터를 신뢰할 수 있는 상태로 만들어야 할 때"
 success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분석 재작업 횟수]
 ---
@@ -49,7 +49,7 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 
 | 멈추는 곳 | 묻는 것 | 기본값 (답 없으면) |
 |---|---|---|
-| Phase 1 | 로우데이터가 없으면 묻고 멈춘다 | `sample-data/A브랜드-2026-06-매출.xlsx` · **멈추지 않는다** |
+| Phase 1 | 로우데이터가 없으면 묻고 멈춘다 | `sample-data/A브랜드-메타광고-30일.csv` · **멈추지 않는다** |
 | Phase 3 ⏸ | **결측·이상치 처리 방식은 사람이 고른다** (제거·대체·보간·유지) | **유지 + 표기** · 가장 덜 파괴적인 선택 |
 | Phase 5 뒤 | "정리본입니다. 원본을 덮어쓸까요?" | **사본으로만 낸다** · 원본은 건드리지 않는다 |
 
@@ -79,8 +79,18 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **`068-data-cleaning.csv` 는 원본의 실제 열 이름을 유지한 정리본이다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+{원본의 실제 열1},{원본의 실제 열2},...,{원본의 실제 마지막 열}
+{정리된 값1},{정리된 값2},...,{정리된 값N}
+```
+변경 이력은 `068-data-cleaning-log.csv` 에 아래 열로 쓴다.
+```csv
+행키,열이름,원값,정리값,적용규칙,사유,상태
+{행 식별값},{열},{원값},{새값},{규칙},{사유},{자동처리|확인보류}
+```
+설명·판정은 같은 폴더의 `068-data-cleaning-해설.md` 에 아래 형식으로 쓴다.
+세 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 데이터 클리닝 결과 — {파일명} · [실데이터|샘플]
 품질 요약: {n}행 × {n}열 → 정리 후 {n}행 · 결측 {n} / 중복 {n} / 형식 {n} / 이상치 {n} 처리
@@ -98,7 +108,7 @@ success_metrics: [클리닝 소요 시간, 결측·중복 잔존율, 후속 분�
 파일: {원본명}_cleaned.{ext} + cleaning-log.md (원본 불변)
 다음 액션: → 061 판매 데이터 분석 (정리본으로 즉시 분석 시작)
 
-저장 파일: outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv
+저장 파일: outputs/{날짜}/068-data-cleaning/068-data-cleaning.csv · 068-data-cleaning-log.csv · 068-data-cleaning-해설.md
 ```
 
 ## Anti-Patterns

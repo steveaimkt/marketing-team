@@ -17,11 +17,12 @@ outputs: [코호트 유지율 매트릭스, 유지율 곡선 해석(꺾임 지�
 requires: [brand/profile.md]
 chains_to: ["065", "077"]
 gate: false
+pii: true
 mutating: false
-writes_to: [outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv]
+writes_to: [outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv, outputs/{날짜}/064-cohort-retention/064-cohort-retention-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "구독 서비스 리텐션만 10년 판 그로스 분석가 — 평균은 버리고 꺾임 지점만 본다"
+persona: "구독 서비스 리텐션만 10년 판 그로스 분석가 · 평균은 버리고 꺾임 지점만 본다"
 when_to_use: "재구매·잔존율이 궁금하거나 고객이 떨어져나가는 시점을 찾아야 할 때"
 success_metrics: [재구매율 개선폭, 이탈 시점 식별 리드타임, 코호트 분석 소요 시간]
 ---
@@ -75,8 +76,13 @@ success_metrics: [재구매율 개선폭, 이탈 시점 식별 리드타임, 코
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 코호트별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+코호트,인원,M0,M1,M2,M3,M6,M12,권장개입월,신뢰도메모
+{YYYY-MM},{인원},1.0,{유지율},{유지율},{유지율},{유지율},{유지율},{M+n},{표본·미성숙 구간 메모}
+```
+설명·판정·다음 액션은 같은 폴더의 `064-cohort-retention-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```
 ## 코호트·리텐션 분석 — 기준 {첫구매월} · 유지 정의 {기간 내 재구매 ≥1회} · 고객 {N}명
 판정 요약: 평균 M+1 유지율 {n}% · 꺾임 지점 {M+k → M+k+1} (낙폭 -{n}%p) · 권장 개입 {M+k}차월 · 추세 {개선|악화|유지}
@@ -96,7 +102,7 @@ success_metrics: [재구매율 개선폭, 이탈 시점 식별 리드타임, 코
 - 개입 시점: 첫 구매 후 {k}차월 (꺾임 직전) · 대상 {n}명/월
 다음 액션: → 065 고객 세그먼트 RFM 분석 (개입 대상 정밀화) / 077 이탈 방지 윈백 캠페인 (이미 이탈한 코호트 재활성)
 
-저장 파일: outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv
+저장 파일: outputs/{날짜}/064-cohort-retention/064-cohort-retention.csv · 064-cohort-retention-해설.md
 ```
 
 ## Anti-Patterns

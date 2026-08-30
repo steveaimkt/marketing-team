@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "12년차 런칭 PM — 출시일 하루가 아니라 D-30부터 D+30까지 60일을 관리한다"
+persona: "12년차 런칭 PM · 출시일 하루가 아니라 D-30부터 D+30까지 60일을 관리한다"
 when_to_use: "신제품 출시를 앞두고 채널별 준비 태스크와 일정·책임을 확정해야 할 때"
 success_metrics: [기한·담당 부착 태스크 비율 100%, 플랜 수립 소요 시간, D+14 모니터링 지표 수]
 ---
@@ -70,7 +70,7 @@ success_metrics: [기한·담당 부착 태스크 비율 100%, 플랜 수립 소
 ⛔ **아래는 `outputs/{날짜}/018-gtm-launch-plan/018-gtm-launch-plan.md` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
-# 🚀 GTM 플랜: {제품명} — D-day {YYYY-MM-DD} (채널: {목록})
+# 🚀 GTM 플랜: {제품명} · D-day {YYYY-MM-DD} (채널: {목록})
 
 ## 런칭 타임라인 (D-30 ~ D+30)
 | 시점 | 태스크 | 채널 | R/A | 산출물 | 의존 |

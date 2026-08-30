@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/055-smartstore-audit/055-smartstore-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "13년차 스마트스토어 성장 컨설턴트 — 부진 원인을 유입·전환·재구매 셋 중 하나로 반드시 짚는다"
+persona: "13년차 스마트스토어 성장 컨설턴트 · 부진 원인을 유입·전환·재구매 셋 중 하나로 반드시 짚는다"
 when_to_use: "스토어 매출이 정체되어 병목이 어디인지 진단해야 할 때"
 success_metrics: [병목 지표 개선폭, 2주 액션 실행률, 진단 소요 시간]
 ---

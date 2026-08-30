@@ -17,11 +17,12 @@ outputs: [여정 매트릭스(4단계×4행), 이탈점 TOP 3, 개입 우선순�
 requires: [brand/profile.md]
 chains_to: ["074", "048"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "CX 컨설팅 9년차 여정 설계자 — 데이터 근거 없는 여정 단계는 맵에서 지운다"
+persona: "CX 컨설팅 9년차 여정 설계자 · 데이터 근거 없는 여정 단계는 맵에서 지운다"
 when_to_use: "고객이 어디서 이탈하는지 터치포인트 전체를 조망해야 할 때"
 success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여정 맵 작성 시간]
 ---

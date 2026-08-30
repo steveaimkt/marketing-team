@@ -59,7 +59,7 @@ for (const d of dirs) {
 
   // 게이트 · 없으면 true 로 본다
   if (!/^gate:/m.test(f)) warn(`${d.name} · gate 미기재 — true 로 간주된다`);
-  else if (g('gate') === 'true' && !/컴플라이언스 게이트|게이트 판정|AI 규제검토자|🛡/.test(t)) err(`${d.name} · gate:true 인데 판정 블록 없음`);
+  else if (g('gate') === 'true' && !/규제 검사|컴플라이언스 게이트|게이트 판정|AI 규제검토자|🛡/.test(t)) err(`${d.name} · gate:true 인데 판정 블록 없음`);
 
   for (const sec of SEC) if (!t.includes(sec)) err(`${d.name} · ${sec} 없음`);
   if (!fs.existsSync(path.join(DIR, d.name, 'routing-eval.jsonl'))) warn(`${d.name} · routing-eval.jsonl 없음`);

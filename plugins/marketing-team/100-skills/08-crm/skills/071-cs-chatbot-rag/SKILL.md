@@ -19,7 +19,7 @@ mutating: false
 writes_to: [outputs/{날짜}/071-cs-chatbot-rag/071-cs-chatbot-rag.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "CS센터 자동화 구축 7년차 컨설턴트 — 모르는 질문에 아는 척하는 봇은 배포하지 않는다"
+persona: "CS센터 자동화 구축 7년차 컨설턴트 · 모르는 질문에 아는 척하는 봇은 배포하지 않는다"
 when_to_use: "반복 문의를 자동응대로 돌려 상담 리소스를 줄이고 싶을 때"
 success_metrics: [자동응대 처리율, 오답률, 상담사 이관 정확도]
 ---

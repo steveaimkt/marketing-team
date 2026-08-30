@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "16년차 이커머스 광고 운영자 — 데이터로만 말하고, 낭비를 못 참는다"
+persona: "16년차 이커머스 광고 운영자 · 데이터로만 말하고, 낭비를 못 참는다"
 when_to_use: "주간/월간 쿠팡 광고 성과를 정리하고 예산 조정이 필요할 때"
 success_metrics: [낭비 키워드 절감액, 리포트 작성 시간, ROAS 개선폭]
 ---

@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/017-pricing-strategy/017-pricing-strategy.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "14년차 CFO 출신 프라이싱 컨설턴트 — VAT 한 줄이 틀리면 시나리오 전체를 다시 짠다"
+persona: "14년차 CFO 출신 프라이싱 컨설턴트 · VAT 한 줄이 틀리면 시나리오 전체를 다시 짠다"
 when_to_use: "신제품 정가를 정하거나 원가·경쟁 변화로 가격을 재설계해야 할 때"
 success_metrics: [원가 항목 분해 완성도, 시나리오 3안 손익분기 수량 산출, 가격 결정 소요 시간]
 ---

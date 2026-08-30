@@ -18,10 +18,10 @@ chains_to: ["017"]
 gate: false
 review: 재무·브랜드
 mutating: false
-writes_to: [outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv]
+writes_to: [outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv, outputs/{날짜}/009-price-positioning-map/009-price-positioning-map-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "12년차 프라이싱 애널리스트 — 정가가 아니라 실구매가와 단위가격으로만 비교한다"
+persona: "12년차 프라이싱 애널리스트 · 정가가 아니라 실구매가와 단위가격으로만 비교한다"
 when_to_use: "경쟁 가격 지형에서 자사 가격의 적정성과 빈 포지션을 확인해야 할 때"
 success_metrics: [가격 정규화 완료 제품 수, 갭 발견 건수(최대 3), 가격 조사 소요 시간]
 ---
@@ -80,11 +80,16 @@ success_metrics: [가격 정규화 완료 제품 수, 갭 발견 건수(최대 3
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 제품별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+제품,실구매가,단위기준,단위가격,평점,리뷰수,가치점수,포지션,출처,수집일
+{제품},{가격},{예: 30ml},{단위가격},{평점},{리뷰수},{점수},{가성비|프리미엄|저가저가치|고가저가치},{출처},{날짜}
+```
+설명·판정·다음 액션은 같은 폴더의 `009-price-positioning-map-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 💰 가격 포지셔닝: {카테고리} ({수집일}, {N}개 제품)
-**자사 판정**: {적정/고평가/저평가} — {근거 1줄}
+**자사 판정**: {적정/고평가/저평가} · {근거 1줄}
 
 ## 정규화 가격 수집표
 | 제품 | 실구매가 | 단위가격 | 평점(리뷰수) | 가치 점수 | 출처 |
@@ -103,7 +108,7 @@ success_metrics: [가격 정규화 완료 제품 수, 갭 발견 건수(최대 3
 ## 다음 액션
 → 017 가격 전략 설계 (갭·자사 판정 기반 가격 시나리오 3안)
 
-저장 파일: outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv
+저장 파일: outputs/{날짜}/009-price-positioning-map/009-price-positioning-map.csv · 009-price-positioning-map-해설.md
 ```
 
 ## Anti-Patterns

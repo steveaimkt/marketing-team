@@ -297,7 +297,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const ex = path.join(p, 'example', 'output.md');
     if (!fs.existsSync(ex)) continue;
     const t = fs.readFileSync(ex, 'utf8');
-    if (!/🛡|AI 규제검토자\(규제\)|게이트 판정|컴플라이언스 게이트/.test(t)) {
+    if (!/🛡|AI 규제검토자\(규제\)|규제 검사|게이트 판정|컴플라이언스 게이트/.test(t)) {
       err(`gate:true 인데 실습 예시에 판정 블록이 없다: ${path.basename(p)}`); bad++;
     }
   }
@@ -485,6 +485,35 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-i4-b G2 실행 보호 훅이 승인 전 쓰기·셸·추가 스킬을 실제로 막나
+{
+  const hp = path.join(ROOT, 'hooks', 'hooks.json');
+  const guard = path.join(ROOT, 'scripts', 'runtime-guard.mjs');
+  const test = path.join(ROOT, 'scripts', 'test-runtime-guard.mjs');
+  const missing = [guard, test].filter(file => !fs.existsSync(file));
+  if (missing.length) err(`실행 보호 훅 파일이 없다: ${missing.map(file => path.basename(file)).join(' · ')}`);
+  else {
+    let hook;
+    try { hook = JSON.parse(fs.readFileSync(hp, 'utf8')); }
+    catch { hook = null; }
+    const groups = hook?.hooks?.PreToolUse || [];
+    const matchers = groups.map(group => group.matcher || '').join('|');
+    const commands = groups.flatMap(group => (group.hooks || []).map(item => item.command || '')).join('\n');
+    for (const tool of ['Bash', 'Write', 'Edit', 'Agent', 'Skill'])
+      if (!matchers.includes(tool)) err(`PreToolUse 실행 보호 대상에 ${tool}이 없다`);
+    if (!commands.includes('runtime-guard.mjs')) err('PreToolUse가 runtime-guard.mjs를 부르지 않는다');
+    else {
+      try {
+        execFileSync(process.execPath, [test], { cwd: ROOT, stdio: 'pipe' });
+        ok.push('G2 실행 보호 훅 (승인 · 경로 · 계획 밖 스킬 · 설치본 탐색 차단)');
+      } catch (error) {
+        const detail = String(error.stderr || error.stdout || error.message).trim().split('\n').at(-1);
+        err(`G2 실행 보호 훅 실제 검사가 실패했다${detail ? ` · ${detail}` : ''}`);
+      }
+    }
+  }
+}
+
 // ⑥-i5 영문 C레벨 약어가 다시 새지 않았나
 //   0.17.0 에서 우리말로 바꿨는데 5관점 목록만 고치고 개별 언급 17곳을 놓쳤다 (실측 2026-08-25).
 //   ⚠️ CFO 는 실제 업계 직함으로도 쓰인다 — persona 줄은 우리 팀 C레벨이 아니므로 예외다.
@@ -562,10 +591,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('샘플 모드 끝맺음에 「업종 한 줄」 경로가 없다 — 탈출구가 3분 온보딩뿐이면 대부분 안 한다');
   if (!G.includes('업종만 말했음'))
     빠짐.push('규약 §0-b 에 「업종만 말했음」 모드가 없다');
-  //   사용자가 고른 셋 — ①브랜드 기입 ②샘플로 테스트 ③브랜드 없이 스킬만.
+  //   사용자가 고른 셋 — ①샘플로 실습 ②우리 회사 정보 ③회사 정보 없이 스킬만.
   //   ⛔ ③ 은 **고를 때만** 들어간다. 프로필이 없다고 여기로 오면 결과가 텅 빈다.
   const B2 = fs.readFileSync(path.join(ROOT, 'skills', '마케팅팀-구축하기', 'SKILL.md'), 'utf8');
-  if (!B2.includes('③ 브랜드 없이 스킬만'))
+  if (!B2.includes('③ 회사 정보 없이 스킬만 사용한다'))
     빠짐.push('온보딩에 3지선다가 없다 — 브랜드 없이 쓸 길을 사용자가 못 고른다');
   for (const [f, 이름] of [[G, '규약 §0-b'], [R, '런타임 §0']])
     if (!f.includes('`[틀]`')) 빠짐.push(`${이름} 에 [틀] 모드가 없다`);
@@ -593,7 +622,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('[틀] 에서 게이트가 도는지가 명시되지 않았다 — 검사 없이 발행될 수 있다');
   if (!G.includes('못 잡은 것을 판정 블록에 반드시 적는다'))
     빠짐.push('[틀] 에서 못 잡은 것을 안 적는다 — 통과했다고 믿고 발행하게 된다');
-  if (!B2.includes('글은 문장이 안 나옵니다'))
+  if (!B2.includes('문장이 안 나옵니다'))
     빠짐.push('온보딩 ③번 선택지가 한계를 안 밝힌다 — 고르고 나서 알게 된다');
 
   if (빠짐.length) {
@@ -1309,6 +1338,92 @@ for (const link of ['agents', 'skills']) {
       warn('카탈로그가 ROUTING.md 보다 오래됐다 — `node scripts/build-catalog.mjs`');
     else if (fs.existsSync(cat)) ok.push('카탈로그 최신');
   }
+}
+
+// ⑫ 실행 영수증 · 검토한 산출물과 전달할 산출물이 같은가
+//   gate.md 가 있어도 본문을 그 뒤에 고치면 검토 근거는 낡는다.
+//   성공 경로뿐 아니라 **검토 후 한 글자 변경이 실제로 차단되는지** 임시 작업 폴더에서 밟는다.
+{
+  const receipt = path.join(ROOT, 'scripts', 'run-receipt.mjs');
+  const test = path.join(ROOT, 'scripts', 'test-run-receipt.mjs');
+  const contract = path.join(ROOT, 'docs', '실행-영수증.md');
+  const marketer = fs.readFileSync(dpath, 'utf8');
+  const gateAgent = fs.readFileSync(path.join(ROOT, 'agents', 'staff-gate-auditor.md'), 'utf8');
+  const businessAgent = fs.readFileSync(path.join(ROOT, 'agents', 'staff-reviewer.md'), 'utf8');
+  const missing = [];
+  for (const [file, name] of [[receipt, 'run-receipt.mjs'], [test, 'test-run-receipt.mjs'], [contract, '실행-영수증.md']])
+    if (!fs.existsSync(file)) missing.push(name);
+  for (const word of ['run.json', 'run-receipt.mjs', 'verification-failed'])
+    if (!marketer.includes(word)) missing.push(`AI 마케터의 ${word} 배선`);
+  if (!gateAgent.includes('검사 기준 산출물')) missing.push('AI 규제검토자의 검사 기준 반환');
+  if (!businessAgent.includes('검사 기준 산출물')) missing.push('AI 사업검토자의 검사 기준 반환');
+
+  if (missing.length) err(`실행 영수증 배선이 끊겼다: ${missing.join(' · ')}`);
+  else {
+    try {
+      execFileSync(process.execPath, [test], { cwd: ROOT, stdio: 'pipe' });
+      ok.push('실행 영수증 (완료 상태 · writes_to · 체인 순서 · PII · SHA-256 · 다중 검토 차단)');
+      // 산출물 내용 검사 층 · 판단이 아니라 재는 것만 여기 있다 (pii · csv-format · house-style)
+      for (const [script, label] of [
+        ['test-output-checks.mjs', '산출물 내용 검사 (CSV 형식 · 우리말 · 개인정보)'],
+        ['check-flag-counts.mjs', '플래그 개수 문서 일치 (gate · pii · review)'],
+        ['test-plan-compiler.mjs', '계획 스키마·승인 해시 (계획 밖 산출물·순서 변경 차단)'],
+        ['test-router.mjs', '자연어 후보 라우터 (006·046 · 복합 요청 분해)'],
+        ['test-chain-compiler.mjs', '일반 체인 그래프 (누락·역순·순환·입력 단절 차단)'],
+        ['test-review-policy.mjs', '산출물별 검토 정책 자동 생성'],
+        ['test-orchestrator-events.mjs', '오케스트레이터 이벤트 기록·요약'],
+      ]) {
+        const p = path.join(ROOT, 'scripts', script);
+        if (!fs.existsSync(p)) { err(`${label} 스크립트가 없다: scripts/${script}`); continue; }
+        try {
+          execFileSync(process.execPath, [p], { cwd: ROOT, stdio: 'pipe' });
+          ok.push(label);
+        } catch (error) {
+          const detail = String(error.stderr || error.stdout || error.message).trim().split('\n').at(-1);
+          err(`${label} 실패${detail ? ` · ${detail}` : ''}`);
+        }
+      }
+    } catch (error) {
+      const detail = String(error.stderr || error.stdout || error.message).trim().split('\n').at(-1);
+      err(`실행 영수증 실제 검사가 실패했다${detail ? ` · ${detail}` : ''}`);
+    }
+  }
+}
+
+// ⑬ 실기동 결함 회귀 · 2026-08-30 실제 실행에서 발견한 네 가지가 소스에서 다시 생기지 않나
+//   ① 마스킹 설명·예시가 원문 ID를 다시 노출 ② 검토 보고서가 내부 용어를 사용자에게 노출
+//   ③ 같은 기간이라는 이유만으로 서로 다른 합성 샘플을 교차 계산 ④ 주간 계절성을 이상치로 오탐
+//   설치 검증도 저장소 세션이 캐시 설치본을 가리는 경우를 통과로 세지 않게 문서 계약을 고정한다.
+{
+  const read = (...parts) => fs.readFileSync(path.join(ROOT, ...parts), 'utf8');
+  const sales = read('100-skills', '07-analytics', 'skills', '061-sales-data-analysis', 'SKILL.md');
+  const rfm = read('100-skills', '07-analytics', 'skills', '065-rfm-segments', 'SKILL.md');
+  const reviewer = read('agents', 'staff-reviewer.md');
+  const common = read('docs', '공통규약.md');
+  const marketer = read('skills', 'AI-마케터', 'SKILL.md');
+  const samples = read('sample-data', 'README.md');
+  const liveGuide = read('docs', '클로드코드-실기검증.md');
+  const missing = [];
+
+  for (const word of ['같은 요일', '반복 패턴', '[기준 부족]'])
+    if (!sales.includes(word)) missing.push(`061 요일 보정의 「${word}」`);
+  for (const word of ['실행별 임의 대체키', '무염 SHA-256', '설명용 예시'])
+    if (!rfm.includes(word)) missing.push(`065 ID 보호의 「${word}」`);
+  for (const word of ['회사 자료가 없어 연습용 자료를 사용했습니다', '원문 식별자'])
+    if (!reviewer.includes(word)) missing.push(`사업검토자 쉬운말·식별자 점검의 「${word}」`);
+  if (!common.includes('[자료 충돌]') || !common.includes('교차 계산 금지'))
+    missing.push('공통규약의 [자료 충돌]·교차 계산 금지');
+  if (!marketer.includes('[자료 충돌]') || !marketer.includes('합산·나눗셈'))
+    missing.push('AI 마케터의 [자료 충돌]·합산/나눗셈 금지');
+  if (!samples.includes('독립적으로 만든 합성 데이터') || !samples.includes('파일을 넘나드는 계산을 하지 않는다'))
+    missing.push('샘플 README의 독립 합성 데이터·교차 계산 금지');
+  for (const word of ['Source: Directory', 'GitHub', '~/.claude/plugins/cache', 'plugins/marketing-team/scripts/실제확인-기록'])
+    if (!liveGuide.includes(word)) missing.push(`실기검증 설치 격리·기록 경로의 「${word}」`);
+
+  if (missing.length) {
+    err(`실기동 결함 회귀 배선이 끊겼다 ${missing.length}건`);
+    for (const x of missing) err(`  ${x}`);
+  } else ok.push('실기동 결함 회귀 (ID 재노출 · 내부말 · 샘플 충돌 · 요일 오탐 · 설치 격리)');
 }
 
 // 출력

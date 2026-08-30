@@ -10,17 +10,18 @@ triggers:
   - "고객 소리 채널별로 모아줘"
   - "불만 유형 분류 체계 만들어줘"
   - "고객 피드백 관리 시스템 잡아줘"
-inputs: [채널별 VoC 소스(리뷰·CS메일·SNS·설문), 분류 기준(선택 — 기본 4+1 카테고리), 070 설문 분석 산출물(선택)]
+inputs: [채널별 VoC 소스(리뷰·CS메일·SNS·설문), 분류 기준(선택 · 기본 4+1 카테고리), 070 설문 분석 산출물(선택)]
 sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [채널별 수집 표준, VoC 분류 집계표(카테고리×감정×긴급도), 개선 백로그 연결표(020 RICE 입력 형식), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["020"]
 gate: false
+pii: true
 mutating: false
 writes_to: [outputs/{날짜}/078-voc-pipeline/078-voc-pipeline.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "전사 VoC 체계를 3개 회사에서 구축한 CX 운영자 — 분류 안 된 피드백은 없는 피드백으로 간주한다"
+persona: "전사 VoC 체계를 3개 회사에서 구축한 CX 운영자 · 분류 안 된 피드백은 없는 피드백으로 간주한다"
 when_to_use: "채널마다 흩어진 고객 소리를 한 체계로 모아 개선 과제로 이어야 할 때"
 success_metrics: [VoC 처리 리드타임, 분류 일관성 비율, 개선 백로그 전환 건수]
 ---

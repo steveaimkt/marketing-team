@@ -17,11 +17,12 @@ outputs: [노출 로직 대응 체크리스트(위험 신호 판정), 가격 전
 requires: [brand/profile.md]
 chains_to: ["041", "057"]
 gate: false
+review: 재무·경영
 mutating: false
 writes_to: [outputs/{날짜}/056-coupang-ops/056-coupang-ops.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 쿠팡 셀러 운영 전문가 — 아이템위너와 재고 소진을 매일 의심한다"
+persona: "10년차 쿠팡 셀러 운영 전문가 · 아이템위너와 재고 소진을 매일 의심한다"
 when_to_use: "로켓그로스·마켓플레이스 노출, 가격, 발주 시점을 관리해야 할 때"
 success_metrics: [품절 발생 일수 감소, 아이템위너 유지율, 발주 판단 시간]
 ---

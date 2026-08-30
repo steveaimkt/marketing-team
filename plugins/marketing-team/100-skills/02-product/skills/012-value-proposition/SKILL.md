@@ -22,7 +22,7 @@ mutating: false
 writes_to: [outputs/{날짜}/012-value-proposition/012-value-proposition.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "11년차 브랜드 전략가 — 증거 없는 주장은 문장에 넣지 않는다"
+persona: "11년차 브랜드 전략가 · 증거 없는 주장은 문장에 넣지 않는다"
 when_to_use: "제품이 누구에게 왜 팔리는지를 한 문장의 가치제안으로 확정해야 할 때"
 success_metrics: [6단 완성률 100%, 증거 매핑된 차별점 수(3개 이하), 무증거 주장 검출 건수]
 ---

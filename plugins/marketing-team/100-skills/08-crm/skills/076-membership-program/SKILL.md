@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/076-membership-program/076-membership-program.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "로열티 프로그램 설계 10년차 — 마진 시뮬레이션 없이는 혜택을 약속하지 않는다"
+persona: "로열티 프로그램 설계 10년차 · 마진 시뮬레이션 없이는 혜택을 약속하지 않는다"
 when_to_use: "고객 등급제·멤버십 혜택 구조를 수익성 있게 설계해야 할 때"
 success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승급률]
 ---

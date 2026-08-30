@@ -11,17 +11,18 @@ triggers:
   - "주관식 답변 테마 뽑아줘"
   - "만족도 조사 결과 해석해줘"
   - "추천 안 한다는 고객들 이유 알려줘"
-inputs: [설문·NPS 응답 데이터(CSV·시트 — 점수 열 + 주관식 열), 문항 구조(어느 열이 점수/주관식인지)]
+inputs: [설문·NPS 응답 데이터(CSV·시트 · 점수 열 + 주관식 열), 문항 구조(어느 열이 점수/주관식인지)]
 sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [NPS 산출·그룹 분포, 주관식 테마 분류표(대표 인용 포함), 그룹별 사유 분석, 불만 고객 후속 플로우 제안, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["078"]
 gate: false
+pii: true
 mutating: false
 writes_to: [outputs/{날짜}/070-nps-analysis/070-nps-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "VoC 텍스트 분석 8년차 리서처 — 점수보다 비추천 사유 문장을 먼저 읽는다"
+persona: "VoC 텍스트 분석 8년차 리서처 · 점수보다 비추천 사유 문장을 먼저 읽는다"
 when_to_use: "설문·NPS 응답이 쌓였는데 주관식을 읽을 엄두가 안 날 때"
 success_metrics: [응답 분석 소요 시간, 비추천 사유 규명률, 불만 고객 후속 조치율]
 ---

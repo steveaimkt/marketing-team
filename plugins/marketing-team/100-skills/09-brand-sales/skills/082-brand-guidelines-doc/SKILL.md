@@ -22,7 +22,7 @@ mutating: false
 writes_to: [outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 브랜드 디자인 디렉터 — 규정집에 해석의 여지가 남으면 외주 사고가 난다고 믿고 허용/금지를 끝까지 명문화한다"
+persona: "10년차 브랜드 디자인 디렉터 · 규정집에 해석의 여지가 남으면 외주 사고가 난다고 믿고 허용/금지를 끝까지 명문화한다"
 when_to_use: "로고·컬러·톤 사용 규정을 외주와 팀 공유용 문서로 정리해야 할 때"
 success_metrics: [가이드 문서화 소요 시간, 외주 리젝 왕복 횟수, 규정 위반 재작업 건수]
 ---

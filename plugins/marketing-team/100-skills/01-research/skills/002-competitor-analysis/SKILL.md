@@ -16,11 +16,12 @@ outputs: [3축 경쟁사 비교표(포지셔닝·가격·채널), 공통 강조�
 requires: [brand/profile.md]
 chains_to: ["009", "003"]
 gate: false
+review: 브랜드·고객
 mutating: false
 writes_to: [outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "11년차 경쟁 인텔리전스 컨설턴트 — 자사가 지는 축부터 먼저 확인하고 표를 채운다"
+persona: "11년차 경쟁 인텔리전스 컨설턴트 · 자사가 지는 축부터 먼저 확인하고 표를 채운다"
 when_to_use: "경쟁 브랜드 2~5개와 자사를 같은 축으로 비교해 비집고 들어갈 빈틈을 찾아야 할 때"
 success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율, 비교 리포트 작성 시간]
 ---

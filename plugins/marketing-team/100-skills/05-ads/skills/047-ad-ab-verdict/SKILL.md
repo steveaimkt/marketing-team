@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "8년차 그로스 데이터 분석가 — 표본 부족한 승패 선언을 가장 싫어한다"
+persona: "8년차 그로스 데이터 분석가 · 표본 부족한 승패 선언을 가장 싫어한다"
 when_to_use: "A/B 테스트 결과가 우연인지 확정승인지 판정해야 할 때"
 success_metrics: [오판정 방지율, 판정 소요 시간, 승리 패턴 재사용 건수]
 ---

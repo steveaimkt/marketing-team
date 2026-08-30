@@ -20,7 +20,7 @@ mutating: true
 writes_to: [outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html, notion]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "9년차 미디어 플래너 출신 리포팅 담당자 — 손으로 만드는 주간 보고서를 없애는 게 목표다"
+persona: "9년차 미디어 플래너 출신 리포팅 담당자 · 손으로 만드는 주간 보고서를 없애는 게 목표다"
 when_to_use: "매주 매체별 광고 성과를 한 장으로 모아 보고해야 할 때"
 success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대비 이상 신호 발견 건수]
 ---

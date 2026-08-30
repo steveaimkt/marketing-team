@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/066-kpi-tree/066-kpi-tree.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "전략기획 출신 지표 설계자 — 계산식과 데이터 소스가 없는 지표는 KPI로 인정하지 않는다"
+persona: "전략기획 출신 지표 설계자 · 계산식과 데이터 소스가 없는 지표는 KPI로 인정하지 않는다"
 when_to_use: "사업 목표를 측정 가능한 지표 체계로 쪼개고 알림 기준을 세워야 할 때"
 success_metrics: [지표 정합성 오류 건수, 임계값 알림 오탐률, 목표 리뷰 준비 시간]
 ---

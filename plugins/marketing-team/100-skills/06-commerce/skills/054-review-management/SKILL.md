@@ -17,11 +17,12 @@ outputs: [감정 분류표, 리뷰별 답변 초안 (복붙 가능), 에스컬�
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["006", "079"]
 gate: true
+pii: true
 mutating: false
 writes_to: [outputs/{날짜}/054-review-management/054-review-management.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "12년차 CS 총괄 출신 리뷰 매니저 — 부정 리뷰 한 개를 광고비보다 무겁게 다룬다"
+persona: "12년차 CS 총괄 출신 리뷰 매니저 · 부정 리뷰 한 개를 광고비보다 무겁게 다룬다"
 when_to_use: "쌓인 리뷰에 답변을 달고 부정 리뷰 대응이 필요할 때"
 success_metrics: [리뷰 답변 처리 시간, 에스컬레이션 누락 건수, 답변률]
 ---
@@ -92,7 +93,7 @@ success_metrics: [리뷰 답변 처리 시간, 에스컬레이션 누락 건수,
 | # | 감정 | 쟁점 | 확인할 사실 | 대응 방향 A / B |
 |---|---|---|---|---|
 
-─── 🛡 컴플라이언스 게이트 ───
+─── 🛡 규제 검사 ───
 판정: ✅ / ⚠️ ({n}건 치환) / ⛔
 검출·치환 내역: ...
 ──────────────────────────

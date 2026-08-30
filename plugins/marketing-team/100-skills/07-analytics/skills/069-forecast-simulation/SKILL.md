@@ -11,7 +11,7 @@ triggers:
   - "시뮬레이션 해줘"
   - "다음 분기 매출 전망 잡아줘"
   - "전환율 오르면 매출 어떻게 되는지 계산해줘"
-inputs: [과거 성과 데이터(최소 4주 권장 — 일별 매출·광고비·전환), 변수 조정 범위(광고비·전환율·객단가)]
+inputs: [과거 성과 데이터(최소 4주 권장 · 일별 매출·광고비·전환), 변수 조정 범위(광고비·전환율·객단가)]
 sample_fallback: sample-data/A브랜드-2026-06-매출.xlsx   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [기준선 예측(가중 공식), 시나리오 3안(보수/중립/공격) 비교표, 민감도 분석표, 전제 목록, 저장 파일(.md)]
 requires: [brand/profile.md]
@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/069-forecast-simulation/069-forecast-simulation.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "수요예측 11년차 사업계획 플래너 — 전제를 안 밝힌 예측은 점괘로 취급한다"
+persona: "수요예측 11년차 사업계획 플래너 · 전제를 안 밝힌 예측은 점괘로 취급한다"
 when_to_use: "예산·목표 수립 전에 매출 시나리오와 민감도를 확인해야 할 때"
 success_metrics: [예측 오차율, 시나리오 산출 시간, 예산 의사결정 반영 건수]
 ---

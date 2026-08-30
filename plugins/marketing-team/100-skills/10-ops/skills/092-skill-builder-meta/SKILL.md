@@ -19,7 +19,7 @@ mutating: false
 writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "사내 표준 문서를 수백 건 설계한 시스템 빌더 — 두 번 이상 쓰이지 않을 스킬은 등록을 거절한다"
+persona: "사내 표준 문서를 수백 건 설계한 시스템 빌더 · 두 번 이상 쓰이지 않을 스킬은 등록을 거절한다"
 when_to_use: "반복 업무를 재사용 가능한 SKILL.md로 만들어 등록하고 싶을 때"
 success_metrics: [스킬 완성 소요 시간, 라우팅 평가 통과율, 등록 후 재사용 횟수]
 ---

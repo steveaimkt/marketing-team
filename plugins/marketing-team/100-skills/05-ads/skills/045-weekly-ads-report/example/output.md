@@ -66,7 +66,7 @@
 HANDOFF → 사용자
 
 - 여기까지 했습니다
-    메타 30일 · 손익분기 ROAS 3.3 기준 판정 · 점유율 vs 기여율 격차표
+    메타 30일 · 손익분기 ROAS 2.0 기준 판정 · 점유율 vs 기여율 격차표
     outputs/2026-08-22/045-weekly-ads-report/045-weekly-ads-report.md
 
 - 이것만 해주시면

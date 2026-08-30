@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 신사업 프로듀서 — 갭에서 출발하지 않은 아이디어는 아이디어로 인정하지 않는다"
+persona: "10년차 신사업 프로듀서 · 갭에서 출발하지 않은 아이디어는 아이디어로 인정하지 않는다"
 when_to_use: "리서치 자료를 바탕으로 신제품 컨셉을 발산·수렴해 검증 가능한 5안으로 좁혀야 할 때"
 success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·폐기 조건 부착률 100%, 컨셉 수렴 소요 시간]
 ---

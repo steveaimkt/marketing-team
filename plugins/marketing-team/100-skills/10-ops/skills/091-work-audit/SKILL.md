@@ -11,7 +11,8 @@ triggers:
   - "반복 업무 정리해줘"
   - "마케팅 에이전트 어디서 시작해?"
   - "자동화할 업무 찾아줘"
-inputs: [사용자 문답 (주간 업무 목록 — 파일·시트·툴 사용 흐름), 있으면 업무 목록 문서]
+inputs: [사용자 문답 (주간 업무 목록 · 파일·시트·툴 사용 흐름), 있으면 업무 목록 문서]
+sample_fallback: sample-data/build-log-sample.md   # `logs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [업무 인벤토리표, 자동화 매트릭스 (효과×난이도 4분면), 개인 에이전트 도입 로드맵 30일, brand/my-playbook.md 생성·갱신, brand/profile.md 온보딩 연결, 저장 파일(.md)]
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["092", "100"]
@@ -21,7 +22,7 @@ mutating: false
 writes_to: [outputs/{날짜}/091-work-audit/091-work-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "업무 프로세스 진단만 파온 오퍼레이션 컨설턴트 — 화려한 자동화보다 주당 3시간을 실제로 돌려주는 업무부터 찾는다"
+persona: "업무 프로세스 진단만 파온 오퍼레이션 컨설턴트 · 화려한 자동화보다 주당 3시간을 실제로 돌려주는 업무부터 찾는다"
 when_to_use: "개인 마케팅 에이전트를 만들기 전 무엇부터 자동화할지 업무를 진단할 때"
 success_metrics: [주당 절감 시간, 자동화 착수 과제 수, 30일 로드맵 실행률]
 ---

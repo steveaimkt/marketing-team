@@ -20,7 +20,7 @@ mutating: false
 writes_to: [outputs/{날짜}/010-market-entry-priority/010-market-entry-priority.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "15년차 전략기획 임원 출신 — 채점이 끝난 뒤에는 기준을 절대 바꾸지 않는다"
+persona: "15년차 전략기획 임원 출신 · 채점이 끝난 뒤에는 기준을 절대 바꾸지 않는다"
 when_to_use: "진입 후보 시장·채널이 여러 개일 때 무엇부터 들어갈지 순서를 정해야 할 때"
 success_metrics: [점수 근거 병기율 100%, TOP 3 확정 소요 시간, 90일 액션 판정 지표 수]
 ---
@@ -73,7 +73,7 @@ success_metrics: [점수 근거 병기율 100%, TOP 3 확정 소요 시간, 90�
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 🎯 진입 시장 우선순위: {후보 n개} ({작성일})
-**판정 요약**: 1순위 "{후보}" (Impact {n}·Effort {n}) — {한 줄 이유}
+**판정 요약**: 1순위 "{후보}" (Impact {n}·Effort {n}) · {한 줄 이유}
 
 ## 평가 기준 (합의 완료 ⏸)
 Impact = 시장 크기 × 적합도 / Effort = 진입 비용 + 경쟁 강도 (각 1~5, 가중치: {균등/조정 내역})

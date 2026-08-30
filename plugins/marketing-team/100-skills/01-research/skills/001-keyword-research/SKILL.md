@@ -17,10 +17,10 @@ requires: [brand/profile.md]
 chains_to: ["002", "022"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/001-keyword-research/001-keyword-research.csv]
+writes_to: [outputs/{날짜}/001-keyword-research/001-keyword-research.csv, outputs/{날짜}/001-keyword-research/001-keyword-research-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "12년차 검색 데이터 분석가 — 검색량의 크기가 아니라 경쟁도 대비 효율로만 키워드를 줄 세운다"
+persona: "12년차 검색 데이터 분석가 · 검색량의 크기가 아니라 경쟁도 대비 효율로만 키워드를 줄 세운다"
 when_to_use: "콘텐츠·광고에 쓸 검색 키워드를 근거 있는 우선순위로 확정해야 할 때"
 success_metrics: [확장 키워드 수(50개 이상), 수치 출처 표기율, 키워드 선정 소요 시간]
 ---
@@ -88,11 +88,16 @@ success_metrics: [확장 키워드 수(50개 이상), 수치 출처 표기율, �
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/001-keyword-research/001-keyword-research.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+순위,키워드,월간검색량,플랫폼,경쟁도,SERP유형,전환가능성,점수,계절성,근거출처
+1,{키워드},{검색량},{네이버|구글},{낮음|중간|높음},{블로그|쇼핑|영상},{낮음|중간|높음},{점수},{계절성},{출처}
+```
+설명·판정·다음 액션은 같은 폴더의 `001-keyword-research-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 🔎 키워드 리서치: "{시드 키워드}"
-**판정 요약**: {한 줄 — 예: 롱테일 "○○ △△" 군이 경쟁도 대비 검색량 최상.
+**판정 요약**: {한 줄 · 예: 롱테일 "○○ △△" 군이 경쟁도 대비 검색량 최상.
 콘텐츠 5건 집중 시 3개월 내 상위 노출 가능 (추정)}
 
 ## TOP 20 우선순위
@@ -108,7 +113,7 @@ success_metrics: [확장 키워드 수(50개 이상), 수치 출처 표기율, �
 → 002 경쟁사 분석 리포트 (TOP 키워드의 경쟁 지형 확인) / 022 블로그 SEO 아티클 (TOP 3 키워드로 초안)
 · 보조: 021 콘텐츠 캘린더 빌더 (TOP 20 소재화)
 
-저장 파일: outputs/{날짜}/001-keyword-research/001-keyword-research.csv
+저장 파일: outputs/{날짜}/001-keyword-research/001-keyword-research.csv · 001-keyword-research-해설.md
 ```
 
 ## Anti-Patterns

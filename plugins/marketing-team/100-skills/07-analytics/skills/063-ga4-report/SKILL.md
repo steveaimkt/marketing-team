@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/063-ga4-report/063-ga4-report.html]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "GA4 전환 세팅 감사만 300회 한 웹 분석 컨설턴트 — 세팅 오류부터 잡고 해석은 그 다음이다"
+persona: "GA4 전환 세팅 감사만 300회 한 웹 분석 컨설턴트 · 세팅 오류부터 잡고 해석은 그 다음이다"
 when_to_use: "웹사이트 유입·전환 데이터를 해석하거나 GA4 세팅을 점검할 때"
 success_metrics: [세팅 오류 검출 건수, 전환율 개선폭, 리포트 작성 시간]
 ---

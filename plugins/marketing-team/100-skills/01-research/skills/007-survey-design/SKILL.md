@@ -21,7 +21,7 @@ mutating: false
 writes_to: [outputs/{날짜}/007-survey-design/007-survey-design.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "14년차 리서치 설계자 — 어느 가설도 검증하지 못하는 문항은 설계에서 지운다"
+persona: "14년차 리서치 설계자 · 어느 가설도 검증하지 못하는 문항은 설계에서 지운다"
 when_to_use: "고객 조사 설문을 설계하거나 응답 데이터를 세그먼트로 갈라 가설을 판정해야 할 때"
 success_metrics: [가설-문항 매핑률 100%, 금지 룰 위반 문항 0건, 가설 판정 완료 수]
 ---

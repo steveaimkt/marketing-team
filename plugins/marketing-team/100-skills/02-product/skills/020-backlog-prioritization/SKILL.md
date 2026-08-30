@@ -19,10 +19,10 @@ chains_to: ["078"]
 gate: false
 review: 경영
 mutating: false
-writes_to: [outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv]
+writes_to: [outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv, outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "10년차 프로덕트 오너 — 목소리 큰 요청도 RICE 산식 앞에 똑같이 줄 세운다"
+persona: "10년차 프로덕트 오너 · 목소리 큰 요청도 RICE 산식 앞에 똑같이 줄 세운다"
 when_to_use: "쌓인 개선 요청·VoC를 근거 있는 우선순위 백로그로 정리해야 할 때"
 success_metrics: [요소별 근거 병기 항목 비율, 중복 병합 건수, 우선순위 확정 소요 시간]
 ---
@@ -74,10 +74,15 @@ success_metrics: [요소별 근거 병기 항목 비율, 중복 병합 건수, �
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
-파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
+⛔ **CSV에는 아래 열과 백로그 항목별 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+```csv
+순위,항목,Reach,Impact,Confidence,Effort,RICE점수,근거,상태,재검토조건
+1,{개선 항목},{도달},{영향},{신뢰도},{공수},{점수},{근거},{이번분기|보류},{조건}
+```
+설명·판정·다음 액션은 같은 폴더의 `020-backlog-prioritization-해설.md` 에 아래 형식으로 쓴다.
+두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
-# 📋 개선 백로그 우선순위: {제품/서비스} ({작성일}) — 항목 {n}개 (병합 전 {m}개)
+# 📋 개선 백로그 우선순위: {제품/서비스} ({작성일}) · 항목 {n}개 (병합 전 {m}개)
 
 ## RICE 스코어링 표
 | 순위 | 항목 | Reach | Impact | Conf. | Effort | RICE | 근거 요약 |
@@ -100,7 +105,7 @@ success_metrics: [요소별 근거 병기 항목 비율, 중복 병합 건수, �
 ## 다음 액션
 → 078 VoC 취합·분류 시스템 (분기 VoC → 백로그 자동 연결 루프)
 
-저장 파일: outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv
+저장 파일: outputs/{날짜}/020-backlog-prioritization/020-backlog-prioritization.csv · 020-backlog-prioritization-해설.md
 ```
 
 ## Anti-Patterns

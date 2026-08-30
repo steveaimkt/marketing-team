@@ -17,11 +17,12 @@ outputs: [4축 진단표(첫 화면·신뢰·마찰·CTA), 24섹션 결손 맵, 
 requires: [brand/profile.md]
 chains_to: ["019", "051"]
 gate: false
+review: 경영
 mutating: false
 writes_to: [outputs/{날짜}/048-landing-cro-audit/048-landing-cro-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
-persona: "13년차 CRO 컨설턴트 — 트래픽 탓하기 전에 첫 화면부터 뜯어본다"
+persona: "13년차 CRO 컨설턴트 · 트래픽 탓하기 전에 첫 화면부터 뜯어본다"
 when_to_use: "광고 클릭은 나오는데 전환이 안 나와 랜딩을 진단해야 할 때"
 success_metrics: [전환율 개선폭, 이탈률 감소폭, 진단 소요 시간]
 ---
