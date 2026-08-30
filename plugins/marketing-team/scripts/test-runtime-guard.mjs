@@ -126,6 +126,13 @@ try {
     result = call('Bash', { command: `node "${pluginRoot}/scripts/${dev}"` });
     assert.equal(decision(result), 'deny', `승인 전에 개발 스크립트를 허용했습니다: ${dev}`);
   }
+  // ledger-stats 는 --summary(요약 파일)·--hook(스탬프)이 쓴다 — 읽기 점검만 허용 (릴리스 검토 2026-08-30)
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --summary` });
+  assert.equal(decision(result), 'deny', '승인 전에 원장 요약 쓰기를 허용했습니다.');
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --hook` });
+  assert.equal(decision(result), 'deny', '승인 전에 원장 스탬프 쓰기를 허용했습니다.');
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --check` });
+  assert.equal(decision(result), 'none', '읽기 점검(--check)까지 막았습니다.');
   writeTranscript([active, plan, approval]);
   result = call('Bash', { command: `node "${pluginRoot}/scripts/eval-routing.mjs" --update-baseline` });
   assert.equal(decision(result), 'deny', '승인 뒤 기준선 갱신 스크립트를 허용했습니다.');
@@ -184,7 +191,7 @@ try {
     assert.equal(tryWrite(), 'none', 'plan.json 이 없는 예전 경로까지 막았습니다.');
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 7 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 10 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

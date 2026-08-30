@@ -185,7 +185,8 @@ const SCRIPT_ALLOW = {
     'router.mjs': null,
     'chain-compiler.mjs': ['check', 'list'],
     'plan-compiler.mjs': ['compile', 'check'],
-    'ledger-stats.mjs': null,
+    // --summary 는 요약 파일을, --hook 은 스탬프를 쓴다 — 읽기 점검(--check)만 (실측 2026-08-30 · 릴리스 검토)
+    'ledger-stats.mjs': ['--check'],
   },
   // 계획 대기(미승인·해시 불일치) · 계획 상태 기계만 — 잠긴 상태에서 빠져나오는 문
   pending: {
@@ -198,7 +199,7 @@ const SCRIPT_ALLOW = {
     'plan-compiler.mjs': ['compile', 'approve', 'check'],
     'run-receipt.mjs': null,
     'orchestrator-events.mjs': ['summary'],
-    'ledger-stats.mjs': null,
+    'ledger-stats.mjs': ['--check'],
     'output-checks.mjs': null,
     'pii-check.mjs': null,
   },
