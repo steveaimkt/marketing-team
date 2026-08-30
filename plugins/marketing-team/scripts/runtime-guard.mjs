@@ -198,6 +198,7 @@ const SCRIPT_ALLOW = {
   // 승인 전 · 라우팅과 계획 준비만 — 파일을 바꾸는 명령은 없다 (compile 은 계획 초안만 봉인한다)
   pre: {
     'router.mjs': null,
+    'recall.mjs': ['search', 'graph'],   // 되짚기 조회 — index(쓰기)는 승인 뒤
     'chain-compiler.mjs': ['check', 'list'],
     'plan-compiler.mjs': ['compile', 'check'],
     // --summary 는 요약 파일을, --hook 은 스탬프를 쓴다 — 읽기 점검(--check)만 (실측 2026-08-30 · 릴리스 검토)
@@ -213,6 +214,7 @@ const SCRIPT_ALLOW = {
     'chain-compiler.mjs': ['check', 'list'],
     'plan-compiler.mjs': ['compile', 'approve', 'check'],
     'run-receipt.mjs': null,
+    'recall.mjs': null,
     'orchestrator-events.mjs': ['summary'],
     'ledger-stats.mjs': ['--check'],
     'output-checks.mjs': null,
@@ -288,12 +290,20 @@ function planApproval(cwd) {
   if (!cwd) return null;
   const root = path.join(cwd, 'outputs');
   let newest = null;
-  const walk = dir => {
+  // 규모 실측 2026-08-31 · 이 탐색은 모든 도구 호출마다 돈다. 폴더 5,000개에서 호출당 ~120ms —
+  // 수년치가 쌓이면 수백 ms 다. 계획 게이트가 실제로 물 일이 있는 것은 최근 계획뿐이므로
+  // (옛 계획은 완료·승인 상태) 날짜 이름 폴더는 90일 창 밖이면 걷지 않는다.
+  // 90일 넘게 방치된 미승인 계획은 게이트를 잃지만, 그것은 버려진 계획이다.
+  const cutoff = new Date(Date.now() - 92 * 86400e3).toISOString().slice(0, 7); // YYYY-MM
+  const walk = (dir, depth = 0) => {
     let entries;
     try { entries = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
     for (const entry of entries) {
       const target = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(target);
+      if (entry.isDirectory()) {
+        if (depth === 0 && /^\d{4}-\d{2}/.test(entry.name) && entry.name.slice(0, 7) < cutoff) continue;
+        walk(target, depth + 1);
+      }
       else if (entry.name === 'plan.json') {
         try {
           const at = fs.statSync(target).mtimeMs;

@@ -632,6 +632,8 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('빠른 진입 회귀 테스트가 없다 (scripts/test-first-run-ux.mjs)');
   if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
     빠짐.push('run/v1 회귀 픽스처가 없다 (개선 플랜 Phase 0)');
+  if (!fs.existsSync(path.join(ROOT, 'scripts', 'recall.mjs')) || !R.includes('recall.mjs'))
+    빠짐.push('회상 색인이 없거나 G1 되짚기에 배선되지 않았다 (gbrain 구조 참고 · 2026-08-31)');
   if (!G.includes('재료를 받았으면 죽은 틀이 아니다'))
     빠짐.push('[틀] 모드에서 재료를 받아도 문장을 안 쓴다 — 요청만 하고 살리지 않는다 (사용자 지시 2026-08-30)');
 

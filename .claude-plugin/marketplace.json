@@ -10,7 +10,7 @@
       "source": "./plugins/marketing-team",
       "description": "「마케팅팀 업무 시작하자」 한마디면 된다. 무슨 일인지 묻고 → 필요한 데이터를 알려주고 → 계획을 세워 승인받고 → 실행하고 → 보고하고 → 다음을 제안한다. 스킬 100개는 자원이고 AI 마케터가 골라 쓴다.",
       "category": "productivity",
-      "version": "0.49.0",
+      "version": "0.50.0",
       "author": {
         "name": "WMBB"
       },
