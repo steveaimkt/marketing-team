@@ -171,9 +171,19 @@ function pluginScriptCall(input) {
   ].filter(Boolean);
   if (!candidates.some(file => inside(scriptsDir, file))) return null;
   const argsRaw = String(m[4] || '').trim();
-  const sub = argsRaw.match(/^(?:"([^"]*)"|'([^']*)'|(\S+))/);
-  const flags = argsRaw.split(/\s+/).filter(token => token.startsWith('--'));
-  return { script: path.basename(target.replace(/\\/g, '/')), sub: (sub && (sub[1] || sub[2] || sub[3])) || '', flags };
+  // 인수를 셸처럼 토큰화한다 — 「"--summary"」처럼 따옴표로 감싼 옵션이 공백 분리 검사를
+  // 지나쳐 셸에서 벗겨지는 우회가 있었다 (릴리스 재검토 실측 2026-08-30).
+  // 온전한 따옴표 토큰과 맨 토큰만 인정하고, 접합 인용(-"-summary")·이스케이프·변수가 섞인
+  // 애매한 토큰은 통째로 거부한다 — 벗긴 뒤 무엇이 될지 여기서 확정할 수 없기 때문이다.
+  const tokens = [];
+  const tokenRe = /"([^"]*)"|'([^']*)'|(\S+)/g;
+  let piece;
+  while ((piece = tokenRe.exec(argsRaw))) {
+    if (piece[3] !== undefined && /["'\\$]/.test(piece[3])) return null;
+    tokens.push(piece[1] ?? piece[2] ?? piece[3]);
+  }
+  const flags = tokens.filter(token => token.startsWith('--'));
+  return { script: path.basename(target.replace(/\\/g, '/')), sub: tokens[0] || '', flags };
 }
 
 /**

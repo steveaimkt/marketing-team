@@ -138,6 +138,13 @@ try {
   assert.equal(decision(result), 'deny', '허용 플래그 뒤에 붙인 쓰기 플래그(--summary)를 통과시켰습니다.');
   result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --check --hook` });
   assert.equal(decision(result), 'deny', '허용 플래그 뒤에 붙인 쓰기 플래그(--hook)를 통과시켰습니다.');
+  // 따옴표 우회 (릴리스 재검토 2026-08-30) — 셸이 따옴표를 벗기면 같은 쓰기 플래그다
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --check "--summary"` });
+  assert.equal(decision(result), 'deny', '따옴표로 감싼 쓰기 플래그("--summary")를 통과시켰습니다.');
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --check '--hook'` });
+  assert.equal(decision(result), 'deny', "따옴표로 감싼 쓰기 플래그('--hook')를 통과시켰습니다.");
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/ledger-stats.mjs" --check -"-summary"` });
+  assert.equal(decision(result), 'deny', '접합 인용(-"-summary")을 통과시켰습니다.');
   writeTranscript([active, plan, approval]);
   result = call('Bash', { command: `node "${pluginRoot}/scripts/eval-routing.mjs" --update-baseline` });
   assert.equal(decision(result), 'deny', '승인 뒤 기준선 갱신 스크립트를 허용했습니다.');
@@ -196,7 +203,7 @@ try {
     assert.equal(tryWrite(), 'none', 'plan.json 이 없는 예전 경로까지 막았습니다.');
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 12 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
