@@ -6,8 +6,12 @@ import process from 'node:process';
 import { approvalState } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
-const PLAN_MARKER = /\[실행 계획\][\s\S]*?\[승인 요청\]/;
-const APPROVAL = /^\s*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?)\s*[.!]?\s*$/;
+const PLAN_MARKER = /^\[실행 계획\][\s\S]*?^\[승인 요청\]/m; // 줄머리만 — 문장 속 인용은 계획이 아니다 (실측 2026-08-30)
+// 승인 판정 A안 (2026-08-30) · 「진행 승인」으로 시작하면 뒤에 지시가 붙어도 승인이다 (보류·취소류는 제외).
+// 자연 변형(「네 진행해주세요」 등)은 온전한 한 문장일 때만 승인으로 친다.
+const APPROVAL_EXACT = /^\s*(?:네|예|넵)?[\s,]*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?|진행해\s*줘요?|진행해주세요|진행하자)\s*[.!~]?\s*$/;
+const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:보류|취소|아직|말|안\s|못\s))/;
+const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) };
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/AI-마케터/SKILL.md', '\\skills\\AI-마케터\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 
@@ -97,7 +101,8 @@ function validateWrite(input) {
     ? toolInput.notebook_path || toolInput.file_path
     : toolInput.file_path || toolInput.path;
   if (!raw) return '쓰기 대상 경로를 확인할 수 없습니다.';
-  const cwd = path.resolve(input.cwd || process.cwd());
+  // 셸 cd 가 플러그인 폴더에 머물러 있어도 작업 폴더 기준을 잃지 않는다 (실측 2026-08-30 · 3회 오차단).
+  const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
   const target = path.resolve(cwd, raw);
   if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw}`;
   const [root] = path.relative(cwd, target).split(path.sep);
@@ -124,7 +129,12 @@ function validateBash(input) {
 
 function isReadOnlyBash(input) {
   const raw = String(input.tool_input?.command || '');
-  const command = raw.replace(/\d?>\s*\/dev\/null/g, '');
+  // 따옴표 속은 인수지 문법이 아니다 — 판정 전에 비운다 (실측 2026-08-30 · grep "=> {" 를 쓰기로 오인).
+  // 단 $·백틱이 든 겹따옴표는 명령 치환이 살아 있으므로 남긴다.
+  const unquoted = raw
+    .replace(/'[^']*'/g, "''")
+    .replace(/"[^"]*"/g, q => (/[`$]/.test(q) ? q : '""'));
+  const command = unquoted.replace(/\d?>\s*\/dev\/null/g, '');
   if (/(?:^|\s)(?:rm|mv|cp|mkdir|touch|tee|chmod|chown|install|patch|apply_patch|node|python\d*|ruby|perl|npm|npx|pnpm|yarn|bun|deno|curl|wget|osascript)(?:\s|$)/.test(command))
     return false;
   if (/(?:^|\s)sed\s+[^;&|]*\s-i(?:\s|$)/.test(command)) return false;
@@ -139,6 +149,27 @@ function isReadOnlyBash(input) {
     const name = segment.match(/^([^\s]+)/)?.[1];
     return allowed.has(name);
   });
+}
+
+/** 승인 뒤에도 셸로는 쓰지 못한다. 절차가 요구하는 플러그인 스크립트 실행만 통과시킨다. */
+function isPluginScript(input) {
+  const raw = String(input.tool_input?.command || '').trim();
+  if (raw.includes('\n') || /`|\$\(/.test(raw)) return false;
+  const fallbackRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+  const pluginRoot = path.resolve(process.env.CLAUDE_PLUGIN_ROOT || fallbackRoot);
+  const m = raw.match(/^(?:cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|<>]+)\s*&&\s*)?node\s+(?:"([^"]+)"|'([^']+)'|([^\s;&|<>]+))([^;&|<>]*)$/);
+  if (!m) return false;
+  const target = (m[1] || m[2] || m[3])
+    .replace('${CLAUDE_PLUGIN_ROOT}', pluginRoot)
+    .replace('$CLAUDE_PLUGIN_ROOT', pluginRoot);
+  if (!target.endsWith('.mjs')) return false;
+  const scriptsDir = path.join(pluginRoot, 'scripts');
+  const candidates = [
+    path.isAbsolute(target) ? path.resolve(target) : null,
+    path.resolve(input.cwd || process.cwd(), target),
+    path.resolve(pluginRoot, target),
+  ].filter(Boolean);
+  return candidates.some(file => inside(scriptsDir, file));
 }
 
 function validateSkill(input, plan) {
@@ -167,6 +198,12 @@ async function main() {
   }
   const rows = transcriptRows(input.transcript_path);
   if (!isActive(rows, rawTranscript)) return;
+
+  // 플러그인 개발 저장소(marketplace.json 이 있는 곳)에서는 실행 보호를 걸지 않는다 —
+  // 이 가드는 사용자 마케팅 작업 공간을 위한 것이다. 스킬 경로를 언급만 해도 무장되는 탓에
+  // 자기 소스 유지보수(패치·커밋)까지 잠겼다 (실측 2026-08-30 · 편집 6건 전부 거부).
+  const devRoot = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
+  try { if (fs.existsSync(path.join(devRoot, '.claude-plugin', 'marketplace.json'))) return; } catch { /* 무시 */ }
 
   if (input.tool_name === 'Bash') {
     const issue = validateBash(input);
@@ -217,13 +254,22 @@ function planApproval(cwd) {
 
   const approval = approved(rows);
   if (!approval.ok) {
-    if (input.tool_name === 'Bash' && isReadOnlyBash(input)) return;
+    // 조회와 상태 기계(scripts/*.mjs)는 승인 전에도 돈다 — G1 라우팅·G2 컴파일이 여기 산다 (실측 2026-08-30).
+    // 산출물 쓰기(Write/Edit)는 여전히 문장 승인 ∧ 계획 해시 뒤에 있다.
+    if (input.tool_name === 'Bash' && (isReadOnlyBash(input) || isPluginScript(input))) return;
     deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
     return;
   }
 
-  const planIssue = planApproval(input.cwd);
-  if (planIssue) {
+  const planIssue = planApproval(process.env.CLAUDE_PROJECT_DIR || input.cwd);
+  // 계획 상태 기계(plan-compiler·run-receipt)는 잠긴 상태에서 빠져나오는 유일한 문이다 —
+  // 이 문까지 잠그면 compile 뒤 approve 를 부를 수 없다 (실측 2026-08-30 · 영구 잠금).
+  // 읽기 조회는 계획을 위반할 수 없고(R8a), plan.json 자체는 쓰기 차단이 아니라 해시가 지킨다(R8b) —
+  // 무효 계획을 고칠 문이 없으면 세션이 벽돌이 된다 (실측 2026-08-30 · 컴파일 거부 계획에서 완전 잠금).
+  const planFileWrite = ['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) &&
+    path.basename(String(input.tool_input?.file_path || input.tool_input?.notebook_path || '')) === 'plan.json';
+  if (planIssue && !planFileWrite &&
+      !(input.tool_name === 'Bash' && (isReadOnlyBash(input) || isPluginScript(input)))) {
     deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
     return;
   }
@@ -232,7 +278,10 @@ function planApproval(cwd) {
     const issue = validateWrite(input);
     if (issue) deny(issue);
   } else if (input.tool_name === 'Bash') {
-    // 설치본 경로 검사는 승인 여부보다 앞에서 이미 수행했다.
+    // 승인은 계획을 허락한 것이지 파일시스템을 연 것이 아니다 — 쓰는 문은 Write/Edit 하나다.
+    // (실측 2026-08-30 · 승인 뒤 셸 heredoc·python3 이 경로 규칙을 그대로 지나쳤다)
+    if (!isReadOnlyBash(input) && !isPluginScript(input))
+      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 node ${CLAUDE_PLUGIN_ROOT}/scripts/*.mjs 실행만 허용됩니다.');
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, approval.plan);
     if (issue) deny(issue);

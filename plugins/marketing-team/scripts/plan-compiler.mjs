@@ -139,17 +139,19 @@ export function validatePlan(plan) {
     const at = `step ${index + 1}(${id || '?'})`;
     if (!found) { issues.push(`${at} · 그런 스킬이 없습니다.`); continue; }
 
-    // writes_to 계약이 예정 산출물에 들어 있는가
+    // writes_to 계약이 예정 산출물에 들어 있는가 · 같은 날 재실행 산출물(이름-2.md)은 정본 이름으로 본다
+    // (실행-영수증의 -2 규약과 모순이었다 · 실측 2026-08-30 · R7. 정확 일치를 먼저 보므로 기존 계약은 안 깨진다)
+    const rerunMatch = (out, base) => out === base || out.replace(/-\d+(\.[a-z0-9]+)$/i, '$1') === base;
     const outs = (step.outputs || []).map(v => path.posix.basename(String(v)));
     for (const contract of found.writesTo) {
       const base = path.posix.basename(contract);
       if (!base.includes('.')) continue;
-      if (!outs.includes(base)) issues.push(`${at} · writes_to 파일이 산출물에 없습니다: ${base}`);
+      if (!outs.some(out => rerunMatch(out, base))) issues.push(`${at} · writes_to 파일이 산출물에 없습니다: ${base}`);
     }
     // 계획에 없는 산출물
-    const allowed = new Set(found.writesTo.map(v => path.posix.basename(v)));
+    const allowed = [...new Set(found.writesTo.map(v => path.posix.basename(v)))];
     for (const base of outs) {
-      if (!allowed.has(base)) issues.push(`${at} · 스킬 계약에 없는 산출물입니다: ${base}`);
+      if (!allowed.some(b => rerunMatch(base, b))) issues.push(`${at} · 스킬 계약에 없는 산출물입니다: ${base}`);
     }
     // 검토 정책 · 선언한 것은 계획에 있어야 한다
     const reviews = step.reviews || [];

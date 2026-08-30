@@ -295,8 +295,11 @@ function validateExecutionContract(file, skillRows, outputRows) {
   const uniqueExpected = [...new Set(expected)];
   const actual = outputRows.map(item => path.posix.basename(item.path.replace(/^workspace:/, '')));
   const uniqueActual = new Set(actual);
-  const missing = uniqueExpected.filter(name => !uniqueActual.has(name));
-  const extra = [...uniqueActual].filter(name => !uniqueExpected.includes(name));
+  // 같은 날 재실행 산출물(이름-2.md)은 정본 이름으로 본다 (§1 -2 규약 · R7 · 실측 2026-08-30).
+  // plan-compiler 의 rerunMatch 와 같은 규칙 — 정확 일치를 먼저 보므로 기존 계약은 안 깨진다.
+  const rerunMatch = (out, base) => out === base || out.replace(/-\d+(\.[a-z0-9]+)$/i, '$1') === base;
+  const missing = uniqueExpected.filter(name => ![...uniqueActual].some(out => rerunMatch(out, name)));
+  const extra = [...uniqueActual].filter(name => !uniqueExpected.some(base => rerunMatch(name, base)));
   if (missing.length) throw new Error(`writes_to 필수 산출물이 outputs에 없습니다: ${missing.join(' · ')}`);
   if (extra.length) throw new Error(`writes_to에 없는 산출물은 이 실행에 추가할 수 없습니다: ${extra.join(' · ')}`);
   if (actual.length !== uniqueActual.size) throw new Error('outputs에 같은 파일명이 중복됐습니다.');
