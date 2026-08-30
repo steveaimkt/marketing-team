@@ -490,6 +490,7 @@ async function currentHash(ref) {
 async function inspect(run, finalStatus = run.status) {
   const issues = [];
   const sourceChanges = [];
+  const notes = []; // ⚠ 참고 — 위반도 변경도 아닌 안내문. 완료 봉인을 막지 않는다 (설치본 실기 실측 2026-08-30)
   const checkSnapshot = async (item, label) => {
     const now = await currentHash(item.path);
     if (!now) issues.push(`${label} 파일이 없습니다: ${item.path}`);
@@ -509,7 +510,10 @@ async function inspect(run, finalStatus = run.status) {
   if (run.pii || (Array.isArray(run.checks) && run.checks.length)) {
     try {
       for (const line of await runChecks(run, ref => resolveRef(ref).abs)) {
-        if (line.startsWith('\u26a0')) sourceChanges.push(line.replace(/^\u26a0\s*/, ''));
+        // 「⚠ 참고」는 pii-check 의 안내문(예: 3자 미만 식별자 오탐 제외)이다 — 변경 사항으로 승격하면
+        // 짧은 식별자 데이터셋에서 finalize 가 영원히 실패한다 (설치본 초급 실기 실측 2026-08-30).
+        if (line.startsWith('\u26a0 참고')) notes.push(line.replace(/^\u26a0\s*/, ''));
+        else if (line.startsWith('\u26a0')) sourceChanges.push(line.replace(/^\u26a0\s*/, ''));
         else issues.push(`산출물 검사 · ${line}`);
       }
     } catch (error) {
@@ -551,7 +555,7 @@ async function inspect(run, finalStatus = run.status) {
   if (finalStatus === 'completed' && !ledgerRecorded)
     issues.push(`원장에서 이 실행을 찾지 못했습니다: ${ledgerRef}`);
 
-  return { issues, sourceChanges, ledgerRecorded };
+  return { issues, sourceChanges, notes, ledgerRecorded };
 }
 
 /* ── 단계별 실행 · 중단과 재개 ─────────────────────────────────
@@ -684,6 +688,7 @@ async function finalize(file, args) {
     writeJson(file, run);
     emit(file, run, status === 'completed' ? 'run.completed' : 'run.stopped', { final_status: status });
     for (const warning of result.sourceChanges) console.warn(`🟡 ${warning}`);
+    for (const note of result.notes || []) console.warn(`🟡 ${note}`);
     console.log(`✅ 실행 봉인 · ${run.run_id} · ${status}`);
   } catch (error) {
     fail(error.message);
