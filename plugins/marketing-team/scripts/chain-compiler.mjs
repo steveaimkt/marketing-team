@@ -96,6 +96,18 @@ export function compileChain(plan) {
     } else if (!exact) {
       issues.push(`체인 ${named.name} 단계가 정본과 다릅니다: 계획 ${ids.join('→')} · 정본 ${named.expression}`);
     }
+    // 체인 단계 간 입력 연결 강제 (P1 · 2026-08-30 최종 검토) —
+    // 순서만 정본과 같고 산출물이 이어지지 않으면 그래프가 아니라 나열이다.
+    // 2단계부터는 직전 단계 산출물을 입력에 받거나, 더 앞 단계를 쓰면 depends_on 으로 명시한다.
+    // 사용자 지정 역순(위 warning 경로)은 연결이 약해지는 것을 이미 위험으로 고지했으므로 여기서 다시 막지 않는다.
+    if (exact) {
+      for (let i = 1; i < steps.length; i++) {
+        const fromPrev = edges.some(edge => edge.kind === 'artifact' && edge.from === i && edge.to === i + 1);
+        const declared = edges.some(edge => edge.kind === 'explicit' && edge.to === i + 1 && edge.from <= i);
+        if (!fromPrev && !declared)
+          issues.push(`step ${i + 1}(${steps[i].skill}) 이 직전 단계(${steps[i - 1].skill}) 산출물을 입력에 받지 않습니다 — 앞 산출물 경로를 inputs 에 넣거나 depends_on 으로 명시하세요.`);
+      }
+    }
   }
 
   // 명시·산출물 의존 그래프의 일반 순환 검사

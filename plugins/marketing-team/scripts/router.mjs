@@ -2,8 +2,10 @@
 /**
  * router.mjs · 자연어 요청을 실행하지 않고 스킬 후보만 좁힌다.
  *
- * 이 파일의 점수는 최종 판단 점수가 아니다. 트리거와 검증용 표현을 이용한 로컬 후보 검색이며,
+ * 이 파일의 점수는 최종 판단 점수가 아니다. 트리거·이름·설명(when_to_use)만으로 좁히는 로컬 후보 검색이며,
  * AI 마케터는 low confidence 또는 동률이면 상위 후보를 보여 주고 한 번만 확인한다.
+ * ⛔ routing-eval.jsonl 은 색인에 넣지 않는다 (P2 · 2026-08-30) — 평가 문장으로 운영 색인을 만들면
+ *    같은 문장으로 재는 평가가 과대평가된다. 평가셋은 eval-routing.mjs 전용이다.
  * 실제 의미 라우팅 품질은 eval-routing.mjs --live-cc 로 별도 측정한다.
  *
  * 사용: node scripts/router.mjs "광고 예산을 다시 나눠줘"
@@ -70,19 +72,12 @@ export function loadRoutingIndex() {
         const fm = frontmatter(text);
         const id = scalar(fm, 'id').match(/\d{3}/)?.[0];
         if (!id) continue;
-        const evalFile = path.join(path.dirname(target), 'routing-eval.jsonl');
-        const examples = fs.existsSync(evalFile)
-          ? fs.readFileSync(evalFile, 'utf8').split(/\r?\n/).filter(Boolean).flatMap(line => {
-              try { return [JSON.parse(line).intent].filter(Boolean); } catch { return []; }
-            })
-          : [];
         rows.push({
           id,
           name: scalar(fm, 'name'),
           description: scalar(fm, 'description'),
           whenToUse: scalar(fm, 'when_to_use'),
           triggers: blockList(fm, 'triggers'),
-          examples,
         });
       }
     }
@@ -91,7 +86,6 @@ export function loadRoutingIndex() {
   cached = rows.sort((a, b) => a.id.localeCompare(b.id)).map(row => ({
     ...row,
     triggerGrams: row.triggers.map(grams),
-    exampleGrams: row.examples.map(grams),
     nameGrams: grams(row.name),
     descGrams: grams(`${row.description} ${row.whenToUse}`),
   }));
@@ -103,13 +97,12 @@ export function routeOne(request, { limit = 3 } = {}) {
   const compact = norm(request);
   const candidates = loadRoutingIndex().map(skill => {
     const bestTrigger = Math.max(0, ...skill.triggerGrams.map(value => dice(query, value)));
-    const bestExample = Math.max(0, ...skill.exampleGrams.map(value => dice(query, value)));
     const exactTrigger = skill.triggers.some(value => {
       const phrase = norm(value);
       return phrase.length >= 4 && (compact.includes(phrase) || phrase.includes(compact));
     });
-    const score = Math.min(1, (exactTrigger ? 0.42 : 0) + bestTrigger * 0.38 + bestExample * 0.42 +
-      dice(query, skill.nameGrams) * 0.12 + dice(query, skill.descGrams) * 0.08);
+    const score = Math.min(1, (exactTrigger ? 0.5 : 0) + bestTrigger * 0.42 +
+      dice(query, skill.nameGrams) * 0.14 + dice(query, skill.descGrams) * 0.1);
     return { id: skill.id, name: skill.name, score: Number(score.toFixed(4)), reason: skill.whenToUse || skill.description };
   }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
   const top = candidates.slice(0, Math.max(2, limit));
@@ -138,5 +131,18 @@ const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath
 if (isCli) {
   const request = process.argv.slice(2).join(' ').trim();
   if (!request) { console.error('사용: router.mjs "자연어 요청"'); process.exit(1); }
-  console.log(JSON.stringify(routeRequest(request), null, 2));
+  const result = routeRequest(request);
+  console.log(JSON.stringify(result, null, 2));
+  // 라우팅 흔적을 실행 타래에 남긴다 (P2 · 2026-08-30) — 작업 공간일 때만 · 실패해도 라우팅을 막지 않는다.
+  try {
+    if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {
+      const { appendEvent } = await import('./orchestrator-events.mjs');
+      appendEvent(process.cwd(), { skills: [] }, 'route.completed', {
+        request,
+        request_class: result.request_class,
+        decision: result.decision ?? (result.subrequests ? result.subrequests.map(row => row.decision).join(',') : null),
+        confidence: result.confidence || null,
+      });
+    }
+  } catch { /* 무시 */ }
 }

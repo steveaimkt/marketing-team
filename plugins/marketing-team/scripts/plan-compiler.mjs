@@ -139,20 +139,33 @@ export function validatePlan(plan) {
     const at = `step ${index + 1}(${id || '?'})`;
     if (!found) { issues.push(`${at} · 그런 스킬이 없습니다.`); continue; }
 
-    // writes_to 계약이 예정 산출물에 들어 있는가 · 같은 날 재실행 산출물(이름-2.md)은 정본 이름으로 본다
-    // (실행-영수증의 -2 규약과 모순이었다 · 실측 2026-08-30 · R7. 정확 일치를 먼저 보므로 기존 계약은 안 깨진다)
-    const rerunMatch = (out, base) => out === base || out.replace(/-\d+(\.[a-z0-9]+)$/i, '$1') === base;
+    // 재실행 산출물 1:1 계약 (P1 · 2026-08-30 최종 검토) —
+    // 이름-2.md 는 정본 이름.md 의 재실행이다. 정본 하나에 실제 파일이 정확히 하나,
+    // 재실행 순번은 한 단계 안에서 하나여야 한다 (정본과 -2 동시는 두 실행이 섞인 것이다).
+    // 정확 일치를 먼저 보므로 이름에 숫자가 든 기존 계약은 안 깨진다. run-receipt 와 같은 규칙.
+    const parseOut = out => {
+      const m2 = out.match(/^(.*)-(\d+)(\.[a-z0-9]+)$/i);
+      return m2 ? { canon: m2[1] + m2[3], ord: m2[2] } : { canon: out, ord: '1' };
+    };
     const outs = (step.outputs || []).map(v => path.posix.basename(String(v)));
+    const allowed = [...new Set(found.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
+    const canonOf = out => (allowed.includes(out) ? out : (allowed.includes(parseOut(out).canon) ? parseOut(out).canon : null));
+    const matchCount = new Map(allowed.map(b => [b, 0]));
+    const ords = new Set();
+    for (const out of outs) {
+      const canon = canonOf(out);
+      if (canon === null) { issues.push(`${at} · 스킬 계약에 없는 산출물입니다: ${out}`); continue; }
+      matchCount.set(canon, matchCount.get(canon) + 1);
+      ords.add(out === canon ? '1' : parseOut(out).ord);
+    }
     for (const contract of found.writesTo) {
       const base = path.posix.basename(contract);
       if (!base.includes('.')) continue;
-      if (!outs.some(out => rerunMatch(out, base))) issues.push(`${at} · writes_to 파일이 산출물에 없습니다: ${base}`);
+      const count = matchCount.get(base) || 0;
+      if (count === 0) issues.push(`${at} · writes_to 파일이 산출물에 없습니다: ${base}`);
+      if (count > 1) issues.push(`${at} · 같은 정본에 산출물이 ${count}개 대응합니다 — 한 실행에 하나입니다: ${base}`);
     }
-    // 계획에 없는 산출물
-    const allowed = [...new Set(found.writesTo.map(v => path.posix.basename(v)))];
-    for (const base of outs) {
-      if (!allowed.some(b => rerunMatch(base, b))) issues.push(`${at} · 스킬 계약에 없는 산출물입니다: ${base}`);
-    }
+    if (ords.size > 1) issues.push(`${at} · 재실행 순번이 섞였습니다(${[...ords].sort().join('·')}) — 한 실행의 산출물은 같은 순번을 씁니다.`);
     // 검토 정책 · 선언한 것은 계획에 있어야 한다
     const reviews = step.reviews || [];
     for (const perspective of found.review) {
@@ -231,6 +244,14 @@ if (isCli) {
     plan.approved_sha256 = null;
     write(file, plan);
     console.log(`✅ 계획 확정 · ${plan.skills.join('→')} · ${plan.plan_sha256.slice(0, 12)} · 승인 대기`);
+    // 계획 흔적을 실행 타래에 남긴다 (P2 · 2026-08-30) — 작업 공간일 때만 · 실패해도 컴파일을 막지 않는다.
+    try {
+      if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {
+        const { appendEvent } = await import('./orchestrator-events.mjs');
+        appendEvent(process.cwd(), { plan: { plan_sha256: plan.plan_sha256 }, skills: plan.skills, status: plan.status },
+          'plan.compiled', { plan_id: plan.plan_id || null, request: plan.request || null });
+      }
+    } catch { /* 무시 */ }
   } else if (command === 'approve') {
     const issues = validatePlan(plan);
     if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); fail('계획이 계약과 맞지 않아 승인할 수 없습니다.'); }
@@ -242,6 +263,13 @@ if (isCli) {
     plan.status = 'approved';
     write(file, plan);
     console.log(`✅ 계획 승인 봉인 · ${current.slice(0, 12)}`);
+    try {
+      if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {
+        const { appendEvent } = await import('./orchestrator-events.mjs');
+        appendEvent(process.cwd(), { plan: { plan_sha256: current }, skills: plan.skills, status: plan.status },
+          'plan.approved', { plan_id: plan.plan_id || null, request: plan.request || null });
+      }
+    } catch { /* 무시 */ }
   } else if (command === 'check') {
     const issues = validatePlan(plan);
     for (const line of issues) console.error(`⛔ ${line}`);

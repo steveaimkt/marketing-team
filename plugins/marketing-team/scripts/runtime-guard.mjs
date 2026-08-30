@@ -151,25 +151,65 @@ function isReadOnlyBash(input) {
   });
 }
 
-/** 승인 뒤에도 셸로는 쓰지 못한다. 절차가 요구하는 플러그인 스크립트 실행만 통과시킨다. */
-function isPluginScript(input) {
+/** node 로 부른 플러그인 스크립트의 (파일명, 첫 하위 명령)을 얻는다. 형식이 어긋나면 null. */
+function pluginScriptCall(input) {
   const raw = String(input.tool_input?.command || '').trim();
-  if (raw.includes('\n') || /`|\$\(/.test(raw)) return false;
+  if (raw.includes('\n') || /`|\$\(/.test(raw)) return null;
   const fallbackRoot = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
   const pluginRoot = path.resolve(process.env.CLAUDE_PLUGIN_ROOT || fallbackRoot);
   const m = raw.match(/^(?:cd\s+(?:"[^"]*"|'[^']*'|[^\s;&|<>]+)\s*&&\s*)?node\s+(?:"([^"]+)"|'([^']+)'|([^\s;&|<>]+))([^;&|<>]*)$/);
-  if (!m) return false;
+  if (!m) return null;
   const target = (m[1] || m[2] || m[3])
     .replace('${CLAUDE_PLUGIN_ROOT}', pluginRoot)
     .replace('$CLAUDE_PLUGIN_ROOT', pluginRoot);
-  if (!target.endsWith('.mjs')) return false;
+  if (!target.endsWith('.mjs')) return null;
   const scriptsDir = path.join(pluginRoot, 'scripts');
   const candidates = [
     path.isAbsolute(target) ? path.resolve(target) : null,
     path.resolve(input.cwd || process.cwd(), target),
     path.resolve(pluginRoot, target),
   ].filter(Boolean);
-  return candidates.some(file => inside(scriptsDir, file));
+  if (!candidates.some(file => inside(scriptsDir, file))) return null;
+  const sub = String(m[4] || '').trim().match(/^(?:"([^"]*)"|'([^']*)'|(\S+))/);
+  return { script: path.basename(target.replace(/\\/g, '/')), sub: (sub && (sub[1] || sub[2] || sub[3])) || '' };
+}
+
+/**
+ * 명령·상태별 허용 목록 (P0 · 2026-08-30 최종 검토) —
+ * scripts/ 에 파일이 있다는 이유로 허용하지 않는다. 빌드·동기화·기준선 갱신은 개발자 명령이고,
+ * 마케팅 실행 훅의 허용 대상이 아니다. null 은 「하위 명령 무관」이다.
+ */
+const SCRIPT_ALLOW = {
+  // 승인 전 · 라우팅과 계획 준비만 — 파일을 바꾸는 명령은 없다 (compile 은 계획 초안만 봉인한다)
+  pre: {
+    'router.mjs': null,
+    'chain-compiler.mjs': ['check', 'list'],
+    'plan-compiler.mjs': ['compile', 'check'],
+    'ledger-stats.mjs': null,
+  },
+  // 계획 대기(미승인·해시 불일치) · 계획 상태 기계만 — 잠긴 상태에서 빠져나오는 문
+  pending: {
+    'plan-compiler.mjs': ['compile', 'approve', 'check'],
+  },
+  // 문장 승인 + 계획 정합 뒤 · 계획이 요구하는 실행·검증 명령만
+  run: {
+    'router.mjs': null,
+    'chain-compiler.mjs': ['check', 'list'],
+    'plan-compiler.mjs': ['compile', 'approve', 'check'],
+    'run-receipt.mjs': null,
+    'orchestrator-events.mjs': ['summary'],
+    'ledger-stats.mjs': null,
+    'output-checks.mjs': null,
+    'pii-check.mjs': null,
+  },
+};
+
+function allowedScript(input, stage) {
+  const call = pluginScriptCall(input);
+  if (!call) return false;
+  const subs = SCRIPT_ALLOW[stage]?.[call.script];
+  if (subs === undefined) return false;
+  return subs === null || subs.includes(call.sub);
 }
 
 function validateSkill(input, plan) {
@@ -254,9 +294,9 @@ function planApproval(cwd) {
 
   const approval = approved(rows);
   if (!approval.ok) {
-    // 조회와 상태 기계(scripts/*.mjs)는 승인 전에도 돈다 — G1 라우팅·G2 컴파일이 여기 산다 (실측 2026-08-30).
-    // 산출물 쓰기(Write/Edit)는 여전히 문장 승인 ∧ 계획 해시 뒤에 있다.
-    if (input.tool_name === 'Bash' && (isReadOnlyBash(input) || isPluginScript(input))) return;
+    // 조회와 라우팅·계획 준비 명령만 승인 전에 돈다 — G1 라우팅·G2 컴파일이 여기 산다 (실측 2026-08-30).
+    // 산출물 쓰기(Write/Edit)와 영수증·생성·동기화 스크립트는 승인 뒤에도 허용 목록으로만 돈다 (P0).
+    if (input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pre'))) return;
     deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
     return;
   }
@@ -269,7 +309,7 @@ function planApproval(cwd) {
   const planFileWrite = ['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) &&
     path.basename(String(input.tool_input?.file_path || input.tool_input?.notebook_path || '')) === 'plan.json';
   if (planIssue && !planFileWrite &&
-      !(input.tool_name === 'Bash' && (isReadOnlyBash(input) || isPluginScript(input)))) {
+      !(input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pending')))) {
     deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
     return;
   }
@@ -280,8 +320,9 @@ function planApproval(cwd) {
   } else if (input.tool_name === 'Bash') {
     // 승인은 계획을 허락한 것이지 파일시스템을 연 것이 아니다 — 쓰는 문은 Write/Edit 하나다.
     // (실측 2026-08-30 · 승인 뒤 셸 heredoc·python3 이 경로 규칙을 그대로 지나쳤다)
-    if (!isReadOnlyBash(input) && !isPluginScript(input))
-      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 node ${CLAUDE_PLUGIN_ROOT}/scripts/*.mjs 실행만 허용됩니다.');
+    // 스크립트도 파일이 있다고 다 허용하지 않는다 — 계획이 요구하는 실행·검증 명령만 (P0 허용 목록).
+    if (!isReadOnlyBash(input) && !allowedScript(input, 'run'))
+      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다.');
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, approval.plan);
     if (issue) deny(issue);

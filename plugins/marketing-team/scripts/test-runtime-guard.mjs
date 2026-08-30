@@ -118,6 +118,20 @@ try {
   });
   assert.equal(decision(result), 'none', '셸 cd 표류 시 작업 폴더 쓰기를 오차단했습니다.');
 
+  // P0 · 스크립트 허용 목록 (2026-08-30 최종 검토) — scripts/ 에 파일이 있다고 다 허용하지 않는다
+  writeTranscript([active, plan]);
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" start "outputs/run.json"` });
+  assert.equal(decision(result), 'deny', '승인 전에 영수증 시작을 허용했습니다.');
+  for (const dev of ['bootstrap.mjs', 'build-routing.mjs', 'sync-skills.mjs']) {
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/${dev}"` });
+    assert.equal(decision(result), 'deny', `승인 전에 개발 스크립트를 허용했습니다: ${dev}`);
+  }
+  writeTranscript([active, plan, approval]);
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/eval-routing.mjs" --update-baseline` });
+  assert.equal(decision(result), 'deny', '승인 뒤 기준선 갱신 스크립트를 허용했습니다.');
+  result = call('Bash', { command: `node "${pluginRoot}/scripts/build-catalog.mjs"` });
+  assert.equal(decision(result), 'deny', '승인 뒤 생성 스크립트를 허용했습니다.');
+
   // 승인의 대상은 문장이 아니라 계획 해시다 · plan.json 이 있을 때만 본다 (하위 호환)
   {
     const rel = 'outputs/2026-08-30/046-roas-budget-rebalance';
@@ -147,6 +161,8 @@ try {
     assert.equal(tryWrite(), 'deny', '승인 대기 계획에서 쓰기를 허용했습니다.');
     result = call('Bash', { command: `node "${pluginRoot}/scripts/plan-compiler.mjs" approve "${rel}/plan.json"` });
     assert.equal(decision(result), 'none', '승인 대기 상태가 상태 기계 호출까지 잠갔습니다 — approve 로 빠져나올 수 없습니다.');
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" start "${rel}/run.json"` });
+    assert.equal(decision(result), 'deny', '계획 대기 중에 영수증 시작을 허용했습니다 (P0).');
     result = call('Bash', { command: 'ls outputs' });
     assert.equal(decision(result), 'none', '계획 대기가 읽기 조회까지 잠갔습니다.');
     result = call('Write', { file_path: planFile });
@@ -168,7 +184,7 @@ try {
     assert.equal(tryWrite(), 'none', 'plan.json 이 없는 예전 경로까지 막았습니다.');
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 7 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

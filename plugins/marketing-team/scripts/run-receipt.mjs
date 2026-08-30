@@ -295,13 +295,29 @@ function validateExecutionContract(file, skillRows, outputRows) {
   const uniqueExpected = [...new Set(expected)];
   const actual = outputRows.map(item => path.posix.basename(item.path.replace(/^workspace:/, '')));
   const uniqueActual = new Set(actual);
-  // 같은 날 재실행 산출물(이름-2.md)은 정본 이름으로 본다 (§1 -2 규약 · R7 · 실측 2026-08-30).
-  // plan-compiler 의 rerunMatch 와 같은 규칙 — 정확 일치를 먼저 보므로 기존 계약은 안 깨진다.
-  const rerunMatch = (out, base) => out === base || out.replace(/-\d+(\.[a-z0-9]+)$/i, '$1') === base;
-  const missing = uniqueExpected.filter(name => ![...uniqueActual].some(out => rerunMatch(out, name)));
-  const extra = [...uniqueActual].filter(name => !uniqueExpected.some(base => rerunMatch(name, base)));
+  // 재실행 산출물 1:1 계약 (P1 · 2026-08-30 최종 검토 · plan-compiler 와 같은 규칙) —
+  // 이름-2.md 는 정본 이름.md 의 재실행이다. 정본 하나에 실제 파일이 정확히 하나,
+  // 재실행 순번은 한 실행 전체에서 하나여야 한다. 정확 일치를 먼저 보므로 기존 계약은 안 깨진다.
+  const parseOut = out => {
+    const m = out.match(/^(.*)-(\d+)(\.[a-z0-9]+)$/i);
+    return m ? { canon: m[1] + m[3], ord: m[2] } : { canon: out, ord: '1' };
+  };
+  const canonOf = out => (uniqueExpected.includes(out) ? out : (uniqueExpected.includes(parseOut(out).canon) ? parseOut(out).canon : null));
+  const matchCount = new Map(uniqueExpected.map(name => [name, 0]));
+  const ords = new Set();
+  const extra = [];
+  for (const out of uniqueActual) {
+    const canon = canonOf(out);
+    if (canon === null) { extra.push(out); continue; }
+    matchCount.set(canon, matchCount.get(canon) + 1);
+    ords.add(out === canon ? '1' : parseOut(out).ord);
+  }
+  const missing = uniqueExpected.filter(name => (matchCount.get(name) || 0) === 0);
+  const duplicated = uniqueExpected.filter(name => (matchCount.get(name) || 0) > 1);
   if (missing.length) throw new Error(`writes_to 필수 산출물이 outputs에 없습니다: ${missing.join(' · ')}`);
   if (extra.length) throw new Error(`writes_to에 없는 산출물은 이 실행에 추가할 수 없습니다: ${extra.join(' · ')}`);
+  if (duplicated.length) throw new Error(`같은 정본에 산출물이 2개 이상 대응합니다 — 한 실행에 하나입니다: ${duplicated.join(' · ')}`);
+  if (ords.size > 1) throw new Error(`재실행 순번이 섞였습니다(${[...ords].sort().join('·')}) — 한 실행의 산출물은 같은 순번을 씁니다.`);
   if (actual.length !== uniqueActual.size) throw new Error('outputs에 같은 파일명이 중복됐습니다.');
 
   const receiptDir = path.dirname(file);
@@ -417,7 +433,7 @@ async function start(file) {
     };
     refreshUsage(run);
     writeJson(file, run);
-    emit(file, run, 'run.started');
+    emit(file, run, 'run.started', { plan_id: run.plan?.plan_id || null, request: run.request || null });
     console.log(`✅ 실행 시작 · ${run.run_id} · 스킬 ${skillRows.map(s => s.id).join('→')}`);
   } catch (error) {
     fail(error.message);

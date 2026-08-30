@@ -30,15 +30,26 @@ export function readEvents(file) {
 }
 
 export function summarizeEvents(rows, runId = null) {
-  const selected = runId ? rows.filter(row => row.run_id === runId) : rows;
+  let selected = runId ? rows.filter(row => row.run_id === runId) : rows;
+  if (runId && selected.length) {
+    // 상관 확장 (P2 · 2026-08-30) — 실행 이전의 라우팅·계획 흔적을 같은 타래로 묶는다.
+    // 계획은 plan_sha256, 라우팅은 요청 원문이 상관키다. run_id 없는 행만 끌어온다.
+    const hashes = new Set(selected.map(row => row.plan_sha256).filter(Boolean));
+    const requests = new Set(selected.map(row => row.request).filter(Boolean));
+    const linked = rows.filter(row => !row.run_id && (
+      (row.plan_sha256 && hashes.has(row.plan_sha256)) ||
+      (row.request && requests.has(row.request))));
+    selected = [...linked, ...selected].sort((a, b) => String(a.at).localeCompare(String(b.at)));
+  }
   const counts = {};
   for (const row of selected) counts[row.type] = (counts[row.type] || 0) + 1;
+  const lastRun = [...selected].reverse().find(row => row.run_id === runId) || selected.at(-1);
   return {
     run_id: runId,
     events: selected.length,
     first_at: selected[0]?.at || null,
     last_at: selected.at(-1)?.at || null,
-    current_status: selected.at(-1)?.status || null,
+    current_status: lastRun?.status || null,
     counts,
   };
 }

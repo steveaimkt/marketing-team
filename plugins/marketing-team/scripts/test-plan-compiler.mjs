@@ -62,6 +62,14 @@ try {
   const ghost = base(); ghost.skills = ['999']; ghost.steps[0].skill = '999';
   assert.match(validatePlan(ghost).join(' '), /그런 스킬이 없습니다/, '없는 스킬을 잡아야 한다');
 
+  // 재실행 산출물 1:1 (P1 · 2026-08-30 최종 검토)
+  const rerunOnly = base(); rerunOnly.steps[0].outputs = [`workspace:${rel}/046-roas-budget-rebalance-2.md`];
+  assert.equal(validatePlan(rerunOnly).length, 0, '-2 재실행 산출물 단독은 통과해야 한다');
+  const dupCanon = base(); dupCanon.steps[0].outputs = [OUT, `workspace:${rel}/046-roas-budget-rebalance-2.md`];
+  assert.match(validatePlan(dupCanon).join(' '), /한 실행에 하나/, '정본과 -2 동시 입력은 막아야 한다');
+  const freeName = base(); freeName.steps[0].outputs = [`workspace:${rel}/046-roas-budget-rebalance-final.md`];
+  assert.match(validatePlan(freeName).join(' '), /계약에 없는 산출물/, '숫자 아닌 이름 변형은 막아야 한다');
+
   // 사용자가 지정한 순서 · 모델이 바꾸면 막는다 (실측 2026-08-30 · 061→073→065→066 이 바뀜)
   const ordered = base();
   ordered.requested_order = ['046'];
@@ -107,7 +115,7 @@ try {
   assert.equal(started.status, 0, `승인 뒤에는 시작해야 한다: ${started.stderr}`);
   assert.equal(JSON.parse(fs.readFileSync(runFile, 'utf8')).plan.plan_sha256, planHash(load()), '영수증에 승인 해시가 남아야 한다');
 
-  console.log('계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · ✅');
+  console.log('계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

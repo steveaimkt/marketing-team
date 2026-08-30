@@ -126,6 +126,45 @@ try {
   assert.notEqual(result.status, 0, 'writes_to에 없는 HTML 산출물을 허용했습니다.');
   assert.match(`${result.stdout}\n${result.stderr}`, /writes_to에 없는 산출물/);
 
+  // 재실행 산출물 1:1 (P1 · 2026-08-30 최종 검토) — -2 단독 통과 · 정본+재실행 동시 차단 · 순번 섞임 차단
+  const rerunReceipt = 'outputs/2026-08-30/043-meta-ad-copy/run-8.json';
+  const rerunDraft = extra => ({
+    schema: 'marketing-team.run/v1', status: 'draft', request: '메타 광고 카피 다시 만들어줘', skills: ['043'],
+    data_mode: '실데이터', inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
+    profile: 'workspace:brand/profile.md',
+    required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+    ...extra,
+  });
+  fs.writeFileSync(path.join(temp, rerunReceipt), `${JSON.stringify(rerunDraft({
+    outputs: ['workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md'],
+    // 검토 정책 자동 생성은 정본 이름으로 아티팩트를 매칭하므로 재실행(-2)에는 명시로 넣는다 (알려진 제약 · 2026-08-30)
+    required_reviews: [{ kind: 'compliance', artifact: 'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md' }],
+  }), null, 2)}\n`);
+  result = run('start', rerunReceipt);
+  assert.equal(result.status, 0, `-2 재실행 산출물 단독은 시작돼야 합니다: ${result.stderr}`);
+  const dupReceipt = 'outputs/2026-08-30/043-meta-ad-copy/run-9.json';
+  fs.writeFileSync(path.join(temp, dupReceipt), `${JSON.stringify(rerunDraft({
+    outputs: [
+      'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.md',
+      'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md',
+    ],
+  }), null, 2)}\n`);
+  result = run('start', dupReceipt);
+  assert.notEqual(result.status, 0, '정본과 -2 재실행을 한 실행에 동시에 허용했습니다.');
+  assert.match(`${result.stdout}\n${result.stderr}`, /한 실행에 하나/);
+  const ordReceipt = 'outputs/2026-08-30/050-utm-attribution/run-10.json';
+  fs.mkdirSync(path.join(temp, 'outputs', '2026-08-30', '050-utm-attribution'), { recursive: true });
+  fs.writeFileSync(path.join(temp, ordReceipt), `${JSON.stringify(rerunDraft({
+    request: 'UTM 규칙 다시 만들어줘', skills: ['050'],
+    outputs: [
+      'workspace:outputs/2026-08-30/050-utm-attribution/050-utm-attribution-2.csv',
+      'workspace:outputs/2026-08-30/050-utm-attribution/050-utm-attribution-해설-3.md',
+    ],
+  }), null, 2)}\n`);
+  result = run('start', ordReceipt);
+  assert.notEqual(result.status, 0, '재실행 순번이 섞였는데 시작됐습니다.');
+  assert.match(`${result.stdout}\n${result.stderr}`, /순번이 섞였습니다/);
+
   // 예산·자료 부족으로 조기 중단할 때는 아직 없는 산출물과 원장을 완료 조건처럼 요구하지 않는다.
   const blockedReceipt = 'outputs/2026-08-30/046-roas-budget-rebalance/run-4.json';
   fs.writeFileSync(path.join(temp, blockedReceipt), `${JSON.stringify({
@@ -323,7 +362,7 @@ try {
     assert.equal(after.steps.find(x => x.step === 4).status, 'pending');
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 단계별 실행·재개 6 · ✅');
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 단계별 실행·재개 6 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
