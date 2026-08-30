@@ -170,8 +170,10 @@ function pluginScriptCall(input) {
     path.resolve(pluginRoot, target),
   ].filter(Boolean);
   if (!candidates.some(file => inside(scriptsDir, file))) return null;
-  const sub = String(m[4] || '').trim().match(/^(?:"([^"]*)"|'([^']*)'|(\S+))/);
-  return { script: path.basename(target.replace(/\\/g, '/')), sub: (sub && (sub[1] || sub[2] || sub[3])) || '' };
+  const argsRaw = String(m[4] || '').trim();
+  const sub = argsRaw.match(/^(?:"([^"]*)"|'([^']*)'|(\S+))/);
+  const flags = argsRaw.split(/\s+/).filter(token => token.startsWith('--'));
+  return { script: path.basename(target.replace(/\\/g, '/')), sub: (sub && (sub[1] || sub[2] || sub[3])) || '', flags };
 }
 
 /**
@@ -210,7 +212,12 @@ function allowedScript(input, stage) {
   if (!call) return false;
   const subs = SCRIPT_ALLOW[stage]?.[call.script];
   if (subs === undefined) return false;
-  return subs === null || subs.includes(call.sub);
+  if (subs === null) return true;
+  if (!subs.includes(call.sub)) return false;
+  // 결합 옵션 우회 차단 (릴리스 관문 검토 실측 2026-08-30) — 첫 인수만 보면
+  // 「--check --summary」가 통과해 쓰기 모드가 열린다. 제한 목록이 걸린 스크립트는
+  // 명령의 모든 --옵션이 목록 안에 있어야 한다.
+  return call.flags.every(flag => subs.includes(flag));
 }
 
 function validateSkill(input, plan) {
