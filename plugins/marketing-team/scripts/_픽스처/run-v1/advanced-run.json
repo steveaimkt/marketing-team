@@ -1,0 +1,259 @@
+{
+  "schema": "marketing-team.run/v1",
+  "run_id": "20260830080346-061-3791e9",
+  "started_at": "2026-08-30T08:03:46.577Z",
+  "completed_at": "2026-08-30T08:21:20.721Z",
+  "status": "completed",
+  "plan": {
+    "plan_sha256": "9f7322fd881a9720372f3792ffe5256a4fd87e8c3c43ea275cd3600c94a564b2",
+    "plan_id": null
+  },
+  "steps": [
+    {
+      "step": 1,
+      "skill": "061",
+      "status": "completed",
+      "inputs": [
+        "plugin:sample-data/A브랜드-채널성과-90일.csv"
+      ],
+      "outputs": [
+        "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md"
+      ],
+      "consumed": {},
+      "started_at": "2026-08-30T08:04:09.628Z",
+      "completed_at": "2026-08-30T08:06:03.467Z"
+    },
+    {
+      "step": 2,
+      "skill": "073",
+      "status": "completed",
+      "inputs": [
+        "plugin:sample-data/A브랜드-퍼널-가입구매-90일.csv",
+        "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md"
+      ],
+      "outputs": [
+        "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md"
+      ],
+      "consumed": {
+        "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md": "3eb02fb2f668c54b9308c18dcdfd5aa92638274b09b7fb8671862893a95c4919"
+      },
+      "started_at": "2026-08-30T08:06:10.858Z",
+      "completed_at": "2026-08-30T08:07:21.741Z"
+    },
+    {
+      "step": 3,
+      "skill": "065",
+      "status": "completed",
+      "inputs": [
+        "plugin:sample-data/A브랜드-고객마스터.csv"
+      ],
+      "outputs": [
+        "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments.csv",
+        "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md"
+      ],
+      "consumed": {},
+      "started_at": "2026-08-30T08:08:15.019Z",
+      "completed_at": "2026-08-30T08:16:42.005Z"
+    },
+    {
+      "step": 4,
+      "skill": "066",
+      "status": "completed",
+      "inputs": [
+        "plugin:sample-data/profile-sample.md",
+        "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md",
+        "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md",
+        "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md"
+      ],
+      "outputs": [
+        "workspace:outputs/2026-08-30/066-kpi-tree/066-kpi-tree.md"
+      ],
+      "consumed": {
+        "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md": "3eb02fb2f668c54b9308c18dcdfd5aa92638274b09b7fb8671862893a95c4919",
+        "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md": "d49519790302e6b116eb80645bc4c22ba0da8bacff4772e964ef940dec7e2a81",
+        "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md": "ea3b35bd53cccb39a67eba5fd9d7aed4038bafbf2f063ec7275f96327a2194c3"
+      },
+      "started_at": "2026-08-30T08:19:13.636Z",
+      "completed_at": "2026-08-30T08:21:04.243Z"
+    }
+  ],
+  "request": "판매 데이터 분석부터 고객 여정, RFM 세그먼트, KPI 트리까지 061 → 073 → 065 → 066 순서로 한 번에 돌려줘",
+  "skills": [
+    {
+      "id": "061",
+      "name": "판매 데이터 분석",
+      "path": "plugin:100-skills/07-analytics/skills/061-sales-data-analysis/SKILL.md",
+      "sha256": "c9e4a2a147a5e1dfbd494c1c8c0b91921ca29c8ad12d5f779268f96f8f2a1b7c",
+      "pii": false,
+      "gate": false,
+      "review": [],
+      "writes_to": [
+        "outputs/{날짜}/061-sales-data-analysis/061-sales-data-analysis.md"
+      ]
+    },
+    {
+      "id": "073",
+      "name": "고객 여정 맵핑",
+      "path": "plugin:100-skills/08-crm/skills/073-customer-journey-map/SKILL.md",
+      "sha256": "4b4d341d79ad916d0c3ab010500c0416680ca0832d86b9705ea3c20b7073ec3b",
+      "pii": false,
+      "gate": false,
+      "review": [
+        "경영"
+      ],
+      "writes_to": [
+        "outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md"
+      ]
+    },
+    {
+      "id": "065",
+      "name": "고객 세그먼트 RFM 분석",
+      "path": "plugin:100-skills/07-analytics/skills/065-rfm-segments/SKILL.md",
+      "sha256": "430e11a776f3d642c00cac5db5849d3dbdcd04325a98464ba7f978295c33d661",
+      "pii": true,
+      "gate": false,
+      "review": [],
+      "writes_to": [
+        "outputs/{날짜}/065-rfm-segments/065-rfm-segments.csv",
+        "outputs/{날짜}/065-rfm-segments/065-rfm-segments-해설.md"
+      ]
+    },
+    {
+      "id": "066",
+      "name": "KPI 트리 설계",
+      "path": "plugin:100-skills/07-analytics/skills/066-kpi-tree/SKILL.md",
+      "sha256": "a4cc58ed3e9a0b61d9d7c6b018c82c9058e7011584401ed8c5d4e7859386dfae",
+      "pii": false,
+      "gate": false,
+      "review": [],
+      "writes_to": [
+        "outputs/{날짜}/066-kpi-tree/066-kpi-tree.md"
+      ]
+    }
+  ],
+  "data_mode": "샘플",
+  "inputs": [
+    {
+      "path": "plugin:sample-data/A브랜드-채널성과-90일.csv",
+      "sha256": "f75de133779a177a32b47a7f13dbf83d0f9c9d63e564059ac2c19c998671d425",
+      "period": "2026-05-01~2026-07-29"
+    },
+    {
+      "path": "plugin:sample-data/A브랜드-퍼널-가입구매-90일.csv",
+      "sha256": "c974589016fdc48c961b52d0eeb55f3136a277e241979e39be7edae986675fc6",
+      "period": "2026-05-01~2026-07-29"
+    },
+    {
+      "path": "plugin:sample-data/A브랜드-고객마스터.csv",
+      "sha256": "b7397c5f897963eda2c11bab9c4be60cd4ccd9511cd8f106b806d7b509c0cf30",
+      "period": "2025-07-01~2026-06-30"
+    },
+    {
+      "path": "plugin:sample-data/profile-sample.md",
+      "sha256": "7c37757970e8fdf0dce38f63d6253583d55779169201650c26b747c3f895c03c",
+      "period": "미확인"
+    }
+  ],
+  "profile": {
+    "path": "plugin:sample-data/profile-sample.md",
+    "sha256": "7c37757970e8fdf0dce38f63d6253583d55779169201650c26b747c3f895c03c"
+  },
+  "pii": {
+    "source": "plugin:sample-data/A브랜드-고객마스터.csv",
+    "id_columns": [
+      "고객ID"
+    ],
+    "surrogate_column": "마스킹고객ID"
+  },
+  "outputs": [
+    {
+      "path": "workspace:outputs/2026-08-30/066-kpi-tree/061-sales-data-analysis.md",
+      "sha256": "3eb02fb2f668c54b9308c18dcdfd5aa92638274b09b7fb8671862893a95c4919"
+    },
+    {
+      "path": "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md",
+      "sha256": "d49519790302e6b116eb80645bc4c22ba0da8bacff4772e964ef940dec7e2a81"
+    },
+    {
+      "path": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments.csv",
+      "sha256": "d4c4a6b06bc56f62d18d0327b6110131f64b94c202b2610f6a6e6d3cd72cf55d"
+    },
+    {
+      "path": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md",
+      "sha256": "ea3b35bd53cccb39a67eba5fd9d7aed4038bafbf2f063ec7275f96327a2194c3"
+    },
+    {
+      "path": "workspace:outputs/2026-08-30/066-kpi-tree/066-kpi-tree.md",
+      "sha256": "6579aa8816043956fd23c01c5b8501a96a59c8e6baa3087b74776d08dbb270da"
+    }
+  ],
+  "required_reviews": [
+    {
+      "kind": "business",
+      "perspective": "경영",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md"
+    },
+    {
+      "kind": "compliance",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments.csv"
+    },
+    {
+      "kind": "compliance",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md"
+    }
+  ],
+  "review_policy": {
+    "source": "skill-frontmatter",
+    "generated": 1
+  },
+  "reviews": [
+    {
+      "kind": "business",
+      "perspective": "경영",
+      "status": "approved",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/073-customer-journey-map.md",
+      "artifact_sha256": "d49519790302e6b116eb80645bc4c22ba0da8bacff4772e964ef940dec7e2a81",
+      "report": "workspace:outputs/2026-08-30/066-kpi-tree/review-경영-073.md",
+      "report_sha256": "b09fe42c2f9329977e16996b0e92d5de0e2f73c637f00d6bfc6891c772c27c44",
+      "reviewed_at": "2026-08-30T08:18:43.961Z"
+    },
+    {
+      "kind": "compliance",
+      "status": "pass",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments.csv",
+      "artifact_sha256": "d4c4a6b06bc56f62d18d0327b6110131f64b94c202b2610f6a6e6d3cd72cf55d",
+      "report": "workspace:outputs/2026-08-30/066-kpi-tree/gate-065.md",
+      "report_sha256": "ef64347e901a37b8f364a4adf3da2f9ba3aabed60d9ab70c1f46b66008b48c9e",
+      "reviewed_at": "2026-08-30T08:19:44.776Z"
+    },
+    {
+      "kind": "compliance",
+      "status": "pass",
+      "artifact": "workspace:outputs/2026-08-30/066-kpi-tree/065-rfm-segments-해설.md",
+      "artifact_sha256": "ea3b35bd53cccb39a67eba5fd9d7aed4038bafbf2f063ec7275f96327a2194c3",
+      "report": "workspace:outputs/2026-08-30/066-kpi-tree/gate-065.md",
+      "report_sha256": "ef64347e901a37b8f364a4adf3da2f9ba3aabed60d9ab70c1f46b66008b48c9e",
+      "reviewed_at": "2026-08-30T08:19:48.643Z"
+    }
+  ],
+  "ledger": {
+    "path": "workspace:logs/build-log.md",
+    "recorded": true
+  },
+  "integrity": {
+    "status": "current",
+    "verified_at": "2026-08-30T08:21:20.721Z",
+    "issues": []
+  },
+  "budget": {
+    "tool_calls": 0,
+    "wall_minutes": 0,
+    "review_rounds": 3
+  },
+  "usage": {
+    "tool_calls": 0,
+    "review_rounds": 3,
+    "wall_minutes": 17.57,
+    "warnings": []
+  }
+}

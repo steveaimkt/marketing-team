@@ -1,0 +1,135 @@
+{
+  "schema": "marketing-team.run/v1",
+  "run_id": "20260830080346-006-fef911",
+  "started_at": "2026-08-30T08:03:46.104Z",
+  "completed_at": "2026-08-30T08:14:55.008Z",
+  "status": "completed",
+  "plan": {
+    "plan_sha256": "010d75b9e394128e5368e3ba6704631a2283970128641eec3d41fa48b794bb65",
+    "plan_id": null
+  },
+  "steps": [
+    {
+      "step": 1,
+      "skill": "006",
+      "status": "completed",
+      "inputs": [
+        "plugin:sample-data/A브랜드-리뷰-200건.csv",
+        "plugin:sample-data/profile-sample.md"
+      ],
+      "outputs": [
+        "workspace:outputs/2026-08-30/006-review-mining/006-review-mining.csv",
+        "workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md"
+      ],
+      "consumed": {},
+      "started_at": "2026-08-30T08:03:51.521Z",
+      "completed_at": "2026-08-30T08:09:31.591Z"
+    }
+  ],
+  "request": "고객 불만 정리해줘",
+  "skills": [
+    {
+      "id": "006",
+      "name": "소비자 리뷰 마이닝",
+      "path": "plugin:100-skills/01-research/skills/006-review-mining/SKILL.md",
+      "sha256": "601200772403ce08f74c8c556377ab6eb3309c4081a2d3d3f1e68e2f00e58d22",
+      "pii": true,
+      "gate": false,
+      "review": [],
+      "writes_to": [
+        "outputs/{날짜}/006-review-mining/006-review-mining.csv",
+        "outputs/{날짜}/006-review-mining/006-review-mining-해설.md"
+      ]
+    }
+  ],
+  "data_mode": "샘플",
+  "inputs": [
+    {
+      "path": "plugin:sample-data/A브랜드-리뷰-200건.csv",
+      "sha256": "9531853e00c368fc02b3aa7a29fcb539733d389d1d3986d17335274aab7c0092",
+      "period": "2026-06-01~2026-07-31"
+    },
+    {
+      "path": "plugin:sample-data/profile-sample.md",
+      "sha256": "7c37757970e8fdf0dce38f63d6253583d55779169201650c26b747c3f895c03c",
+      "period": "미확인"
+    }
+  ],
+  "profile": {
+    "path": "plugin:sample-data/profile-sample.md",
+    "sha256": "7c37757970e8fdf0dce38f63d6253583d55779169201650c26b747c3f895c03c"
+  },
+  "pii": {
+    "source": "plugin:sample-data/A브랜드-리뷰-200건.csv",
+    "id_columns": [
+      "번호"
+    ],
+    "surrogate_column": "번호"
+  },
+  "outputs": [
+    {
+      "path": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining.csv",
+      "sha256": "7e11902abd46bab33fe8adee10007acf9c8e1364cecc6a7fda87c3879bc7c51b"
+    },
+    {
+      "path": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md",
+      "sha256": "464a0f740949041e5cd8890b42359b46bf6af5bb845d8505f24b270bb97bfe69"
+    }
+  ],
+  "required_reviews": [
+    {
+      "kind": "compliance",
+      "artifact": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining.csv"
+    },
+    {
+      "kind": "compliance",
+      "artifact": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md"
+    }
+  ],
+  "review_policy": {
+    "source": "skill-frontmatter",
+    "generated": 0
+  },
+  "reviews": [
+    {
+      "kind": "compliance",
+      "status": "pass",
+      "artifact": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining.csv",
+      "artifact_sha256": "7e11902abd46bab33fe8adee10007acf9c8e1364cecc6a7fda87c3879bc7c51b",
+      "report": "workspace:outputs/2026-08-30/006-review-mining/gate.md",
+      "report_sha256": "b73b14e292da4dd13338d473dbae4edba728d01c1c79290fc25af9c967fb08c0",
+      "reviewed_at": "2026-08-30T08:11:00.161Z"
+    },
+    {
+      "kind": "compliance",
+      "status": "pass",
+      "artifact": "workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md",
+      "artifact_sha256": "464a0f740949041e5cd8890b42359b46bf6af5bb845d8505f24b270bb97bfe69",
+      "report": "workspace:outputs/2026-08-30/006-review-mining/gate.md",
+      "report_sha256": "b73b14e292da4dd13338d473dbae4edba728d01c1c79290fc25af9c967fb08c0",
+      "reviewed_at": "2026-08-30T08:11:04.044Z"
+    }
+  ],
+  "ledger": {
+    "path": "workspace:logs/build-log.md",
+    "recorded": true
+  },
+  "integrity": {
+    "status": "current",
+    "verified_at": "2026-08-30T08:14:55.007Z",
+    "issues": []
+  },
+  "budget": {
+    "tool_calls": 30,
+    "wall_minutes": 10,
+    "review_rounds": 3
+  },
+  "usage": {
+    "tool_calls": 0,
+    "review_rounds": 2,
+    "wall_minutes": 11.15,
+    "warnings": [
+      "실행 시간 소프트 예산 초과: 11.15 > 10"
+    ]
+  }
+}

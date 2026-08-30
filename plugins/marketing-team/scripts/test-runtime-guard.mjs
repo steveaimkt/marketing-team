@@ -92,6 +92,12 @@ try {
   assert.equal(decision(result), 'none', '따옴표 속 기호를 문법으로 오인해 조회를 막았습니다.');
   result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/run-receipt.mjs" start "outputs/run.json"' });
   assert.equal(decision(result), 'none', '절차가 요구하는 플러그인 스크립트 실행을 막았습니다.');
+  // 굵은 표식도 계획으로 결속된다 (실측 2026-08-31 · 헛 재승인 2회)
+  const boldPlan = row('assistant', '**[실행 계획]**\n광고 문구 3안\n**[승인 요청]**\n진행하려면 「진행 승인」');
+  writeTranscript([active, boldPlan, approval]);
+  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  assert.equal(decision(result), 'none', '굵은 표식 계획에 승인이 결속되지 않았습니다 — 헛 재승인이 난다.');
+
   const quotedMarker = row('assistant', '본보기 설명 · 되돌림 화면도 「[실행 계획]」·「[승인 요청]」 표식을 그대로 쓴다.');
   writeTranscript([active, plan, approval, quotedMarker]);
   result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
