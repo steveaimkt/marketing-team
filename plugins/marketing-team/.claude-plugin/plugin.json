@@ -1,7 +1,7 @@
 {
   "name": "marketing-team",
   "description": "스킬 100개를 갖춘 마케터를 세팅한다. 브랜드 정보를 채우면 100개가 우리 값으로 돈다.",
-  "version": "0.48.5",
+  "version": "0.48.6",
   "author": {
     "name": "WMBB"
   },
