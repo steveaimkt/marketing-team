@@ -31,7 +31,7 @@
   "skills": [
     {
       "id": "046",
-      "name": "ROAS 진단 & 예산 재배분",
+      "name": "ROAS 진단",
       "path": "plugin:100-skills/05-ads/skills/046-roas-budget-rebalance/SKILL.md",
       "sha256": "7b5e4aff04dcb35118094c0ffc7d769ddd4ed5a408e94f53e386ad06a0d8b896",
       "pii": false,

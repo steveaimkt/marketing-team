@@ -7,6 +7,12 @@
  *
  * 사용: node scripts/sync-skills.mjs <정본_marketing-os_경로>
  *   예: node scripts/sync-skills.mjs ../marketing-os-dist
+ *
+ * 🔴 **이름(`name:`)만은 이 저장소가 정본이다** (2026-09-01 · 사용자 결정).
+ *    100개 이름을 「대상 + 행위」 한 꼴로 통일했고 `docs/스킬명-대조표.md` 가 그 정본이다.
+ *    상류(marketing-os · marketing-os-dist)는 옛 이름을 들고 있어서, 그냥 받아 오면
+ *    **100개가 조용히 되돌아간다.** 그래서 받은 뒤 대조표로 이름을 **되씌운다.**
+ *    이름 말고 다른 것(절차·트리거·입출력)은 상류가 정본이다.
  */
 import fs from 'node:fs';
 // ⚠️ 윈도우에서 클론하면 .md 가 CRLF 로 온다 (git 기본값 core.autocrlf=true).
@@ -32,6 +38,33 @@ if (!fs.existsSync(path.join(from, 'ROUTING.md'))) { console.error(`정본이 �
 const to = path.join(ROOT, '100-skills');
 fs.rmSync(to, { recursive: true, force: true });
 fs.cpSync(from, to, { recursive: true });
+
+// 🔴 이름 되씌우기 · 상류가 옛 이름을 들고 있어도 이 저장소의 이름이 이긴다 (2026-09-01)
+{
+  const 표 = path.join(ROOT, 'docs', '스킬명-대조표.md');
+  if (!fs.existsSync(표)) {
+    console.error('🔴 docs/스킬명-대조표.md 가 없다. 이름 정본이 없으면 상류의 옛 이름이 그대로 들어온다.');
+    process.exit(1);
+  }
+  const 쌍 = [...fs.readFileSync(표, 'utf8')
+    .matchAll(/^\| ?(\d{3}) ?\| ?([^|]+?) ?\| ?([^|]+?) ?\|/gm)]
+    .map(m => ({ from: m[2].trim().replace(/\*\*/g, '').trim(), to: m[3].trim().replace(/\*\*/g, '').trim() }))
+    .filter(r => r.from && r.to && r.from !== r.to && !/^-+$/.test(r.from))
+    .sort((a, b) => b.from.length - a.from.length);
+  const rx = new RegExp(쌍.map(r => r.from.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+  const 사전 = Object.fromEntries(쌍.map(r => [r.from, r.to]));
+  let 되씌움 = 0;
+  const 훑기 = d => fs.readdirSync(d, { withFileTypes: true }).forEach(e => {
+    const q = path.join(d, e.name);
+    if (e.isDirectory()) return 훑기(q);
+    if (!/\.(md|html|json)$/.test(e.name)) return;
+    const body = fs.readFileSync(q, 'utf8');
+    const 새 = body.replace(rx, m => 사전[m]);
+    if (새 !== body) { fs.writeFileSync(q, 새); 되씌움++; }
+  });
+  훑기(to);
+  console.log(`✅ 이름 되씌움 · 파일 ${되씌움}개 (대조표 ${쌍.length}쌍 · 이름은 이 저장소가 정본)`);
+}
 
 // 받아 온 사본에서 개인 인스턴스 이름을 이 패키지의 이름으로 바꾼다 (정본은 건드리지 않는다)
 const SUBS = [[/트루먼이 상시로/g, '디렉터가 상시로'], [/트루먼/g, '디렉터'],

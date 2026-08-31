@@ -30,7 +30,7 @@
   "skills": [
     {
       "id": "006",
-      "name": "소비자 리뷰 마이닝",
+      "name": "소비자 리뷰 분석",
       "path": "plugin:100-skills/01-research/skills/006-review-mining/SKILL.md",
       "sha256": "601200772403ce08f74c8c556377ab6eb3309c4081a2d3d3f1e68e2f00e58d22",
       "pii": true,

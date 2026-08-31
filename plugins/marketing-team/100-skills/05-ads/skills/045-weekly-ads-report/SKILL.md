@@ -1,6 +1,6 @@
 ---
 id: "045"
-name: 광고 주간 리포트 자동화
+name: 광고 주간 성과 분석
 description: "매체 데이터 취합 → 주간 성과 리포트 (실전 자산). 매주 매체별 광고 성과를 한 장으로 모아 보고해야 할 때 사용."
 slug: weekly-ads-report
 category: 05-ads
@@ -25,7 +25,7 @@ when_to_use: "매주 매체별 광고 성과를 한 장으로 모아 보고해�
 success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대비 이상 신호 발견 건수]
 ---
 
-# 045 광고 주간 리포트 자동화
+# 045 광고 주간 성과 분석
 
 > 매체별 데이터를 공통 스키마로 취합 → KPI 카드 + 인라인 SVG 차트 3종 → 전주 대비 해석까지 담긴 단일 HTML 주간 리포트.
 > 계승: 교육 파트너 6-1 meta-ads-analyzer(KPI 카드·인라인 SVG 차트 3종·읽기 전용 원칙) + 6-4 3media(매체 취합·동일 잣대 비교 구조).
@@ -63,7 +63,7 @@ success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대�
 5. **HTML 리포트 생성** — html-report-template 표준 골격 + 인라인 SVG 차트 3종:
    ① 매체/캠페인 ROAS 막대 (전주 vs 이번 주 + BEP 세로선) ② 예산 점유율 vs 매출 기여율 (효자 과소투자·부진 과대투자 검출) ③ 캠페인 ROAS 가로 랭킹 (TOP→BOTTOM + BEP 선). 저장: `outputs/{날짜}/weekly-ads-{날짜}.html`.
 6. **적재·발송** — Notion 아카이브 1행 (연결 시). ⏸ 외부 채널 발송·매주 자동 가동(cron)은 사용자 승인 후에만.
-7. **체인 제안** — BOTTOM 캠페인·매체 불균형 발견 시 → 046 ROAS 진단 & 예산 재배분.
+7. **체인 제안** — BOTTOM 캠페인·매체 불균형 발견 시 → 046 ROAS 진단.
 
 8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
@@ -89,7 +89,7 @@ success_metrics: [리포트 작성 시간 절감, 보고 누락률, 전주 대�
 
 ### 전주 대비 해석 — 오른 것·내린 것 각 2개, 원인 가설 1줄씩 (WoW)
 파일: outputs/{날짜}/weekly-ads-{날짜}.html · Notion 아카이브 {✅/미연결}
-다음 액션: → 046 ROAS 진단 & 예산 재배분 (BOTTOM 캠페인 예산 이동 시나리오)
+다음 액션: → 046 ROAS 진단 (BOTTOM 캠페인 예산 이동 시나리오)
 
 저장 파일: outputs/{날짜}/045-weekly-ads-report/045-weekly-ads-report.html
 ```

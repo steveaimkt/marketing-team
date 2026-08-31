@@ -1,4 +1,4 @@
-# 실습 입력 · 042 네이버 쇼핑검색광고 최적화
+# 실습 입력 · 042 네이버 쇼핑광고 진단
 
 ```
 sample-data/naver-ads-sample-report.csv 로 네이버 광고 최적화해줘

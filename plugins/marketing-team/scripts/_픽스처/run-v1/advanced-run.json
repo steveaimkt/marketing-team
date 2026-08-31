@@ -93,7 +93,7 @@
     },
     {
       "id": "073",
-      "name": "고객 여정 맵핑",
+      "name": "고객 여정 정리",
       "path": "plugin:100-skills/08-crm/skills/073-customer-journey-map/SKILL.md",
       "sha256": "4b4d341d79ad916d0c3ab010500c0416680ca0832d86b9705ea3c20b7073ec3b",
       "pii": false,
@@ -107,7 +107,7 @@
     },
     {
       "id": "065",
-      "name": "고객 세그먼트 RFM 분석",
+      "name": "고객 등급 분석",
       "path": "plugin:100-skills/07-analytics/skills/065-rfm-segments/SKILL.md",
       "sha256": "430e11a776f3d642c00cac5db5849d3dbdcd04325a98464ba7f978295c33d661",
       "pii": true,
@@ -120,7 +120,7 @@
     },
     {
       "id": "066",
-      "name": "KPI 트리 설계",
+      "name": "KPI 체계 설계",
       "path": "plugin:100-skills/07-analytics/skills/066-kpi-tree/SKILL.md",
       "sha256": "a4cc58ed3e9a0b61d9d7c6b018c82c9058e7011584401ed8c5d4e7859386dfae",
       "pii": false,

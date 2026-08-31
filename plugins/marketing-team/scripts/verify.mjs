@@ -748,9 +748,9 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 }
 
 // ⑥-i22 PLUGIN.md 의 스킬명이 SKILL.md 와 같나
-//   실측 2026-08-28 · 024 를 「YouTube 스크립트」로 바꿨는데(v0.28.0)
-//   03-content/PLUGIN.md 는 「YouTube 스크립트 (성과 증명형)」 옛 이름 그대로였다.
-//   052 도 PLUGIN 은 「상세페이지 → Figma 자동화」, SKILL 은 「상세페이지 디자인 시안」이었다.
+//   실측 2026-08-28 · 024 를 「유튜브 대본 작성」로 바꿨는데(v0.28.0)
+//   03-content/PLUGIN.md 는 「유튜브 대본 작성 (성과 증명형)」 옛 이름 그대로였다.
+//   052 도 PLUGIN 은 「상세페이지 → Figma 자동화」, SKILL 은 「상세페이지 디자인 작성」이었다.
 //   ⚠️ ROUTING.md 는 자동 생성이라 항상 맞는데 **PLUGIN.md 는 손으로 쓴다.**
 //   이름을 바꿀 때 여기를 같이 안 고치면 카테고리 안내가 조용히 옛것을 말한다.
 {
@@ -1336,6 +1336,69 @@ for (const link of ['agents', 'skills']) {
   for (const k of ['완주 조건', '파일 착지', '규제 게이트', '원장'])
     if (!d.includes(k)) { err(`AI 마케터에 완주 조건 「${k}」 가 없다 — 단축 요청에 절차가 빠진다`); break; }
   if (d.includes('완주 조건')) ok.push('완주 조건 셋 명시 (단축 요청에도 생략 불가)');
+}
+
+// ⑩-b 스킬 이름 · 정본 하나가 사본 1,284곳을 거느린다 (2026-09-01 · 이름 통일 작업)
+//   왜: `SKILL.md` frontmatter `name:` 이 정본인데, 같은 파일 본문 H1 이 이름을 복제하고
+//       PLUGIN.md·example·타 스킬 참조까지 사본이 700곳 넘게 자동 검사 밖에 있었다.
+//       이름을 바꿀 때 「바꾸는 일」보다 「안 바뀐 것을 찾는 일」이 어렵다.
+{
+  const 정본 = new Map();                       // id → name
+  for (const cdir of fs.readdirSync(M).filter(d => /^\d\d-/.test(d))) {
+    const sdir = path.join(M, cdir, 'skills');
+    if (!fs.existsSync(sdir)) continue;
+    for (const s of fs.readdirSync(sdir)) {
+      const file = path.join(sdir, s, 'SKILL.md');
+      if (!fs.existsSync(file)) continue;
+      const body = fs.readFileSync(file, 'utf8');
+      const id = body.match(/^id:\s*"?(\d{3})"?/m)?.[1];
+      const nm = body.match(/^name:\s*(.+)$/m)?.[1]?.trim();
+      if (!id || !nm) continue;
+      정본.set(id, nm);
+      // ① 본문 H1 이 이름을 복제한다 — `# 이름` 또는 `# 006 이름`. 한 쌍으로 움직여야 한다
+      const h1 = body.match(/^#\s+(.+)$/m)?.[1]?.trim();
+      if (!h1) err(`${id} SKILL.md 에 본문 제목(H1)이 없다`);
+      else if (h1.replace(/^\d{3}\s*/, '').trim() !== nm)
+        err(`${id} 본문 제목이 이름과 다르다 · name「${nm}」≠ H1「${h1}」 — 이름을 바꿀 때 둘을 함께 바꾼다`);
+    }
+  }
+  if (정본.size === 100) ok.push('스킬 이름 · 정본 100개 · 본문 제목과 한 쌍');
+
+  // ② 옛 이름이 어디에도 안 남았나 · `docs/스킬명-대조표.md` 가 있을 때만 돈다
+  //    표가 정본이다. 표에 적힌 「지금 이름」이 저장소에 남아 있으면 안 바뀐 사본이다.
+  const 대조표 = path.join(ROOT, 'docs', '스킬명-대조표.md');
+  if (fs.existsSync(대조표)) {
+    const 옛 = [...fs.readFileSync(대조표, 'utf8')
+      .matchAll(/^\| ?(\d{3}) ?\| ?([^|]+?) ?\| ?([^|]+?) ?\|/gm)]
+      .map(m => ({ id: m[1], from: m[2].trim().replace(/\*\*/g, '').trim(),
+                                to: m[3].trim().replace(/\*\*/g, '').trim() }))
+      .filter(r => r.from && r.to && r.from !== r.to && !/^-+$/.test(r.from));
+    const 볼곳 = [];
+    const walk = d => { for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const q = path.join(d, e.name);
+      if (e.isDirectory()) { if (!/^(node_modules|\.git|_픽스처|실제확인-기록)$/.test(e.name)) walk(q); }
+      else if (/\.(md|html|json|mjs)$/.test(e.name) && !q.endsWith('스킬명-대조표.md')) 볼곳.push(q);
+    } };
+    walk(ROOT);
+    let 잔존 = 0;
+    for (const f of 볼곳) {
+      const body = fs.readFileSync(f, 'utf8');
+      const 세기 = (s, w) => s.split(w).length - 1;
+      for (const r of 옛) {
+        // 옛 이름이 새 이름에 통째로 들어 있으면 (짧은 옛 이름 ⊂ 뒤에 말이 붙은 새 이름)
+        // 새 이름 안의 것은 잔존이 아니다. 초과분만 센다.
+        const 남음 = r.to.includes(r.from)
+          ? 세기(body, r.from) > 세기(body, r.to)
+          : body.includes(r.from);
+        if (남음) {
+          if (잔존 < 12) err(`옛 이름이 남았다 · ${r.id}「${r.from}」→「${r.to}」 · ${path.relative(ROOT, f)}`);
+          잔존++;
+        }
+      }
+    }
+    if (잔존 > 12) err(`… 옛 이름 잔존 ${잔존}건 (12건만 표시)`);
+    if (!잔존) ok.push(`스킬 이름 · 옛 이름 잔존 0 (대조표 ${옛.length}건 전수)`);
+  }
 }
 
 // ⑪ 카탈로그 · 100개를 한 장으로 보는 파일이 있고 명부보다 최신인가

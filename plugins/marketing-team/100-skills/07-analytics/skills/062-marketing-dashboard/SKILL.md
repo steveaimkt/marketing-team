@@ -1,6 +1,6 @@
 ---
 id: "062"
-name: 마케팅 대시보드 빌더
+name: 마케팅 대시보드 작성
 description: "멀티채널 데이터 → HTML 대시보드 (검증 방법론). 흩어진 채널 지표를 한 화면에서 매일 확인해야 할 때 사용."
 slug: marketing-dashboard
 category: 07-analytics
@@ -26,7 +26,7 @@ when_to_use: "흩어진 채널 지표를 한 화면에서 매일 확인해야 �
 success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, 대시보드 갱신 소요 시간]
 ---
 
-# 062 마케팅 대시보드 빌더
+# 062 마케팅 대시보드 작성
 
 > 멀티채널 데이터 → 단일 파일 HTML 대시보드. KPI 카드 → 추이 → 채널 비교 3층 구조, 폰에서 열리고 인쇄되고 다크모드까지.
 > 계승: marketing-os 「html-report-template」 표준 템플릿 **그대로** — 단일 파일·모바일 우선·인쇄 가능·다크모드 자동 + 표준 섹션 골격(header/kpi/highlights/charts/tables/actions/footer).
@@ -93,7 +93,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 ⑥ 지표 정의: ROAS = 매출/광고비 (BEP {n}, profile.md §4) · ...
 
 갱신 가이드: {소스별 교체 절차}
-다음 액션: → 067 월간 마케팅 리포트 자동화 (이 지표 세트로 월간 보고 정례화)
+다음 액션: → 067 월간 마케팅 성과 분석 (이 지표 세트로 월간 보고 정례화)
 
 저장 파일: outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html
 ```

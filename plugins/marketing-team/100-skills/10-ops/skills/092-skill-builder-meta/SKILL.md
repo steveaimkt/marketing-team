@@ -1,6 +1,6 @@
 ---
 id: "092"
-name: 나만의 스킬 만들기 (메타 스킬)
+name: 나만의 스킬 만들기
 description: "자기 업무를 SKILL.md로 만드는 가이드 스킬. 반복 업무를 재사용 가능한 SKILL.md로 만들어 등록하고 싶을 때 사용."
 slug: skill-builder-meta
 category: 10-ops
@@ -24,7 +24,7 @@ when_to_use: "반복 업무를 재사용 가능한 SKILL.md로 만들어 등록�
 success_metrics: [스킬 완성 소요 시간, 라우팅 평가 통과율, 등록 후 재사용 횟수]
 ---
 
-# 092 나만의 스킬 만들기 (메타 스킬)
+# 092 나만의 스킬 만들기
 
 100개로 부족한 그 일 — 당신만의 101번째 스킬을 만든다. **게이트형 문답**으로 한 번에 하나씩 묻고, 답을 받은 뒤 다음으로 간다. 산출 스킬은 `100-skills/SPEC.md` 규격과 `${CLAUDE_PLUGIN_ROOT}/100-skills/gates/quality-checklist.md` C섹션을 모두 통과해야 `brand/my-skills/`에 등록된다.
 
@@ -56,7 +56,7 @@ success_metrics: [스킬 완성 소요 시간, 라우팅 평가 통과율, 등�
 5. **초안 생성 + MECE 검사** — 워크시트 답변을 `100-skills/SPEC.md` 규격으로 조립한다. ID는 `u01`부터 부여한다. 초안 `SKILL.md`와 `routing-eval.jsonl`은 `outputs/{날짜}/092-skill-builder-meta/u{NN}-{slug}/`에 함께 쓴다. 트리거를 공식 `ROUTING.md`와 사용자 `brand/my-skills/INDEX.md`에 대조해 겹침 후보를 조정한다.
    - 겹침이 크면 신규 제작 대신 기존 스킬 복제·개조 경로를 우선 제안한다 (Phase 3부터 재진입).
 6. **시범 실행 + 수정** — 새 스킬을 Phase 2의 실데이터로 1회 완주하고, 기대와 다른 곳을 한 번에 하나씩 고친다 (보통 3~5회). 완주 로그는 **등록 심사**의 "실행 검증 1회" 증빙이 된다.
-7. ⏸ **등록 심사** — `${CLAUDE_PLUGIN_ROOT}/100-skills/gates/quality-checklist.md` C섹션 전 항목과 MECE·eval을 심사한다. 통과하면 초안 폴더를 **`brand/my-skills/u{NN}-{slug}/`**로 복사하고 **`brand/my-skills/INDEX.md`에 ID·이름·트리거·경로 한 줄을 추가**한다. ID 는 **`u01`~`u99`**, `category: custom` 이다 (`SPEC.md §0`). ⛔ 패키지 안 `100-skills/`는 고치지 않는다. 미통과면 초안 경로와 보강 방법만 반환한다. 완료 후 100(나만의 마케팅 에이전트 구축)으로 넘긴다.
+7. ⏸ **등록 심사** — `${CLAUDE_PLUGIN_ROOT}/100-skills/gates/quality-checklist.md` C섹션 전 항목과 MECE·eval을 심사한다. 통과하면 초안 폴더를 **`brand/my-skills/u{NN}-{slug}/`**로 복사하고 **`brand/my-skills/INDEX.md`에 ID·이름·트리거·경로 한 줄을 추가**한다. ID 는 **`u01`~`u99`**, `category: custom` 이다 (`SPEC.md §0`). ⛔ 패키지 안 `100-skills/`는 고치지 않는다. 미통과면 초안 경로와 보강 방법만 반환한다. 완료 후 100(나만의 에이전트 만들기)으로 넘긴다.
 
 8. **제작 리포트를 남긴다** — 심사 결과·MECE 대조·등록 여부를 `outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md`에 저장하고, 초안 경로와 채택본 경로를 함께 알린다. 화면에만 띄우고 끝내지 않는다.
    > 쓰기 권한이 없으면 산출물을 화면에 내고 "저장 권한이 없어 파일로 남기지 못했습니다"라고 적는다. 저장하지 못한 것을 등록 완료로 말하지 않는다.
@@ -89,7 +89,7 @@ success_metrics: [스킬 완성 소요 시간, 라우팅 평가 통과율, 등�
 ### ⑤ 등록 가이드
 저장: outputs/{날짜}/092-skill-builder-meta/ 에 초안 → 채택하면 brand/my-skills/u{NN}-{slug}/ + INDEX.md 한 줄
 
-다음 액션: 100 나만의 마케팅 에이전트 구축 — 새 스킬을 체인·주간 루틴에 배선합니다.
+다음 액션: 100 나만의 에이전트 만들기 — 새 스킬을 체인·주간 루틴에 배선합니다.
 
 초안 파일: outputs/{날짜}/092-skill-builder-meta/u{NN}-{slug}/SKILL.md
 채택 파일: brand/my-skills/u{NN}-{slug}/SKILL.md

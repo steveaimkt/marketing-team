@@ -7,7 +7,7 @@
 ## 어떻게 쓰나
 
 ```
-brand/skill-notes/051.md      051 상세페이지 24섹션 빌더의 우리 구조
+brand/skill-notes/051.md      051 상세페이지 기획의 우리 구조
 brand/skill-notes/043.md      043 메타 광고 카피의 우리 규칙
 ```
 
