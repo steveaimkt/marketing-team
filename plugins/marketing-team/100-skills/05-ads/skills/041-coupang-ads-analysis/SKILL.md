@@ -12,7 +12,7 @@ triggers:
   - "쿠팡 광고비 어디서 새는지 봐줘"
   - "쿠팡 입찰가 조정안 만들어줘"
 inputs: [쿠팡 광고센터 키워드 리포트(xlsx·CSV), 분석 기간]
-sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-쿠팡광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [KPI 성과 요약, 키워드 분류표(효자·낭비·잠재), 입찰 조정안, 실행 계획(긴급·주간·월간), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["046", "043"]
