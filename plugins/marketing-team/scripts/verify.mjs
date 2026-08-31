@@ -630,8 +630,39 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('빠른 진입 계약이 런타임에 없다 (개선 플랜 §13 · 2026-08-31)');
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'test-first-run-ux.mjs')))
     빠짐.push('빠른 진입 회귀 테스트가 없다 (scripts/test-first-run-ux.mjs)');
+  // 화면 속 따옴표 · 예시 발화(‘ ’)와 정해진 호출어(「 」)를 가른다 (사용자 결정 2026-09-01)
+  if (!G.includes('예시 발화와 정해진 호출어를 가른다'))
+    빠짐.push('화면 따옴표 규칙이 규약에 없다 — 예시 발화와 정해진 호출어가 다시 섞인다 (사용자 결정 2026-09-01)');
+  {
+    const 화면 = [['skills/마케팅팀-구축하기/SKILL.md', B2],
+                  ['skills/마케팅팀-업무리스트/SKILL.md',
+                   fs.readFileSync(path.join(ROOT, 'skills', '마케팅팀-업무리스트', 'SKILL.md'), 'utf8')]];
+    for (const [이름, 본문] of 화면)
+      for (const 예시 of ['리뷰 분석해줘', '이번 달 광고 어땠어'])
+        if (본문.includes(`「${예시}」`) || 본문.includes(`"${예시}"`))
+          빠짐.push(`${이름} 화면의 예시 발화 「${예시}」가 작은따옴표가 아니다 — 예시를 외워야 할 말로 읽는다`);
+  }
+  if (!R.includes('「진행 승인」 단독이 무엇으로 도는지 그 줄에 적는다'))
+    빠짐.push('승인 줄이 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');
   if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
     빠짐.push('run/v1 회귀 픽스처가 없다 (개선 플랜 Phase 0)');
+  // §14 M1 · 일일 자가검증 — 실행기·회귀·정책이 셋 다 있어야 하고, 정책은 실행기 자신을 보호해야 한다
+  if (!fs.existsSync(path.join(ROOT, 'scripts', 'daily-health-check.mjs')))
+    빠짐.push('일일 자가검증 실행기가 없다 (scripts/daily-health-check.mjs · 개선 플랜 §14 M1)');
+  if (!fs.existsSync(path.join(ROOT, 'scripts', 'test-daily-health-check.mjs')))
+    빠짐.push('일일 자가검증 회귀가 없다 (scripts/test-daily-health-check.mjs)');
+  {
+    const pol = path.resolve(ROOT, '..', '..', 'maintenance', 'self-check-policy.json');
+    if (fs.existsSync(path.resolve(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))) {
+      let ok = false;
+      try {
+        const j = JSON.parse(fs.readFileSync(pol, 'utf8'));
+        ok = (j.auto_fix?.forbid || []).some(f => f.includes('daily-health-check.mjs'))
+          && (j.auto_fix?.forbid || []).some(f => f.includes('self-check-policy.json'));
+      } catch {}
+      if (!ok) 빠짐.push('자가검증 정책이 없거나 실행기 자신을 보호하지 않는다 (maintenance/self-check-policy.json · §14.4)');
+    }
+  }
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'recall.mjs')) || !R.includes('recall.mjs'))
     빠짐.push('회상 색인이 없거나 G1 되짚기에 배선되지 않았다 (gbrain 구조 참고 · 2026-08-31)');
   if (!G.includes('재료를 받았으면 죽은 틀이 아니다'))
@@ -1384,6 +1415,7 @@ for (const link of ['agents', 'skills']) {
         ['test-chain-compiler.mjs', '일반 체인 그래프 (누락·역순·순환·입력 단절 차단)'],
         ['test-review-policy.mjs', '산출물별 검토 정책 자동 생성'],
         ['test-orchestrator-events.mjs', '오케스트레이터 이벤트 기록·요약'],
+        ['test-daily-health-check.mjs', '일일 자가검증 실행기 (실패 계속 · 회로 차단 · 정책 무결)'],
       ]) {
         const p = path.join(ROOT, 'scripts', script);
         if (!fs.existsSync(p)) { err(`${label} 스크립트가 없다: scripts/${script}`); continue; }

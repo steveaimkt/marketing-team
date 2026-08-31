@@ -1,0 +1,21 @@
+{
+  "schema": "marketing-team.self-check-policy/v1",
+  "note": "일일 자가검증 정책 (개선 플랜 §14.4) · 저장소 유지보수 자산 — 플러그인 패키지에 넣지 않는다",
+  "repeat_failure_limit": 2,
+  "auto_fix": {
+    "allow": [],
+    "allow_note": "A·B 등급 허용 목록은 M2 에서 채운다 — 빈 목록이면 예약 작업은 보고만 한다",
+    "forbid": [
+      "plugins/marketing-team/scripts/daily-health-check.mjs",
+      "maintenance/self-check-policy.json",
+      "plugins/marketing-team/scripts/test-*.mjs",
+      "plugins/marketing-team/scripts/verify.mjs",
+      "plugins/marketing-team/scripts/runtime-guard.mjs",
+      "plugins/marketing-team/scripts/routing-baseline.json",
+      "plugins/marketing-team/scripts/banned-words.json",
+      "plugins/marketing-team/scripts/banned-brands.json",
+      "plugins/marketing-team/.claude-plugin/plugin.json",
+      ".claude-plugin/marketplace.json"
+    ]
+  }
+}

@@ -21,6 +21,7 @@ for (const [anchor, why] of [
   ['최소 재료 한 개만', '한 번에 하나만 묻는 규칙이 없다'],
   ['같은 화면에', '샘플·실제 병기 규칙이 없다'],
   ['승인과 재료를 한 답으로', '승인 접두 재료 규칙이 없다'],
+  ['「진행 승인」 단독이 무엇으로 도는지', '승인 줄이 기본값을 안 밝힌다 (사용자 지적 2026-09-01)'],
   ['빠른 진입이어도 줄지 않는 것', '안전장치 유지 선언이 없다'],
   ['같은 요청은 늘 같은 판정', '판정 일관성 규칙이 없다'],
 ]) assert.ok(S.includes(anchor), why);
@@ -49,6 +50,10 @@ try {
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인. 샘플로')].join('\n') + '\n');
   r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
   assert.equal(decision(r), 'none', '「진행 승인. 샘플로」를 승인으로 인정하지 않는다.');
+  // 단독 「진행 승인」 — 승인 줄이 기본값으로 안내하는 경로 (사용자 지적 2026-09-01)
+  fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인')].join('\n') + '\n');
+  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  assert.equal(decision(r), 'none', '단독 「진행 승인」을 승인으로 인정하지 않는다 — 기본값 경로가 막힌다.');
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인 보류할게')].join('\n') + '\n');
   r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
   assert.equal(decision(r), 'deny', '보류를 승인으로 오인했다.');
@@ -71,4 +76,4 @@ for (const n of names) {
 const adv = JSON.parse(fs.readFileSync(path.join(FIX, 'advanced-run.json'), 'utf8'));
 assert.equal((adv.steps || []).length, 4, '고급 픽스처에 4단계가 없다');
 
-console.log('빠른 진입·픽스처 · 계약 앵커 10 · 승인 접두 재료 2 · 보류 거부 1 · run/v1 픽스처 3(단계 4) · ✅');
+console.log('빠른 진입·픽스처 · 계약 앵커 11 · 승인 접두 재료 2 · 단독 승인 1 · 보류 거부 1 · run/v1 픽스처 3(단계 4) · ✅');
