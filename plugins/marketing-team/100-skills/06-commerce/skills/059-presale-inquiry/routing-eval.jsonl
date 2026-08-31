@@ -1,7 +1,7 @@
-{"intent": "상품 문의 답변 정리해줘", "expected_skill": "059"}
-{"intent": "상품 문의 응대 가이드 만들어줘", "expected_skill": "059"}
-{"intent": "문의 답변 템플릿 만들어줘", "expected_skill": "059"}
-{"intent": "상품 Q&A 어떻게 답해야 해", "expected_skill": "059"}
-{"intent": "구매 전 문의 응대 정리해줘", "expected_skill": "059"}
-{"intent": "재고 언제 들어오냐는 문의가 계속 오는데 정리해줘", "expected_skill": "059"}
-{"intent": "상품 문의 답변 기준 잡아줘", "expected_skill": "059"}
+{"intent": "상품 페이지에 똑같은 질문이 계속 올라오는데 답변 좀 정리해줘", "expected_skill": "059"}
+{"intent": "재고 언제 들어오냐고 자꾸 물어보는데 뭐라고 답해야 하지", "expected_skill": "059"}
+{"intent": "사람마다 답변이 달라서 기준을 하나 만들고 싶어", "expected_skill": "059"}
+{"intent": "사기 전에 물어보는 것들 유형별로 나눠서 답 만들어줘", "expected_skill": "059"}
+{"intent": "Q&A 답변 늦어서 놓치는 것 같은데 표준안 좀", "expected_skill": "059"}
+{"intent": "자주 오는 질문은 아예 페이지에 넣고 싶은데 뭐부터 볼까", "expected_skill": "059"}
+{"intent": "옵션 뭐 고르냐는 문의가 제일 많아 답변 틀 잡아줘", "expected_skill": "059"}
