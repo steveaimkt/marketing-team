@@ -13,6 +13,7 @@ triggers:
   - "고객 미팅 내용에서 할 일 뽑아줘"
   - "영업 미팅 팔로업 준비해줘"
 inputs: [미팅 녹취·메모(텍스트·전사본), 참석자·미팅 목적(있으면), brand/profile.md]
+sample_fallback: sample-data/A브랜드-미팅메모.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [결정사항 요약, 할 일 목록(담당·기한), 팔로업 메일 초안(제목 2안), 영업 신호 메모(084 입력용), 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["084"]

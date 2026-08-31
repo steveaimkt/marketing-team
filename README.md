@@ -33,8 +33,8 @@
 딱 맞는 말이 아니어도 된다 — 비슷하게 말해도 찾아내고, 그래도 안 되면 무엇을 하려는지 되묻는다.
 
 <!-- STATS:START -->
-스킬 100 · 부를 말 475 · 게이트 32 · 상태변경 7 · 체인 15
-저장 형식 md 75 · csv 12 · html 8 · pptx 3 · dir 2 · `writes_to` 보유 100 · 샘플 폴백 52
+스킬 100 · 부를 말 479 · 게이트 32 · 상태변경 7 · 체인 15
+저장 형식 md 76 · csv 12 · html 7 · pptx 3 · dir 2 · `writes_to` 보유 100 · 샘플 폴백 56
 <!-- STATS:END -->
 
 > 위 숫자는 `node plugins/marketing-team/scripts/build-stats.mjs` 가 정본에서 계산한다. 손으로 고치지 않는다.

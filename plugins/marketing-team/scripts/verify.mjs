@@ -642,6 +642,24 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
         if (본문.includes(`「${예시}」`) || 본문.includes(`"${예시}"`))
           빠짐.push(`${이름} 화면의 예시 발화 「${예시}」가 작은따옴표가 아니다 — 예시를 외워야 할 말로 읽는다`);
   }
+  // 필수 재료·형식은 오케스트레이터가 받는다 (사용자 결정 2026-09-01)
+  if (!R.includes('필수 재료는 **스킬이 아니라 여기서** 받는다'))
+    빠짐.push('필수 재료를 오케스트레이터가 받는 계약이 없다 — 스킬마다 제각각 묻게 된다 (사용자 결정 2026-09-01)');
+  if (!R.includes('산출물 형식도 **묻고 정한다**'))
+    빠짐.push('산출물 형식을 승인 전에 묻는 계약이 없다 — 만든 뒤에 형식이 아니라고 하면 다시 만든다');
+  {  // `.pptx` 를 내겠다고 적은 스킬은 공식 스킬 인계를 밝혀야 한다
+    for (const cdir of fs.readdirSync(M).filter(d => /^\d\d-/.test(d))) {
+      const sdir = path.join(M, cdir, 'skills');
+      if (!fs.existsSync(sdir)) continue;
+      for (const s of fs.readdirSync(sdir)) {
+        const file = path.join(sdir, s, 'SKILL.md');
+        if (!fs.existsSync(file)) continue;
+        const body = fs.readFileSync(file, 'utf8');
+        if (/^outputs:.*\.pptx/m.test(body) && !body.includes('공식 pptx 스킬'))
+          빠짐.push(`${s} 가 .pptx 를 내겠다고 적었는데 공식 스킬 인계를 안 밝혔다 — .md 를 내면서 .pptx 라 할 수 있다`);
+      }
+    }
+  }
   if (!R.includes('「진행 승인」 단독이 무엇으로 도는지 그 줄에 적는다'))
     빠짐.push('승인 줄이 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');
   if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
