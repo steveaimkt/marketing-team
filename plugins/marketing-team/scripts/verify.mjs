@@ -645,6 +645,26 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   // 원장 여덟 열이 오케스트레이터 본문에 있나 (실측 2026-09-01 · 여섯 열로 지어냈다)
   if (!R.includes('| 일시 | 스킬 ID | 요청 | 데이터 모드 | 산출물 경로 | 게이트 | 보완 횟수 | 상태 |'))
     빠짐.push('원장 여덟 열 규격이 AI-마케터 본문에 없다 — 실행할 때마다 열을 지어낸다 (실측 2026-09-01)');
+  if (!R.includes('그릇은 성격이 정한다. 전부 `.md` 로 뭉치지 않는다'))
+    빠짐.push('산출물 그릇을 성격으로 가르는 규칙이 없다 — 표까지 .md 로 나와 엑셀에서 못 쓴다 (사용자 지시 2026-09-01)');
+  {  // outputs 가 말한 형식과 실제 착지 형식이 같은가
+    for (const cdir of fs.readdirSync(M).filter(d => /^\d\d-/.test(d))) {
+      const sdir = path.join(M, cdir, 'skills');
+      if (!fs.existsSync(sdir)) continue;
+      for (const s of fs.readdirSync(sdir)) {
+        const file = path.join(sdir, s, 'SKILL.md');
+        if (!fs.existsSync(file)) continue;
+        const body = fs.readFileSync(file, 'utf8');
+        const o = body.match(/^outputs:\s*\[([\s\S]+?)\]/m), w = body.match(/^writes_to:\s*\[([\s\S]+?)\]/m);
+        if (!o || !w) continue;
+        // ⚠️ `.jsonl` 을 `.json` 으로 잡지 않는다 (2026-09-01 · 092 오탐)
+        const ext = x => [...new Set([...x.matchAll(/\.(md|csv|html|pptx|xlsx|jsonl|json|docx)(?![a-z])/g)].map(m => m[1]))].sort();
+        const dec = ext(o[1]), land = ext(w[1]);
+        if (land.length && dec.join() !== land.join())
+          빠짐.push(`${s} 산출물 형식 선언이 착지와 다르다 · outputs [${dec}] ≠ writes_to [${land}] — 계획 화면이 틀린 형식을 말한다`);
+      }
+    }
+  }
   if (!R.includes('부르기 전에 「못 부른다」고 말하지 않는다'))
     빠짐.push('검토자 폴백을 계획에서 미리 선언하는 것을 막는 규칙이 없다 — 되는 것도 안 된다고 믿게 된다 (실측 2026-09-01)');
   if (!R.includes('`interrupted` 는 사람이 그만둔 것에만 쓴다'))

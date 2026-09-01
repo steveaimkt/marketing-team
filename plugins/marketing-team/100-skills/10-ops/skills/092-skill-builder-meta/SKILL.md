@@ -11,12 +11,12 @@ triggers:
   - "SKILL.md 작성 도와줘"
   - "이 반복 작업 스킬로 등록하자"
 inputs: [대상 업무 설명 (문답으로 수집), 잘된 결과물 예시 2~3개, brand/profile.md]
-outputs: [SKILL.md 완성본 (필수 19 + 선택 1), routing-eval.jsonl 5줄 이상, 등록 심사 결과, 등록 가이드, 저장 파일(.md)]
+outputs: [SKILL.md 완성본 (필수 19 + 선택 1), routing-eval.jsonl 5줄 이상, 등록 심사 결과, 등록 가이드, 저장 파일(.md 스킬 본문 + .jsonl 부를 말)]
 requires: [brand/profile.md]
 chains_to: ["100"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md]
+writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md, outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.jsonl]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "사내 표준 문서를 수백 건 설계한 시스템 빌더 · 두 번 이상 쓰이지 않을 스킬은 등록을 거절한다"

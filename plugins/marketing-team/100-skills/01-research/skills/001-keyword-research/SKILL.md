@@ -12,7 +12,7 @@ triggers:
   - "검색 키워드 분석해줘"
   - "롱테일 키워드 찾아줘"
 inputs: [시드 키워드 1개, 타겟 시장(기본 한국), 콘텐츠 포맷(기본 blog)]
-outputs: [키워드 TOP 20 우선순위 표, 콘텐츠 제안 5건, 다음 스킬 추천, 저장 파일(.csv)]
+outputs: [키워드 TOP 20 우선순위 표, 콘텐츠 제안 5건, 다음 스킬 추천, 저장 파일(.csv + .md)]
 requires: [brand/profile.md]
 chains_to: ["002", "022"]
 gate: false

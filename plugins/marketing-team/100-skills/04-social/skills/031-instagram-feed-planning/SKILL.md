@@ -13,12 +13,12 @@ triggers:
   - "프로필 들어왔을 때 예쁘게 보이게 피드 설계해줘"
 inputs: [브랜드 무드·제품 사진 자산 현황, 월 발행 수(기본 30), 계정 목적(팔로워/판매/커뮤니티)]
 sample_fallback: sample-data/A브랜드-인스타-인사이트-30편.csv   # `inputs/` 를 먼저 보고, 없으면 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [30일 발행 플랜 표(일자·요일·유형·주제·캡션·해시태그·이미지 프롬프트), 그리드 무드보드(팔레트·배치 패턴), 콘텐츠 유형 배합표, 규제 검사 결과 블록, 저장 파일(.md)]
+outputs: [30일 발행 플랜 표(일자·요일·유형·주제·캡션·해시태그·이미지 프롬프트), 그리드 무드보드(팔레트·배치 패턴), 콘텐츠 유형 배합표, 규제 검사 결과 블록, 저장 파일(.csv 표 + .md 해설)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["040"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md]
+writes_to: [outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.csv, outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "팔로워 10만 계정 그리드를 설계해온 인스타그램 아트디렉터 · 낱장이 아니라 9칸 단위로 본다"
@@ -83,8 +83,17 @@ success_metrics: [프로필 방문 대비 팔로우 전환율, 게시물 저장�
 > ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 `.md` 쪽에 쓴다 (`docs/공통규약.md §H`)
 
 ## Output Format · **파일에 들어갈 내용**
+
+⛔ **CSV 에는 열과 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+`.csv` 는 엑셀에서 열리는 파일이다. 설명과 판단은 `.md` 쪽에 쓴다.
+
+```csv
+일,요일,유형,그리드위치,주제,캡션첫줄,해시태그,이미지갈래,이미지지시
+{1~30},{월~일},{정보/제품/신뢰/참여/릴스},{1~30},{주제},{훅 한 줄},{#태그 공백구분},{생성|촬영},{프롬프트 또는 촬영 지시}
+```
 
 ⛔ **아래는 `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).

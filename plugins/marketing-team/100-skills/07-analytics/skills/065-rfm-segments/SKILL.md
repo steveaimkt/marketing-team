@@ -13,7 +13,7 @@ triggers:
   - "고객 등급 나눠서 뭘 보낼지 정해줘"
 inputs: [구매 데이터 (주문 CSV·시트 · 고객ID·주문일·주문금액 3열 필수), brand/profile.md의 AOV·구매주기]
 sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [RFM 점수표, 세그먼트 정의표 (6~8종), 세그먼트별 액션 맵, 저장 파일(.csv)]
+outputs: [RFM 점수표, 세그먼트 정의표 (6~8종), 세그먼트별 액션 맵, 저장 파일(.csv + .md)]
 requires: [brand/profile.md]
 chains_to: ["073", "074"]
 gate: false

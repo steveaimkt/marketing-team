@@ -13,7 +13,7 @@ triggers:
   - "분석 전에 데이터부터 손봐줘"
 inputs: [로우데이터 파일(CSV·XLSX·구글시트), 목표 스키마(선택)]
 sample_fallback: sample-data/A브랜드-메타광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [정리된 데이터셋(사본), 클리닝 로그(변경 내역 전수), 품질 진단 요약, 저장 파일(.csv)]
+outputs: [정리된 데이터셋(사본), 클리닝 로그(변경 내역 전수), 품질 진단 요약, 저장 파일(.csv + .md)]
 requires: [brand/profile.md]
 chains_to: ["061"]
 gate: false

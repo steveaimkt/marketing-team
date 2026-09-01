@@ -12,7 +12,7 @@ triggers:
   - "캠페인 링크 태그 어떻게 달아?"
   - "어느 채널에서 전환 왔는지 모르겠어"
 inputs: [현재 UTM 사용 현황(GA4 유입 내보내기 또는 링크 목록), 운영 채널 목록]
-outputs: [UTM 명명 규칙 표, 기존 태그 매핑표, 링크 빌더 템플릿, 채널 기여 해석 가이드, 저장 파일(.csv)]
+outputs: [UTM 명명 규칙 표, 기존 태그 매핑표, 링크 빌더 템플릿, 채널 기여 해석 가이드, 저장 파일(.csv + .md)]
 requires: [brand/profile.md]
 chains_to: ["063"]
 gate: false

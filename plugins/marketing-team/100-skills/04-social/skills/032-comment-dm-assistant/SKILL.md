@@ -13,13 +13,13 @@ triggers:
   - "인스타 문의 답장 초안 써줘"
 inputs: [수신 댓글·DM 목록(원문), 채널(인스타/유튜브/스레드 등), brand/tone.md]
 sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [건별 분류 태그(3분류·감정점수·긴급도), 공개 댓글·DM 이원화 응대 초안, 위기 검출 목록(→089), 규제 검사 결과 블록, 저장 파일(.md)]
+outputs: [건별 분류 태그(3분류·감정점수·긴급도), 공개 댓글·DM 이원화 응대 초안, 위기 검출 목록(→089), 규제 검사 결과 블록, 저장 파일(.csv 건별 분류 + .md 응대 초안)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["038", "089"]
 gate: true
 pii: true
 mutating: false
-writes_to: [outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md]
+writes_to: [outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.csv, outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "위기 대응까지 겪어본 8년차 소셜 CS 매니저 · 답변은 화난 1명이 아니라 지켜보는 100명에게 쓴다"
@@ -92,8 +92,17 @@ success_metrics: [건당 응대 초안 작성 시간, 위기 건 검출·에스�
 > ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 `.md` 쪽에 쓴다 (`docs/공통규약.md §H`)
 
 ## Output Format · **파일에 들어갈 내용**
+
+⛔ **CSV 에는 열과 데이터 행만 쓴다. 마크다운 제목·표·설명을 넣지 않는다.**
+`.csv` 는 엑셀에서 열리는 파일이다. 설명과 판단은 `.md` 쪽에 쓴다.
+
+```csv
+번호,채널,작성일,원문,분류,감정점수,긴급도,공개답변,DM답변
+{n},{인스타/페이스북/유튜브},{YYYY-MM-DD},{원문},{문의/불만/칭찬},{-2~2},{상/중/하},{공개용 답변},{개별 DM 답변}
+```
 
 ⛔ **아래는 `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).

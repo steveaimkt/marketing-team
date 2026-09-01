@@ -11,7 +11,7 @@ triggers:
   - "인플루언서 진성인지 평가해줘"
   - "이 계정 팔로워 진짜인지 봐줘"
 inputs: [카테고리·타깃, 예산 범위, 후보 계정 리스트(선택)]
-outputs: [후보 스코어카드(진성도 50+적합도 50), TOP 5 추천, 예산 매칭안, 저장 파일(.csv)]
+outputs: [후보 스코어카드(진성도 50+적합도 50), TOP 5 추천, 예산 매칭안, 저장 파일(.csv + .md)]
 requires: [brand/profile.md]
 chains_to: ["034"]
 gate: false
