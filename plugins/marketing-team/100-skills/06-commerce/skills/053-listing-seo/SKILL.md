@@ -11,12 +11,12 @@ triggers:
   - "태그랑 카테고리 세팅해줘"
   - "상품명 후보 뽑아줘"
 inputs: [상품 정보(브랜드·모델·속성), 판매 플랫폼, 타깃 키워드·유입 검색어 데이터(선택)]
-outputs: [플랫폼별 상품명 조합안(각 3안), 태그·카테고리 세팅안, 키워드 우선순위표, 저장 파일(.md)]
+outputs: [플랫폼별 상품명 조합안(각 3안), 태그·카테고리 세팅안, 키워드 우선순위표, 저장 파일(.xlsx · .html)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["051"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/053-listing-seo/053-listing-seo.md]
+writes_to: [outputs/{날짜}/053-listing-seo/053-listing-seo.xlsx, outputs/{날짜}/053-listing-seo/053-listing-seo.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 커머스 검색 최적화 전문가 · 검색량 없는 예쁜 상품명은 장식이라 본다"
@@ -62,11 +62,12 @@ success_metrics: [검색 유입 증가율, 타깃 키워드 노출 순위, 세�
 6. ⏸ **게이트 검사 → 전달** — 금지·과장 표현 스캔 후 전달. 다음: 051 상세페이지 기획로 본문 제작.
 
 7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/053-listing-seo/053-listing-seo.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/053-listing-seo/053-listing-seo.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/053-listing-seo/053-listing-seo.xlsx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
 > ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/053-listing-seo/053-listing-seo.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
 
 ## Output Format · **파일에 들어갈 내용**
 

@@ -12,12 +12,12 @@ triggers:
   - "이 키워드로 블로그 포스팅 만들어줘"
   - "블로그 원고 완성해줘"
 inputs: [타깃 키워드 1개(001 산출물 권장), 참고 자료(선택), 목표 독자·전환 목표(선택)]
-outputs: [검색의도 분석 블록, SEO 최적화 본문(2,000~3,000자), 메타 타이틀·디스크립션, FAQ 3문항, 규제 검사 결과 블록, 저장 파일(.md)]
+outputs: [검색의도 분석 블록, SEO 최적화 본문(2,000~3,000자), 메타 타이틀·디스크립션, FAQ 3문항, 규제 검사 결과 블록, 저장 파일(.docx)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["027"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.md]
+writes_to: [outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "검색 1페이지 상위 노출 아티클을 수백 편 낸 SEO 에디터 · 검색의도 판정 없이는 첫 문장을 쓰지 않는다"
@@ -60,16 +60,16 @@ success_metrics: [본문 작성 시간, 검색 노출 클릭률(CTR), 키워드 
 7. **규제 검사** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 게이트 결과 블록 부착. ⛔ 차단이면 수정·재통과 전 전달 금지.
 8. **체인 제안** — 027 콘텐츠 채널별 재작성 (이 글을 앵커로 링크드인·스레드·뉴스레터 확산).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.md`
+> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 
 ## Output Format · **파일에 들어갈 내용**
 
-⛔ **아래는 `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.md` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
+⛔ **아래는 `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx` 안에 들어갈 것이다. 화면에 그대로 쓰는 것이 아니다.**
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 📝 SEO 아티클: {키워드}

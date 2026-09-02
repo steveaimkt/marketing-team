@@ -14,13 +14,13 @@ triggers:
   - "고객 목소리 모아서 개선 요청 많은 순서로 정리해줘"
 inputs: [리뷰·댓글·CS 데이터(CSV/엑셀/텍스트/캡처 · 로그인 뒤 데이터는 크롤링 불가, 내보내서 inputs/ 에), 분석 기간(기본 최근 7일), 최대 건수(기본 500)]
 sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [행별 분류 시트(5분류+5축 점수), 페인포인트 TOP 5까지(유효 군집 수만큼), CS 우선 확인 목록, 저장 파일(.csv+해설.md)]
+outputs: [행별 분류 시트(5분류+5축 점수), 페인포인트 TOP 5까지(유효 군집 수만큼), CS 우선 확인 목록, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["008", "012"]
 gate: false
 pii: true
 mutating: false
-writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.csv, outputs/{날짜}/006-review-mining/006-review-mining-해설.md]
+writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.xlsx, outputs/{날짜}/006-review-mining/006-review-mining.html, outputs/{날짜}/006-review-mining/006-review-mining.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 VoC 분석가 · 고객의 문장을 각색하지 않고 그대로 옮긴다"
@@ -78,13 +78,18 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 - CS 문의 (메일 라벨 내보내기 등)
 - 상품 상세 URL (스크랩 가능 시)
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/006-review-mining/006-review-mining.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/006-review-mining/006-review-mining.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+8. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/006-review-mining/006-review-mining.xlsx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/006-review-mining/006-review-mining.csv`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/006-review-mining/006-review-mining.xlsx`
+> · 화면 → `outputs/{날짜}/006-review-mining/006-review-mining.html`
+> · 해설 → `outputs/{날짜}/006-review-mining/006-review-mining.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
-> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 같은 폴더에 `-해설.md` 로 따로 (`docs/공통규약.md §H`)
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

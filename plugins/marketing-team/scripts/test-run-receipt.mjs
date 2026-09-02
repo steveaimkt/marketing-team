@@ -20,6 +20,7 @@ try {
   fs.writeFileSync(path.join(temp, 'inputs', 'brief.md'), '신제품 광고\n');
 
   const out = 'outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.md';
+  const 표 = 'outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.xlsx';
   const receipt = 'outputs/2026-08-30/043-meta-ad-copy/run.json';
   fs.writeFileSync(path.join(temp, receipt), `${JSON.stringify({
     schema: 'marketing-team.run/v1',
@@ -29,10 +30,12 @@ try {
     data_mode: '실데이터',
     inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
     profile: 'workspace:brand/profile.md',
-    outputs: [`workspace:${out}`],
+    outputs: [`workspace:${표}`, `workspace:${out}`],
     required_reviews: [
       { kind: 'business', perspective: '브랜드', artifact: `workspace:${out}` },
       { kind: 'compliance', artifact: `workspace:${out}` },
+      { kind: 'business', perspective: '브랜드', artifact: `workspace:${표}` },
+      { kind: 'compliance', artifact: `workspace:${표}` },
     ],
     reviews: [],
     ledger: { path: 'workspace:logs/build-log.md' },
@@ -47,6 +50,7 @@ try {
   assert.match(`${result.stdout}\n${result.stderr}`, /완료 상태가 아닙니다: running/);
 
   fs.writeFileSync(path.join(temp, out), '[실데이터]\n검증된 신제품 광고 카피\n');
+  fs.writeFileSync(path.join(temp, 표), '[실데이터] 카피 열 개와 점수표\n');
   fs.writeFileSync(path.join(temp, 'outputs/2026-08-30/043-meta-ad-copy/review-브랜드.md'), '판정: 승인\n');
   fs.writeFileSync(path.join(temp, 'outputs/2026-08-30/043-meta-ad-copy/gate.md'), '판정: ✅ 통과\n');
 
@@ -55,6 +59,12 @@ try {
   assert.equal(result.status, 0, result.stderr || result.stdout);
   result = run('review', receipt, '--kind', 'compliance', '--status', 'pass',
     '--report', 'outputs/2026-08-30/043-meta-ad-copy/gate.md', '--artifact', out);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  result = run('review', receipt, '--kind', 'business', '--perspective', '브랜드', '--status', 'approved',
+    '--report', 'outputs/2026-08-30/043-meta-ad-copy/review-브랜드.md', '--artifact', 표);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  result = run('review', receipt, '--kind', 'compliance', '--status', 'pass',
+    '--report', 'outputs/2026-08-30/043-meta-ad-copy/gate.md', '--artifact', 표);
   assert.equal(result.status, 0, result.stderr || result.stdout);
 
   fs.writeFileSync(path.join(temp, 'logs', 'build-log.md'), [
@@ -72,7 +82,7 @@ try {
   const sealed = JSON.parse(fs.readFileSync(path.join(temp, receipt), 'utf8'));
   assert.equal(sealed.status, 'completed');
   assert.equal(sealed.integrity.status, 'current');
-  assert.equal(sealed.reviews.length, 2);
+  assert.equal(sealed.reviews.length, 4);   // 산출물 둘 × 검토 둘 (2026-09-02 · 043 이 표+해설 두 파일 계약)
   assert.match(sealed.outputs[0].sha256, /^[a-f0-9]{64}$/);
 
   fs.appendFileSync(path.join(temp, out), '검토 뒤 몰래 바뀐 문장\n');
@@ -136,15 +146,22 @@ try {
     ...extra,
   });
   fs.writeFileSync(path.join(temp, rerunReceipt), `${JSON.stringify(rerunDraft({
-    outputs: ['workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md'],
+    outputs: [
+      'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.xlsx',
+      'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md',
+    ],
     // 검토 정책 자동 생성은 정본 이름으로 아티팩트를 매칭하므로 재실행(-2)에는 명시로 넣는다 (알려진 제약 · 2026-08-30)
-    required_reviews: [{ kind: 'compliance', artifact: 'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md' }],
+    required_reviews: [
+      { kind: 'compliance', artifact: 'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.xlsx' },
+      { kind: 'compliance', artifact: 'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md' },
+    ],
   }), null, 2)}\n`);
   result = run('start', rerunReceipt);
   assert.equal(result.status, 0, `-2 재실행 산출물 단독은 시작돼야 합니다: ${result.stderr}`);
   const dupReceipt = 'outputs/2026-08-30/043-meta-ad-copy/run-9.json';
   fs.writeFileSync(path.join(temp, dupReceipt), `${JSON.stringify(rerunDraft({
     outputs: [
+      'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.xlsx',
       'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.md',
       'workspace:outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy-2.md',
     ],
@@ -181,8 +198,9 @@ try {
   const piiDir = path.join(temp, 'outputs', '2026-08-30', '006-review-mining');
   fs.mkdirSync(piiDir, { recursive: true });
   const piiOutputs = [
-    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.csv',
-    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md',
+    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.xlsx',
+    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.html',
+    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md',
   ];
   const piiDraft = {
     schema: 'marketing-team.run/v1',
@@ -261,7 +279,11 @@ try {
       data_mode: '샘플',
       inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
       profile: 'workspace:brand/profile.md',
-      outputs: [`workspace:${dir}/073-customer-journey-map.md`],
+      outputs: [
+        `workspace:${dir}/073-customer-journey-map.xlsx`,
+        `workspace:${dir}/073-customer-journey-map.html`,
+        `workspace:${dir}/073-customer-journey-map.md`,
+      ],
       required_reviews: [],
       reviews: [],
       ledger: { path: 'workspace:logs/build-log.md' },
@@ -299,6 +321,60 @@ try {
     assert.ok(sealed.required_reviews.some(row => row.kind === 'compliance'));
   }
 
+  // 사용자가 고른 그릇 · 파일 수와 이름은 그대로 두고 확장자만 바꾼다 (2026-09-02)
+  // 저자 결정 · 「산출물은 사용자가 원하는 형식에 맞게 나올 수 있게」 · G2 에서 한 번 정한다.
+  {
+    const dir = 'outputs/2026-08-30/042-naver-shopping-ads';
+    fs.mkdirSync(path.join(temp, dir), { recursive: true });
+    const 초안 = (name, extra) => {
+      const rj = `${dir}/${name}`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '네이버 광고 키워드 진단해줘',
+        skills: ['042'], data_mode: '샘플',
+        inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
+        profile: 'workspace:brand/profile.md',
+        required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+        ...extra,
+      }, null, 2)}\n`);
+      return rj;
+    };
+    const 낸다 = (...names) => names.map(n => `workspace:${dir}/${n}`);
+
+    // ① 표를 csv 로 받겠다고 하면 csv 로 착지한다
+    let r = run('start', 초안('run-11.json', {
+      형식: { '042-naver-shopping-ads.xlsx': 'csv' },
+      outputs: 낸다('042-naver-shopping-ads.csv', '042-naver-shopping-ads.html', '042-naver-shopping-ads.md'),
+    }));
+    assert.equal(r.status, 0, `고른 그릇으로 시작돼야 한다: ${r.stderr}${r.stdout}`);
+    assert.equal(
+      JSON.parse(fs.readFileSync(path.join(temp, `${dir}/run-11.json`), 'utf8')).형식['042-naver-shopping-ads.xlsx'],
+      'csv', 'start 가 고른 그릇을 영수증에 남기지 않았습니다.');
+
+    // ② 그릇만 바꾸는 것이라 파일을 빼면 여전히 막는다
+    r = run('start', 초안('run-12.json', {
+      형식: { '042-naver-shopping-ads.xlsx': 'csv' },
+      outputs: 낸다('042-naver-shopping-ads.csv'),
+    }));
+    assert.notEqual(r.status, 0, '그릇을 바꾼다고 파일 수까지 줄이면 안 된다.');
+    assert.match(`${r.stdout}\n${r.stderr}`, /필수 산출물이 outputs에 없습니다/);
+
+    // ③ 모르는 그릇은 안 받는다
+    r = run('start', 초안('run-13.json', {
+      형식: { '042-naver-shopping-ads.xlsx': 'xls' },
+      outputs: 낸다('042-naver-shopping-ads.xls', '042-naver-shopping-ads.html', '042-naver-shopping-ads.md'),
+    }));
+    assert.notEqual(r.status, 0, '모르는 그릇을 받았습니다.');
+    assert.match(`${r.stdout}\n${r.stderr}`, /모르는 그릇/);
+
+    // ④ 계약에 없는 정본은 못 바꾼다
+    r = run('start', 초안('run-14.json', {
+      형식: { '042-naver-shopping-ads.pdf': 'csv' },
+      outputs: 낸다('042-naver-shopping-ads.xlsx', '042-naver-shopping-ads.html', '042-naver-shopping-ads.md'),
+    }));
+    assert.notEqual(r.status, 0, '계약에 없는 정본의 그릇을 바꿨습니다.');
+    assert.match(`${r.stdout}\n${r.stderr}`, /계약에 없습니다/);
+  }
+
   // 단계별 실행과 재개 · 중단해도 완료한 단계를 다시 만들지 않는다
   // 실측 2026-08-30 — 4스킬 조합이 중간에 멈추면 어디까지 됐는지 알 방법이 없었다.
   {
@@ -310,8 +386,8 @@ try {
       schema: 'marketing-team.plan/v1', plan_id: 'chain', request: '061 → 073 → 065 → 066 조합',
       requested_order: ['061', '073', '065', '066'], skills: ['061', '073', '065', '066'],
       steps: [
-        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.md')], reviews: [] },
-        { step: 2, skill: '073', inputs: [ref('061-sales-data-analysis.md')], outputs: [ref('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
+        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html')], reviews: [] },
+        { step: 2, skill: '073', inputs: [ref('061-sales-data-analysis.xlsx')], outputs: [ref('073-customer-journey-map.xlsx'), ref('073-customer-journey-map.html'), ref('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
         { step: 3, skill: '065', inputs: ['plugin:sample-data/A브랜드-고객마스터.csv'], outputs: [ref('065-rfm-segments.csv'), ref('065-rfm-segments-해설.md')], reviews: [] },
         { step: 4, skill: '066', inputs: [ref('073-customer-journey-map.md'), ref('065-rfm-segments-해설.md')], outputs: [ref('066-kpi-tree.md')], reviews: [] },
       ],
@@ -335,11 +411,11 @@ try {
       required_reviews: [{ kind: 'business', perspective: '경영', artifact: ref('073-customer-journey-map.md') }],
       reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
     }, null, 2)}\n`);
-    assert.equal(run('start', rj).status, 0, '단계 있는 실행이 시작돼야 한다');
+    { const r = run('start', rj); assert.equal(r.status, 0, `단계 있는 실행이 시작돼야 한다: ${r.stderr}${r.stdout}`); }
 
     const make = {
-      1: () => fs.writeFileSync(path.join(dir, '061-sales-data-analysis.md'), '061\n'),
-      2: () => fs.writeFileSync(path.join(dir, '073-customer-journey-map.md'), '073\n'),
+      1: () => { for (const e of ['xlsx', 'html']) fs.writeFileSync(path.join(dir, `061-sales-data-analysis.${e}`), '061\n'); },
+      2: () => { for (const e of ['xlsx', 'html', 'md']) fs.writeFileSync(path.join(dir, `073-customer-journey-map.${e}`), '073\n'); },
       3: () => { fs.writeFileSync(path.join(dir, '065-rfm-segments.csv'), '\ufeff대체키,세그먼트\nabc,챔피언\n'); fs.writeFileSync(path.join(dir, '065-rfm-segments-해설.md'), '065\n'); },
       4: () => fs.writeFileSync(path.join(dir, '066-kpi-tree.md'), '066\n'),
     };
@@ -362,7 +438,7 @@ try {
     assert.equal(after.steps.find(x => x.step === 4).status, 'pending');
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 단계별 실행·재개 6 · ✅');
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

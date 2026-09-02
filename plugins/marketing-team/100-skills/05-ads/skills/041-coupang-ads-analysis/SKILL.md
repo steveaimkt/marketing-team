@@ -13,12 +13,12 @@ triggers:
   - "쿠팡 입찰가 조정안 만들어줘"
 inputs: [쿠팡 광고센터 키워드 리포트(xlsx·CSV), 분석 기간]
 sample_fallback: sample-data/A브랜드-쿠팡광고-30일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [KPI 성과 요약, 키워드 분류표(효자·낭비·잠재), 입찰 조정안, 실행 계획(긴급·주간·월간), 저장 파일(.md)]
+outputs: [KPI 성과 요약, 키워드 분류표(효자·낭비·잠재), 입찰 조정안, 실행 계획(긴급·주간·월간), 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["046", "043"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md]
+writes_to: [outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.xlsx, outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.html, outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "16년차 이커머스 광고 운영자 · 데이터로만 말하고, 낭비를 못 참는다"
@@ -74,12 +74,18 @@ success_metrics: [낭비 키워드 절감액, 리포트 작성 시간, ROAS 개�
 6. **원인 트리 진단** — ROAS = CTR × CVR × AOV ÷ CPC 로 분해, 각 요소 상/중/하 판정 → 병목 우선순위 CTR→CVR→CPC→AOV.
 7. ⏸ **실행 계획 확정** — 긴급(즉시 OFF 낭비 키워드) / 주간(입찰 조정) / 월간(캠페인 재편) 3단 계획을 제시하고 사용자 승인 후 마무리 → 체인: 046 예산 재배분(채널 차원) · 043 소재 카피 교체(CTR 병목 시).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+8. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.xlsx`
+> · 화면 → `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.html`
+> · 해설 → `outputs/{날짜}/041-coupang-ads-analysis/041-coupang-ads-analysis.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

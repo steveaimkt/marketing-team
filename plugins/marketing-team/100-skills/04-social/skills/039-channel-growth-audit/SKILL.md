@@ -13,12 +13,12 @@ triggers:
   - "이 콘텐츠 왜 조회수가 낮았을까"
 inputs: [계정 데이터(도달·팔로워·참여), 기간]
 sample_fallback: sample-data/A브랜드-인스타-인사이트-30편.csv   # `inputs/` 를 먼저 보고, 없으면 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [성장 진단 리포트(강점·약점·병목), 저성과 콘텐츠 훅 분석, 우선 액션 3가지, 저장 파일(.md)]
+outputs: [성장 진단 리포트(강점·약점·병목), 저성과 콘텐츠 훅 분석, 우선 액션 3가지, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["031", "040"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md]
+writes_to: [outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.xlsx, outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.html, outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "정체된 계정 수십 개를 되살린 그로스 컨설턴트 · 위로 대신 병목을 지목한다"
@@ -64,12 +64,18 @@ success_metrics: [병목 구간 지표 개선폭, 우선 액션 3건 중 실행 
 5. **진단 정리** — 강점 2~3(뭐가 작동하나 — 유지 지시), 약점 2~3(어디서 새나), 병목 선언 1줄.
 6. **우선 액션 3가지 → 체인** — 병목 구간 한정, 각 액션에 실행 방법·측정 지표·기대 변화 명시. 콘텐츠 기획 문제면 → 031, 훅 문제면 → 040 핸드오프.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+7. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.xlsx`
+> · 화면 → `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.html`
+> · 해설 → `outputs/{날짜}/039-channel-growth-audit/039-channel-growth-audit.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 
@@ -227,7 +227,7 @@ function normalizePii(value, inputRows) {
  * 실측 2026-08-30 — 중급이 계획에 없던 HTML 을 만들었고, 고급이 지정 순서를 바꿔 돌았다.
  * 승인의 대상이 문장이 아니라 해시여야 그 둘을 대조할 수 있다.
  */
-function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows) {
+function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows, formatChoice) {
   const planFile = path.join(path.dirname(receiptFile), 'plan.json');
   if (!fs.existsSync(planFile)) return null;
   let plan;
@@ -236,6 +236,10 @@ function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows) 
 
   const state = approvalState(plan);
   if (!state.ok) throw new Error(`승인된 계획이 아닙니다: ${state.reason}`);
+
+  const planFormat = normalizeFormatChoice(plan.형식, 'plan.json 의');
+  if (JSON.stringify(planFormat) !== JSON.stringify(formatChoice || null))
+    throw new Error('승인한 계획과 그릇이 다릅니다. 형식은 G2 에서 정하고 승인과 함께 봉인합니다.');
 
   const planned = (plan.skills || []).map(String);
   const actual = skillRows.map(item => item.id);
@@ -288,11 +292,11 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function validateExecutionContract(file, skillRows, outputRows) {
+function validateExecutionContract(file, skillRows, outputRows, formatChoice) {
   const ids = skillRows.map(item => item.id);
   const expected = skillRows.flatMap(item => item.writes_to || []).map(value => path.posix.basename(value));
   if (!expected.length) throw new Error(`스킬 ${ids.join('→')}의 writes_to 파일 계약을 찾지 못했습니다.`);
-  const uniqueExpected = [...new Set(expected)];
+  const uniqueExpected = applyFormatChoice([...new Set(expected)], formatChoice);
   const actual = outputRows.map(item => path.posix.basename(item.path.replace(/^workspace:/, '')));
   const uniqueActual = new Set(actual);
   // 재실행 산출물 1:1 계약 (P1 · 2026-08-30 최종 검토 · plan-compiler 와 같은 규칙) —
@@ -396,13 +400,14 @@ async function start(file) {
       const { ref } = resolveRef(value, { workspaceOnly: true });
       return { path: ref, sha256: null };
     });
-    validateExecutionContract(file, skillRows, outputRows);
+    const formatChoice = normalizeFormatChoice(draft.형식, 'run.json 의');
+    validateExecutionContract(file, skillRows, outputRows, formatChoice);
     const outputRefs = new Set(outputRows.map(item => item.path));
     const manualRequired = (draft.required_reviews || []).map(value => normalizeRequired(value, outputRefs));
     const automaticRequired = requiredReviewsForExecution(skillRows, outputRows);
     const required = mergeRequiredReviews(manualRequired, automaticRequired);
     validateReviewCoverage(skillRows, required);
-    const approvedPlan = validateApprovedPlan(file, skillRows, outputRows, required);
+    const approvedPlan = validateApprovedPlan(file, skillRows, outputRows, required, formatChoice);
     const run = {
       schema: SCHEMA,
       run_id: draft.run_id || `${iso().replace(/[-:.TZ]/g, '').slice(0, 14)}-${skillRows[0].id}-${crypto.randomBytes(3).toString('hex')}`,
@@ -416,6 +421,7 @@ async function start(file) {
       request: String(draft.request).trim(),
       skills: skillRows,
       data_mode: draft.data_mode,
+      ...(formatChoice ? { 형식: formatChoice } : {}),
       inputs: inputRows,
       profile,
       ...(pii ? { pii } : {}),

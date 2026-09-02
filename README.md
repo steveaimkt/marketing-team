@@ -51,7 +51,7 @@
 
 <!-- STATS:START -->
 스킬 100 · 부를 말 479 · 게이트 32 · 상태변경 7 · 체인 15
-저장 형식 md 74 · csv 14 · html 7 · pptx 3 · dir 2 · `writes_to` 보유 100 · 샘플 폴백 56
+저장 형식 md 55 · xlsx 19 · csv 10 · docx 8 · html 4 · pptx 3 · dir 1 · `writes_to` 보유 100 · 샘플 폴백 56
 <!-- STATS:END -->
 
 > 위 숫자는 `node plugins/marketing-team/scripts/build-stats.mjs` 가 정본에서 계산한다. 손으로 고치지 않는다.
@@ -357,7 +357,7 @@ SKILL.md·routing-eval·docs/ 를 건드렸다 → A층 + B층 60건 (약 2분 �
 
 ② 작업 폴더 (여러 개 가능)         「마케팅팀 구축하자」가 만든다 · 내가 고르는 폴더에
    {내가 연 폴더}/
-     brand/     profile.md · tone.md · my-playbook.md
+     brand/     profile.md · tone.md · my-playbook.md · memory/ (쌓이는 앎)
      inputs/    내 파일을 넣어 두는 곳 (CSV·캡처)
      outputs/   결과물이 날짜별로 떨어지는 곳
      logs/      build-log.md (실적 원장)

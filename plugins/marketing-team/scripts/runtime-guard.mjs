@@ -199,6 +199,8 @@ const SCRIPT_ALLOW = {
   pre: {
     'router.mjs': null,
     'recall.mjs': ['search', 'graph'],   // 되짚기 조회 — index(쓰기)는 승인 뒤
+    // 기억 조회 — capture(쓰기)는 승인 뒤. 옵션까지 목록에 둔다 (결합 옵션 우회 차단이 모든 --옵션을 본다)
+    'memory.mjs': ['search', 'list', 'doctor', '--type', '--top', '--json'],
     'chain-compiler.mjs': ['check', 'list'],
     'plan-compiler.mjs': ['compile', 'check'],
     // --summary 는 요약 파일을, --hook 은 스탬프를 쓴다 — 읽기 점검(--check)만 (실측 2026-08-30 · 릴리스 검토)
@@ -215,6 +217,7 @@ const SCRIPT_ALLOW = {
     'plan-compiler.mjs': ['compile', 'approve', 'check'],
     'run-receipt.mjs': null,
     'recall.mjs': null,
+    'memory.mjs': null,   // G5 기억 남기기 — 초안 json 은 Write 로 쓰고 이 스크립트가 읽는다
     'orchestrator-events.mjs': ['summary'],
     'ledger-stats.mjs': ['--check'],
     'output-checks.mjs': null,

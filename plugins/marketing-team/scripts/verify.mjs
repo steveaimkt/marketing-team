@@ -710,6 +710,23 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'recall.mjs')) || !R.includes('recall.mjs'))
     빠짐.push('회상 색인이 없거나 G1 되짚기에 배선되지 않았다 (gbrain 구조 참고 · 2026-08-31)');
+  // 기억 · 회상과 짝이다. 회상은 「무엇을 했나」, 기억은 「무엇을 아나」 (gbrain 구조 참고 · 2026-09-01)
+  {
+    const 기억 = [];
+    for (const [file, name] of [
+      [path.join(ROOT, 'scripts', 'memory.mjs'), 'scripts/memory.mjs'],
+      [path.join(ROOT, 'scripts', 'test-memory.mjs'), 'scripts/test-memory.mjs'],
+      [path.join(ROOT, 'docs', '기억-운영.md'), 'docs/기억-운영.md'],
+      [path.join(ROOT, 'brand-templates', 'memory', 'INDEX.md'), 'brand-templates/memory/INDEX.md'],
+    ]) if (!fs.existsSync(file)) 기억.push(name);
+    // G1 에서 찾고 G5 에서 남긴다 — 한쪽만 배선되면 기억이 쌓이거나 읽히거나 둘 중 하나만 된다
+    if (!R.includes('memory.mjs') || !R.includes('memory.mjs" search')) 기억.push('AI 마케터 G1 의 기억 조회');
+    if (!R.includes('marketing-team.memory/v1')) 기억.push('AI 마케터 G5 의 기억 남기기');
+    // 인용은 기계가 붙인다 — 이 규칙이 문서에서 빠지면 AI가 출처를 지어낸다
+    if (!fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8').includes('인용은 기계가 붙인다'))
+      기억.push('공통규약 §I 의 인용 규칙');
+    for (const x of 기억) 빠짐.push(`기억 구조가 끊겼다: ${x}`);
+  }
   if (!G.includes('재료를 받았으면 죽은 틀이 아니다'))
     빠짐.push('[틀] 모드에서 재료를 받아도 문장을 안 쓴다 — 요청만 하고 살리지 않는다 (사용자 지시 2026-08-30)');
 
@@ -1523,6 +1540,7 @@ for (const link of ['agents', 'skills']) {
         ['test-chain-compiler.mjs', '일반 체인 그래프 (누락·역순·순환·입력 단절 차단)'],
         ['test-review-policy.mjs', '산출물별 검토 정책 자동 생성'],
         ['test-orchestrator-events.mjs', '오케스트레이터 이벤트 기록·요약'],
+        ['test-memory.mjs', '기억 (인용은 영수증이 만든다 · 멱등 · 역링크 · 주목가치 게이트 · 점검)'],
         ['test-daily-health-check.mjs', '일일 자가검증 실행기 (실패 계속 · 회로 차단 · 정책 무결)'],
       ]) {
         const p = path.join(ROOT, 'scripts', script);

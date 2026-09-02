@@ -13,13 +13,13 @@ triggers:
   - "여정 맵 만들어줘"
 inputs: [터치포인트 목록, 고객 데이터·VoC(리뷰·CS·설문), 065 세그먼트 리포트(선택)]
 sample_fallback: sample-data/A브랜드-퍼널-가입구매-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [여정 매트릭스(4단계×4행), 이탈점 TOP 3, 개입 우선순위 제안, 저장 파일(.md)]
+outputs: [여정 매트릭스(4단계×4행), 이탈점 TOP 3, 개입 우선순위 제안, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["074", "048"]
 gate: false
 review: 경영
 mutating: false
-writes_to: [outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md]
+writes_to: [outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.xlsx, outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.html, outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "CX 컨설팅 9년차 여정 설계자 · 데이터 근거 없는 여정 단계는 맵에서 지운다"
@@ -57,16 +57,22 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
    - **행동**: 고객이 실제 하는 일 (데이터 근거)
    - **감정**: -2~+2 점수 (VoC 인용 근거, 없으면 [추정])
    - **마찰**: 이탈·불만을 만드는 지점 (수치·VoC 인용)
-   - **개입 스킬**: 마찰을 줄일 실행 스킬 ID (048 CRO / 074 이메일 / 075 알림톡 / 077 윈백 / 054 리뷰 등)
+   - **개입 스킬**: 마찰을 줄일 실행 스킬 ID (048 랜딩페이지 진단 / 074 이메일 / 075 카카오 알림 설계 / 077 이탈 고객 되찾기 기획 / 054 리뷰 등)
 5. **이탈점 TOP 3 특정** — 마찰 중 이탈 규모×감정 낙폭이 큰 순으로 3개. 각각 근거 1줄 + 개입 스킬 + 기대 효과 방향.
 6. ⏸ **개입 우선순위 확정** — TOP 3 중 먼저 실행할 1~2개를 사용자가 선택 → 074 이메일 발송 설계(관계·재구매 마찰) 또는 048 랜딩페이지 진단(구매 전환 마찰)으로 핸드오프.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+7. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.xlsx`
+> · 도식·차트 → `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.html`
+> · 해설 → `outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -85,7 +91,16 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
 | 마찰 | 낮음 | 후기 신뢰 부족 | 배송비 확인 후 이탈 (결제 이탈 62%) | 리마인드 부재 |
 | 개입 스킬 | — | 054·048 | 048 | 074·077 |
 
-### ② 감정 곡선: +1 → 0 → -1 → -2 (재구매 구간 급락)
+### ② 도식 → `073-customer-journey-map.html`
+`docs/차트-규격.md` §3-2 를 따른다 (인라인 SVG · CDN 금지 · 다크모드).
+
+| | 도식 | 무엇을 보이나 |
+|---|---|---|
+| ⑧ | **퍼널** | 단계별 잔존수와 이탈률 · **최대 낙폭 한 단만** `--down` |
+| ⑨ | **감정 곡선** | 퍼널 바로 아래 · **단 폭을 퍼널과 맞춘다** |
+
+⛔ 감정 곡선을 「+1 → 0 → -1 → -2」 텍스트로만 적지 않는다. 그건 도식이 아니다.
+⛔ 퍼널의 단 폭이 줄지 않으면 퍼널이 아니다. 막대 네 개는 퍼널이라 부르지 않는다.
 
 ### ③ 이탈점 TOP 3
 | # | 지점 | 근거 (수치·VoC 인용) | 개입 스킬 |
@@ -96,7 +111,9 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
 
 다음 액션: 선택한 이탈점으로 074 이메일 발송 설계 또는 048 랜딩페이지 진단을 바로 시작할 수 있습니다.
 
-저장 파일: outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md
+저장 파일
+· 해설 outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.md
+· 도식 outputs/{날짜}/073-customer-journey-map/073-customer-journey-map.html
 ```
 
 ## Anti-Patterns
@@ -117,5 +134,5 @@ success_metrics: [이탈점 식별 건수, 개입 후 전환율 개선폭, 여�
 
 ## 활용
 - **CRM 설계 첫 단추**: 065 세그먼트 → 073 여정 맵 → 074 시퀀스로 이어지는 「리텐션캠페인」 체인의 두 번째 단계 — "누구에게"(065) 다음 "어디서"(073)를 정한다.
-- **광고비 누수 진단**: 인지·탐색 마찰이 크면 광고를 더 태워도 밑 빠진 독 — 048 CRO를 광고 증액보다 먼저 실행할 근거가 된다.
+- **광고비 누수 진단**: 인지·탐색 마찰이 크면 광고를 더 태워도 밑 빠진 독 — 048 랜딩페이지 진단을 광고 증액보다 먼저 실행할 근거가 된다.
 - **재구매 공백 발견**: 재구매 단계 터치포인트가 "공백"으로 나오는 브랜드가 대부분 — 그 칸 하나가 074·077 도입의 사업 근거가 된다.

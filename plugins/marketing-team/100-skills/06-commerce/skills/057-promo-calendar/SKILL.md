@@ -11,13 +11,13 @@ triggers:
   - "플랫폼 행사 뭐 나가지"
   - "이번 시즌 딜 기획해줘"
 inputs: [판매 플랫폼 목록, 상품·원가·마진 정보, 재고 현황(선택), 월 목표 매출(선택)]
-outputs: [연간/분기 프로모션 캘린더, 참여 판정표(실마진 계산), 딜 기획안 + D-day 준비 타임라인, 저장 파일(.csv + .md)]
+outputs: [연간/분기 프로모션 캘린더, 참여 판정표(실마진 계산), 딜 기획안 + D-day 준비 타임라인, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["016"]
 gate: false
 review: 재무·경영
 mutating: false
-writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv, outputs/{날짜}/057-promo-calendar/057-promo-calendar-해설.md]
+writes_to: [outputs/{날짜}/057-promo-calendar/057-promo-calendar.xlsx, outputs/{날짜}/057-promo-calendar/057-promo-calendar.html, outputs/{날짜}/057-promo-calendar/057-promo-calendar.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "9년차 프로모션 MD · 실마진 계산 없는 행사 참여를 도박이라 부른다"
@@ -64,13 +64,18 @@ success_metrics: [행사 실마진율, 역마진 딜 차단 건수, 기획 소�
 5. **딜 기획안** — 확정 행사별: 대상 상품·행사가·할인 구조(쿠폰/즉시할인)·목표 판매량(재고 소요 공식)·손익 시뮬레이션.
 6. **D-day 타임라인** — 행사일 역산: D-21 신청/제안 → D-14 재고 발주(리드타임 반영) → D-7 소재·상세 배너 → D-3 가격·쿠폰 세팅 → D-day 모니터링. 다음: 016 묶음 상품 설계로 객단가 구성 보강.
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/057-promo-calendar/057-promo-calendar.xlsx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/057-promo-calendar/057-promo-calendar.csv`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/057-promo-calendar/057-promo-calendar.xlsx`
+> · 화면 → `outputs/{날짜}/057-promo-calendar/057-promo-calendar.html`
+> · 해설 → `outputs/{날짜}/057-promo-calendar/057-promo-calendar.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
-> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 같은 폴더에 `-해설.md` 로 따로 (`docs/공통규약.md §H`)
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

@@ -62,6 +62,18 @@ try {
   const ghost = base(); ghost.skills = ['999']; ghost.steps[0].skill = '999';
   assert.match(validatePlan(ghost).join(' '), /그런 스킬이 없습니다/, '없는 스킬을 잡아야 한다');
 
+  // 사용자가 고른 그릇 (2026-09-02) · 계획에서 한 번 정하고 승인과 함께 봉인한다
+  const 그릇바꿈 = base();
+  그릇바꿈.형식 = { '046-roas-budget-rebalance.md': 'docx' };
+  그릇바꿈.steps[0].outputs = [`workspace:${rel}/046-roas-budget-rebalance.docx`];
+  assert.equal(validatePlan(그릇바꿈).length, 0, '고른 그릇은 계획에서 통과해야 한다');
+  const 그릇모름 = base();
+  그릇모름.형식 = { '046-roas-budget-rebalance.md': 'hwp' };
+  assert.match(validatePlan(그릇모름).join(' '), /모르는 그릇/, '모르는 그릇은 막아야 한다');
+  const 그릇남 = base();
+  그릇남.형식 = { '999-없는것.md': 'csv' };
+  assert.match(validatePlan(그릇남).join(' '), /계약에 없습니다/, '계약에 없는 정본은 막아야 한다');
+
   // 재실행 산출물 1:1 (P1 · 2026-08-30 최종 검토)
   const rerunOnly = base(); rerunOnly.steps[0].outputs = [`workspace:${rel}/046-roas-budget-rebalance-2.md`];
   assert.equal(validatePlan(rerunOnly).length, 0, '-2 재실행 산출물 단독은 통과해야 한다');
@@ -115,7 +127,7 @@ try {
   assert.equal(started.status, 0, `승인 뒤에는 시작해야 한다: ${started.stderr}`);
   assert.equal(JSON.parse(fs.readFileSync(runFile, 'utf8')).plan.plan_sha256, planHash(load()), '영수증에 승인 해시가 남아야 한다');
 
-  console.log('계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · ✅');
+  console.log('계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

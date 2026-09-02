@@ -13,12 +13,12 @@ triggers:
   - "월간 콘텐츠 일정 짜줘"
 inputs: [운영 채널 목록, 핵심 주제·캠페인 일정, 월 발행 목표(캐파), 글감 소스(트렌드·VoC·키워드 · 선택)]
 sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [월간 캘린더 표(일자×채널×주제×퍼널×실행 스킬), 채널 믹스 요약, 주차별 발행 플랜, 저장 파일(.csv + .md)]
+outputs: [월간 캘린더 표(일자×채널×주제×퍼널×실행 스킬), 채널 믹스 요약, 주차별 발행 플랜, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md, brand/tone.md]
 chains_to: ["022", "027"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/021-content-calendar/021-content-calendar.csv, outputs/{날짜}/021-content-calendar/021-content-calendar-해설.md]
+writes_to: [outputs/{날짜}/021-content-calendar/021-content-calendar.xlsx, outputs/{날짜}/021-content-calendar/021-content-calendar.html, outputs/{날짜}/021-content-calendar/021-content-calendar-해설.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 콘텐츠 전략 디렉터 · 근거를 못 대는 글감은 캘린더에 올리지 않는다"
@@ -59,15 +59,20 @@ success_metrics: [캘린더 작성 시간, 슬롯 발행 이행률, 퍼널 3단�
 3. **채널 믹스 확정** ⏸ — 운영 채널×주간 캐파를 상수로 선언 (예: IG 7 · Blog 4 · LinkedIn 4 · Threads 8 · Newsletter 2 = 25). 사용자 확인 후 고정 — 이후 임의 변경 금지.
 4. **퍼널 배분** — TOFU(인지) 50% / MOFU(고려) 30% / BOFU(전환) 20% 기준으로 국면에 맞게 조정. 캠페인 D-Day 전후는 BOFU 밀도 상향.
 5. **슬롯 배치** — 날짜×채널 매트릭스에 주제 배치. 슬롯마다 기획 근거(어느 입력에서 왔나)와 실행 스킬(022/024/026/028/029) 매핑.
-6. **주차별 플랜 + 체인 제안** — 주차 단위 제작 순서 정리 → 022 블로그 글 작성(글감 실행) 또는 027 OSMU(1소스 다채널 확산).
+6. **주차별 플랜 + 체인 제안** — 주차 단위 제작 순서 정리 → 022 블로그 글 작성(글감 실행) 또는 027 콘텐츠 채널별 재작성(1소스 다채널 확산).
 
-7. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/021-content-calendar/021-content-calendar.csv` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
-   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/021-content-calendar/021-content-calendar.csv` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
+7. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+   > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/021-content-calendar/021-content-calendar.xlsx` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/021-content-calendar/021-content-calendar.csv`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/021-content-calendar/021-content-calendar.xlsx`
+> · 화면 → `outputs/{날짜}/021-content-calendar/021-content-calendar.html`
+> · 해설 → `outputs/{날짜}/021-content-calendar/021-content-calendar-해설.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
-> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 같은 폴더에 `-해설.md` 로 따로 (`docs/공통규약.md §H`)
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

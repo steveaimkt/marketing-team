@@ -1,0 +1,117 @@
+/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · claude.ai/design/p/019de19d-80e1-7647-a375-b2262874f3c2
+   저자가 명세를 직접 넘겨 주었다. 여기 없는 값은 만들지 않는다.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}

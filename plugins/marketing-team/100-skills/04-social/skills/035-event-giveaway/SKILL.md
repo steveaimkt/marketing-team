@@ -11,12 +11,12 @@ triggers:
   - "팔로워 이벤트 짜줘"
   - "댓글 이벤트 하나 만들어줘"
 inputs: [이벤트 목표(팔로워/UGC/전환), 경품 예산, 기간(선택)]
-outputs: [이벤트 기획안, 당첨자 운영 플로우, 필수 고지 문구, 규제 검사 결과 블록, 저장 파일(.md)]
+outputs: [이벤트 기획안, 당첨자 운영 플로우, 필수 고지 문구, 규제 검사 결과 블록, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["037"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/035-event-giveaway/035-event-giveaway.md]
+writes_to: [outputs/{날짜}/035-event-giveaway/035-event-giveaway.xlsx, outputs/{날짜}/035-event-giveaway/035-event-giveaway.html, outputs/{날짜}/035-event-giveaway/035-event-giveaway.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "제세공과금 분쟁까지 막아본 이벤트 플래너 · 고지 문구 5종 없이는 이벤트를 열지 않는다"
@@ -67,12 +67,18 @@ success_metrics: [이벤트 참여 건수, 목표 지표 달성률, 기획안 �
 6. **규제 검사** — [gates/compliance-gate.md](../../../gates/compliance-gate.md) 3 STEP 실행, 결과 블록 부착.
 7. **전달 → 037 체인** — UGC형이면 수집물 권리 확보·재활용 설계로 핸드오프.
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/035-event-giveaway/035-event-giveaway.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+8. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/035-event-giveaway/035-event-giveaway.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/035-event-giveaway/035-event-giveaway.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/035-event-giveaway/035-event-giveaway.xlsx`
+> · 화면 → `outputs/{날짜}/035-event-giveaway/035-event-giveaway.html`
+> · 해설 → `outputs/{날짜}/035-event-giveaway/035-event-giveaway.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

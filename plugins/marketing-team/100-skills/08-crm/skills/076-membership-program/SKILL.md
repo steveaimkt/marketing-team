@@ -12,12 +12,12 @@ triggers:
   - "등급별 혜택이 남는 장사인지 계산해줘"
 inputs: [065 세그먼트 리포트(권장) 또는 고객 구매 분포, 마진 구조(원가율·배송비), 목표 리텐션]
 sample_fallback: sample-data/A브랜드-고객마스터.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [등급 구조표(기준·혜택), 등급별 마진 시뮬레이션, 승급·강등·유지 규칙, 저장 파일(.md)]
+outputs: [등급 구조표(기준·혜택), 등급별 마진 시뮬레이션, 승급·강등·유지 규칙, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["065"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/076-membership-program/076-membership-program.md]
+writes_to: [outputs/{날짜}/076-membership-program/076-membership-program.xlsx, outputs/{날짜}/076-membership-program/076-membership-program.html, outputs/{날짜}/076-membership-program/076-membership-program.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "로열티 프로그램 설계 10년차 · 마진 시뮬레이션 없이는 혜택을 약속하지 않는다"
@@ -27,7 +27,7 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 
 # 076 멤버십 등급 설계
 
-> 065 RFM 세그먼트의 매출 기여 분포로 등급 경계를 정하고, 혜택 원가를 반영한 마진 시뮬레이션으로 "퍼주다 망하는 멤버십"을 설계 단계에서 차단한다.
+> 065 고객 등급 분석 세그먼트의 매출 기여 분포로 등급 경계를 정하고, 혜택 원가를 반영한 마진 시뮬레이션으로 "퍼주다 망하는 멤버십"을 설계 단계에서 차단한다.
 > 계승: 065 고객 등급 분석의 세그먼트 정의표(M 분위·매출 기여) → 등급 경계 근거 / 016 묶음 상품 설계의 할인 후 실마진 시뮬레이션 공식 재사용.
 
 > **내 일이 아닌 것** · **반복 구매**의 등급·혜택이다. 한 번 사는 묶음은 016, 사람을 모으는 운영은 036.
@@ -62,12 +62,18 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 6. ⏸ **구조 확정** — 시뮬레이션 3안 중 사용자가 선택·조정 → 최종 구조표 인도.
 7. **체인 제안** — 065 고객 등급 분석 (분기마다 재실행해 등급 인원 이동·경계 리밸런싱).
 
-8. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/076-membership-program/076-membership-program.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+8. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/076-membership-program/076-membership-program.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/076-membership-program/076-membership-program.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/076-membership-program/076-membership-program.xlsx`
+> · 도식·차트 → `outputs/{날짜}/076-membership-program/076-membership-program.html`
+> · 해설 → `outputs/{날짜}/076-membership-program/076-membership-program.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -90,12 +96,20 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 |---|---|---|---|---|
 (검증: 전 등급 실마진 > 0 ✅ / 초과 등급은 축소안 병기)
 
-### ④ 운영 규칙: 산정 {주기} · 강등 유예 {기간} · 통보 {채널}
+### ④ 도식 → `076-membership-program.html`
+`docs/차트-규격.md` §3-2 ⑩ 등급 피라미드를 따른다.
+층마다 **인원과 매출 기여를 함께** 적는다 — 인원이 적은데 매출이 큰 층이 보여야 설계가 읽힌다.
+층 색은 `--olive` 의 `fill-opacity` 를 위 1.0 → 아래 0.35 로 내린다. **색상을 바꾸지 않는다.**
+⛔ 등급을 표로만 내지 않는다. 몇 층인지·어느 층이 두꺼운지는 표로 안 보인다.
 
-### ⑤ 구조 확정 ⏸ (보수/기본/낙관 3안 중 선택)
-다음 액션: 분기마다 065 RFM 분석을 재실행해 등급 인원 이동과 경계를 리밸런싱하세요.
+### ⑤ 운영 규칙: 산정 {주기} · 강등 유예 {기간} · 통보 {채널}
 
-저장 파일: outputs/{날짜}/076-membership-program/076-membership-program.md
+### ⑥ 구조 확정 ⏸ (보수/기본/낙관 3안 중 선택)
+다음 액션: 분기마다 065 고객 등급 분석 분석을 재실행해 등급 인원 이동과 경계를 리밸런싱하세요.
+
+저장 파일
+· 해설 outputs/{날짜}/076-membership-program/076-membership-program.md
+· 도식 outputs/{날짜}/076-membership-program/076-membership-program.html
 ```
 
 ## Anti-Patterns
@@ -117,4 +131,4 @@ success_metrics: [등급별 마진율, 재구매율 개선폭, 상위 등급 승
 ## 활용
 - **D2C 멤버십 런칭**: 065 리포트의 챔피언·충성 세그먼트 규모로 VIP·GOLD 경계를 잡고, 시뮬레이션 기본안으로 3개월 파일럿 후 리밸런싱.
 - **기존 등급제 수익성 점검**: 이미 운영 중인 등급제의 혜택 원가율을 ③표로 재계산 — 적자 등급을 찾아 혜택 재배치.
-- **VIP 전용 캠페인 연계**: 등급 구조표를 074 이메일 시퀀스(등급별 오퍼 분리)·075 알림톡(승급 축하·강등 예고)의 타겟 기준으로 전달.
+- **VIP 전용 캠페인 연계**: 등급 구조표를 074 이메일 발송 설계(등급별 오퍼 분리)·075 카카오 알림 설계(승급 축하·강등 예고)의 타겟 기준으로 전달.

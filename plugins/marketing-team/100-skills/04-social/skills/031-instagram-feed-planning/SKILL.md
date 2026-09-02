@@ -13,12 +13,12 @@ triggers:
   - "프로필 들어왔을 때 예쁘게 보이게 피드 설계해줘"
 inputs: [브랜드 무드·제품 사진 자산 현황, 월 발행 수(기본 30), 계정 목적(팔로워/판매/커뮤니티)]
 sample_fallback: sample-data/A브랜드-인스타-인사이트-30편.csv   # `inputs/` 를 먼저 보고, 없으면 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [30일 발행 플랜 표(일자·요일·유형·주제·캡션·해시태그·이미지 프롬프트), 그리드 무드보드(팔레트·배치 패턴), 콘텐츠 유형 배합표, 규제 검사 결과 블록, 저장 파일(.csv 표 + .md 해설)]
+outputs: [30일 발행 플랜 표(일자·요일·유형·주제·캡션·해시태그·이미지 프롬프트), 그리드 무드보드(팔레트·배치 패턴), 콘텐츠 유형 배합표, 규제 검사 결과 블록, 저장 파일(.xlsx + .md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["040"]
 gate: true
 mutating: false
-writes_to: [outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.csv, outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md]
+writes_to: [outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.xlsx, outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "팔로워 10만 계정 그리드를 설계해온 인스타그램 아트디렉터 · 낱장이 아니라 9칸 단위로 본다"
@@ -80,10 +80,12 @@ success_metrics: [프로필 방문 대비 팔로우 전환율, 게시물 저장�
 9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md`
+> ⛔ **착지 · 두 파일로 쓴다**
+> · 표 → `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.xlsx`
+> · 해설 → `outputs/{날짜}/031-instagram-feed-planning/031-instagram-feed-planning.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
-> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·판정은 `.md` 쪽에 쓴다 (`docs/공통규약.md §H`)
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
 
 ## Output Format · **파일에 들어갈 내용**
 

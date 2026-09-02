@@ -127,6 +127,10 @@ export function validatePlan(plan) {
       issues.push(`사용자가 지정한 순서와 다릅니다: 요청 ${requested.join('→')} · 계획 ${got.join('→')}`);
   }
 
+  let planFormat = null;
+  try { planFormat = normalizeFormatChoice(plan.형식, '계획의'); }
+  catch (error) { issues.push(error.message); }
+
   const decl = skillDeclarations();
   const stepSkills = steps.map(s => String(s.skill || '').trim());
   if (skills.join(',') !== stepSkills.join(','))
@@ -148,7 +152,10 @@ export function validatePlan(plan) {
       return m2 ? { canon: m2[1] + m2[3], ord: m2[2] } : { canon: out, ord: '1' };
     };
     const outs = (step.outputs || []).map(v => path.posix.basename(String(v)));
-    const allowed = [...new Set(found.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
+    const 계약 = [...new Set(found.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
+    let allowed = 계약;
+    try { allowed = applyFormatChoice(계약, planFormat); }
+    catch (error) { issues.push(`${at} · ${error.message}`); }
     const canonOf = out => (allowed.includes(out) ? out : (allowed.includes(parseOut(out).canon) ? parseOut(out).canon : null));
     const matchCount = new Map(allowed.map(b => [b, 0]));
     const ords = new Set();
@@ -158,9 +165,7 @@ export function validatePlan(plan) {
       matchCount.set(canon, matchCount.get(canon) + 1);
       ords.add(out === canon ? '1' : parseOut(out).ord);
     }
-    for (const contract of found.writesTo) {
-      const base = path.posix.basename(contract);
-      if (!base.includes('.')) continue;
+    for (const base of allowed) {
       const count = matchCount.get(base) || 0;
       if (count === 0) issues.push(`${at} · writes_to 파일이 산출물에 없습니다: ${base}`);
       if (count > 1) issues.push(`${at} · 같은 정본에 산출물이 ${count}개 대응합니다 — 한 실행에 하나입니다: ${base}`);
@@ -214,6 +219,50 @@ const read = file => {
 const write = (file, value) => fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 
 /** 승인이 현재 계획에 유효한가. run-receipt 와 훅이 함께 쓴다. */
+/**
+ * 사용자가 고른 **그릇**을 계약에 반영한다 (2026-09-02).
+ *
+ * 그릇만 바꾼다 — 파일 수와 이름 줄기는 그대로다. `writes_to` 는 여전히 정본이고,
+ * 무엇을 몇 개 내는지는 스킬이 정한다. 사용자는 **무엇으로 열지**만 고른다.
+ * 어느 정본을 바꾸는지 이름으로 짚게 해서 1:1 계약이 흐려지지 않게 한다.
+ *
+ *   "형식": { "091-work-audit.xlsx": "csv" }
+ *
+ * G2 계획에서 한 번 정하고 승인과 함께 봉인한다. 실행 중에 바꾸지 않는다.
+ * run-receipt 가 이 둘을 그대로 가져다 쓴다 — 계획과 영수증이 같은 자로 재야 한다.
+ */
+export const 그릇 = new Set(['md', 'csv', 'xlsx', 'html', 'docx', 'pptx', 'pdf']);
+
+export function normalizeFormatChoice(value, where) {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'object' || Array.isArray(value))
+    throw new Error(`${where} 형식은 {"정본파일명": "확장자"} 꼴이어야 합니다.`);
+  const out = {};
+  for (const [key, raw] of Object.entries(value)) {
+    const 정본 = path.posix.basename(String(key));
+    const 새 = String(raw).replace(/^\./, '').toLowerCase();
+    if (!그릇.has(새))
+      throw new Error(`모르는 그릇입니다: .${새} — ${[...그릇].map(v => '.' + v).join(' · ')} 중에서 고르세요.`);
+    out[정본] = 새;
+  }
+  return Object.keys(out).length ? out : null;
+}
+
+export function applyFormatChoice(expected, choice) {
+  if (!choice) return expected;
+  const out = [...expected];
+  for (const [정본, 새] of Object.entries(choice)) {
+    const i = out.indexOf(정본);
+    if (i === -1)
+      throw new Error(`그릇을 바꿀 정본이 계약에 없습니다: ${정본} · 계약은 ${expected.join(' · ')} 입니다.`);
+    const 바뀐 = 정본.replace(/\.[^.]+$/, `.${새}`);
+    if (바뀐 !== 정본 && out.includes(바뀐))
+      throw new Error(`그릇을 바꾸면 다른 정본과 이름이 겹칩니다: ${바뀐}`);
+    out[i] = 바뀐;
+  }
+  return out;
+}
+
 export function approvalState(plan) {
   const current = planHash(plan);
   if (plan.status !== 'approved') return { ok: false, current, reason: `계획이 ${plan.status || 'plan-ready'} 상태입니다. 승인을 받으세요.` };
