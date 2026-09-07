@@ -14,13 +14,13 @@ triggers:
   - "고객 목소리 모아서 개선 요청 많은 순서로 정리해줘"
 inputs: [리뷰·댓글·CS 데이터(CSV/엑셀/텍스트/캡처 · 로그인 뒤 데이터는 크롤링 불가, 내보내서 inputs/ 에), 분석 기간(기본 최근 7일), 최대 건수(기본 500)]
 sample_fallback: sample-data/A브랜드-리뷰-200건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [행별 분류 시트(5분류+5축 점수), 페인포인트 TOP 5까지(유효 군집 수만큼), CS 우선 확인 목록, 저장 파일(.xlsx + .html + .md)]
+outputs: [행별 분류 시트(5분류+5축 점수), 페인포인트 TOP 5까지(유효 군집 수만큼), CS 우선 확인 목록, 저장 파일(.xlsx + .html + 해설 .md)]
 requires: [brand/profile.md]
 chains_to: ["008", "012"]
 gate: false
 pii: true
 mutating: false
-writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.xlsx, outputs/{날짜}/006-review-mining/006-review-mining.html, outputs/{날짜}/006-review-mining/006-review-mining.md]
+writes_to: [outputs/{날짜}/006-review-mining/006-review-mining.xlsx, outputs/{날짜}/006-review-mining/006-review-mining.html, outputs/{날짜}/006-review-mining/006-review-mining-해설.md]   # 🔴 2026-09-06 · 공통규약 「.html (20개)」 목록에 넷이 다 있는데 writes_to 에만 빠져 있었다. 041 꼴로 되살렸다
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 VoC 분석가 · 고객의 문장을 각색하지 않고 그대로 옮긴다"
@@ -34,7 +34,7 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 > 계승: marketing-os `voc-analyzer`의 5분류 체계·5축 평가 모델·개인정보 마스킹·CS 우선 확인 원칙.
 
 > **내 일이 아닌 것** · 리뷰에서 **뽑는 데까지**다. 답변을 쓰는 것은 054, 여러 채널 VoC를 모아 분류하는 것은 078.
-> 가르는 말은 `docs/헷갈리는-쌍.md` 에 있다.
+> 나누는 말은 `docs/헷갈리는-쌍.md` 에 있다.
 
 ## Contract
 - 모든 항목은 5분류(긍정/부정/질문/요청/페인포인트) 중 정확히 1개와 5축 점수를 받는다.
@@ -84,12 +84,18 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 > ⛔ **착지 · 세 파일로 쓴다**
 > · 표 → `outputs/{날짜}/006-review-mining/006-review-mining.xlsx`
 > · 화면 → `outputs/{날짜}/006-review-mining/006-review-mining.html`
-> · 해설 → `outputs/{날짜}/006-review-mining/006-review-mining.md`
+> · 해설 → `outputs/{날짜}/006-review-mining/006-review-mining-해설.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
-> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
-> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
+> **`.html` 에는 그래프를 넣는다.** 표만 있는 화면은 어느 불만이 큰지 한눈에 안 보인다.
+> · **① 전체·별점 평균·불만** 을 카드 셋으로 맨 위에 세운다
+> · **② 유형별 불만 건수** 막대 — 건수 내림차순 · 막대 오른쪽에 건수를 적는다
+> ·   **불만율이 100%인 유형과 그렇지 않은 유형을 다른 색으로** 칠한다. 절반은 만족한 유형을 1위와 같은 색으로 칠하지 않는다
+> · **③ 불만 0건인 유형** 은 그래프에 넣지 않고 표로 따로 남긴다 — 0을 막대로 그리면 빈칸으로 보인다
+> 🔴 **인라인 `<svg>` 로 직접 그린다.** 외부 차트 라이브러리를 부르지 않는다 —
+> 산출물은 인터넷 없이 더블클릭으로 열려야 한다. 값이 하나뿐이면 그래프를 만들지 않고 그 사실을 적는다.
+> 해설은 집계 기준과 판단 근거를 문장으로 푼다. 표에 든 값을 다시 늘어놓지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -98,11 +104,11 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 번호,날짜,채널,제품,별점,마스킹본문,분류,감정점수,카테고리,긴급도,신규성,영향도,페인포인트군집,CS우선확인
 1,{날짜},{채널},{제품},{별점},{개인정보를 가린 원문},{긍정|부정|질문|요청|페인포인트},{-2~2},{제품|디자인|배송|CS|가격},{0~3},{Y|N},{낮음|중간|높음},{군집명},{Y|N}
 ```
-설명·판정·다음 액션은 같은 폴더의 `006-review-mining-해설.md` 에 아래 형식으로 쓴다.
+설명·결론·다음 액션은 같은 폴더의 `006-review-mining-해설.md` 에 아래 형식으로 쓴다.
 두 파일을 쓴 뒤 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 📣 VoC 분석: {브랜드/제품} ({기간}, {N}건)
-**판정 요약**: {3줄 이내 · 최대 페인포인트 1개 + 신규 신호 1개 + 권고 1개}
+**결론 요약**: {3줄 이내 · 최대 페인포인트 1개 + 신규 신호 1개 + 권고 1개}
 
 ## 분류 집계
 | 분류 | 건수 | 비중 | 평균 감정 |
@@ -121,7 +127,7 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 → 008 고객 유형 정리 (페인포인트·구매동기 → 페르소나 정의) / 012 가치 제안 정리 (긍정 클러스터 → 소구점)
 · 보조: 051 상세페이지 기획 (페인포인트 → 섹션 메시지)
 
-저장 파일: outputs/{날짜}/006-review-mining/006-review-mining.csv · 006-review-mining-해설.md
+저장 파일: outputs/{날짜}/006-review-mining/006-review-mining.xlsx · 006-review-mining.html · 006-review-mining-해설.md
 ```
 
 ## Anti-Patterns

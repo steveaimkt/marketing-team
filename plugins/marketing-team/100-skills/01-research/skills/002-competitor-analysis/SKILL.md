@@ -18,7 +18,7 @@ chains_to: ["009", "003"]
 gate: false
 review: 브랜드·고객
 mutating: false
-writes_to: [outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.xlsx, outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.html, outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md]
+writes_to: [outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.xlsx, outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.html, outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md]   # 🔴 2026-09-06 · 공통규약 「.html (20개)」 목록에 넷이 다 있는데 writes_to 에만 빠져 있었다. 041 꼴로 되살렸다
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "11년차 경쟁 인텔리전스 컨설턴트 · 자사가 지는 축부터 먼저 확인하고 표를 채운다"
@@ -76,7 +76,7 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 ### 지원 소스 (입력으로 받을 수 있는 것)
 - 경쟁사 상세페이지 캡처 (영역별 5~6장 — 메인 비주얼/옵션/스펙표/특징/리뷰)
 - 스토어 검색 결과 캡처·URL (상위 노출 순위 근거)
-- SNS 계정 URL (채널 활성도 판정용)
+- SNS 계정 URL (채널 활성도 결론용)
 - 뉴스·보도자료 텍스트 (핵심 인용 + 출처 형식으로 정리)
 
 8. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
@@ -89,8 +89,13 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
-> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
-> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다** — `/plugin marketplace add anthropics/skills` · `/plugin install document-skills@anthropic-agent-skills`. ⛔ 설치를 강요하지 않는다.
+> **`.html` 에는 그래프를 넣는다.** 표만 있는 화면은 어느 축에서 지는지 한눈에 안 보인다.
+> · **① 단위당 가격** 막대 — 네 브랜드를 같은 단위(ml당·g당)로 세우고 **자사 막대만 강조색**
+> ·   막대 위에 값, 아래에 브랜드 이름. 단위가 다른 제품이면 환산 근거를 그래프 아래 한 줄로 적는다
+> · **② 축마다 누가 비었나** 매트릭스 — 행은 비교 축, 열은 브랜드 · 채운 곳·빈 곳·미확인 셋으로만 칠한다
+> ·   **자사만 채운 축**을 별표로 표시한다. 그것이 이 표의 결론이다
+> 🔴 **인라인 `<svg>` 로 직접 그린다.** 외부 차트 라이브러리를 부르지 않는다 —
+> 산출물은 인터넷 없이 더블클릭으로 열려야 한다. 값이 하나뿐이면 그래프를 만들지 않고 그 사실을 적는다.
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -98,7 +103,7 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 파일에 쓰고 나서, 화면에는 **경로 · 결론 3줄 · 부족한 것**만 낸다 (15줄 이내).
 ```markdown
 # 🥊 경쟁사 분석: A 브랜드 vs B/C사 (2026-08-03)
-**한 줄 판정**: 가장 큰 위협은 C사의 초저가·로켓배송(ml당 단가 1/6) / 가장 큰 빈틈은 경쟁 전원이 비워 둔 "재구매 CRM"
+**한 줄 결론**: 가장 큰 위협은 C사의 초저가·로켓배송(ml당 단가 1/6) / 가장 큰 빈틈은 경쟁 전원이 비워 둔 "재구매 CRM"
 
 ## 3축 비교표
 | 축 | 자사(A) | B사 | C사 | 출처 |
@@ -115,7 +120,7 @@ success_metrics: [실행 가능 기회 갭 3건 도출, 출처·시점 병기율
 ## 다음 액션
 → 009 가격 조사 (가격-가치 맵으로 심화) / 003 경쟁사 상시 조사 (주간 추적 전환)
 
-저장 파일: outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.md
+저장 파일: outputs/{날짜}/002-competitor-analysis/002-competitor-analysis.xlsx · 002-competitor-analysis.html · 002-competitor-analysis.md
 ```
 
 ## Anti-Patterns

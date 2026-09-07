@@ -583,7 +583,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   for (const [f, t, 이름] of [[G, '규제는 A브랜드 업종으로 걸지 않는다', '규약 §0-b'],
                               [R, '규제만은 A브랜드 업종으로 걸지 않는다', '런타임 §0']])
     if (!f.includes(t)) 빠짐.push(`${이름} 에 「샘플 업종으로 규제를 걸지 않는다」가 없다 — 사료 브랜드가 화장품법으로 검사받는다`);
-  if (!C.includes('샘플 업종으로 대신 판정하지 않는다'))
+  if (!C.includes('샘플 업종으로 대신 결정하지 않는다'))
     빠짐.push('게이트 절차1 에서 그 금지가 사라졌다');
 
   // 중간 경로 — 업종 한 줄
@@ -620,18 +620,18 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   //   못 잡는 것(업종별 금지어·우리 금기)을 판정 블록에 적는다.
   if (!G.includes('`[틀]` 이라고 게이트를 건너뛰지 않는다'))
     빠짐.push('[틀] 에서 게이트가 도는지가 명시되지 않았다 — 검사 없이 발행될 수 있다');
-  if (!G.includes('못 잡은 것을 판정 블록에 반드시 적는다'))
+  if (!G.includes('못 잡은 것을 결과 블록에 반드시 적는다'))
     빠짐.push('[틀] 에서 못 잡은 것을 안 적는다 — 통과했다고 믿고 발행하게 된다');
   if (!B2.includes('재료를 그때그때 확인'))
     빠짐.push('온보딩 ③번이 재료 요청 경로를 안 밝힌다 — 글쓰기 스킬이 죽은 것처럼 읽힌다 (사용자 확정 문안 2026-08-31)');
   if (!B2.includes('②와 같은 결과'))
     빠짐.push('온보딩 ③번이 ②와의 동등성을 안 밝힌다 (사용자 확정 문안 2026-08-31)');
-  if (!R.includes('빠른 진입 · 저위험 단일 업무'))
+  if (!R.includes('빠른 진입, 저위험 단일 업무'))
     빠짐.push('빠른 진입 계약이 런타임에 없다 (개선 플랜 §13 · 2026-08-31)');
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'test-first-run-ux.mjs')))
     빠짐.push('빠른 진입 회귀 테스트가 없다 (scripts/test-first-run-ux.mjs)');
   // 화면 속 따옴표 · 예시 발화(‘ ’)와 정해진 호출어(「 」)를 가른다 (사용자 결정 2026-09-01)
-  if (!G.includes('예시 발화와 정해진 호출어를 가른다'))
+  if (!G.includes('예시 발화와 정해진 호출어를 나눈다'))
     빠짐.push('화면 따옴표 규칙이 규약에 없다 — 예시 발화와 정해진 호출어가 다시 섞인다 (사용자 결정 2026-09-01)');
   {
     const 화면 = [['skills/마케팅팀-구축하기/SKILL.md', B2],
@@ -776,8 +776,8 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   const F = path.join(ROOT, 'docs', 'G3-분기절차.md');
   const 빠짐 = [];
 
-  if (!R.includes('갈라진 절 · **조건이 걸렸을 때만 읽는다**'))
-    빠짐.push('런타임에 Section index 가 없다 — 갈라진 절로 가는 길이 끊긴다');
+  if (!R.includes('조건절, **조건이 걸렸을 때만 읽는다**'))
+    빠짐.push('런타임에 Section index 가 없다 — 조건절로 가는 길이 끊긴다');
   if (!R.includes('기억으로 하지 않는다'))
     빠짐.push('「기억으로 하지 않는다」가 없다 — 쪼갠 절은 안 읽으면 통째로 빠진다');
   if (!fs.existsSync(F)) 빠짐.push('docs/G3-분기절차.md 가 없다');
@@ -804,7 +804,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('규제 게이트가 본체에서 사라졌다 — 조건부로 내리면 검사 없이 발행된다');
 
   if (빠짐.length) {
-    err(`갈라진 절 배선이 끊겼다 ${빠짐.length}건`);
+    err(`조건절 배선이 끊겼다 ${빠짐.length}건`);
     for (const x of 빠짐) err(`  ${x}`);
   } else ok.push('갈라진 절 (색인 · 기억금지 · 3절 실재 · 게이트는 본체)');
 }
@@ -1418,7 +1418,9 @@ for (const link of ['agents', 'skills']) {
       if (!id || !nm) continue;
       정본.set(id, nm);
       // ① 본문 H1 이 이름을 복제한다 — `# 이름` 또는 `# 006 이름`. 한 쌍으로 움직여야 한다
-      const h1 = body.match(/^#\s+(.+)$/m)?.[1]?.trim();
+      //   ⚠️ frontmatter 를 먼저 걷어낸다. YAML 주석(`# 🔴 …`)이 H1 으로 잡혔다 (실측 2026-09-07 · 003·024·048·072)
+      const 본문 = body.replace(/^---\n[\s\S]*?\n---\n/, '');
+      const h1 = 본문.match(/^#\s+(.+)$/m)?.[1]?.trim();
       if (!h1) err(`${id} SKILL.md 에 본문 제목(H1)이 없다`);
       else if (h1.replace(/^\d{3}\s*/, '').trim() !== nm)
         err(`${id} 본문 제목이 이름과 다르다 · name「${nm}」≠ H1「${h1}」 — 이름을 바꿀 때 둘을 함께 바꾼다`);

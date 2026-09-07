@@ -1,0 +1,270 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>고객 여정 맵</title><style>/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · claude.ai/design/p/019de19d-80e1-7647-a375-b2262874f3c2
+   저자가 명세를 직접 넘겨 주었다. 여기 없는 값은 만들지 않는다.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-soft:   #F0F0EF;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-soft:  #3A3A37;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   산출물 공통 컴포넌트 · tokens.css 를 먼저 읽어야 한다
+   색과 서체와 크기를 여기서 정하지 않는다. 전부 토큰을 부른다.
+
+   저자 시스템의 규칙 셋을 지킨다.
+     ① 강조는 드물게 — 모래와 올리브는 면과 막대에만, 노랑은 사람이 판단할 자리에만
+     ② 카드는 뜨지 않는다 — 헤어라인 1px 과 아주 옅은 그림자로 앉는다
+     ③ 바탕에 그러데이션과 무늬를 쓰지 않는다
+   ───────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--ff); font-size:var(--t-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; word-break:keep-all;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){ .wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)} }
+
+/* ── 머리 ───────────────────────────────────────────── */
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);
+   letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);
+   padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+h3{font-size:var(--t-h3);line-height:var(--lh-head);margin:var(--sp-4) 0 var(--sp-2);
+   color:var(--ink-mut);font-weight:600}
+p{margin:0 0 var(--sp-2)}
+a{color:var(--ink);text-decoration-color:var(--ink-fade);transition:opacity .2s ease-out}
+a:hover{opacity:.7}
+code{font-family:var(--ff-mono);font-size:.88em;background:var(--paper-sunk);
+     padding:1px 5px;border-radius:var(--r-s);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-s)}
+
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;
+     border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:var(--ink)}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+
+/* ── KPI 카드 · 격자 간격 20 ─────────────────────────── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+     gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);
+      border-radius:var(--r-l);padding:var(--sp-3) var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);
+           line-height:var(--lh-display);margin:var(--sp-1) 0 2px;
+           overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.card.empty{background:var(--paper-sunk);border-style:dashed;box-shadow:none}
+.card.empty .val{font-size:17px;font-weight:700;color:var(--ink-fade);margin:5px 0 6px}
+.card.empty .why{font-size:var(--t-tiny);line-height:1.55;color:var(--ink-fade)}
+
+/* ── 표 ─────────────────────────────────────────────── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;
+    border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);
+         color:var(--ink-mut);white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s ease-out}
+tbody tr:hover{background:var(--acc-band)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;color:var(--ink);width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);
+        color:var(--ink-fade);border-top:1px solid var(--line)}
+
+/* 판정 배지 · 낱칸이라 모서리 5 */
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;
+   border-radius:var(--r-s);white-space:nowrap}
+.b.up{background:var(--up-band);color:var(--up)}
+.b.down{background:var(--down-band);color:var(--down)}
+.b.warn{background:var(--warn-band);color:var(--warn)}
+.b.none{background:var(--paper-sunk);color:var(--none)}
+.b.me{background:var(--mark);color:#2A2A28}   /* 사람이 판단할 자리에만 */
+
+/* ── 강조 상자 ───────────────────────────────────────── */
+.hl,.warn-box,.gate{border:1px solid var(--line);border-radius:var(--r-l);
+     padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}
+.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}
+.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.gate{border-left:3px solid var(--sand);background:var(--acc-band)}
+.gate .t{font-size:var(--t-small);font-weight:700;margin-bottom:var(--sp-1)}
+
+/* ── 차트 ───────────────────────────────────────────── */
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);
+       padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)} .bar.dim{fill:var(--sand)}
+.grid-l{stroke:var(--line);stroke-width:1}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+
+/* 표 안 가로 막대 · 낱칸이라 모서리 5 */
+.mb{position:relative;background:var(--paper-sunk);border-radius:var(--r-s);height:17px;min-width:60px}
+.mb>i{position:absolute;inset:0 auto 0 0;background:var(--olive);border-radius:var(--r-s);display:block}
+.mb>span{position:relative;font-size:11px;font-weight:700;padding-left:5px;line-height:17px}
+
+/* ── 꼬리 ───────────────────────────────────────────── */
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);
+      font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+.src{font-size:var(--t-tiny);color:var(--ink-fade);margin-top:var(--sp-2);
+     padding-top:8px;border-top:1px solid var(--line)}
+
+@media print{
+  body{background:#fff}
+  .card,.chart,.tw{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body><div class="wrap">
+<div class="head">
+<span class="tag sample">샘플</span>
+</div>
+<h1>고객 여정 맵</h1>
+<p class="meta">065 세그먼트를 받았습니다 · 2026-08-28</p>
+<div class="kpi">
+<div class="card"><div class="lab">항목</div><div class="val">4<span class="unit">개</span></div></div>
+<div class="card"><div class="lab">인원 190,290</div><div class="val">1<span class="unit">위</span></div></div>
+<div class="card"><div class="lab">다음 단계로 24,037</div><div class="val">1<span class="unit">위</span></div></div>
+</div>
+<h2>단계별 이탈</h2>
+<p>90일(2026-05-01 ~ 2026-07-29) 퍼널 자료를 채널·디바이스 구분 없이 합산했습니다.</p>
+<div class="chart"><div class="cap">인원</div><svg viewBox="0 0 640 118" role="img" aria-label="인원"><text class="axis" x="0" y="19">유입</text><rect class="bar" x="132" y="8" width="400.0" height="15" rx="3"/><text class="val-l" x="538.0" y="20">190,290</text><text class="axis" x="0" y="45">가입</text><rect class="bar" x="132" y="34" width="50.5" height="15" rx="3"/><text class="val-l" x="188.5" y="46">24,037</text><text class="axis" x="0" y="71">장바구니</text><rect class="bar" x="132" y="60" width="14.4" height="15" rx="3"/><text class="val-l" x="152.4" y="72">6,865</text><text class="axis" x="0" y="97">결제 시작</text><rect class="bar dim" x="132" y="86" width="8.0" height="15" rx="3"/><text class="val-l" x="146.0" y="98">3,820</text></svg></div>
+<div class="tw"><table><thead><tr><th>단계</th><th class="n">인원</th><th class="n">다음 단계로</th><th class="n">이탈률</th><th>마찰</th></tr></thead><tbody><tr><td>유입</td><td class="n">190,290</td><td class="n">24,037</td><td class="n">87%</td><td>상세페이지에서 그냥 나감</td></tr><tr><td>가입</td><td class="n">24,037</td><td class="n">6,865</td><td class="n">71%</td><td>가입 후 담을 이유가 없음</td></tr><tr><td>장바구니</td><td class="n">6,865</td><td class="n">3,820</td><td class="n">44%</td><td>배송비 확인 후 이탈</td></tr><tr><td>결제 시작</td><td class="n">3,820</td><td class="n">1,526</td><td class="n">60%</td><td><span class="b none">미확인</span></td></tr></tbody></table></div>
+<h2>최대 누수 판정 (1차)</h2>
+<p>들어와서 아무것도 안 하고 나가는 사람이 166,253명입니다.</p><p>· 유입에서 가입으로 가는 이탈 87%가 가장 크다. 여기를 먼저 고친다.</p>
+<h2>터치포인트</h2>
+
+<div class="tw"><table><thead><tr><th>단계</th><th>지금 있는 것</th><th>없는 것</th></tr></thead><tbody><tr><td>유입</td><td>상세페이지</td><td><span class="b none">미확인</span></td></tr><tr><td>가입</td><td>가입 완료 메일</td><td>가입 직후 안내</td></tr><tr><td>장바구니</td><td><span class="b none">미확인</span></td><td>이탈 리마인드</td></tr><tr><td>결제 시작</td><td>주문 확인 메일</td><td><span class="b none">미확인</span></td></tr><tr><td>휴면</td><td><span class="b none">미확인</span></td><td>윈백</td></tr></tbody></table></div>
+<h2>⚠️ 아직 확인 안 된 것</h2>
+<div class="warn-box"><div class="t">확인하고 넘어갈 것</div><p>세그먼트별 인원은 065 에서 왔지만, 단계별 이탈률은 퍼널 데이터에서 온 것이라</p><p>065 의 등급과 아직 겹쳐 보지 않았습니다. 모수가 다릅니다. 065 는 산 적이 있는 고객 880명이고,</p><p>여기는 90일 동안 들어온 사람이 단계마다 얼마나 남는지입니다.</p><p>074 에서 단계마다 메일이 닿는 사람을 실제로 세어 봅니다.</p></div>
+<h2>다음</h2>
+<p>→ 074 이메일 시퀀스 · 어느 단계에 무슨 말을 걸지 정합니다</p>
+<div class="foot"><span class="next">다음 →</span> 074 이메일 시퀀스 · 어느 단계에 무슨 말을 걸지 정합니다</div>
+<div class="src">이 파일은 AI 마케팅팀 스킬이 만들었다. 읽은 자료와 만든 날짜는 맨 위에 적혀 있다.</div>
+</div></body></html>

@@ -1,0 +1,275 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>네이버 쇼핑검색광고 진단 — 기간 미상(보고서에 날짜 열 없음) · [샘플]</title><style>/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · claude.ai/design/p/019de19d-80e1-7647-a375-b2262874f3c2
+   저자가 명세를 직접 넘겨 주었다. 여기 없는 값은 만들지 않는다.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-soft:   #F0F0EF;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-soft:  #3A3A37;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   산출물 공통 컴포넌트 · tokens.css 를 먼저 읽어야 한다
+   색과 서체와 크기를 여기서 정하지 않는다. 전부 토큰을 부른다.
+
+   저자 시스템의 규칙 셋을 지킨다.
+     ① 강조는 드물게 — 모래와 올리브는 면과 막대에만, 노랑은 사람이 판단할 자리에만
+     ② 카드는 뜨지 않는다 — 헤어라인 1px 과 아주 옅은 그림자로 앉는다
+     ③ 바탕에 그러데이션과 무늬를 쓰지 않는다
+   ───────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--ff); font-size:var(--t-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; word-break:keep-all;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){ .wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)} }
+
+/* ── 머리 ───────────────────────────────────────────── */
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);
+   letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);
+   padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+h3{font-size:var(--t-h3);line-height:var(--lh-head);margin:var(--sp-4) 0 var(--sp-2);
+   color:var(--ink-mut);font-weight:600}
+p{margin:0 0 var(--sp-2)}
+a{color:var(--ink);text-decoration-color:var(--ink-fade);transition:opacity .2s ease-out}
+a:hover{opacity:.7}
+code{font-family:var(--ff-mono);font-size:.88em;background:var(--paper-sunk);
+     padding:1px 5px;border-radius:var(--r-s);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-s)}
+
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;
+     border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:var(--ink)}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+
+/* ── KPI 카드 · 격자 간격 20 ─────────────────────────── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+     gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);
+      border-radius:var(--r-l);padding:var(--sp-3) var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);
+           line-height:var(--lh-display);margin:var(--sp-1) 0 2px;
+           overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.card.empty{background:var(--paper-sunk);border-style:dashed;box-shadow:none}
+.card.empty .val{font-size:17px;font-weight:700;color:var(--ink-fade);margin:5px 0 6px}
+.card.empty .why{font-size:var(--t-tiny);line-height:1.55;color:var(--ink-fade)}
+
+/* ── 표 ─────────────────────────────────────────────── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;
+    border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);
+         color:var(--ink-mut);white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s ease-out}
+tbody tr:hover{background:var(--acc-band)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;color:var(--ink);width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);
+        color:var(--ink-fade);border-top:1px solid var(--line)}
+
+/* 판정 배지 · 낱칸이라 모서리 5 */
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;
+   border-radius:var(--r-s);white-space:nowrap}
+.b.up{background:var(--up-band);color:var(--up)}
+.b.down{background:var(--down-band);color:var(--down)}
+.b.warn{background:var(--warn-band);color:var(--warn)}
+.b.none{background:var(--paper-sunk);color:var(--none)}
+.b.me{background:var(--mark);color:#2A2A28}   /* 사람이 판단할 자리에만 */
+
+/* ── 강조 상자 ───────────────────────────────────────── */
+.hl,.warn-box,.gate{border:1px solid var(--line);border-radius:var(--r-l);
+     padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}
+.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}
+.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.gate{border-left:3px solid var(--sand);background:var(--acc-band)}
+.gate .t{font-size:var(--t-small);font-weight:700;margin-bottom:var(--sp-1)}
+
+/* ── 차트 ───────────────────────────────────────────── */
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);
+       padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)} .bar.dim{fill:var(--sand)}
+.grid-l{stroke:var(--line);stroke-width:1}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+
+/* 표 안 가로 막대 · 낱칸이라 모서리 5 */
+.mb{position:relative;background:var(--paper-sunk);border-radius:var(--r-s);height:17px;min-width:60px}
+.mb>i{position:absolute;inset:0 auto 0 0;background:var(--olive);border-radius:var(--r-s);display:block}
+.mb>span{position:relative;font-size:11px;font-weight:700;padding-left:5px;line-height:17px}
+
+/* ── 꼬리 ───────────────────────────────────────────── */
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);
+      font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+.src{font-size:var(--t-tiny);color:var(--ink-fade);margin-top:var(--sp-2);
+     padding-top:8px;border-top:1px solid var(--line)}
+
+@media print{
+  body{background:#fff}
+  .card,.chart,.tw{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body><div class="wrap">
+<div class="head">
+<span class="tag sample">샘플</span>
+</div>
+<h1>네이버 쇼핑검색광고 진단 — 기간 미상(보고서에 날짜 열 없음) · [샘플]</h1>
+<p class="meta">## 네이버 쇼핑검색광고 진단 — 기간 미상(보고서에 날짜 열 없음) · [샘플]</p>
+<div class="kpi">
+<div class="card"><div class="lab">항목</div><div class="val">5<span class="unit">개</span></div></div>
+<div class="card"><div class="lab">광고비 972,000원</div><div class="val">1<span class="unit">위</span></div></div>
+<div class="card"><div class="lab">전환매출 574,000원</div><div class="val">1<span class="unit">위</span></div></div>
+</div>
+<h2>① 분리 기준 (재현용)</h2>
+<p>같은 규칙을 다시 돌리면 8행이 브랜드 3 · 일반 5로 똑같이 갈린다.</p>
+<div class="chart"><div class="cap">출처</div><svg viewBox="0 0 640 196" role="img" aria-label="출처"><text class="axis" x="0" y="19">브랜드 키워드 판별 시드</text><rect class="bar" x="132" y="8" width="100.0" height="15" rx="3"/><text class="val-l" x="238.0" y="20">profile.md §1 브랜드명</text><text class="axis" x="0" y="45">제품명 시드</text><rect class="bar" x="132" y="34" width="100.0" height="15" rx="3"/><text class="val-l" x="238.0" y="46">profile.md §1 — 보고서에 등장하지 않아 판별에 관여하지 않았다</text><text class="axis" x="0" y="71">판별 규칙</text><rect class="bar" x="132" y="60" width="300.0" height="15" rx="3"/><text class="val-l" x="438.0" y="72">SKILL.md Phase 3</text><text class="axis" x="0" y="97">손익분기 ROAS (BEP)</text><rect class="bar dim" x="132" y="86" width="400.0" height="15" rx="3"/><text class="val-l" x="538.0" y="98">profile.md §4</text><text class="axis" x="0" y="123">목표 ROAS</text><rect class="bar dim" x="132" y="112" width="400.0" height="15" rx="3"/><text class="val-l" x="538.0" y="124">profile.md §4</text><text class="axis" x="0" y="149">목표 CPA</text><rect class="bar dim" x="132" y="138" width="400.0" height="15" rx="3"/><text class="val-l" x="538.0" y="150">profile.md §4</text><text class="axis" x="0" y="175">공헌이익률</text><rect class="bar dim" x="132" y="164" width="400.0" height="15" rx="3"/><text class="val-l" x="538.0" y="176">profile.md §4</text></svg></div>
+<div class="tw"><table><thead><tr><th>항목</th><th>값</th><th class="n">출처</th></tr></thead><tbody><tr><td>브랜드 키워드 판별 시드</td><td>「A 브랜드」</td><td class="n">profile.md §1 브랜드명</td></tr><tr><td>제품명 시드</td><td>수분 세럼 · 진정 크림 · 클렌징 밤</td><td class="n">profile.md §1 — 보고서에 등장하지 않아 판별에 관여하지 않았다</td></tr><tr><td>판별 규칙</td><td>키워드 문자열에 시드가 포함되면 브랜드, 그 밖은 일반</td><td class="n">SKILL.md Phase 3</td></tr><tr><td>손익분기 ROAS (BEP)</td><td>2.0</td><td class="n">profile.md §4</td></tr><tr><td>목표 ROAS</td><td>2.9</td><td class="n">profile.md §4</td></tr><tr><td>목표 CPA</td><td>16,450원</td><td class="n">profile.md §4</td></tr><tr><td>공헌이익률</td><td>50%</td><td class="n">profile.md §4</td></tr></tbody></table></div>
+<h2>② 분리 집계표</h2>
+<p>착시 해부. 합산 1.54는 BEP 2.0에 조금 못 미치는 값으로 보이지만, 그 안에서 브랜드 3개가 광고비의 12.4%만 쓰고 매출의 59.5%를 가져온다. 브랜드 ROAS 7.41은 광고 실력이 아니라 이미 「A 브랜드」를 검색한 사람에게 한 번 더 방어 입찰한 값이다. 그 사람들 상당수는 광고가 없어도 자연 검색으로 들어온다. 브랜드 입찰은 매출을 만드는 것이 아니라 지키는 것이다.</p><p>일반 5개만 놓으면 광고비 2,551,000원에 매출 1,820,000원이다. 광고비만 놓고 봐도 731,000원이 모자라고, 공헌이익률 50%를 반영하면 1,641,000원 손실이다. 일반 그룹이 BEP 2.0을 채우려면 매출 5,102,000원이 필요한데 3,282,000원이 비어 있다.</p><p>CPC는 일반 576원, 브랜드 130원으로 4.43배 차이다. 전환율은 브랜드 6.87%, 일반 2.93%다. 비싸게 사서 덜 팔린다.</p>
+<div class="tw"><table><thead><tr><th>그룹</th><th class="n">키워드 수</th><th class="n">노출</th><th class="n">클릭</th><th class="n">광고비</th><th class="n">전환매출</th><th class="n">전환</th><th class="n">ROAS</th><th class="n">CPC</th><th>판정</th></tr></thead><tbody><tr><td>합산</td><td class="n">8</td><td class="n">158,700</td><td class="n">7,210</td><td class="n">2,912,000원</td><td class="n">4,494,000원</td><td class="n">321</td><td class="n">1.54</td><td class="n">404원</td><td>참고용 (착시)</td></tr><tr><td>브랜드</td><td class="n">3</td><td class="n">9,700</td><td class="n">2,780</td><td class="n">361,000원</td><td class="n">2,674,000원</td><td class="n">191</td><td class="n">7.41</td><td class="n">130원</td><td>방어 유지</td></tr><tr><td>일반</td><td class="n">5</td><td class="n">149,000</td><td class="n">4,430</td><td class="n">2,551,000원</td><td class="n">1,820,000원</td><td class="n">130</td><td class="n">0.71</td><td class="n">576원</td><td>BEP 2.0 미달</td></tr></tbody></table></div>
+<h2>③ 일반 키워드 3축 진단</h2>
+<p>① 키워드 — BEP 미달 적자 랭킹 (지출 큰 순)</p><p>다섯 개가 전부 BEP 2.0 미달이다. 목표 CPA 16,450원을 지킨 것은 저자극 토너(14,143원)와 토너 패드 추천(16,211원) 둘뿐이고, 나머지 셋은 목표 CPA를 넘겼다 — 모공 토너 7% 초과, 모공 화장품 37% 초과, 토너 추천 44% 초과다.</p><p>② 소재 — CTR 저조</p><p>일반 그룹 평균 CTR은 2.97%로 다섯 개가 2.89%에서 3.17% 사이에 몰려 있다. 소재 사이의 차이보다 브랜드와 일반의 차이(28.66% 대 2.97%)가 훨씬 크다. 소재를 갈아서 벌 수 있는 폭이 크지 않다는 뜻이다. 교체 후보 순서는 노출이 크고 CTR이 낮은 「토너 추천」, 그다음이 「모공 화장품」이다.</p><p>한 가지 더 눈에 띈다. CTR이 낮은 키워드가 전환율도 낮다. 클릭이 안 붙는 것과 사지 않는 것이 같은 방향으로 움직이므로, 소재만이 아니라 랜딩 페이지에서 보는 것과 검색어 사이의 거리를 함께 봐야 한다.</p><p>③ 입찰 — CPC 대비 전환가치 역전</p><p>BEP 2.0을 지키려면 CPC가 「클릭당 전환매출 ÷ 2.0」을 넘으면 안 된다. 그 상한과 현재 CPC를 나란히 둔다.</p><p>다섯 개 모두 클릭 한 번에 들어온 돈보다 클릭 한 번에 나간 돈이 크거나 비슷하다. 「저자극 토너」는 CPC 521원에 클릭당 전환매출 516원으로 거의 같다. 마진을 빼기 전부터 본전이라는 뜻이다.</p>
+<div class="tw"><table><thead><tr><th>키워드</th><th class="n">광고비</th><th class="n">전환매출</th><th class="n">ROAS</th><th class="n">CPA</th><th class="n">매출−광고비</th><th class="n">공헌이익(매출×50%−광고비)</th><th>판정</th></tr></thead><tbody><tr><td>토너 추천</td><td class="n">972,000원</td><td class="n">574,000원</td><td class="n">0.59</td><td class="n">23,707원</td><td class="n">−398,000원</td><td class="n">−685,000원</td><td>최대 출혈</td></tr><tr><td>모공 토너</td><td class="n">689,000원</td><td class="n">546,000원</td><td class="n">0.79</td><td class="n">17,667원</td><td class="n">−143,000원</td><td class="n">−416,000원</td><td>적자</td></tr><tr><td>모공 화장품</td><td class="n">384,000원</td><td class="n">238,000원</td><td class="n">0.62</td><td class="n">22,588원</td><td class="n">−146,000원</td><td class="n">−265,000원</td><td>적자</td></tr><tr><td>토너 패드 추천</td><td class="n">308,000원</td><td class="n">266,000원</td><td class="n">0.86</td><td class="n">16,211원</td><td class="n">−42,000원</td><td class="n">−175,000원</td><td>적자</td></tr><tr><td><span class="b me">저자극 토너</span></td><td class="n">198,000원</td><td class="n">196,000원</td><td class="n">0.99</td><td class="n">14,143원</td><td class="n">−2,000원</td><td class="n">−100,000원</td><td>본전 근처</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>키워드</th><th class="n">노출</th><th class="n">클릭</th><th class="n">CTR</th><th class="n">전환율</th></tr></thead><tbody><tr><td>토너 추천</td><td class="n">56,000</td><td class="n">1,620</td><td class="n">2.89%</td><td class="n">2.53%</td></tr><tr><td>모공 화장품</td><td class="n">22,000</td><td class="n">640</td><td class="n">2.91%</td><td class="n">2.66%</td></tr><tr><td>모공 토너</td><td class="n">41,000</td><td class="n">1,230</td><td class="n">3.00%</td><td class="n">3.17%</td></tr><tr><td>토너 패드 추천</td><td class="n">18,000</td><td class="n">560</td><td class="n">3.11%</td><td class="n">3.39%</td></tr><tr><td><span class="b me">저자극 토너</span></td><td class="n">12,000</td><td class="n">380</td><td class="n">3.17%</td><td class="n">3.68%</td></tr><tr><td>(참고) 브랜드 3개</td><td class="n">9,700</td><td class="n">2,780</td><td class="n">28.66%</td><td class="n">6.87%</td></tr></tbody></table></div>
+<div class="tw"><table><thead><tr><th>키워드</th><th class="n">현재 CPC</th><th class="n">클릭당 전환매출</th><th class="n">BEP를 지키는 CPC 상한</th><th class="n">필요한 인하폭</th></tr></thead><tbody><tr><td>토너 추천</td><td class="n">600원</td><td class="n">354원</td><td class="n">177원</td><td class="n">−70%</td></tr><tr><td>모공 화장품</td><td class="n">600원</td><td class="n">372원</td><td class="n">186원</td><td class="n">−69%</td></tr><tr><td>모공 토너</td><td class="n">560원</td><td class="n">444원</td><td class="n">222원</td><td class="n">−60%</td></tr><tr><td>토너 패드 추천</td><td class="n">550원</td><td class="n">475원</td><td class="n">238원</td><td class="n">−57%</td></tr><tr><td><span class="b me">저자극 토너</span></td><td class="n">521원</td><td class="n">516원</td><td class="n">258원</td><td class="n">−51%</td></tr></tbody></table></div>
+<h2>④ 수요 교차검증 사분면 — 생략했다</h2>
+<p>데이터랩이 연결되어 있지 않다. 제품의 docs/데이터-가져오기.md에서 데이터랩은 MCP가 아니라 사람이 사이트에서 내려받는 수동 경로로 적혀 있고, 이번 실행에서는 그 파일을 받지 못했다.</p><p>그래서 이 진단은 수요가 오르는 중인데 아직 수익이 안 나는 키워드(🟡 컷 금지·진단 대상)를 가려내지 못한다. 아래 조정 제안을 그대로 실행하면 성수기에 자리를 잃을 위험이 남는다. 데이터랩 검색어트렌드 13개월 자료를 inputs/에 넣으면 🔴 중단 / 🟡 진단 / 🟢 확대 판정이 붙는다.</p>
+<h2>⑤ 조정 제안 ⏸ — 지출 큰 순 3개</h2>
+<p>가정을 먼저 적는다. 아래 예상 효과는 입찰을 내려도 클릭수와 전환수는 그대로이고 CPC만 인하폭만큼 내려간다고 본 값이다 [추정]. 실제로는 입찰을 내리면 순위가 밀려 노출과 클릭도 함께 줄어든다. 그래서 이 표의 개선 ROAS는 상한으로 읽어야 한다.</p><p>같이 봐야 할 두 줄.</p><p>· 「저자극 토너」는 지출이 가장 작지만(198,000원) 가장 살릴 만하다. ROAS 0.99로 본전 근처이고 CPA 14,143원으로 목표 16,450원 안에 든다. 다만 −30%로는 ROAS 1.41이라 BEP 2.0에 못 미친다. BEP를 넘기려면 −51%가 필요하다.</p><p>· 일반 5개를 일괄 중단하면 광고비 2,551,000원이 빠지고 매출 1,820,000원이 사라져 공헌이익 기준 1,641,000원이 개선된다. 숫자만 보면 가장 큰 값이지만, ④를 생략한 상태에서 이 선택을 하면 안 된다. 수요 상승기 키워드를 함께 끄게 된다.</p>
+<div class="tw"><table><thead><tr><th class="n">순위</th><th>키워드</th><th class="n">조치</th><th>근거 수치</th><th class="n">예상 효과 [추정]</th><th>리스크</th></tr></thead><tbody><tr><td class="n">1</td><td>토너 추천</td><td class="n">중단 또는 입찰 −70%</td><td>광고비 972,000원 · ROAS 0.59 · 공헌이익 −685,000원</td><td class="n">중단 시 공헌이익 +685,000원 · −50%로는 ROAS 1.18에 그쳐 여전히 BEP 미달</td><td>일반 그룹 클릭의 37%가 여기서 나온다. 끄면 신규 유입이 크게 준다</td></tr><tr><td class="n">2</td><td>모공 토너</td><td class="n">입찰 −60% + 소재 교체</td><td>광고비 689,000원 · ROAS 0.79 · CTR 3.00%</td><td class="n">−60%면 ROAS 1.98로 BEP 목전 · 중단 시 공헌이익 +416,000원</td><td>인하폭이 커서 노출이 크게 빠질 수 있다. 두 주 나눠 −30%씩 내린다</td></tr><tr><td class="n">3</td><td>모공 화장품</td><td class="n">입찰 −69% 또는 중단</td><td>광고비 384,000원 · ROAS 0.62 · CTR 2.91% · CPA 22,588원</td><td class="n">중단 시 공헌이익 +265,000원</td><td>다섯 중 CTR이 두 번째로 낮다. 소재를 먼저 고쳐 볼 여지</td></tr></tbody></table></div>
+<h2>부족한 것</h2>
+<p>기간을 모른다. 보고서에 날짜 열이 없어 이 8행이 며칠치인지 셀 수 없다. 그래서 「주당 적자 얼마」를 내지 못하고 기간 전체 합계로만 냈다.</p><p>한 가지 어긋나는 자리가 있다. 이 보고서의 합산 광고비는 2,912,000원인데, profile.md §4의 월 마케팅 예산에서 네이버 배정은 2,000,000원이다. 912,000원, 1.46배 초과다. 연습용 자료가 브랜드 정보와 따로 만들어져 생긴 차이이므로 실제 초과 집행으로 읽으면 안 된다. 우리 계정 보고서로 돌리면 이 값은 예산 안에서 나온다.</p><p>소재 진단이 얕다. 보고서에 소재별 행이 없고 키워드별 합계만 있어, 어느 문구가 안 먹히는지가 아니라 어느 키워드의 CTR이 낮은지까지만 셌다. 광고주센터에서 소재 단위 보고서를 함께 내려받아 inputs/에 넣으면 교체 후보가 문구 단위로 좁혀진다.</p><p>다음 액션: → 046 ROAS 진단 (네이버에서 뺀 예산을 메타·쿠팡으로 옮기는 시나리오)</p><p>저장 파일: outputs/2026-09-01/042-naver-shopping-ads/042-naver-shopping-ads.md</p>
+<div class="src">이 파일은 AI 마케팅팀 스킬이 만들었다. 읽은 자료와 만든 날짜는 맨 위에 적혀 있다.</div>
+</div></body></html>

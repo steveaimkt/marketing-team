@@ -12,13 +12,13 @@ triggers:
   - "이 시장에서 뭘 만들면 팔릴까"
 inputs: [시장 갭·리서치 자료(001·002·005·006 산출물 권장), 카테고리, 가용 자원·제약(선택)]
 sample_fallback: sample-data/경쟁사-3곳.md   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
-outputs: [시장 갭 요약표, 제품 컨셉 5안 카드(타깃·차별점·검증 가설·폐기 조건), 컨셉 스코어표, 저장 파일(.md)]
+outputs: [시장 갭 요약표, 제품 컨셉 5안 카드(타깃·차별점·검증 가설·폐기 조건), 컨셉 스코어표, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["012"]
 gate: false
 review: 브랜드·고객
 mutating: false
-writes_to: [outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md]
+writes_to: [outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.xlsx, outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.html, outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md]   # 🔴 2026-09-06 · 공통규약 「.html (20개)」 목록에 넷이 다 있는데 writes_to 에만 빠져 있었다. 041 꼴로 되살렸다
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "10년차 신사업 프로듀서 · 갭에서 출발하지 않은 아이디어는 아이디어로 인정하지 않는다"
@@ -63,10 +63,20 @@ success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·폐기 �
 7. ⏸ **컨셉 선택** — 스코어표를 보여주고 사용자가 진행할 컨셉 1~2개를 확정한다.
 8. **산출 + 체인 제안** — 012 가치 제안 정리 (선택 컨셉의 6단 가치제안문 작성).
 
-9. **파일로 남긴다** — 위 산출물을 `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
+9. **파일로 남긴다** — 위 산출물을 아래 「⛔ 착지」의 세 파일로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다 — 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다** — `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md`
+> ⛔ **착지 · 세 파일로 쓴다**
+> · 표 → `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.xlsx`
+> · 화면 → `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.html`
+> · 해설 → `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md`
+> **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> **`.html` 에는 그래프를 넣는다.** 표만 있는 화면은 어느 후보가 근거를 많이 쥐었는지 안 보인다.
+> · **① 후보별 근거 건수** 막대 — 후보를 근거 건수 내림차순으로 세운다
+> ·   막대는 **판정 셋으로만 칠한다**(채택 / 검토 / 보류) · 막대 옆에 근거가 된 앞선 결과와 건수를 적는다
+> · **② 걸러낸 것** 은 그래프로 그리지 않고 표로 남긴다 — 왜 뺐는지가 값보다 중요하다
+> 🔴 **인라인 `<svg>` 로 직접 그린다.** 외부 차트 라이브러리를 부르지 않는다 —
+> 산출물은 인터넷 없이 더블클릭으로 열려야 한다. 값이 하나뿐이면 그래프를 만들지 않고 그 사실을 적는다.
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 
@@ -99,7 +109,7 @@ success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·폐기 �
 ## 다음 액션
 → 012 가치 제안 정리 (선택 컨셉의 6단 가치제안문) / 검증 실험이 필요하면 019 A/B 테스트 설계
 
-저장 파일: outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md
+저장 파일: outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.xlsx · 011-product-concept-ideation.html · 011-product-concept-ideation.md
 ```
 
 ## Anti-Patterns

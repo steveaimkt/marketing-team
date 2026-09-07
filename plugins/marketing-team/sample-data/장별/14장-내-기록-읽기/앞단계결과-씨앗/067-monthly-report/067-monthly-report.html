@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>067 월간 마케팅 성과 분석 · A 브랜드 2026-06</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · claude.ai/design/p/019de19d-80e1-7647-a375-b2262874f3c2
+   저자가 명세를 직접 넘겨 주었다. 여기 없는 값은 만들지 않는다.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   산출물 공통 컴포넌트 · tokens.css 를 먼저 읽어야 한다
+   색과 서체와 크기를 여기서 정하지 않는다. 전부 토큰을 부른다.
+
+   저자 시스템의 규칙 셋을 지킨다.
+     ① 강조는 드물게 — 모래와 올리브는 면과 막대에만, 노랑은 사람이 판단할 자리에만
+     ② 카드는 뜨지 않는다 — 헤어라인 1px 과 아주 옅은 그림자로 앉는다
+     ③ 바탕에 그러데이션과 무늬를 쓰지 않는다
+   ───────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--ff); font-size:var(--t-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; word-break:keep-all;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){ .wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)} }
+
+/* ── 머리 ───────────────────────────────────────────── */
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);
+   letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);
+   padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+h3{font-size:var(--t-h3);line-height:var(--lh-head);margin:var(--sp-4) 0 var(--sp-2);
+   color:var(--ink-mut);font-weight:600}
+p{margin:0 0 var(--sp-2)}
+a{color:var(--ink);text-decoration-color:var(--ink-fade);transition:opacity .2s ease-out}
+a:hover{opacity:.7}
+code{font-family:var(--ff-mono);font-size:.88em;background:var(--paper-sunk);
+     padding:1px 5px;border-radius:var(--r-s);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-s)}
+
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;
+     border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:var(--ink)}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+
+/* ── KPI 카드 · 격자 간격 20 ─────────────────────────── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+     gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);
+      border-radius:var(--r-l);padding:var(--sp-3) var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);
+           line-height:var(--lh-display);margin:var(--sp-1) 0 2px;
+           overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.card.empty{background:var(--paper-sunk);border-style:dashed;box-shadow:none}
+.card.empty .val{font-size:17px;font-weight:700;color:var(--ink-fade);margin:5px 0 6px}
+.card.empty .why{font-size:var(--t-tiny);line-height:1.55;color:var(--ink-fade)}
+
+/* ── 표 ─────────────────────────────────────────────── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;
+    border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);
+         color:var(--ink-mut);white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s ease-out}
+tbody tr:hover{background:var(--acc-band)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;color:var(--ink);width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);
+        color:var(--ink-fade);border-top:1px solid var(--line)}
+
+/* 판정 배지 · 낱칸이라 모서리 5 */
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;
+   border-radius:var(--r-s);white-space:nowrap}
+.b.up{background:var(--up-band);color:var(--up)}
+.b.down{background:var(--down-band);color:var(--down)}
+.b.warn{background:var(--warn-band);color:var(--warn)}
+.b.none{background:var(--paper-sunk);color:var(--none)}
+.b.me{background:var(--mark);color:#2A2A28}   /* 사람이 판단할 자리에만 */
+
+/* ── 강조 상자 ───────────────────────────────────────── */
+.hl,.warn-box,.gate{border:1px solid var(--line);border-radius:var(--r-l);
+     padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}
+.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}
+.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.gate{border-left:3px solid var(--sand);background:var(--acc-band)}
+.gate .t{font-size:var(--t-small);font-weight:700;margin-bottom:var(--sp-1)}
+
+/* ── 차트 ───────────────────────────────────────────── */
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);
+       padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)} .bar.dim{fill:var(--sand)}
+.grid-l{stroke:var(--line);stroke-width:1}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+
+/* 표 안 가로 막대 · 낱칸이라 모서리 5 */
+.mb{position:relative;background:var(--paper-sunk);border-radius:var(--r-s);height:17px;min-width:60px}
+.mb>i{position:absolute;inset:0 auto 0 0;background:var(--olive);border-radius:var(--r-s);display:block}
+.mb>span{position:relative;font-size:11px;font-weight:700;padding-left:5px;line-height:17px}
+
+/* ── 꼬리 ───────────────────────────────────────────── */
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);
+      font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+.src{font-size:var(--t-tiny);color:var(--ink-fade);margin-top:var(--sp-2);
+     padding-top:8px;border-top:1px solid var(--line)}
+
+@media print{
+  body{background:#fff}
+  .card,.chart,.tw{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+</style></head><body>
+<main class="wrap">
+
+<h1>2026년 6월 마케팅 월간 보고</h1>
+<p class="meta">A 브랜드 · 채널 여섯 · 2026-06-01~06-30 (30일) · <span class="tag sample">샘플</span> · 판정 기준 brand/profile.md §4</p>
+
+<div class="warn-box">
+<p class="t">이 보고서가 못 보는 것 — 먼저 밝힌다</p>
+<ul>
+<li><strong>6월 마케팅비를 못 받았다.</strong> 매체 광고 자료가 2026-07 한 달치뿐이다. 그래서 <strong>ROAS와 CPA를 내지 못했다.</strong> 이 보고서는 매출과 유입만 본 값이다.</li>
+<li><strong>목표 대비를 못 냈다.</strong> profile.md §4 는 목표 ROAS 2.9 를 적어 두었으나, ROAS 자체를 못 내어 비교할 수 없다.</li>
+<li><strong>쿠팡이 빠져 있다.</strong> 이 자료의 채널 여섯에 쿠팡이 없다. 같은 6월을 판매처로 집계한 061 판매 데이터 분석은 자사몰과 쿠팡 두 곳으로 104,890,000원을 냈다. <strong>두 자료는 채널을 다르게 정의하므로 합치지 않았다.</strong></li>
+<li><strong>추이가 석 달뿐이다.</strong> 자료가 2026-05~07 이라 6개월 추이를 그리지 못했다.</li>
+</ul>
+</div>
+
+<h2>경영진 요약</h2>
+<ol>
+<li><strong>6월 매출은 230,830,000원으로 전월 대비 4.1% 줄었다.</strong> 다만 5월은 31일, 6월은 30일이다. 하루당으로 보면 7,760,742원에서 7,694,333원으로 0.9% 줄어든 것이다.</li>
+<li><strong>무료로 들어오던 매출이 빠지고 유료·소셜이 메웠다.</strong> 뉴스레터가 11,693,000원, 자연검색이 9,381,000원, 직접유입이 7,244,000원 줄었다. 그러나 인스타그램이 11,269,000원, 메타광고가 3,925,000원, 유료검색이 3,371,000원 늘었다.</li>
+<li><strong>그 교체가 남는 장사인지는 이 보고서로 판정할 수 없다.</strong> 늘어난 셋 가운데 둘이 유료 채널인데 6월 광고비 자료가 없다.</li>
+</ol>
+
+<h3>의사결정 요청</h3>
+<div class="tw"><table>
+<thead><tr><th>무엇을 정할 것인가</th><th>근거</th></tr></thead>
+<tbody>
+<tr><td>6월 매체별 광고비를 넣을 것인가</td><td>넣지 않으면 ROAS·CPA 판정이 계속 빈다. 유료 채널 셋이 매출을 끌어올린 이번 달에는 특히 크다</td></tr>
+<tr><td>채널 정의를 하나로 맞출 것인가</td><td>이 보고서는 유입 경로 여섯, 061 판매 분석은 판매처 둘로 센다. 같은 6월인데 매출이 230,830,000원과 104,890,000원으로 갈린다</td></tr>
+<tr><td>profile.md 의 월 예산을 고칠 것인가</td><td>§4 는 월 800만 원인데, 7월 메타광고 한 매체만 69,648,041원이 집행됐다</td></tr>
+</tbody></table></div>
+
+<h2>전사 지표</h2>
+<section class="kpi">
+  <div class="card"><p class="lab">매출</p><p class="val">230,830,000<span class="unit">원</span></p><p class="dlt down">▼ 9,753,000원 (-4.1%)</p><p class="base">일평균으로는 -0.9%</p></div>
+  <div class="card"><p class="lab">세션</p><p class="val">226,767</p><p class="dlt down">▼ 8,577 (-3.6%)</p><p class="base">5월 235,344</p></div>
+  <div class="card"><p class="lab">주문</p><p class="val">3,574<span class="unit">건</span></p><p class="dlt down">▼ 160건 (-4.3%)</p><p class="base">전환율 1.58% (5월 1.59%)</p></div>
+  <div class="card"><p class="lab">객단가</p><p class="val">64,586<span class="unit">원</span></p><p class="dlt up">▲ 156원</p><p class="base">profile.md §4 는 47,000원</p></div>
+  <div class="card empty"><p class="lab">ROAS</p><p class="val">자료 없음</p><p class="why">6월 마케팅비를 못 받았다. 매체 광고 자료가 2026-07 한 달치뿐이다</p></div>
+  <div class="card empty"><p class="lab">CPA</p><p class="val">자료 없음</p><p class="why">위와 같은 이유다. 분모가 되는 광고비가 없다</p></div>
+</section>
+
+<figure class="chart"><p class="cap">① 무엇이 끌고 무엇이 깎았나 · 전월 대비 채널 기여</p><p class="sub">2026-05 → 2026-06 · [샘플]</p>
+<svg viewBox="0 0 720 240" role="img" aria-label="매출은 240,583,000원에서 230,830,000원으로 9,753,000원 줄었다. 올린 채널은 인스타, 메타광고, 유료검색이고 내린 채널은 직접유입, 자연검색, 뉴스레터이다. 무료 유입 셋이 빠진 자리를 유료·소셜 셋이 메웠다.">
+<rect class="bar" x="64" y="42.7" width="52" height="167.3"/>
+<text class="axis" x="90.0" y="35.7" text-anchor="middle">241M</text>
+<text class="axis" x="90.0" y="228" text-anchor="middle">5월</text>
+<rect class="bar dim" x="142" y="34.9" width="52" height="7.8"/>
+<line class="grid-l" x1="116" y1="42.7" x2="142" y2="42.7" stroke-dasharray="4 3"/>
+<text class="axis" x="168.0" y="27.9" text-anchor="middle">▲11M</text>
+<text class="axis" x="168.0" y="228" text-anchor="middle">인스타</text>
+<rect class="bar dim" x="220" y="32.2" width="52" height="2.7"/>
+<line class="grid-l" x1="194" y1="34.9" x2="220" y2="34.9" stroke-dasharray="4 3"/>
+<text class="axis" x="246.0" y="25.2" text-anchor="middle">▲4M</text>
+<text class="axis" x="246.0" y="228" text-anchor="middle">메타광고</text>
+<rect class="bar dim" x="298" y="29.8" width="52" height="2.3"/>
+<line class="grid-l" x1="272" y1="32.2" x2="298" y2="32.2" stroke-dasharray="4 3"/>
+<text class="axis" x="324.0" y="22.8" text-anchor="middle">▲3M</text>
+<text class="axis" x="324.0" y="228" text-anchor="middle">유료검색</text>
+<rect class="bar dim" x="376" y="29.8" width="52" height="5.0"/>
+<line class="grid-l" x1="350" y1="29.8" x2="376" y2="29.8" stroke-dasharray="4 3"/>
+<text class="axis" x="402.0" y="48.9" text-anchor="middle">▼7M</text>
+<text class="axis" x="402.0" y="228" text-anchor="middle">직접유입</text>
+<rect class="bar dim" x="454" y="34.9" width="52" height="6.5"/>
+<line class="grid-l" x1="428" y1="34.9" x2="454" y2="34.9" stroke-dasharray="4 3"/>
+<text class="axis" x="480.0" y="55.4" text-anchor="middle">▼9M</text>
+<text class="axis" x="480.0" y="228" text-anchor="middle">자연검색</text>
+<rect class="bar dim" x="532" y="41.4" width="52" height="8.1"/>
+<line class="grid-l" x1="506" y1="41.4" x2="532" y2="41.4" stroke-dasharray="4 3"/>
+<text class="axis" x="558.0" y="63.5" text-anchor="middle">▼12M</text>
+<text class="axis" x="558.0" y="228" text-anchor="middle">뉴스레터</text>
+<rect class="bar" x="610" y="49.5" width="52" height="160.5"/>
+<text class="axis" x="636.0" y="42.5" text-anchor="middle">231M</text>
+<text class="axis" x="636.0" y="228" text-anchor="middle">6월</text>
+<line class="grid-l" x1="40" y1="210" x2="710" y2="210"/>
+</svg>
+<p class="sub">읽기 — 매출은 240,583,000원에서 230,830,000원으로 9,753,000원 줄었다. 올린 채널은 인스타, 메타광고, 유료검색이고 내린 채널은 직접유입, 자연검색, 뉴스레터이다. 무료 유입 셋이 빠진 자리를 유료·소셜 셋이 메웠다.</p></figure>
+
+<figure class="chart"><p class="cap">② 매출의 무게중심이 옮겨가고 있나 · 채널 구성비</p><p class="sub">월별 100% 스택 · [샘플]</p>
+<svg viewBox="0 0 720 216" role="img" aria-label="인스타그램 비중이 석 달 동안 꾸준히 오르고 뉴스레터와 자연검색이 내린다. 다만 석 달치라 추세로 부르기에는 짧다.">
+<text class="axis" x="110" y="43.0" text-anchor="end">2026-05</text>
+<rect x="120.0" y="18" width="81.5" height="40" fill="var(--olive)" fill-opacity="1"/>
+<text class="val-l" x="160.7" y="42.0" text-anchor="middle" fill="var(--paper)">16%</text>
+<rect x="201.5" y="18" width="79.1" height="40" fill="var(--olive)" fill-opacity="0.82"/>
+<text class="val-l" x="241.1" y="42.0" text-anchor="middle" fill="var(--paper)">15%</text>
+<rect x="280.6" y="18" width="74.4" height="40" fill="var(--olive)" fill-opacity="0.64"/>
+<text class="val-l" x="317.8" y="42.0" text-anchor="middle" fill="var(--paper)">14%</text>
+<rect x="355.1" y="18" width="98.3" height="40" fill="var(--olive)" fill-opacity="0.5"/>
+<text class="val-l" x="404.2" y="42.0" text-anchor="middle" fill="var(--paper)">19%</text>
+<rect x="453.3" y="18" width="91.8" height="40" fill="var(--olive)" fill-opacity="0.38"/>
+<text class="val-l" x="499.2" y="42.0" text-anchor="middle" fill="var(--paper)">18%</text>
+<rect x="545.2" y="18" width="94.8" height="40" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="592.6" y="42.0" text-anchor="middle" fill="var(--paper)">18%</text>
+<text class="axis" x="110" y="101.0" text-anchor="end">2026-06</text>
+<rect x="120.0" y="76" width="110.3" height="40" fill="var(--olive)" fill-opacity="1"/>
+<text class="val-l" x="175.2" y="100.0" text-anchor="middle" fill="var(--paper)">21%</text>
+<rect x="230.3" y="76" width="90.1" height="40" fill="var(--olive)" fill-opacity="0.82"/>
+<text class="val-l" x="275.4" y="100.0" text-anchor="middle" fill="var(--paper)">17%</text>
+<rect x="320.4" y="76" width="86.4" height="40" fill="var(--olive)" fill-opacity="0.64"/>
+<text class="val-l" x="363.6" y="100.0" text-anchor="middle" fill="var(--paper)">17%</text>
+<rect x="406.8" y="76" width="86.1" height="40" fill="var(--olive)" fill-opacity="0.5"/>
+<text class="val-l" x="449.9" y="100.0" text-anchor="middle" fill="var(--paper)">17%</text>
+<rect x="492.9" y="76" width="74.6" height="40" fill="var(--olive)" fill-opacity="0.38"/>
+<text class="val-l" x="530.2" y="100.0" text-anchor="middle" fill="var(--paper)">14%</text>
+<rect x="567.5" y="76" width="72.5" height="40" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="603.7" y="100.0" text-anchor="middle" fill="var(--paper)">14%</text>
+<text class="axis" x="110" y="159.0" text-anchor="end">2026-07</text>
+<rect x="120.0" y="134" width="74.5" height="40" fill="var(--olive)" fill-opacity="1"/>
+<text class="val-l" x="157.2" y="158.0" text-anchor="middle" fill="var(--paper)">14%</text>
+<rect x="194.5" y="134" width="81.9" height="40" fill="var(--olive)" fill-opacity="0.82"/>
+<text class="val-l" x="235.4" y="158.0" text-anchor="middle" fill="var(--paper)">16%</text>
+<rect x="276.3" y="134" width="87.7" height="40" fill="var(--olive)" fill-opacity="0.64"/>
+<text class="val-l" x="320.2" y="158.0" text-anchor="middle" fill="var(--paper)">17%</text>
+<rect x="364.0" y="134" width="96.1" height="40" fill="var(--olive)" fill-opacity="0.5"/>
+<text class="val-l" x="412.1" y="158.0" text-anchor="middle" fill="var(--paper)">18%</text>
+<rect x="460.1" y="134" width="81.6" height="40" fill="var(--olive)" fill-opacity="0.38"/>
+<text class="val-l" x="500.9" y="158.0" text-anchor="middle" fill="var(--paper)">16%</text>
+<rect x="541.7" y="134" width="98.3" height="40" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="590.8" y="158.0" text-anchor="middle" fill="var(--paper)">19%</text>
+<rect x="120" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="1"/>
+<text class="axis" x="135" y="210">인스타</text>
+<rect x="218" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="0.82"/>
+<text class="axis" x="233" y="210">유료검색</text>
+<rect x="316" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="0.64"/>
+<text class="axis" x="331" y="210">메타광고</text>
+<rect x="414" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="0.5"/>
+<text class="axis" x="429" y="210">직접유입</text>
+<rect x="512" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="0.38"/>
+<text class="axis" x="527" y="210">자연검색</text>
+<rect x="610" y="200" width="11" height="11" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="axis" x="625" y="210">뉴스레터</text>
+</svg>
+<p class="sub">읽기 — 인스타그램 비중이 석 달 동안 꾸준히 오르고 뉴스레터와 자연검색이 내린다. 다만 석 달치라 추세로 부르기에는 짧다.</p></figure>
+
+<figure class="chart"><p class="cap">③ 목표 대비 어디쯤 왔나 · 월별 매출</p><p class="sub">2026-05~07 · 목표선 없음 · [샘플]</p>
+<svg viewBox="0 0 720 195" role="img" aria-label="석 달 연속 내려왔다. 목표선은 그리지 못했다. profile.md 가 적은 목표는 ROAS 2.9 인데 ROAS 를 못 냈기 때문이다.">
+<polyline points="90.0,39.6 370.0,44.9 650.0,61.6" fill="none" stroke="var(--olive)" stroke-width="2"/>
+<circle cx="90.0" cy="39.6" r="4" fill="var(--olive)"/>
+<text class="axis" x="90.0" y="28.6" text-anchor="middle">241M</text>
+<text class="axis" x="90.0" y="188" text-anchor="middle">2026-05</text>
+<circle cx="370.0" cy="44.9" r="4" fill="var(--olive)"/>
+<text class="axis" x="370.0" y="33.9" text-anchor="middle">231M</text>
+<text class="axis" x="370.0" y="188" text-anchor="middle">2026-06</text>
+<circle cx="650.0" cy="61.6" r="4" fill="var(--olive)"/>
+<text class="axis" x="650.0" y="50.6" text-anchor="middle">200M</text>
+<text class="axis" x="650.0" y="188" text-anchor="middle">2026-07</text>
+<line class="grid-l" x1="70" y1="170" x2="670" y2="170"/>
+<text class="axis" x="370.0" y="16.0" text-anchor="middle">목표선을 그리지 못했다 · ROAS 를 못 내어 목표를 댈 수 없다</text>
+</svg>
+<p class="sub">읽기 — 석 달 연속 내려왔다. 목표선은 그리지 못했다. profile.md 가 적은 목표는 ROAS 2.9 인데 ROAS 를 못 냈기 때문이다.</p></figure>
+
+<h2>채널별 성과</h2>
+<div class="tw"><table>
+<thead><tr><th>채널</th><th>5월 매출</th><th>6월 매출</th><th>Δ</th><th>6월 비중</th><th>6월 세션</th><th>6월 주문</th><th>신호</th></tr></thead>
+<tbody>
+<tr><td>인스타</td><td>37,703,000</td><td>48,972,000</td><td>▲ 11,269,000</td><td>21.2%</td><td>41,586</td><td>684</td><td><span class='b up'>올랐다</span></td></tr><tr><td>유료검색</td><td>36,607,000</td><td>39,978,000</td><td>▲ 3,371,000</td><td>17.3%</td><td>41,008</td><td>607</td><td><span class='b up'>올랐다</span></td></tr><tr><td>메타광고</td><td>34,444,000</td><td>38,369,000</td><td>▲ 3,925,000</td><td>16.6%</td><td>38,731</td><td>606</td><td><span class='b up'>올랐다</span></td></tr><tr><td>직접유입</td><td>45,465,000</td><td>38,221,000</td><td>▼ 7,244,000</td><td>16.6%</td><td>36,113</td><td>607</td><td><span class='b down'>내렸다</span></td></tr><tr><td>자연검색</td><td>42,481,000</td><td>33,100,000</td><td>▼ 9,381,000</td><td>14.3%</td><td>32,119</td><td>529</td><td><span class='b down'>내렸다</span></td></tr><tr><td>뉴스레터</td><td>43,883,000</td><td>32,190,000</td><td>▼ 11,693,000</td><td>13.9%</td><td>37,210</td><td>541</td><td><span class='b down'>내렸다</span></td></tr>
+<tr><td><strong>합계</strong></td><td><strong>240,583,000</strong></td><td><strong>230,830,000</strong></td><td><strong>▼ 9,753,000</strong></td><td><strong>100.0%</strong></td><td><strong>226,767</strong></td><td><strong>3,574</strong></td><td></td></tr>
+</tbody></table></div>
+<p class="src">채널 여섯에 쿠팡이 없다. 이 자료는 유입 경로로 나눈 것이고, 061 판매 데이터 분석은 판매처(자사몰·쿠팡)로 나눈 것이다. <strong>기여 모델이 달라 두 표를 더하거나 나누면 안 된다.</strong></p>
+
+<h2>다음 달 우선순위 셋</h2>
+<ol>
+<li><strong>6월 광고비를 채운다.</strong> 유료 채널 둘이 이번 달 상승을 끌었는데 그 비용을 모른다. 채우면 046 ROAS 진단으로 예산 재배분까지 이어진다.</li>
+<li><strong>빠진 무료 유입 셋을 본다.</strong> 뉴스레터·자연검색·직접유입에서 28,318,000원이 빠졌다. 유료로 메우면 같은 매출에 비용이 더 든다.</li>
+<li><strong>채널 정의를 하나로 맞춘다.</strong> 유입 경로와 판매처가 섞이면 다음 달 보고서도 같은 자리에서 갈린다.</li>
+</ol>
+
+<h2>이어서 할 것</h2>
+<p>지표 체계가 흔들리면 066 KPI 체계 설계로 간다. 다음 달 예산을 확정하려면 095 마케팅 예산 설계, 채널 재배분 상세는 046 ROAS 진단이다. 노션 적재와 매월 자동 생성은 켜지 않았다.</p>
+
+<footer class="foot">067 월간 마케팅 성과 분석 · 입력 sample-data/A브랜드-채널성과-90일.csv 540행 <span class="tag sample">샘플</span> · 선행 산출물 061 판매 데이터 분석(2026-06) 참조 · 착지 067-monthly-report.xlsx + 067-monthly-report.html</footer>
+</main></body></html>

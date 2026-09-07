@@ -200,7 +200,7 @@ try {
   const piiOutputs = [
     'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.xlsx',
     'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.html',
-    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md',
+    'workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md',
   ];
   const piiDraft = {
     schema: 'marketing-team.run/v1',

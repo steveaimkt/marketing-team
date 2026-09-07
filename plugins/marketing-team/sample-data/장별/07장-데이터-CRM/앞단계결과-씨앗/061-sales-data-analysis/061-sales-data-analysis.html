@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>061 판매 데이터 분석 · A브랜드 2026-06</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · claude.ai/design/p/019de19d-80e1-7647-a375-b2262874f3c2
+   저자가 명세를 직접 넘겨 주었다. 여기 없는 값은 만들지 않는다.
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   산출물 공통 컴포넌트 · tokens.css 를 먼저 읽어야 한다
+   색과 서체와 크기를 여기서 정하지 않는다. 전부 토큰을 부른다.
+
+   저자 시스템의 규칙 셋을 지킨다.
+     ① 강조는 드물게 — 모래와 올리브는 면과 막대에만, 노랑은 사람이 판단할 자리에만
+     ② 카드는 뜨지 않는다 — 헤어라인 1px 과 아주 옅은 그림자로 앉는다
+     ③ 바탕에 그러데이션과 무늬를 쓰지 않는다
+   ───────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--ff); font-size:var(--t-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; word-break:keep-all;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){ .wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)} }
+
+/* ── 머리 ───────────────────────────────────────────── */
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);
+   letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);
+   padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+h3{font-size:var(--t-h3);line-height:var(--lh-head);margin:var(--sp-4) 0 var(--sp-2);
+   color:var(--ink-mut);font-weight:600}
+p{margin:0 0 var(--sp-2)}
+a{color:var(--ink);text-decoration-color:var(--ink-fade);transition:opacity .2s ease-out}
+a:hover{opacity:.7}
+code{font-family:var(--ff-mono);font-size:.88em;background:var(--paper-sunk);
+     padding:1px 5px;border-radius:var(--r-s);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-s)}
+
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;
+     border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:var(--ink)}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+
+/* ── KPI 카드 · 격자 간격 20 ─────────────────────────── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+     gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);
+      border-radius:var(--r-l);padding:var(--sp-3) var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);
+           line-height:var(--lh-display);margin:var(--sp-1) 0 2px;
+           overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.card.empty{background:var(--paper-sunk);border-style:dashed;box-shadow:none}
+.card.empty .val{font-size:17px;font-weight:700;color:var(--ink-fade);margin:5px 0 6px}
+.card.empty .why{font-size:var(--t-tiny);line-height:1.55;color:var(--ink-fade)}
+
+/* ── 표 ─────────────────────────────────────────────── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;
+    border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);
+         color:var(--ink-mut);white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s ease-out}
+tbody tr:hover{background:var(--acc-band)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;color:var(--ink);width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);
+        color:var(--ink-fade);border-top:1px solid var(--line)}
+
+/* 판정 배지 · 낱칸이라 모서리 5 */
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;
+   border-radius:var(--r-s);white-space:nowrap}
+.b.up{background:var(--up-band);color:var(--up)}
+.b.down{background:var(--down-band);color:var(--down)}
+.b.warn{background:var(--warn-band);color:var(--warn)}
+.b.none{background:var(--paper-sunk);color:var(--none)}
+.b.me{background:var(--mark);color:#2A2A28}   /* 사람이 판단할 자리에만 */
+
+/* ── 강조 상자 ───────────────────────────────────────── */
+.hl,.warn-box,.gate{border:1px solid var(--line);border-radius:var(--r-l);
+     padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}
+.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}
+.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.gate{border-left:3px solid var(--sand);background:var(--acc-band)}
+.gate .t{font-size:var(--t-small);font-weight:700;margin-bottom:var(--sp-1)}
+
+/* ── 차트 ───────────────────────────────────────────── */
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);
+       padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)} .bar.dim{fill:var(--sand)}
+.grid-l{stroke:var(--line);stroke-width:1}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+
+/* 표 안 가로 막대 · 낱칸이라 모서리 5 */
+.mb{position:relative;background:var(--paper-sunk);border-radius:var(--r-s);height:17px;min-width:60px}
+.mb>i{position:absolute;inset:0 auto 0 0;background:var(--olive);border-radius:var(--r-s);display:block}
+.mb>span{position:relative;font-size:11px;font-weight:700;padding-left:5px;line-height:17px}
+
+/* ── 꼬리 ───────────────────────────────────────────── */
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);
+      font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+.src{font-size:var(--t-tiny);color:var(--ink-fade);margin-top:var(--sp-2);
+     padding-top:8px;border-top:1px solid var(--line)}
+
+@media print{
+  body{background:#fff}
+  .card,.chart,.tw{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+</style></head><body>
+<main class="wrap">
+<h1>판매 데이터 분석 · 2026-06</h1>
+<p class="meta">A브랜드 · 매출 원장 150행 · 2026-06-01~06-30 (30일) · <span class="tag sample">샘플</span> · 판정 기준 <code>brand/profile.md §4</code></p>
+
+<section class="kpi">
+  <div class="card"><p class="lab">총매출</p><p class="val">104,890,000<span class="unit">원</span></p><p class="base">수량 2,694 · 평균단가 38,935원</p></div>
+  <div class="card"><p class="lab">공헌이익 <span class="tag est">추정</span></p><p class="val">52,445,000<span class="unit">원</span></p><p class="base">원가 열이 없어 profile.md §4 마진율 50% 적용</p></div>
+  <div class="card"><p class="lab">Δ매출 (후반−전반)</p><p class="val">▲8,778,000<span class="unit">원</span></p><p class="base">+18.3% · 수량 기여 99.3%</p></div>
+  <div class="card"><p class="lab">이상치</p><p class="val">0<span class="unit">건</span></p><p class="base">요일 기준선 2σ 초과 없음 · 토요일은 반복 패턴</p></div>
+</section>
+
+<figure class="chart">
+  <p class="cap">① 무엇이 매출을 올렸나 · 요인 분해</p>
+  <p class="sub">전반 6/01~6/15 → 후반 6/16~6/30 · [샘플]</p>
+  <svg viewBox="0 0 720 235" role="img" aria-label="매출 48,056,000에서 56,834,000로 8,778,000 늘었다. 그중 수량 기여가 8,716,230로 99.3%다. 단가는 52,286, 믹스는 9,484밖에 안 움직였다. 더 비싸게 판 것이 아니라 더 많이 판 것이다.">
+<rect class="bar" x="70" y="51.2" width="76" height="148.8"/>
+<text class="axis" x="108.0" y="45.2" text-anchor="middle">48,056,000</text>
+<text class="axis" x="108.0" y="218" text-anchor="middle">전반</text>
+<rect class="bar dim" x="190" y="24.3" width="76" height="27.0"/>
+<text class="axis" x="228.0" y="18.3" text-anchor="middle">▲8,716,230</text>
+<line class="grid-l" x1="146" y1="51.2" x2="190" y2="51.2" stroke-dasharray="4 3"/>
+<text class="axis" x="228.0" y="218" text-anchor="middle">Δ수량</text>
+<rect class="bar dim" x="310" y="21.8" width="76" height="2.5"/>
+<text class="axis" x="348.0" y="15.8" text-anchor="middle">▲52,286</text>
+<line class="grid-l" x1="266" y1="24.3" x2="310" y2="24.3" stroke-dasharray="4 3"/>
+<text class="axis" x="348.0" y="218" text-anchor="middle">Δ단가</text>
+<rect class="bar dim" x="430" y="21.6" width="76" height="2.5"/>
+<text class="axis" x="468.0" y="15.6" text-anchor="middle">▲9,484</text>
+<line class="grid-l" x1="386" y1="24.1" x2="430" y2="24.1" stroke-dasharray="4 3"/>
+<text class="axis" x="468.0" y="218" text-anchor="middle">Δ믹스</text>
+<rect class="bar" x="550" y="24.1" width="76" height="175.9"/>
+<text class="axis" x="588.0" y="18.1" text-anchor="middle">56,834,000</text>
+<text class="axis" x="588.0" y="218" text-anchor="middle">후반</text>
+<line class="grid-l" x1="40" y1="200" x2="700" y2="200"/>
+  </svg>
+  <p class="sub">읽기 — 매출 48,056,000에서 56,834,000로 8,778,000 늘었다. 그중 수량 기여가 8,716,230로 99.3%다. 단가는 52,286, 믹스는 9,484밖에 안 움직였다. 더 비싸게 판 것이 아니라 더 많이 판 것이다.</p>
+</figure>
+
+<figure class="chart">
+  <p class="cap">② 언제 튀었나 · 일별 추이와 7일 이동평균</p>
+  <p class="sub">실선 일별 매출 · 점선 7일 이동평균 · ◆ 토요일 · [샘플]</p>
+  <svg viewBox="0 0 720 215" role="img" aria-label="토요일 네 번이 눈에 띄게 솟는다. 평균 5,322,500원으로 나머지 26일 평균 3,215,385원의 1.66배다. 7일마다 규칙적으로 반복되므로 사고가 아니라 요일 패턴이다.">
+<polyline points="50.0,112.9 72.4,112.9 94.8,112.9 117.2,112.9 139.7,112.9 162.1,62.1 184.5,112.9 206.9,106.6 229.3,106.6 251.7,106.6 274.1,106.6 296.6,106.6 319.0,51.5 341.4,106.6 363.8,116.2 386.2,100.2 408.6,100.2 431.0,100.2 453.4,100.2 475.9,39.9 498.3,100.2 520.7,93.9 543.1,93.9 565.5,93.9 587.9,93.9 610.3,93.9 632.8,29.3 655.2,93.9 677.6,87.6 700.0,87.6" fill="none" stroke="var(--olive)" stroke-width="2"/>
+<polyline points="50.0,112.9 72.4,112.9 94.8,112.9 117.2,112.9 139.7,112.9 162.1,104.5 184.5,105.7 206.9,104.8 229.3,103.9 251.7,103.0 274.1,102.0 296.6,101.1 319.0,99.6 341.4,98.7 363.8,100.1 386.2,99.2 408.6,98.3 431.0,97.4 453.4,96.5 475.9,94.8 498.3,93.9 520.7,90.7 543.1,89.8 565.5,88.9 587.9,88.0 610.3,87.1 632.8,85.6 655.2,84.7 677.6,83.8 700.0,82.9" fill="none" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="162.1" cy="62.1" r="4" fill="var(--mark)" stroke="var(--ink)" stroke-width="1"/>
+<circle cx="319.0" cy="51.5" r="4" fill="var(--mark)" stroke="var(--ink)" stroke-width="1"/>
+<circle cx="475.9" cy="39.9" r="4" fill="var(--mark)" stroke="var(--ink)" stroke-width="1"/>
+<circle cx="632.8" cy="29.3" r="4" fill="var(--mark)" stroke="var(--ink)" stroke-width="1"/>
+<text class="axis" x="50.0" y="206" text-anchor="middle">6/1</text>
+<text class="axis" x="206.9" y="206" text-anchor="middle">6/8</text>
+<text class="axis" x="363.8" y="206" text-anchor="middle">6/15</text>
+<text class="axis" x="520.7" y="206" text-anchor="middle">6/22</text>
+<text class="axis" x="677.6" y="206" text-anchor="middle">6/29</text>
+<line class="grid-l" x1="40" y1="190" x2="710" y2="190"/>
+  </svg>
+  <p class="sub">읽기 — 토요일 네 번이 눈에 띄게 솟는다. 평균 5,322,500원으로 나머지 26일 평균 3,215,385원의 1.66배다. 7일마다 규칙적으로 반복되므로 사고가 아니라 요일 패턴이다.</p>
+</figure>
+
+<figure class="chart">
+  <p class="cap">③ 어디가 크고 어디가 남나 · 채널별</p>
+  <p class="sub">매출 · 비중 · 공헌이익[추정] · [샘플]</p>
+  <svg viewBox="0 0 720 130" role="img" aria-label="자사몰 51.8%, 쿠팡 48.2%로 거의 반씩이다. 원가 열이 없어 두 채널의 수익률을 가를 수 없다. 수수료가 다른 두 채널을 같은 마진율로 본 값이다.">
+<rect class="bar" x="120" y="14" width="320.0" height="38"/>
+<text class="axis" x="112" y="38.0" text-anchor="end">자사몰</text>
+<text class="axis" x="448.0" y="38.0">54,322,000 · 51.8% · 이익[추정] 27,161,000</text>
+<rect class="bar" x="120" y="70" width="297.9" height="38"/>
+<text class="axis" x="112" y="94.0" text-anchor="end">쿠팡</text>
+<text class="axis" x="425.9" y="94.0">50,568,000 · 48.2% · 이익[추정] 25,284,000</text>
+  </svg>
+  <p class="sub">읽기 — 자사몰 51.8%, 쿠팡 48.2%로 거의 반씩이다. 원가 열이 없어 두 채널의 수익률을 가를 수 없다. 수수료가 다른 두 채널을 같은 마진율로 본 값이다.</p>
+</figure>
+
+<figure class="chart">
+  <p class="cap">④ 상위 몇 개가 매출 몇 %인가 · 파레토</p>
+  <p class="sub">막대 매출 · 점선 누적 비중 · [샘플]</p>
+  <svg viewBox="0 0 720 200" role="img" aria-label="수분 세럼 하나가 63.1%다. 상품이 3개뿐이라 상위 20%를 끊는 파레토 규칙은 성립하지 않는다. 대신 1위 하나가 80% 선에 못 미친다는 것만 읽는다.">
+<line class="grid-l" x1="76" y1="55.2" x2="640" y2="55.2" stroke-dasharray="2 4"/>
+<text class="axis" x="646" y="59.2">80%</text>
+<rect class="bar" x="100" y="81.5" width="110" height="98.5"/>
+<text class="val-l" x="155.0" y="99.5" text-anchor="middle" fill="var(--paper)">66,222,000</text>
+<text class="axis" x="155.0" y="198" text-anchor="middle">수분 세럼 · 63%</text>
+<rect class="bar" x="280" y="131.9" width="110" height="48.1"/>
+<text class="val-l" x="335.0" y="149.9" text-anchor="middle" fill="var(--paper)">32,340,000</text>
+<text class="axis" x="335.0" y="198" text-anchor="middle">진정 크림 · 31%</text>
+<rect class="bar" x="460" y="170.6" width="110" height="9.4"/>
+<text class="axis" x="515.0" y="163.6" text-anchor="middle">6,328,000</text>
+<text class="axis" x="515.0" y="198" text-anchor="middle">클렌징 밤 · 6%</text>
+<polyline points="155.0,81.5 335.0,33.4 515.0,24.0" fill="none" stroke="var(--ink-faint)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<circle cx="155.0" cy="81.5" r="3.5" fill="var(--ink-faint)"/>
+<text class="axis" x="155.0" y="71.5" text-anchor="middle">누적 63%</text>
+<circle cx="335.0" cy="33.4" r="3.5" fill="var(--ink-faint)"/>
+<text class="axis" x="335.0" y="23.4" text-anchor="middle">누적 94%</text>
+<circle cx="515.0" cy="24.0" r="3.5" fill="var(--ink-faint)"/>
+<text class="axis" x="515.0" y="14.0" text-anchor="middle">누적 100%</text>
+<line class="grid-l" x1="76" y1="180" x2="640" y2="180"/>
+  </svg>
+  <p class="sub">읽기 — 수분 세럼 하나가 63.1%다. 상품이 3개뿐이라 상위 20%를 끊는 파레토 규칙은 성립하지 않는다. 대신 1위 하나가 80% 선에 못 미친다는 것만 읽는다.</p>
+</figure>
+
+<figure class="chart">
+  <p class="cap">⑤ 반복 패턴과 사고를 가른다 · 요일×주차</p>
+  <p class="sub">칸 색이 짙을수록 매출이 크다 · [샘플]</p>
+  <svg viewBox="0 0 720 240" role="img" aria-label="토요일 열이 다섯 주 내내 짙다. 한 번만 짙었으면 사고를 의심하지만 매주 같은 자리라 반복 패턴이다. 요일 효과를 빼지 않고 7일 이동평균으로만 판정하면 이 네 칸이 전부 이상치로 잡힌다.">
+<text class="axis" x="60" y="51.0" text-anchor="end">1주</text>
+<rect x="70" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="111.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<rect x="158" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="199.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<rect x="246" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="287.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<rect x="334" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="375.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<rect x="422" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="463.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<rect x="510" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.72"/>
+<text class="val-l" x="551.0" y="47.0" text-anchor="middle" fill="var(--paper)">4.7M</text>
+<rect x="598" y="26" width="82" height="34" fill="var(--olive)" fill-opacity="0.28"/>
+<text class="val-l" x="639.0" y="47.0" text-anchor="middle" fill="var(--ink)">2.8M</text>
+<text class="axis" x="60" y="91.0" text-anchor="end">2주</text>
+<rect x="70" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="111.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<rect x="158" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="199.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<rect x="246" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="287.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<rect x="334" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="375.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<rect x="422" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="463.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<rect x="510" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.81"/>
+<text class="val-l" x="551.0" y="87.0" text-anchor="middle" fill="var(--paper)">5.1M</text>
+<rect x="598" y="66" width="82" height="34" fill="var(--olive)" fill-opacity="0.33"/>
+<text class="val-l" x="639.0" y="87.0" text-anchor="middle" fill="var(--ink)">3.1M</text>
+<text class="axis" x="60" y="131.0" text-anchor="end">3주</text>
+<rect x="70" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.25"/>
+<text class="val-l" x="111.0" y="127.0" text-anchor="middle" fill="var(--ink)">2.7M</text>
+<rect x="158" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.39"/>
+<text class="val-l" x="199.0" y="127.0" text-anchor="middle" fill="var(--ink)">3.3M</text>
+<rect x="246" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.39"/>
+<text class="val-l" x="287.0" y="127.0" text-anchor="middle" fill="var(--ink)">3.3M</text>
+<rect x="334" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.39"/>
+<text class="val-l" x="375.0" y="127.0" text-anchor="middle" fill="var(--ink)">3.3M</text>
+<rect x="422" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.39"/>
+<text class="val-l" x="463.0" y="127.0" text-anchor="middle" fill="var(--ink)">3.3M</text>
+<rect x="510" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.91"/>
+<text class="val-l" x="551.0" y="127.0" text-anchor="middle" fill="var(--paper)">5.5M</text>
+<rect x="598" y="106" width="82" height="34" fill="var(--olive)" fill-opacity="0.39"/>
+<text class="val-l" x="639.0" y="127.0" text-anchor="middle" fill="var(--ink)">3.3M</text>
+<text class="axis" x="60" y="171.0" text-anchor="end">4주</text>
+<rect x="70" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="111.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<rect x="158" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="199.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<rect x="246" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="287.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<rect x="334" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="375.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<rect x="422" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="463.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<rect x="510" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="1.00"/>
+<text class="val-l" x="551.0" y="167.0" text-anchor="middle" fill="var(--paper)">5.9M</text>
+<rect x="598" y="146" width="82" height="34" fill="var(--olive)" fill-opacity="0.44"/>
+<text class="val-l" x="639.0" y="167.0" text-anchor="middle" fill="var(--ink)">3.5M</text>
+<text class="axis" x="60" y="211.0" text-anchor="end">5주</text>
+<rect x="70" y="186" width="82" height="34" fill="var(--olive)" fill-opacity="0.50"/>
+<text class="val-l" x="111.0" y="207.0" text-anchor="middle" fill="var(--ink)">3.8M</text>
+<rect x="158" y="186" width="82" height="34" fill="var(--olive)" fill-opacity="0.50"/>
+<text class="val-l" x="199.0" y="207.0" text-anchor="middle" fill="var(--ink)">3.8M</text>
+<text class="axis" x="111.0" y="18" text-anchor="middle">월</text>
+<text class="axis" x="199.0" y="18" text-anchor="middle">화</text>
+<text class="axis" x="287.0" y="18" text-anchor="middle">수</text>
+<text class="axis" x="375.0" y="18" text-anchor="middle">목</text>
+<text class="axis" x="463.0" y="18" text-anchor="middle">금</text>
+<text class="axis" x="551.0" y="18" text-anchor="middle">토</text>
+<text class="axis" x="639.0" y="18" text-anchor="middle">일</text>
+  </svg>
+  <p class="sub">읽기 — 토요일 열이 다섯 주 내내 짙다. 한 번만 짙었으면 사고를 의심하지만 매주 같은 자리라 반복 패턴이다. 요일 효과를 빼지 않고 7일 이동평균으로만 판정하면 이 네 칸이 전부 이상치로 잡힌다.</p>
+</figure>
+
+<h2>이상치 판정 · 왜 0건인가</h2>
+<p>요일별 기준선을 세우고 <code>실제값 − 같은 요일 평균</code> 잔차를 2σ·3σ로 판정했다. 잔차 표준편차는 331,144원이고 2σ를 넘은 날이 없다.</p>
+<div class="tw"><table>
+<thead><tr><th>판정 방법</th><th>잔차 SD</th><th>2σ 초과</th><th>무엇을 잡았나</th></tr></thead>
+<tbody>
+<tr><td>요일 기준선 <strong>(이 스킬이 쓴 것)</strong></td><td>331,144</td><td><strong>0건</strong></td><td>—</td></tr>
+<tr><td>7일 이동평균만</td><td>699,115</td><td>4건</td><td>토요일 6/6 · 6/13 · 6/20 · 6/27 — 전부 반복 패턴이다</td></tr>
+</tbody></table></div>
+<p class="src">요일을 안 빼면 매주 오는 토요일이 매주 사고로 보고된다. 그래서 먼저 요일 기준선을 세운다.</p>
+
+<h2>이 분석이 못 보는 것</h2>
+<ul>
+<li><strong>수익률을 채널별로 가를 수 없다.</strong> 원장에 원가 열이 없어 <code>profile.md §4</code> 마진율 50%를 두 채널에 똑같이 적용했다. 쿠팡 수수료가 자사몰과 다르면 이 값은 틀린다. <span class="tag est">추정</span></li>
+<li><strong>지역·카테고리 집계를 못 했다.</strong> 원장에 그 열이 없다.</li>
+<li><strong>광고비를 안 본다.</strong> 이 스킬은 매출만 본다. ROAS·CPA 판정은 041·042·046이 한다.</li>
+<li><strong>전월 비교가 아니다.</strong> 자료가 2026-06 한 달뿐이라 전기를 같은 달 전반 15일로 잡았다. 진짜 전월 대비를 보려면 5월 원장이 있어야 한다.</li>
+<li><strong>상품이 3개뿐이라 파레토가 성립하지 않는다.</strong> 상위 20%가 0.6개다.</li>
+</ul>
+
+<h2>다음</h2>
+<p>067 월간 마케팅 성과 분석으로 이어 전 채널을 묶는다. 069 성과 예측 분석으로 시나리오를 본다. 토요일 반복 패턴을 광고와 엮어 보려면 046 ROAS 진단으로 분기한다.</p>
+
+<footer class="foot">061 판매 데이터 분석 · 입력 <code>inputs/A브랜드-2026-06-매출.xlsx</code> 150행 <strong>[샘플]</strong> · 착지 <code>061-sales-data-analysis.xlsx</code> + <code>061-sales-data-analysis.html</code></footer>
+</main></body></html>

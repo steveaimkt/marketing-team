@@ -1,4 +1,4 @@
-{"intent": "다음 분기에 어떤 행사 나갈지 계획 세워줘", "expected_skill": "057"}
+{"intent": "다음 분기 프로모션 언제 열지 계획 세워줘", "expected_skill": "057"}
 {"intent": "11월 빅세일 준비 일정 역산해서 짜줘", "expected_skill": "057"}
 {"intent": "이번 추석 딜 들어가는 게 남는 장사일까?", "expected_skill": "057", "ambiguous_with": ["016"]}
 {"intent": "플랫폼별 프로모션 연간 캘린더 만들어줘", "expected_skill": "057"}

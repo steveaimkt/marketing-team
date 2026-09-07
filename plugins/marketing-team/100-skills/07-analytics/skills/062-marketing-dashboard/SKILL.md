@@ -32,7 +32,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 > 계승: marketing-os 「html-report-template」 표준 템플릿 **그대로** — 단일 파일·모바일 우선·인쇄 가능·다크모드 자동 + 표준 섹션 골격(header/kpi/highlights/charts/tables/actions/footer).
 
 > **내 일이 아닌 것** · **매일 여는 화면**이다. 한 번 내는 문서는 045(주간)·067(월간).
-> 가르는 말은 `docs/헷갈리는-쌍.md` 에 있다.
+> 나누는 말은 `docs/헷갈리는-쌍.md` 에 있다.
 
 ## Contract
 - 대시보드는 **KPI 카드 → 추이 → 채널 비교** 3층 구조를 따른다 (html-report-template 표준 섹션 순서 준수).
@@ -58,7 +58,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 
 ## Phases
 1. **지표·소스 정의** ⏸ — 사용자와 핵심 지표 4~8개 확정 (미지정 시 profile.md §5 운영 채널 기준 기본 세트 제안: 매출·광고비·ROAS·전환·CPA·트래픽). 지표별 소스 매핑.
-2. **데이터 확보** — `docs/데이터-가져오기.md` 모드 판정: GA4·Coupler.io·Sheets MCP 연결 시 자동 조회, **미연결 시 CSV 업로드 폴백** (CSV → HTML 경로는 연결 없이 완주 가능). `[실데이터]`/`[샘플]` 태그.
+2. **데이터 확보** — `docs/데이터-가져오기.md` 모드 결과: GA4·Coupler.io·Sheets MCP 연결 시 자동 조회, **미연결 시 CSV 업로드 폴백** (CSV → HTML 경로는 연결 없이 완주 가능). `[실데이터]`/`[샘플]` 태그.
 3. **정규화** — 채널별 지표를 공통 스키마·동일 기간으로 정렬. 채널 간 정의 차이(전환 기준 등)는 각주로.
 4. **HTML 생성** — html-report-template 골격 적용:
    - `header` 제목·기간·생성 타임스탬프 / `kpi` 카드 4~8개 (값+증감 delta) / `highlights` 핵심 3가지 (텍스트)

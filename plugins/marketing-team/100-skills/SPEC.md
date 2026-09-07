@@ -103,7 +103,7 @@ example/input.md    무엇을 넣었나
 example/output.md   무엇이 나왔나
 ```
 
-⛔ **`gate: true` 면 `output.md` 에 AI 규제검토자 판정 블록이 있어야 한다.**
+⛔ **`gate: true` 면 `output.md` 에 AI 규제검토자 결과 블록이 있어야 한다.**
 없으면 독자가 게이트를 안 거쳐도 되는 줄 안다. `verify.mjs` 가 검사한다.
 
 ## 6. 사용자가 만든 스킬 · `brand/my-skills/`
