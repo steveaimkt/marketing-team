@@ -320,6 +320,25 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
+// ⑥-g0 스킬 설명 길이 · 1,024자를 넘으면 코워크가 그 스킬을 아예 등록하지 않는다
+//   왜: 2026-09-07 · ai-마케터(설명 1,178자)가 코워크에서 통째로 사라졌다. 파일은 갔는데
+//       목록에 안 떴고 「스킬 2개」로 보였다. 클로드 코드는 통과시켜서 로컬에서는 멀쩡했다.
+//       688자로 줄이니 바로 떴다. 문법 오류가 아니라 조용히 빠지는 종류라 기계가 지켜야 한다.
+{
+  const SD2 = path.join(ROOT, 'skills');
+  const LIMIT = 1024;
+  if (fs.existsSync(SD2)) for (const d of fs.readdirSync(SD2)) {
+    const f = path.join(SD2, d, 'SKILL.md');
+    if (!fs.existsSync(f)) continue;
+    const fm = (fs.readFileSync(f, 'utf8').match(/^---\n([\s\S]*?)\n---\n/) || [, ''])[1];
+    const m = fm.match(/^description:\s*\|\n((?:  .*\n?|\n)*)/m);
+    const n = m ? m[1].length : (fm.match(/^description:\s*(.*)$/m) || [, ''])[1].length;
+    if (n > LIMIT) err(`${d} 설명이 ${n.toLocaleString()}자다 (한도 ${LIMIT}) — 코워크가 이 스킬을 등록하지 않는다 (실측 2026-09-07)`);
+    else if (n > LIMIT * 0.85) warn(`${d} 설명 ${n}자 · 한도 ${LIMIT} 에 가깝다`);
+    else ok.push(`${d} 설명 ${n}자`);
+  }
+}
+
 // ⑥-g1 버전 · 배포되는 파일이 바뀌었는데 버전이 그대로면 기존 사용자에게 안 간다
 //   왜: 2026-08-23 · plugins/ 안에서 12개 파일 +930줄을 고쳐 놓고 0.14.0 을 그대로 뒀다.
 //       코워크는 버전으로 「새것이 있나」를 판정한다. 그대로면 이미 깐 사람은 업데이트를 못 받는다.
