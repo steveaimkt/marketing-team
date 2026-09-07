@@ -3,6 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 import { approvalState } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
@@ -246,6 +247,59 @@ function validateSkill(input, plan) {
   return '';
 }
 
+/* ── 저위험 자동 승인 · 저자 지시 2026-09-07 「요청하면 바로 결과」 ──────────
+ * 원고(4장)는 요청 한 줄 뒤 곧바로 결과표가 나온다고 적는다. 사람이 정하는 자리는
+ * 처음(요청)과 마지막(결과 판단) 둘뿐이라는 것이 이 책의 약속이다.
+ * 그래서 **저위험 단일 업무**는 사람 문장 없이 통과시킨다.
+ *
+ * 🔴 푸는 것은 「사람이 한 문장을 치는 대기」뿐이다. 다음은 그대로 남는다 —
+ *    · 계획 해시 결속(planApproval) — 승인 뒤 계획이 바뀌면 여전히 막는다
+ *    · 계획에 없는 스킬 차단(validateSkill)
+ *    · 쓰기 경로 검사(validateWrite) · Bash 쓰기 차단 · 파일 착지
+ *    2026-08-30 사고(계획에 없던 HTML·순서 바꿔 돌기)는 이 셋이 막는 것이라 그대로 막힌다.
+ *
+ * 🔴 위험 표시는 **계획에 적힌 값을 믿지 않고** SKILL.md 를 그때 읽는다.
+ *    plan.json 은 미승인 상태에서 쓸 수 있어(상태기계 탈출문), 계획이 스스로
+ *    「저위험」을 선언하게 두면 문이 통째로 열린다.
+ */
+const PLUGIN_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const SKILLS_ROOT = path.join(PLUGIN_ROOT, '100-skills');
+
+/** 스킬 하나의 위험 표시. 못 찾거나 못 읽으면 null — 모르면 저위험으로 치지 않는다. */
+function skillFlags(id) {
+  let areas;
+  try { areas = fs.readdirSync(SKILLS_ROOT, { withFileTypes: true }); } catch { return null; }
+  for (const area of areas) {
+    if (!area.isDirectory()) continue;
+    const dir = path.join(SKILLS_ROOT, area.name, 'skills');
+    let names;
+    try { names = fs.readdirSync(dir); } catch { continue; }
+    const hit = names.find(n => n.startsWith(`${id}-`));
+    if (!hit) continue;
+    let text;
+    try { text = fs.readFileSync(path.join(dir, hit, 'SKILL.md'), 'utf8'); } catch { return null; }
+    return {
+      gate: /^gate:\s*true\s*$/m.test(text),
+      pii: /^pii:\s*true\s*$/m.test(text),
+      mutating: /^mutating:\s*true\s*$/m.test(text),
+    };
+  }
+  return null;
+}
+
+/** 계획의 모든 단계가 저위험이어야 저위험이다. 하나라도 모르면 false. */
+function lowRiskPlan(plan) {
+  const steps = plan?.steps;
+  if (!Array.isArray(steps) || steps.length === 0) return false;
+  for (const step of steps) {
+    const id = (String(step?.skill ?? '').match(/\d{3}/) || [])[0];
+    if (!id) return false;
+    const flags = skillFlags(id);
+    if (!flags || flags.gate || flags.pii || flags.mutating) return false;
+  }
+  return true;
+}
+
 async function main() {
   let input;
   try {
@@ -289,7 +343,7 @@ async function main() {
  * `plan.json` 이 있을 때만 본다. 없으면 예전 문장 게이트 그대로다 (하위 호환).
  * 읽지 못하면 막지 않는다 — 훅이 세션을 잠그는 쪽이 더 나쁘다. 문장 게이트가 남아 있다.
  */
-function planApproval(cwd) {
+function newestPlan(cwd) {
   if (!cwd) return null;
   const root = path.join(cwd, 'outputs');
   let newest = null;
@@ -317,17 +371,31 @@ function planApproval(cwd) {
   };
   try { if (fs.existsSync(root)) walk(root); } catch { return null; }
   if (!newest) return null;
-  let plan;
-  try { plan = JSON.parse(fs.readFileSync(newest.file, 'utf8')); } catch { return null; }
+  try { return { file: newest.file, plan: JSON.parse(fs.readFileSync(newest.file, 'utf8')) }; }
+  catch { return null; }
+}
+
+function planApproval(cwd) {
+  const found = newestPlan(cwd);
+  if (!found) return null;
   try {
-    const state = approvalState(plan);
+    const state = approvalState(found.plan);
     if (state.ok) return null;
-    return `${state.reason} (${path.relative(cwd, newest.file)})`;
+    return `${state.reason} (${path.relative(cwd, found.file)})`;
   } catch { return null; }
 }
 
   const approval = approved(rows);
+  const cwd = process.env.CLAUDE_PROJECT_DIR || input.cwd;
+
+  // 저위험 단일 업무는 사람 문장 없이 통과한다 (2026-09-07). 계획이 없으면 해당 없다.
+  let autoPlan = null;
   if (!approval.ok) {
+    const found = newestPlan(cwd);
+    if (found && lowRiskPlan(found.plan)) autoPlan = found.plan;
+  }
+
+  if (!approval.ok && !autoPlan) {
     // 조회와 라우팅·계획 준비 명령만 승인 전에 돈다 — G1 라우팅·G2 컴파일이 여기 산다 (실측 2026-08-30).
     // 산출물 쓰기(Write/Edit)와 영수증·생성·동기화 스크립트는 승인 뒤에도 허용 목록으로만 돈다 (P0).
     if (input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pre'))) return;
@@ -335,7 +403,10 @@ function planApproval(cwd) {
     return;
   }
 
-  const planIssue = planApproval(process.env.CLAUDE_PROJECT_DIR || input.cwd);
+  // 계획 밖 스킬 검사에 쓸 계획 본문 — 자동 승인이면 계획 자체를 글로 삼는다
+  const planText = approval.ok ? approval.plan : JSON.stringify(autoPlan);
+
+  const planIssue = planApproval(cwd);
   // 계획 상태 기계(plan-compiler·run-receipt)는 잠긴 상태에서 빠져나오는 유일한 문이다 —
   // 이 문까지 잠그면 compile 뒤 approve 를 부를 수 없다 (실측 2026-08-30 · 영구 잠금).
   // 읽기 조회는 계획을 위반할 수 없고(R8a), plan.json 자체는 쓰기 차단이 아니라 해시가 지킨다(R8b) —
@@ -358,7 +429,7 @@ function planApproval(cwd) {
     if (!isReadOnlyBash(input) && !allowedScript(input, 'run'))
       deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다.');
   } else if (input.tool_name === 'Skill') {
-    const issue = validateSkill(input, approval.plan);
+    const issue = validateSkill(input, planText);
     if (issue) deny(issue);
   }
 }

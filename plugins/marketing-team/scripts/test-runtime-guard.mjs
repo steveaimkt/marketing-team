@@ -209,7 +209,70 @@ try {
     assert.equal(tryWrite(), 'none', 'plan.json 이 없는 예전 경로까지 막았습니다.');
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · ✅');
+  // ── 저위험 자동 승인 (2026-09-07) ────────────────────────────
+  // 저위험 단일 업무는 사람 문장 없이 통과한다. pii·mutating·gate 는 그대로 막힌다.
+  {
+    const rel = 'outputs/2026-09-07/자동승인';
+    const dir = path.join(temp, rel);
+    fs.mkdirSync(dir, { recursive: true });
+    const planFile = path.join(dir, 'plan.json');
+    // 002 는 review: 브랜드·고객 을 요구한다. 006 은 요구하지 않는다.
+    const 검토 = id => id === '002'
+      ? [{ kind: 'business', perspective: '브랜드' }, { kind: 'business', perspective: '고객' }]
+      : [];
+    // 스킬 계약(writes_to)이 요구하는 산출물 셋을 그대로 적는다
+    const 슬러그 = { '002': '002-competitor-analysis', '006': '006-review-mining' };
+    const 산출 = id => {
+      const g = 슬러그[id];
+      if (!g) return [`workspace:${rel}/out.md`];
+      const 끝 = id === '006' ? `${g}-해설.md` : `${g}.md`;
+      return [`workspace:${rel}/${g}.xlsx`, `workspace:${rel}/${g}.html`, `workspace:${rel}/${끝}`];
+    };
+    const 계획 = id => ({
+      schema: 'marketing-team.plan/v1', plan_id: 'auto', request: '경쟁사 비교해줘', skills: [id],
+      steps: [{ step: 1, skill: id, inputs: [], outputs: 산출(id), reviews: 검토(id) }],
+      budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+    });
+    const 써넣기 = skill => fs.writeFileSync(planFile, `${JSON.stringify(계획(skill), null, 2)}\n`);
+    const pc = (...a) => spawnSync(process.execPath,
+      [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: temp, encoding: 'utf8' });
+    let 쓸파일 = 'out.md';
+    const 쓰기시도 = () => decision(call('Write', { file_path: path.join(dir, 쓸파일) }));
+
+    // 승인 문장이 전혀 없는 대화
+    writeTranscript([active, row('user', '경쟁사 비교해줘')]);
+
+    // 002 는 gate·pii·mutating 이 전부 false → 문장 없이 통과해야 한다
+    써넣기('002');
+    쓸파일 = '002-competitor-analysis.md';
+    pc('compile', `${rel}/plan.json`);
+    pc('approve', `${rel}/plan.json`);
+    assert.equal(쓰기시도(), 'none', '저위험 계획을 사람 문장 없이 통과시키지 못했습니다.');
+
+    // 006 은 pii: true → 여전히 사람 승인이 있어야 한다
+    써넣기('006');
+    쓸파일 = '006-review-mining-해설.md';
+    pc('compile', `${rel}/plan.json`);
+    pc('approve', `${rel}/plan.json`);
+    assert.equal(쓰기시도(), 'deny', 'pii: true 스킬을 승인 없이 통과시켰습니다.');
+
+    // 계획이 스스로 저위험을 선언해도 소용없어야 한다 — 표시는 SKILL.md 에서 읽는다
+    const 위장 = 계획('006');
+    위장.low_risk = true;
+    fs.writeFileSync(planFile, `${JSON.stringify(위장, null, 2)}\n`);
+    pc('compile', `${rel}/plan.json`);
+    pc('approve', `${rel}/plan.json`);
+    assert.equal(쓰기시도(), 'deny', '계획이 선언한 low_risk 를 믿고 통과시켰습니다.');
+
+    // 없는 스킬 번호는 저위험으로 치지 않는다
+    써넣기('999');
+    pc('compile', `${rel}/plan.json`);
+    assert.equal(쓰기시도(), 'deny', '모르는 스킬을 저위험으로 통과시켰습니다.');
+
+    fs.rmSync(planFile, { force: true });
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

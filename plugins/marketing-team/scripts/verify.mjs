@@ -706,9 +706,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       }
     }
   }
-  if (!R.includes('「진행 승인」 단독이 무엇으로 도는지 그 줄에 적는다'))
-    빠짐.push('승인 줄이 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');
-  if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
+  // 2026-09-07 · 승인 대기를 없애며 이 고지가 「승인 줄」에서 「결과 첫 줄」로 옮겼다.
+  // 요구는 그대로다 — 샘플로 돌았는지 내 데이터로 돌았는지 사용자가 반드시 알아야 한다.
+  if (!R.includes('무엇으로 도는지는 결과 첫 줄에 밝힌다'))
+    빠짐.push('결과가 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');  if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
     빠짐.push('run/v1 회귀 픽스처가 없다 (개선 플랜 Phase 0)');
   // §14 M1 · 일일 자가검증 — 실행기·회귀·정책이 셋 다 있어야 하고, 정책은 실행기 자신을 보호해야 한다
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'daily-health-check.mjs')))
