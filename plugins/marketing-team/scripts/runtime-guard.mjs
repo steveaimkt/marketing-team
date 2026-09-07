@@ -15,7 +15,7 @@ const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?^(?:\*\*)?\[승인 요�
 const APPROVAL_EXACT = /^\s*(?:네|예|넵)?[\s,]*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?|진행해\s*줘요?|진행해주세요|진행하자)\s*[.!~]?\s*$/;
 const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:보류|취소|아직|말|안\s|못\s))/;
 const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) };
-const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/AI-마케터/SKILL.md', '\\skills\\AI-마케터\\SKILL.md'];
+const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-마케터/SKILL.md', '\\skills\\ai-마케터\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 
 function deny(reason) {

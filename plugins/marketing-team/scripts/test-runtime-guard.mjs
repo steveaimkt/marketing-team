@@ -38,7 +38,7 @@ try {
   assert.equal(decision(devResult), 'none', '개발 저장소에서 소스 편집을 잠갔습니다.');
   fs.rmSync(path.join(temp, '.claude-plugin'), { recursive: true, force: true });
 
-  const active = row('user', '# 마케팅 AI 마케터\n/skills/AI-마케터/SKILL.md');
+  const active = row('user', '# 마케팅 AI 마케터\n/skills/ai-마케터/SKILL.md');
   writeTranscript([active, row('user', '광고 예산 다시 짜줘')]);
   result = call('Bash', { command: 'node analysis.mjs' });
   assert.equal(decision(result), 'deny', '계획 없는 실행을 허용했습니다.');

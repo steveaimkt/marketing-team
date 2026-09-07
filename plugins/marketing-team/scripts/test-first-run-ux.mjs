@@ -11,7 +11,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, '..');
 
 // ── 계약 앵커 · SKILL 이 빠른 진입 규칙을 들고 있는가 ──
-const S = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+const S = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
 for (const [anchor, why] of [
   ['빠른 진입 · 저위험 단일 업무는 첫 화면 하나로', '빠른 진입 계약이 없다'],
   ['mutating: true (발송·게시·예약', '고위험 제외 ①(외부 실행)이 없다'],

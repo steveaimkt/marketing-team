@@ -113,9 +113,9 @@ else {
 // AI 마케터는 메인 컨텍스트에서 도는 스킬이다. 서브에이전트가 아니다 (2026-08-22 결정).
 //   서브에이전트가 다시 위임하면 맥락이 두 겹으로 접힌다. 내려가는 단계는 언제나 한 단이다.
 if (fs.existsSync(path.join(adir, 'marketing-director.md')))
-  err('agents/marketing-director.md 가 있다 — AI 마케터는 skills/AI-마케터 여야 한다 (중첩 위임 방지)');
-const dpath = path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md');
-if (!fs.existsSync(dpath)) err('skills/AI-마케터/SKILL.md 없음 — 입구가 없다');
+  err('agents/marketing-director.md 가 있다 — AI 마케터는 skills/ai-마케터 여야 한다 (중첩 위임 방지)');
+const dpath = path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md');
+if (!fs.existsSync(dpath)) err('skills/ai-마케터/SKILL.md 없음 — 입구가 없다');
 else {
   const d = fs.readFileSync(dpath, 'utf8');
   for (const a of agents) if (!d.includes(a)) err(`AI 마케터가 모르는 담당: ${a} — 조직도에 없으면 호출되지 않는다`);
@@ -575,7 +575,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   **업종 한 줄**이면 규제 사전이 제 것으로 갈린다. 그 중간이 필요하다.
 {
   const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
-  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
   const C = fs.readFileSync(path.join(ROOT, '100-skills', 'gates', 'compliance-gate.md'), 'utf8');
   const 빠짐 = [];
 
@@ -644,7 +644,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
   // 원장 여덟 열이 오케스트레이터 본문에 있나 (실측 2026-09-01 · 여섯 열로 지어냈다)
   if (!R.includes('| 일시 | 스킬 ID | 요청 | 데이터 모드 | 산출물 경로 | 게이트 | 보완 횟수 | 상태 |'))
-    빠짐.push('원장 여덟 열 규격이 AI-마케터 본문에 없다 — 실행할 때마다 열을 지어낸다 (실측 2026-09-01)');
+    빠짐.push('원장 여덟 열 규격이 ai-마케터 본문에 없다 — 실행할 때마다 열을 지어낸다 (실측 2026-09-01)');
   if (!R.includes('그릇은 성격이 정한다. 전부 `.md` 로 뭉치지 않는다'))
     빠짐.push('산출물 그릇을 성격으로 가르는 규칙이 없다 — 표까지 .md 로 나와 엑셀에서 못 쓴다 (사용자 지시 2026-09-01)');
   {  // outputs 가 말한 형식과 실제 착지 형식이 같은가
@@ -743,7 +743,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   ⛔ 서브에이전트로 돌려도 그 안에서 통째로 읽으면 똑같다 — 격리는 해결이 아니다.
 {
   const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
-  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
   const 빠짐 = [];
   if (!G.includes('큰 입력은 통째로 읽지 않는다'))
     빠짐.push('규약에 큰 입력 규칙이 없다 — 고객마스터 한 장이 11만 토큰이다');
@@ -772,7 +772,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   참고 · gstack(garrytan/gstack) 이 20개 명령에서 쓰는 방식이고,
 //   핵심 문장은 「Read a section in full before doing its step; do not work from memory」다.
 {
-  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
   const F = path.join(ROOT, 'docs', 'G3-분기절차.md');
   const 빠짐 = [];
 
@@ -853,7 +853,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   규제검토자는 잘 돈다. 차이는 하나 — **`gate: true` 는 플래그고 사업검토자는 판단이었다.**
 {
   const 빠짐 = [];
-  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
   const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
 
   // review: 를 단 스킬이 실재하나 · 관점이 §F 다섯 안인가
@@ -924,9 +924,9 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   적어 두었는데 **skill-notes 를 실제로 읽는 스킬은 051 하나**였다.
 //   G5 에 쓰는 배선만 있고 **읽는 배선이 없었다** — 사용자가 「계속 이렇게」라고 해서
 //   파일을 만들어도 다음번에 아무도 안 읽는다. 쓰기만 있는 저장소는 죽은 저장소다.
-//   ⚠️ 100개 SKILL.md 를 고치는 게 아니라 **런타임(AI-마케터)이 번호를 붙든 직후 읽는다.**
+//   ⚠️ 100개 SKILL.md 를 고치는 게 아니라 **런타임(ai-마케터)이 번호를 붙든 직후 읽는다.**
 {
-  const R = fs.readFileSync(path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'utf8');
+  const R = fs.readFileSync(path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'utf8');
   const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
   const 빠짐 = [];
 
@@ -1108,7 +1108,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 {
   for (const [f, name, 표식] of [
     [path.join(ROOT, 'docs', '공통규약.md'), '공통규약 §0-c', '그냥 클로드'],
-    [path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'AI-마케터', 'D2'],
+    [path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'ai-마케터', 'D2'],
   ]) if (fs.existsSync(f) && !fs.readFileSync(f, 'utf8').includes(표식))
     err(`${name} 에 D1~D5 가 없다 — 정체성 규칙이 빠지면 그냥 클로드와 같아진다`);
 
@@ -1183,7 +1183,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   else {
     const 읽는곳 = [
       [path.join(ROOT, 'docs', '공통규약.md'), '공통규약 §0-b'],
-      [path.join(ROOT, 'skills', 'AI-마케터', 'SKILL.md'), 'AI-마케터 §0'],
+      [path.join(ROOT, 'skills', 'ai-마케터', 'SKILL.md'), 'ai-마케터 §0'],
       [path.join(ROOT, '100-skills', 'SPEC.md'), '100-skills/SPEC.md (requires 폴백)'],
     ];
     let miss = 0;
@@ -1572,7 +1572,7 @@ for (const link of ['agents', 'skills']) {
   const rfm = read('100-skills', '07-analytics', 'skills', '065-rfm-segments', 'SKILL.md');
   const reviewer = read('agents', 'staff-reviewer.md');
   const common = read('docs', '공통규약.md');
-  const marketer = read('skills', 'AI-마케터', 'SKILL.md');
+  const marketer = read('skills', 'ai-마케터', 'SKILL.md');
   const samples = read('sample-data', 'README.md');
   const liveGuide = read('docs', '클로드코드-실기검증.md');
   const missing = [];
