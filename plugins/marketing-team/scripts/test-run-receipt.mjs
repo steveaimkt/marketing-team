@@ -232,6 +232,54 @@ try {
   const piiSealed = JSON.parse(fs.readFileSync(path.join(temp, piiReceipt), 'utf8'));
   assert.equal(piiSealed.pii.source, 'plugin:sample-data/A브랜드-리뷰-200건.csv', 'start가 pii 블록을 버렸습니다.');
 
+  // ── 초안/최종 두 단계 · 2026-09-09 ──────────────────────────────
+  //    「내용을 먼저 보고 형식을 고른다」 계약. 초안은 .md 만, 최종은 형식 + 초안.
+  const 초안본 = ['workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md',
+                  'workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md'];
+  const 초안영수증 = 'outputs/2026-08-30/006-review-mining/run-11.json';
+  fs.writeFileSync(path.join(temp, 초안영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '초안', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  result = run('start', 초안영수증);
+  assert.equal(result.status, 0, `초안 단계는 .md 만으로 시작돼야 한다: ${result.stderr}`);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(temp, 초안영수증), 'utf8')).단계, '초안');
+
+  // 초안 단계에 최종 형식(.xlsx)을 끼워 넣으면 막는다
+  const 섞은영수증 = 'outputs/2026-08-30/006-review-mining/run-12.json';
+  fs.writeFileSync(path.join(temp, 섞은영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '초안',
+    outputs: [...초안본, 'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.xlsx'],
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 섞은영수증).status, 0, '초안 단계에 최종 형식을 허용했습니다.');
+
+  // 최종 단계 — 형식 전부 + 초안이 함께 있어도 통과한다
+  const 최종영수증 = 'outputs/2026-08-30/006-review-mining/run-13.json';
+  fs.writeFileSync(path.join(temp, 최종영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '최종',
+    outputs: [...piiOutputs, 'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md'],
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  result = run('start', 최종영수증);
+  assert.equal(result.status, 0, `최종 단계는 초안을 함께 둬도 통과해야 한다: ${result.stderr}`);
+
+  // 최종 단계에서 형식이 빠지면 여전히 막는다
+  const 빠진영수증 = 'outputs/2026-08-30/006-review-mining/run-14.json';
+  fs.writeFileSync(path.join(temp, 빠진영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '최종', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 빠진영수증).status, 0, '최종 단계에서 형식 누락을 허용했습니다.');
+
+  // 모르는 단계는 막는다
+  const 이상영수증 = 'outputs/2026-08-30/006-review-mining/run-15.json';
+  fs.writeFileSync(path.join(temp, 이상영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '중간', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 이상영수증).status, 0, '모르는 단계를 허용했습니다.');
+
   const multiDir = path.join(temp, 'outputs', '2026-08-30', '050-utm-attribution');
   fs.mkdirSync(multiDir, { recursive: true });
   const multiA = 'outputs/2026-08-30/050-utm-attribution/050-utm-attribution.csv';

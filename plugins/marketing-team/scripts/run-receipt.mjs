@@ -292,11 +292,24 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function validateExecutionContract(file, skillRows, outputRows, formatChoice) {
+// 초안 이름 · 정본 파일명의 확장자만 .md 로 바꾼 것
+//   왜: 2026-09-09 · 「내용을 먼저 보고 형식을 고른다」로 계약이 바뀌었다.
+//       모든 실행은 .md 초안을 먼저 낸다. 최종 형식은 사용자가 고른 뒤에 굽는다.
+//       초안은 최종과 같은 폴더에 함께 남는다 — 형식만 다시 구우면 되게 하려는 것이다.
+export function 초안이름(정본) {
+  return path.posix.basename(정본).replace(/\.[^.]+$/, '.md');
+}
+
+function validateExecutionContract(file, skillRows, outputRows, formatChoice, 단계) {
   const ids = skillRows.map(item => item.id);
   const expected = skillRows.flatMap(item => item.writes_to || []).map(value => path.posix.basename(value));
   if (!expected.length) throw new Error(`스킬 ${ids.join('→')}의 writes_to 파일 계약을 찾지 못했습니다.`);
-  const uniqueExpected = applyFormatChoice([...new Set(expected)], formatChoice);
+  const 최종 = applyFormatChoice([...new Set(expected)], formatChoice);
+  const 초안 = [...new Set(최종.map(초안이름))];
+  // 초안 단계 — .md 초안만 낸다. 최종 형식은 아직 없어도 된다
+  // 최종 단계 — 최종 형식이 다 있어야 하고, 초안은 함께 있어도 된다
+  const uniqueExpected = 단계 === '초안' ? 초안 : 최종;
+  const 덤 = 단계 === '초안' ? [] : 초안;
   const actual = outputRows.map(item => path.posix.basename(item.path.replace(/^workspace:/, '')));
   const uniqueActual = new Set(actual);
   // 재실행 산출물 1:1 계약 (P1 · 2026-08-30 최종 검토 · plan-compiler 와 같은 규칙) —
@@ -312,6 +325,8 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice) {
   const extra = [];
   for (const out of uniqueActual) {
     const canon = canonOf(out);
+    // 최종 단계에서 초안 .md 가 함께 있는 것은 계약대로다 (2026-09-09)
+    if (canon === null && 덤.includes(parseOut(out).canon)) continue;
     if (canon === null) { extra.push(out); continue; }
     matchCount.set(canon, matchCount.get(canon) + 1);
     ords.add(out === canon ? '1' : parseOut(out).ord);
@@ -401,7 +416,10 @@ async function start(file) {
       return { path: ref, sha256: null };
     });
     const formatChoice = normalizeFormatChoice(draft.형식, 'run.json 의');
-    validateExecutionContract(file, skillRows, outputRows, formatChoice);
+    const 단계 = String(draft.단계 || '최종').trim();
+    if (!['초안', '최종'].includes(단계))
+      throw new Error(`단계는 「초안」 또는 「최종」 입니다: ${단계}`);
+    validateExecutionContract(file, skillRows, outputRows, formatChoice, 단계);
     const outputRefs = new Set(outputRows.map(item => item.path));
     const manualRequired = (draft.required_reviews || []).map(value => normalizeRequired(value, outputRefs));
     const automaticRequired = requiredReviewsForExecution(skillRows, outputRows);
@@ -421,6 +439,7 @@ async function start(file) {
       request: String(draft.request).trim(),
       skills: skillRows,
       data_mode: draft.data_mode,
+      단계,
       ...(formatChoice ? { 형식: formatChoice } : {}),
       inputs: inputRows,
       profile,
