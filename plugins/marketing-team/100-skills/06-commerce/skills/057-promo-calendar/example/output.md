@@ -1,6 +1,6 @@
 # 실습 결과 예시 · 057 프로모션 일정 기획
 
-> 이 문서는 `057-promo-calendar-해설.md` 예시다. 실제 CSV에는 프로모션·상품별 일정 데이터 행만 들어간다.
+> 이 문서는 `057-promo-calendar.md`(해설) 예시다. 같은 데이터의 프로모션·상품별 표는 `057-promo-calendar.xlsx` 로, 화면용은 `057-promo-calendar.html` 로 함께 나간다.
 
 ---
 

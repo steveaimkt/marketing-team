@@ -7,11 +7,5 @@
 ## 상황
 - 1인 마케터 · 스킨케어 자사몰 + 스마트스토어
 - `brand/profile.md` 작성됨 (화장품 · 마진율 30%)
-- `brand/my-playbook.md` 없음 → 약식 3문답으로 수집
-
-## 약식 3문답 답변
-| 질문 | 답 |
-|---|---|
-| 주간 반복 업무 | 블로그 1편 · 인스타 3회 · 광고 성과 확인 주 1회 |
-| 병목 하나 | 콘텐츠 만드는 데 시간이 다 간다. 광고는 볼 시간이 없다 |
-| 팀 규모 | 혼자 |
+- `brand/my-playbook.md` 없음 · `logs/build-log.md` 도 비어 있음
+  → **묻지 않고** `sample_fallback`(`sample-data/build-log-sample.md`)의 실행 기록으로 완주

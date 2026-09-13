@@ -36,8 +36,8 @@
 | 2026-09-23 14:12 | ROAS 진단(046) | 이 캠페인 끌까 유지할까 | 추정 | outputs/2026-09-23/046-roas-budget-rebalance/046-roas-budget-rebalance.md | 해당없음 | 0 | 완료 |
 | 2026-09-23 14:25 | ROAS 진단(046) | 이 캠페인 끌까 유지할까 | 샘플 | outputs/2026-09-23/046-roas-budget-rebalance/046-roas-budget-rebalance.md | 해당없음 | 0 | 완료 |
 | 2026-09-23 14:38 | 경쟁사 분석(002) | 신제품 런칭 준비해줘 | 샘플 | outputs/2026-09-23/002-competitor-analysis/002-competitor-analysis.md | 해당없음 | 0 | 완료 |
-| 2026-09-23 14:51 | 소비자 리뷰 분석(006) | 신제품 런칭 준비해줘 | 샘플 | outputs/2026-09-23/006-review-mining/006-review-mining.csv | 해당없음 | 1 | 완료 |
-| 2026-09-23 15:04 | 가치 제안 정리(012) | 신제품 런칭 준비해줘 | 추정 | outputs/2026-09-23/012-value-proposition/012-value-proposition.md | 해당없음 | 0 | 완료 |
+| 2026-09-23 14:51 | 소비자 리뷰 분석(006) | 신제품 런칭 준비해줘 | 샘플 | outputs/2026-09-23/006-review-mining/006-review-mining.xlsx | 해당없음 | 1 | 완료 |
+| 2026-09-23 15:04 | 제품 차별점 정리(012) | 신제품 런칭 준비해줘 | 추정 | outputs/2026-09-23/012-value-proposition/012-value-proposition.md | 해당없음 | 0 | 완료 |
 | 2026-09-23 15:17 | 블로그 글 작성(022) | 신제품 런칭 준비해줘 | 샘플 | outputs/2026-09-23/022-blog-seo-article/022-blog-seo-article.md | ✅ | 0 | 완료 |
 | 2026-09-23 15:30 | 인스타그램 피드 기획(031) | 신제품 런칭 준비해줘 | 샘플 | outputs/2026-09-23/031-instagram-feed-planning/031-instagram-feed-planning.md | ✅ | 0 | 완료 |
 | 2026-09-23 15:43 | 보도자료 작성(083) | 신제품 런칭 준비해줘 | 추정 | outputs/2026-09-23/083-press-release/083-press-release.md | ✅ | 0 | 완료 |

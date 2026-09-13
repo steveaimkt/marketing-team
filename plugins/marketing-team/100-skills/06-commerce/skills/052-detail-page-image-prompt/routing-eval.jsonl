@@ -1,6 +1,6 @@
-{"intent": "상세페이지 이미지 프롬프트 만들어줘", "expected_skill": "052"}
+{"intent": "이미지 생성용 프롬프트 좀 작성해줘", "expected_skill": "052"}
 {"intent": "이 기획서에 들어갈 이미지 뭐 찍어야 해?", "expected_skill": "052"}
 {"intent": "촬영 목록 좀 뽑아줘", "expected_skill": "052"}
-{"intent": "어디를 찍고 어디를 만들지 갈라줘", "expected_skill": "052"}
-{"intent": "상세페이지 이미지 자리 정리해줘", "expected_skill": "052", "ambiguous_with": ["051"]}
+{"intent": "어디를 찍고 어디를 만들지 나눠줘", "expected_skill": "052"}
+{"intent": "상세페이지에 이미지 들어갈 자리들 정리해줘", "expected_skill": "052", "ambiguous_with": ["051"]}
 {"intent": "카피는 다 나왔고 이제 이미지만 채우면 돼", "expected_skill": "052", "ambiguous_with": ["051"]}

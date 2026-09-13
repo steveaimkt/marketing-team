@@ -434,7 +434,7 @@ try {
       schema: 'marketing-team.plan/v1', plan_id: 'chain', request: '061 → 073 → 065 → 066 조합',
       requested_order: ['061', '073', '065', '066'], skills: ['061', '073', '065', '066'],
       steps: [
-        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html')], reviews: [] },
+        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html'), ref('061-sales-data-analysis.md')], reviews: [] },
         { step: 2, skill: '073', inputs: [ref('061-sales-data-analysis.xlsx')], outputs: [ref('073-customer-journey-map.xlsx'), ref('073-customer-journey-map.html'), ref('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
         { step: 3, skill: '065', inputs: ['plugin:sample-data/A브랜드-고객마스터.csv'], outputs: [ref('065-rfm-segments.csv'), ref('065-rfm-segments-해설.md')], reviews: [] },
         { step: 4, skill: '066', inputs: [ref('073-customer-journey-map.md'), ref('065-rfm-segments-해설.md')], outputs: [ref('066-kpi-tree.md')], reviews: [] },
@@ -462,7 +462,7 @@ try {
     { const r = run('start', rj); assert.equal(r.status, 0, `단계 있는 실행이 시작돼야 한다: ${r.stderr}${r.stdout}`); }
 
     const make = {
-      1: () => { for (const e of ['xlsx', 'html']) fs.writeFileSync(path.join(dir, `061-sales-data-analysis.${e}`), '061\n'); },
+      1: () => { for (const e of ['xlsx', 'html', 'md']) fs.writeFileSync(path.join(dir, `061-sales-data-analysis.${e}`), '061\n'); },
       2: () => { for (const e of ['xlsx', 'html', 'md']) fs.writeFileSync(path.join(dir, `073-customer-journey-map.${e}`), '073\n'); },
       3: () => { fs.writeFileSync(path.join(dir, '065-rfm-segments.csv'), '\ufeff대체키,세그먼트\nabc,챔피언\n'); fs.writeFileSync(path.join(dir, '065-rfm-segments-해설.md'), '065\n'); },
       4: () => fs.writeFileSync(path.join(dir, '066-kpi-tree.md'), '066\n'),
