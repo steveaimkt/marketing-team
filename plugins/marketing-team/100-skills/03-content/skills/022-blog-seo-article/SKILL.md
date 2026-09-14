@@ -71,6 +71,12 @@ success_metrics: [본문 작성 시간, 검색 노출 클릭률(CTR), 키워드 
 > · 넘길 문서 → `outputs/{날짜}/022-blog-seo-article/022-blog-seo-article.docx`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+>
+> 🔴 **`.docx` 는 우리가 직접 굽지 않는다.** 원고(.md)는 여기서 만들고, **파일로 굽는 일만
+> 앤트로픽 공식 `document-skills` 의 docx 스킬**에 넘긴다. 안 깔려 있으면 **`.docx` 는 만들지
+> 않고 그렇게 말한다** — `.md` 원고는 이미 있으므로 대체 파일을 새로 만들지 않는다. 설치 명령은
+> `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills`
+> 이다. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

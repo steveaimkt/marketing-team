@@ -157,6 +157,10 @@ function skills() {
   const walk = dir => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const target = path.join(dir, entry.name);
+      // _보류/ 는 등록되지 않은 스킬을 보관하는 폴더다. 배제하지 않으면
+      // 같은 id를 쓰는 보류 스킬이 등록 스킬 계약을 조용히 덮어쓴다
+      // (실측 2026-09-13 · 8장 052 ID 충돌).
+      if (entry.isDirectory() && entry.name === '_보류') continue;
       if (entry.isDirectory()) walk(target);
       else if (entry.name === 'SKILL.md') {
         const text = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
@@ -323,11 +327,13 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
   const matchCount = new Map(uniqueExpected.map(name => [name, 0]));
   const ords = new Set();
   const extra = [];
+  const canonOfActual = new Map(); // 파일명 → 정본 파일명, 아래 체인 폴더 검사가 재사용한다
   for (const out of uniqueActual) {
     const canon = canonOf(out);
     // 최종 단계에서 초안 .md 가 함께 있는 것은 계약대로다 (2026-09-09)
-    if (canon === null && 덤.includes(parseOut(out).canon)) continue;
+    if (canon === null && 덤.includes(parseOut(out).canon)) { canonOfActual.set(out, parseOut(out).canon); continue; }
     if (canon === null) { extra.push(out); continue; }
+    canonOfActual.set(out, canon);
     matchCount.set(canon, matchCount.get(canon) + 1);
     ords.add(out === canon ? '1' : parseOut(out).ord);
   }
@@ -341,14 +347,49 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
 
   const receiptDir = path.dirname(file);
   const receiptRel = posix(path.relative(WORK, receiptDir));
-  const mainTemplate = skillRows.at(-1).writes_to?.[0];
-  const mainFolder = mainTemplate?.split('/')[2];
-  if (!mainFolder || !new RegExp(`^outputs/\\d{4}-\\d{2}-\\d{2}/${escapeRegex(mainFolder)}$`).test(receiptRel))
-    throw new Error(`run.json은 주 스킬 폴더 outputs/{날짜}/${mainFolder || '{번호}-{슬러그}'}/에 두세요: ${receiptRel}`);
-  for (const item of outputRows) {
-    const { abs } = resolveRef(item.path, { workspaceOnly: true });
-    if (path.dirname(abs) !== receiptDir)
-      throw new Error(`조합 산출물은 run.json과 같은 주 스킬 폴더에 모아야 합니다: ${item.path}`);
+
+  // 이름 있는 체인은 스킬마다 자기 폴더를 쓰고, run.json 이 있는 프로젝트 폴더 아래 나란히
+  // 둔다 — 마지막 스킬 폴더 하나로 몰지 않는다 (ai-마케터 SKILL.md 「착지」 §G3과 같은 규칙).
+  // 실측 2026-09-14·09-15 · 8장 015→053→051→052, 10장 045→046→043 이 전부 마지막 스킬
+  // 폴더로 몰려 저장됐다 — 문서만 고치고 이 코드를 그대로 두면 다시 같은 일이 난다.
+  let chainName = null;
+  const planFile = path.join(receiptDir, 'plan.json');
+  if (fs.existsSync(planFile)) {
+    try { chainName = JSON.parse(fs.readFileSync(planFile, 'utf8')).chain || null; } catch { /* plan.json 이 아직 없거나 못 읽으면 옛 규칙대로 간다 */ }
+  }
+
+  if (chainName && skillRows.length > 1) {
+    if (!/^outputs\/\d{4}-\d{2}(-\d{2})?-.+$/.test(receiptRel))
+      throw new Error(`이름 있는 체인(${chainName})의 run.json은 프로젝트 폴더 outputs/{YYYY-MM}-{프로젝트명}/ 에 두세요: ${receiptRel}`);
+    const folderOf = row => row.writes_to?.[0]?.split('/')[2] || null;
+    const skillOfCanon = new Map();
+    for (const row of skillRows) {
+      const folder = folderOf(row);
+      if (!folder) continue;
+      const names = applyFormatChoice([...new Set((row.writes_to || []).map(v => path.posix.basename(v)))], formatChoice);
+      for (const name of [...names, ...names.map(초안이름)]) if (!skillOfCanon.has(name)) skillOfCanon.set(name, { id: row.id, folder });
+    }
+    for (const item of outputRows) {
+      const base = path.posix.basename(item.path.replace(/^workspace:/, ''));
+      const canon = canonOfActual.get(base);
+      const owner = canon ? skillOfCanon.get(canon) : null;
+      const { abs } = resolveRef(item.path, { workspaceOnly: true });
+      const parent = path.dirname(abs);
+      if (!owner || path.basename(parent) !== owner.folder)
+        throw new Error(`${owner ? `${owner.id}의 ` : ''}산출물은 자기 폴더 ${owner ? `${owner.folder}/` : ''} 에 저장해야 합니다 — 다른 스킬 폴더에 모으지 않습니다: ${item.path}`);
+      if (path.dirname(parent) !== receiptDir)
+        throw new Error(`${owner.id}의 폴더 ${owner.folder}/ 는 run.json과 같은 프로젝트 폴더 아래에 있어야 합니다: ${item.path}`);
+    }
+  } else {
+    const mainTemplate = skillRows.at(-1).writes_to?.[0];
+    const mainFolder = mainTemplate?.split('/')[2];
+    if (!mainFolder || !new RegExp(`^outputs/\\d{4}-\\d{2}-\\d{2}/${escapeRegex(mainFolder)}$`).test(receiptRel))
+      throw new Error(`run.json은 주 스킬 폴더 outputs/{날짜}/${mainFolder || '{번호}-{슬러그}'}/에 두세요: ${receiptRel}`);
+    for (const item of outputRows) {
+      const { abs } = resolveRef(item.path, { workspaceOnly: true });
+      if (path.dirname(abs) !== receiptDir)
+        throw new Error(`조합 산출물은 run.json과 같은 주 스킬 폴더에 모아야 합니다: ${item.path}`);
+    }
   }
 }
 
@@ -532,7 +573,10 @@ async function inspect(run, finalStatus = run.status) {
     else if (item.sha256 && now !== item.sha256) issues.push(`완료 뒤 산출물이 바뀌었습니다: ${item.path}`);
   }
 
-  if (run.pii || (Array.isArray(run.checks) && run.checks.length)) {
+  // runChecks 자체가 이제 pii·csv 출력 여부로 무엇을 돌릴지 정한다 (output-checks.mjs) —
+  // checks 를 안 적은 스킬도 .csv 를 냈으면 BOM 검사가 돈다 (실측 2026-09-13 · 020, BOM 누락이
+  // 그대로 새 나간 원인이 「스킬이 스스로 checks 에 적어야만 돈다」였다).
+  {
     try {
       for (const line of await runChecks(run, ref => resolveRef(ref).abs)) {
         // 「⚠ 참고」는 pii-check 의 안내문(예: 3자 미만 식별자 오탐 제외)이다 — 변경 사항으로 승격하면

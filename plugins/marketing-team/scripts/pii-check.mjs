@@ -89,6 +89,17 @@ function derivations(ids) {
   return out;
 }
 
+/** 값 집합이 1..N 을 빈틈없이 채우는 정수 순번인가 (행 위치 열 감지). */
+function isRowIndexColumn(values) {
+  const list = [...values];
+  if (list.length < 5) return false; // 표본이 작으면 우연의 일치와 구분 못 한다
+  const nums = list.map(v => Number(v));
+  if (nums.some(n => !Number.isInteger(n) || n <= 0)) return false;
+  const sorted = [...new Set(nums)].sort((a, b) => a - b);
+  if (sorted.length !== nums.length) return false; // 중복이 있으면 순번이 아니라 식별자일 수 있다
+  return sorted[0] === 1 && sorted.every((n, i) => n === i + 1);
+}
+
 /**
  * @param {object} run  run.json 내용
  * @param {(ref:string)=>string} resolve  `workspace:` · `plugin:` 참조를 절대 경로로
@@ -109,6 +120,19 @@ export async function scanPii(run, resolve) {
 
   const { values: ids, missing } = columnValues(sourceAbs, columns);
   for (const name of missing) issues.push(`원본에 식별자 열이 없습니다: ${name} (${spec.source})`);
+
+  // 1부터 빈틈없이 이어지는 순번을 식별자로 쓰면 안 된다 — 행 위치일 뿐 사람을 가리키지
+  // 않는데, 결과 문서에 우연히 나오는 아무 숫자에나 걸려 실행마다 다른 오탐을 낸다
+  // (실측 2026-09-13 · 4장 006 — `id_columns: ['번호']`로 매 실행이 "저장실패"가 됐다).
+  if (isRowIndexColumn(ids)) {
+    issues.push(
+      `id_columns(${columns.join(' · ')})가 1부터 ${ids.size}까지 빈틈없는 순번으로 보입니다 — ` +
+      '행 번호는 사람을 가리키지 않는데 결과 문서의 아무 숫자에나 우연히 걸립니다. ' +
+      '진짜 식별자 열(이름·고객ID·연락처 등)을 지정하거나, 그런 열이 원본에 없으면 이 스킬엔 ' +
+      'id_columns를 적지 않아도 되는지 SKILL.md 를 다시 확인하세요.',
+    );
+    return issues;
+  }
   const usable = [...ids].filter(id => id.length >= MIN_ID_LENGTH);
   const tooShort = ids.size - usable.length;
   if (!usable.length) {

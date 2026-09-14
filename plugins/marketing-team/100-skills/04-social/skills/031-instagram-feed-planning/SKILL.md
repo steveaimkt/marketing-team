@@ -12,7 +12,7 @@ triggers:
   - "인스타 캡션이랑 해시태그 한 달치 만들어줘"
   - "프로필 들어왔을 때 예쁘게 보이게 피드 설계해줘"
 inputs: [브랜드 무드·제품 사진 자산 현황, 월 발행 수(기본 30), 계정 목적(팔로워/판매/커뮤니티), 참고 레퍼런스 이미지(필수), brand-templates/디자인시스템/인스타-피드-레퍼런스.md]
-sample_fallback: sample-data/A브랜드-인스타-인사이트-30편.csv   # `inputs/` 를 먼저 보고, 없으면 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-인스타-인사이트-30편.csv   # `inputs/` 를 먼저 보고, 없으면 이 파일로 완주한다 (산출물에 [샘플]) · 실제 데이터는 인스타 프로페셔널 대시보드 → 인사이트 → 내보내기 (docs/데이터-가져오기.md 참고)
 outputs: [30일 발행 플랜 표(일자·요일·유형·주제·캡션·해시태그·이미지 프롬프트), 그리드 무드보드(팔레트·배치 패턴), 콘텐츠 유형 배합표, 규제 검사 결과 블록, 저장 파일(.xlsx + .md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["040"]
@@ -104,6 +104,11 @@ success_metrics: [프로필 방문 대비 팔로우 전환율, 게시물 저장�
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+>
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽
+> 공식 `document-skills` 의 xlsx 스킬**에 넘긴다. 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다.**
+> 설치 명령은 `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills`
+> 이다. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

@@ -16,6 +16,8 @@ outputs: [캠페인 구조 설계안, 타깃팅·전환 추적 체크리스트, 
 requires: [brand/profile.md]
 chains_to: ["045"]
 gate: false
+review: 재무   # 2026-09-15 · 실측(4장 044)에서 월 예산 배분안을 재무 리스크로 보고 AI 사업검토자를
+               # 자체 호출했다 — 판단이 아니라 플래그로 정한다(docs/공통규약.md) 는 규칙대로 명시했다
 mutating: false
 writes_to: [outputs/{날짜}/044-google-ads-setup/044-google-ads-setup.md]
 builder: 사용자 (이 회사)

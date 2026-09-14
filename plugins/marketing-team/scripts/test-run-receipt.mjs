@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { planHash } from './plan-compiler.mjs';
 
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'run-receipt.mjs');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-run-receipt-'));
@@ -486,7 +487,79 @@ try {
     assert.equal(after.steps.find(x => x.step === 4).status, 'pending');
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · ✅');
+  // 이름 있는 체인 · 스킬마다 자기 폴더, run.json 이 있는 프로젝트 폴더 아래 나란히 둔다
+  // 실측 2026-09-14·09-15 · 8장 015→053→051→052, 10장 045→046→043 이 전부 마지막 스킬
+  // 폴더로 몰려 저장됐다 — plan.json 의 chain 이 있으면 각자 자기 폴더를 강제해야 한다.
+  {
+    const proj = 'outputs/2026-09-테스트체인';
+
+    // 옛 버릇 · 전부 마지막 스킬(073) 폴더로 몰면 이름 있는 체인에서는 막혀야 한다
+    {
+      const dir = path.join(temp, proj, '073-customer-journey-map');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'plan.json'), `${JSON.stringify({ chain: '테스트체인' }, null, 2)}\n`);
+      const rj = `${proj}/073-customer-journey-map/run.json`;
+      const ref = name => `workspace:${proj}/073-customer-journey-map/${name}`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
+        skills: ['061', '073'], data_mode: '샘플',
+        inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
+        profile: 'plugin:sample-data/profile-sample.md',
+        outputs: [
+          ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html'), ref('061-sales-data-analysis.md'),
+          ref('073-customer-journey-map.xlsx'), ref('073-customer-journey-map.html'), ref('073-customer-journey-map.md'),
+        ],
+        required_reviews: [{ kind: 'business', perspective: '경영', artifact: ref('073-customer-journey-map.md') }],
+        reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+      }, null, 2)}\n`);
+      const r = run('start', rj);
+      assert.notEqual(r.status, 0, '이름 있는 체인에서 마지막 스킬 폴더로 산출물을 몰아도 통과시켰습니다.');
+      assert.match(`${r.stdout}\n${r.stderr}`, /자기 폴더/, '옛 방식(주 스킬 폴더 통합)을 이름 있는 체인 오류로 안 잡았습니다.');
+      fs.rmSync(path.join(temp, proj), { recursive: true, force: true });
+    }
+
+    // 고친 방식 · 스킬마다 자기 폴더, 프로젝트 폴더 아래 나란히
+    {
+      const dir1 = path.join(temp, proj, '061-sales-data-analysis');
+      const dir2 = path.join(temp, proj, '073-customer-journey-map');
+      fs.mkdirSync(dir1, { recursive: true });
+      fs.mkdirSync(dir2, { recursive: true });
+      const ref1 = name => `workspace:${proj}/061-sales-data-analysis/${name}`;
+      const ref2 = name => `workspace:${proj}/073-customer-journey-map/${name}`;
+      const plan = {
+        schema: 'marketing-team.plan/v1', plan_id: 'chain-named', request: '061 → 073 조합(이름 있는 체인)',
+        chain: '테스트체인', requested_order: ['061', '073'], skills: ['061', '073'],
+        risks: [],
+        steps: [
+          { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref1('061-sales-data-analysis.xlsx'), ref1('061-sales-data-analysis.html'), ref1('061-sales-data-analysis.md')], reviews: [] },
+          { step: 2, skill: '073', inputs: [ref1('061-sales-data-analysis.xlsx')], outputs: [ref2('073-customer-journey-map.xlsx'), ref2('073-customer-journey-map.html'), ref2('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
+        ],
+        budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+      };
+      // plan-compiler.mjs CLI(compile·approve)는 chain 이름을 정본 목록(CHAINS.md 등)과
+      // 대조한다 — 테스트용 가짜 이름은 그 검사에 걸리므로, run-receipt.mjs 가 실제로 보는
+      // 것(승인 해시)만 직접 봉인한다. run-receipt.mjs 의 validateApprovedPlan 은
+      // approvalState() 만 보지 validatePlan() 의 체인 정본 검사는 보지 않는다.
+      const sealed = planHash(plan);
+      fs.writeFileSync(path.join(temp, proj, 'plan.json'),
+        `${JSON.stringify({ ...plan, plan_sha256: sealed, status: 'approved', approved_sha256: sealed }, null, 2)}\n`);
+
+      const rj = `${proj}/run.json`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
+        skills: ['061', '073'], data_mode: '샘플',
+        inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
+        profile: 'plugin:sample-data/profile-sample.md',
+        outputs: plan.steps.flatMap(x => x.outputs),
+        required_reviews: [{ kind: 'business', perspective: '경영', artifact: ref2('073-customer-journey-map.md') }],
+        reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+      }, null, 2)}\n`);
+      const r = run('start', rj);
+      assert.equal(r.status, 0, `스킬마다 자기 폴더에 둔 이름 있는 체인은 통과해야 합니다: ${r.stderr}${r.stdout}`);
+    }
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
