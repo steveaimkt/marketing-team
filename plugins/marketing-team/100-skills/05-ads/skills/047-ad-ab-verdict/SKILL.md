@@ -15,7 +15,7 @@ inputs: [소재별 노출·클릭·전환·광고비, 결론 지표(019 설계�
 sample_fallback: sample-data/A브랜드-ab테스트-3건.csv   # `inputs/` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
 outputs: [3결론(확정승·박빙·표본부족), 승리 패턴 1줄, 다음 변형 제안 3개, 저장 파일(.md)]
 requires: [brand/profile.md]
-chains_to: ["043"]
+chains_to: ["043", "019"]
 gate: false
 mutating: false
 writes_to: [outputs/{날짜}/047-ad-ab-verdict/047-ad-ab-verdict.md]

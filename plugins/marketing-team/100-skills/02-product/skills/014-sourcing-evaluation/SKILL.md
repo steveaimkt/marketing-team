@@ -15,6 +15,7 @@ outputs: [실마진 계산서, 마진·수요·경쟁 스코어카드(100점), G
 requires: [brand/profile.md]
 chains_to: ["017", "010"]
 gate: false
+review: 재무·경영   # 2026-09-15 · GO/NO-GO 가 초도 발주 자금 집행으로 바로 이어진다 · 같은 실마진 판단을 쓰는 016·017 자매 스킬과 review 기준을 맞춘다
 mutating: false
 writes_to: [outputs/{날짜}/014-sourcing-evaluation/014-sourcing-evaluation.md]
 builder: 사용자 (이 회사)

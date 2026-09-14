@@ -102,6 +102,13 @@ success_metrics: [썸네일 CTR, 제목 후보 산출 개수(10안), 후보 제�
 > ⛔ **착지 · 여기로 쓴다**: `outputs/{날짜}/025-youtube-thumbnail-title/025-youtube-thumbnail-title.docx`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+>
+> 🔴 **`.docx` 는 우리가 직접 굽지 않는다.** 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식
+> `document-skills` 의 docx 스킬**에 넘긴다. 안 깔려 있으면 **`.md` 로 내고 그렇게 말한다** — 이
+> 스킬은 `.md` 를 따로 안 만들므로, 안 깔려 있을 땐 `025-youtube-thumbnail-title.docx` 대신
+> `025-youtube-thumbnail-title.md` 로 같은 내용을 낸다. 설치 명령은 `/plugin marketplace add
+> anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다.
+> ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

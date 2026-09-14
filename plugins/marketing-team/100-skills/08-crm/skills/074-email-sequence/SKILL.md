@@ -14,7 +14,7 @@ triggers:
 inputs: [시나리오 유형(웰컴/장바구니/재구매), 고객 세그먼트(065 산출물 권장), 오퍼]
 outputs: [시퀀스 설계도(트리거·시점·중단 조건), 단계별 이메일 카피, 규제 검사 결과 블록, 발송 로그·아카이브, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
-chains_to: ["075"]
+chains_to: ["077"]
 gate: true
 mutating: true
 writes_to: [outputs/{날짜}/074-email-sequence/074-email-sequence.md, email, notion]

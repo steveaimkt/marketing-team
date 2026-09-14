@@ -15,7 +15,7 @@ inputs: [로고·컬러·폰트 자산(파일·컬러코드), 보이스 톤 자�
 sample_fallback: sample-data/A브랜드-브랜드자산.md   # 8장 · 새 자료 · 로고·컬러·톤 자산 · 실습마다 다른 자료를 쓴다 (2026-09-08)
 outputs: [브랜드 가이드라인 원페이지, 허용/금지 사용 기준 체크리스트, brand/tone 전체 수정안, 저장 파일(.docx)]
 requires: [brand/profile.md]
-chains_to: ["008", "015"]
+chains_to: ["081"]
 gate: false
 review: 브랜드
 mutating: false
@@ -72,6 +72,13 @@ success_metrics: [가이드 문서화 소요 시간, 외주 리젝 왕복 횟수
 > ⛔ **착지 · 여기로 쓴다**: `outputs/{날짜}/082-brand-guidelines-doc/082-brand-guidelines-doc.docx`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
+>
+> 🔴 **`.docx` 는 우리가 직접 굽지 않는다.** 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식
+> `document-skills` 의 docx 스킬**에 넘긴다. 안 깔려 있으면 **`.md` 로 내고 그렇게 말한다** — 이
+> 스킬은 `.md` 를 따로 안 만들므로, 안 깔려 있을 땐 `082-brand-guidelines-doc.docx` 대신
+> `082-brand-guidelines-doc.md` 로 같은 내용을 낸다. 설치 명령은 `/plugin marketplace add
+> anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다.
+> ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

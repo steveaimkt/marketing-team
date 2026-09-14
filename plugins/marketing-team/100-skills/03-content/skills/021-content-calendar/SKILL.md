@@ -82,7 +82,7 @@ success_metrics: [캘린더 작성 시간, 발행 이행률, 퍼널 3단계 배�
 {YYYY-MM-DD},{채널},{포맷},{제목},{TOFU|MOFU|BOFU},{근거},{스킬번호},{계획|제작중|완료}
 ```
 설명·결론·다음 액션은 같은 폴더의 `021-content-calendar-해설.md` 에 아래 형식으로 쓴다.
-두 파일을 쓴 뒤 화면에는 **주요 표 하나 · 경로 · 결론 3줄 · 부족한 것**을 낸다 (표 말고는 15줄 이내).
+세 파일을 쓴 뒤 화면에는 **주요 표 하나 · 경로 · 결론 3줄 · 부족한 것**을 낸다 (표 말고는 15줄 이내).
 ```markdown
 # 🗓 {YYYY-MM} 콘텐츠 캘린더 · {브랜드}
 **국면**: {모집기/판매기/브랜딩기} · **캐파**: 월 {25}건 · **믹스**: IG 7 · Blog 4 · LinkedIn 4 · Threads 8 · NL 2
@@ -108,7 +108,7 @@ IG {7} + Blog {4} + LinkedIn {4} + Threads {8} + NL {2} = {25} ✅ (캐파 일�
 ## 다음 액션
 → 022 블로그 글 작성 (키워드 근거가 붙은 자리부터 집필) · 027 콘텐츠 채널별 재작성 (앵커 콘텐츠 확산) · 031 인스타 피드 기획 (캘린더의 인스타 자리를 그리드·캡션까지 구체화)
 
-저장 파일: outputs/{날짜}/021-content-calendar/021-content-calendar.csv · 021-content-calendar-해설.md
+저장 파일: outputs/{날짜}/021-content-calendar/021-content-calendar.xlsx · 021-content-calendar.html · 021-content-calendar-해설.md
 ```
 
 ## Anti-Patterns

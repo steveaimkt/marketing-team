@@ -16,6 +16,7 @@ outputs: [월간 통합 보고서(HTML), 경영진용 요약 1페이지(결론 3
 requires: [brand/profile.md]
 chains_to: ["066", "095"]
 gate: false
+review: 재무   # 2026-09-15 · 경영진 요약의 의사결정 요청(예산 이동·중단/확대 승인)이 자금 집행으로 바로 이어진다
 mutating: true
 writes_to: [outputs/{날짜}/067-monthly-report/067-monthly-report.xlsx, outputs/{날짜}/067-monthly-report/067-monthly-report.html, notion]
 builder: 사용자 (이 회사)
@@ -68,18 +69,21 @@ success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 �
    | ③ | 추이 라인 · KPI 6개월 + **목표값 점선** | 목표 대비 어디쯤 왔나 |
    ⛔ **①이 대표 차트다.** 월간 보고에서 「왜」가 그림으로 안 나오면 표를 다시 읽게 만든다.
    ⛔ 차트 옆에 **해석 한 줄**과 `[실데이터]`/`[샘플]` 태그를 단다.
-   저장: `outputs/{날짜}/monthly-report-{연월}.html`.
+   저장: `outputs/{날짜}/067-monthly-report/067-monthly-report.html`.
 6. ⏸ **적재·정례화**: Notion 아카이브 1행 승인 후 기록. 매월 자동 생성 스위치는 별도 승인.
 7. **체인 제안**: 지표 체계가 흔들리면 066 KPI 체계 설계, 다음 달 예산 확정은 095 마케팅 예산 설계 (채널 재배분 상세는 046).
 
 8. **파일로 남긴다**: 위 산출물을 `outputs/{날짜}/067-monthly-report/067-monthly-report.html` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다. 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/067-monthly-report/067-monthly-report.html` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다**: `outputs/{날짜}/067-monthly-report/067-monthly-report.html`
+> ⛔ **착지 · 두 파일로 쓴다**
+> · 표 → `outputs/{날짜}/067-monthly-report/067-monthly-report.xlsx`
+> · 보고서 → `outputs/{날짜}/067-monthly-report/067-monthly-report.html`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `<!doctype html>` + `charset=utf-8` 완전 문서 · **자체 완결**(CDN·외부 폰트 금지) · 아티팩트로 발행하지 않는다 (`docs/공통규약.md §H`)
-> **형식** · `.xlsx` 는 openpyxl · 첫 시트는 「요약」 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다.** 설치 명령은 `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -106,10 +110,10 @@ success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 �
 
 ### 인사이트 5줄   ### 다음 달 액션 (담당·기한 포함 3~5개)
 
-파일: outputs/{날짜}/monthly-report-{연월}.html · Notion {✅ 적재/보류}
+파일: outputs/{날짜}/067-monthly-report/067-monthly-report.html · Notion {✅ 적재/보류}
 다음 액션: → 066 KPI 트리 (지표 체계 재설계) / 095 예산 플래너 (다음 달 배분 확정)
 
-저장 파일: outputs/{날짜}/067-monthly-report/067-monthly-report.html
+저장 파일: outputs/{날짜}/067-monthly-report/067-monthly-report.xlsx · 067-monthly-report.html
 ```
 
 ## Anti-Patterns
@@ -137,4 +141,4 @@ success_metrics: [리포트 작성 시간, 경영진 후속 질문 수, 다음 �
 > 부록: 경영진 요약 작성 규칙 (결론 3줄 우선)
 > ① 결론 1줄: 목표 대비 달성/미달 + 핵심 수치 하나만 ② 원인 1줄: 끌어올린 것 하나 + 깎은 것 하나 ③ 방향 1줄: 다음 달 가장 큰 베팅.
 > 의사결정 요청은 "…을 승인해 주세요" 형식의 완결 문장으로 쓴다. 열린 질문("어떻게 할까요?") 금지.
-> 파일명 규칙 monthly-report-{연월}.html 을 바꾸지 않는다. 069 성과 예측 분석·095 예산 플래너가 이 경로를 입력으로 탐색한다.
+> 파일명 규칙 067-monthly-report.html 을 바꾸지 않는다. 069 성과 예측 분석·095 예산 플래너가 이 경로를 입력으로 탐색한다.

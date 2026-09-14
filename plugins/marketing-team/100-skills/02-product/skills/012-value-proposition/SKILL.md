@@ -84,6 +84,8 @@ success_metrics: [6단 완성률 100%, 증거 매핑된 차별점 수(3개 이�
 > · 화면 → `outputs/{날짜}/012-value-proposition/012-value-proposition.html`
 > · 해설 → `outputs/{날짜}/012-value-proposition/012-value-proposition.md`
 > **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다.** 설치 명령은 `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다. ⛔ 설치를 강요하지 않는다.
 > **`.html` 에는 그래프를 넣는다.** 표만 있는 화면은 어느 칸이 아직 안 채워졌는지 안 보인다.
 > · **① 6단 JTBD 띠**: 6칸을 왼쪽에서 오른쪽으로 나란히 놓고 **근거 있음 / 미확인 두 가지로만 칠한다**
 > ·   칸 아래에 그 근거가 어느 앞선 결과에서 왔는지 적는다. 미확인 칸은 비운 채로 둔다

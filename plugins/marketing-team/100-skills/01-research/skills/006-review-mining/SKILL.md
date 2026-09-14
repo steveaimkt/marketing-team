@@ -96,6 +96,9 @@ success_metrics: [처리 리뷰 건수(최대 500), 페인포인트 군집 도�
 > 🔴 **인라인 `<svg>` 로 직접 그린다.** 외부 차트 라이브러리를 부르지 않는다.
 > 산출물은 인터넷 없이 더블클릭으로 열려야 한다. 값이 하나뿐이면 그래프를 만들지 않고 그 사실을 적는다.
 > 해설은 집계 기준과 판단 근거를 문장으로 푼다. 표에 든 값을 다시 늘어놓지 않는다.
+>
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다.** 설치 명령은 `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다. ⛔ 설치를 강요하지 않는다.
 
 ## Output Format · **파일에 들어갈 내용**
 

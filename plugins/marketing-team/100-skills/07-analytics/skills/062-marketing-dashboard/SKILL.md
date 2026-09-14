@@ -13,12 +13,12 @@ triggers:
   - "HTML 리포트 대시보드로 뽑아줘"
 inputs: [멀티채널 데이터 소스(CSV·시트·선행 스킬 산출물), 핵심 지표 정의]
 sample_fallback: sample-data/A브랜드-퍼널-가입구매-90일.csv   # 7장 · 실습마다 다른 자료를 쓴다 (2026-09-08)
-outputs: [단일 파일 HTML 대시보드, 지표 정의 문서(계산식), 데이터 갱신 가이드, 저장 파일(.xlsx + .html)]
+outputs: [단일 파일 HTML 대시보드, 지표 정의 문서(계산식), 데이터 갱신 가이드, 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["067"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.xlsx, outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html]
+writes_to: [outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "그로스팀 대시보드만 8년 만든 데이터 엔지니어, 지표 정의가 안 맞으면 차트를 그리지 않는다"
@@ -73,7 +73,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
      ⛔ ③④⑤ 는 **추이·막대로는 답이 안 나오는 질문**을 맡는다. 자리 채우기용이 아니다.
    - `tables` 정렬 가능한 상세표 (가벼운 인라인 JS)
    - `actions` 권장 액션 3~5개 체크박스 / `footer` + 지표 정의·출처·갱신 시점 블록
-   - 저장: `outputs/{날짜}/dashboard-{날짜}.html`
+   - 저장: `outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html`
 5. **검증**: 500KB·360px·다크모드 3종 체크, 미통과 시 수정 후 재검증.
 6. **갱신 가이드 작성**: "다음 갱신 시: 같은 형식 CSV 교체 → 본 스킬 재실행" 절차 + 소스별 다운로드 경로 1줄씩 → 체인: 067 월간 리포트 (대시보드 지표를 월간 보고 골격으로).
 
@@ -84,7 +84,6 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 > **형식** · `<!doctype html>` + `charset=utf-8` 완전 문서 · **자체 완결**(CDN·외부 폰트 금지) · 아티팩트로 발행하지 않는다 (`docs/공통규약.md §H`)
-> **형식** · `.xlsx` 는 openpyxl · 첫 시트는 「요약」 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -92,7 +91,7 @@ success_metrics: [일일 지표 확인 시간, 지표 정의 불일치 건수, �
 파일에 쓰고 나서, 화면에는 **주요 표 하나 · 경로 · 결론 3줄 · 부족한 것**을 낸다 (표 말고는 15줄 이내).
 ```
 ## 마케팅 대시보드 — {기간} · [실데이터|샘플]
-파일: outputs/{날짜}/dashboard-{날짜}.html ({n}KB · 360px ✅ · 다크모드 ✅)
+파일: outputs/{날짜}/062-marketing-dashboard/062-marketing-dashboard.html ({n}KB · 360px ✅ · 다크모드 ✅)
 
 [대시보드 내부 구조]
 ① KPI 카드: {지표} {값} ({±delta}) × {n}개

@@ -16,7 +16,7 @@ requires: [brand/profile.md]
 chains_to: ["100"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md, outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.jsonl]
+writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md, outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/routing-eval.jsonl]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "사내 표준 문서를 수백 건 설계한 시스템 빌더, 두 번 이상 쓰이지 않을 스킬은 등록을 거절한다"

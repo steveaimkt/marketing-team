@@ -14,7 +14,7 @@ triggers:
 inputs: [원본 상세페이지(051 산출물 우선), 대상 언어·마켓, 제품 규격·인증 정보]
 outputs: [현지화 리스팅(영/일), 규격·단위 변환표, 소구점 재구성 결정 로그, 규제 검사 결과, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
-chains_to: ["051"]
+chains_to: ["051", "053"]
 gate: true
 mutating: false
 writes_to: [outputs/{날짜}/060-global-listing-localize/060-global-listing-localize.md]

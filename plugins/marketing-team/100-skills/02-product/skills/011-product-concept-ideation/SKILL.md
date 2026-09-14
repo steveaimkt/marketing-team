@@ -71,6 +71,8 @@ success_metrics: [발산 아이디어 수(10안 이상), 검증 가설·중단 �
 > · 화면 → `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.html`
 > · 해설 → `outputs/{날짜}/011-product-concept-ideation/011-product-concept-ideation.md`
 > **형식** · `.xlsx` 는 openpyxl 로 만든다 · 첫 시트는 「요약」, 표마다 시트 하나 · 머리 행 굵게 + 배경 `EBEBEB` · 틀 고정 A2 · 자동 필터 · **수는 수로 넣는다**("1,240" 은 합계가 안 돈다) (`docs/공통규약.md §H`)
+> 🔴 **`.xlsx` 는 우리가 직접 굽지 않는다.** 표 내용은 여기서 만들고 **파일로 굽는 일만 앤트로픽 공식 `document-skills` 의 xlsx 스킬**에 넘긴다.
+> 안 깔려 있으면 **`.csv` 로 내고 그렇게 말한다.** 설치 명령은 `/plugin marketplace add anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다. ⛔ 설치를 강요하지 않는다.
 > **`.html` 에는 그래프를 넣는다.** 표만 있는 화면은 어느 후보가 근거를 많이 쥐었는지 안 보인다.
 > · **① 후보별 근거 건수** 막대: 후보를 근거 건수 내림차순으로 놓는다
 > ·   막대는 **결과 세 가지로만 칠한다**(채택 / 검토 / 보류). 막대 옆에 근거가 된 앞선 결과와 건수를 적는다

@@ -89,10 +89,12 @@ success_metrics: [건당 응대 초안 작성 시간, 위기 건 검출·에스�
 7. **파일로 남긴다**: 위 산출물을 `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md` 로 저장하고 경로를 알린다. 화면에만 띄우고 끝내지 않는다. 마케터가 다음 날 다시 열 수 있어야 한다.
    > 쓰기 권한이 없으면 **실패로 처리하지 않는다.** 산출물은 그대로 화면에 내고 맨 아래에 "`outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md` 로 저장하려 했으나 권한이 없어 남기지 못했습니다" 를 적는다. 못 한 일을 못 했다고 말하는 것도 산출물의 일부다.
 
-> ⛔ **착지 · 여기로 쓴다**: `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md`
+> ⛔ **착지 · 두 파일로 쓴다**
+> · 분류 → `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.csv`
+> · 해설 → `outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md`
 > 경로를 새로 만들지 않는다. 위 줄을 그대로 쓰고 `{날짜}` 만 오늘로 바꾼다.
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
-> **형식** · 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·결론은 `.md` 쪽에 쓴다 (`docs/공통규약.md §H`)
+> **형식** · `.csv` 첫 줄이 열 이름 · UTF-8 BOM · 한 행 = 한 건. 설명·결론은 `.md` 쪽에 쓴다 (`docs/공통규약.md §H`)
 
 ## Output Format · **파일에 들어갈 내용**
 
@@ -128,7 +130,7 @@ success_metrics: [건당 응대 초안 작성 시간, 위기 건 검출·에스�
 ## 다음 액션
 ⏸ 초안 승인 후 수동 게시 → 반복 테마는 038 소셜 언급 분석으로 · 위기 카드는 089 위기 대응 설계로
 
-저장 파일: outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.md
+저장 파일: outputs/{날짜}/032-comment-dm-assistant/032-comment-dm-assistant.csv · 032-comment-dm-assistant.md
 ```
 
 ## Anti-Patterns

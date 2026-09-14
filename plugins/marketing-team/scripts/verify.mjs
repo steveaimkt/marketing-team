@@ -883,8 +883,12 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const q = path.join(d, e.name);
     if (e.isDirectory()) return walk(q);
     if (e.name !== 'SKILL.md') return;
-    const v = (fs.readFileSync(q, 'utf8').match(/^review:\s*(.+)$/m) || [])[1];
-    if (!v) return;
+    const raw = (fs.readFileSync(q, 'utf8').match(/^review:\s*(.+)$/m) || [])[1];
+    if (!raw) return;
+    // 다른 필드(sample_fallback 등)처럼 review: 도 뒤에 "# 왜 이 관점인지" 주석을 달 수 있다
+    // (2026-09-15 · 014·044·067). 주석까지 "·"로 쪼개면 관점이 아닌 말이 "알 수 없는 관점"으로
+    // 잘못 잡힌다 — 주석을 먼저 떼고 잰다.
+    const v = raw.split('#')[0];
     n++;
     for (const k of v.trim().split('·')) if (!관점.includes(k.trim()))
       이상.push(`${path.basename(path.dirname(q))} — 알 수 없는 관점 「${k.trim()}」`);
