@@ -126,6 +126,54 @@ function inside(base, target) {
   return rel === '' || (!rel.startsWith(`..${path.sep}`) && rel !== '..' && !path.isAbsolute(rel));
 }
 
+const DISCLOSURE_PHRASE = '물어보지 못해 기본값으로 갔다';
+
+/**
+ * §H 「② 확인 ⏸ 이 그릇으로 만들까요?」 — 최종 단계로 run-receipt start 하기 전에
+ * 그 확인이 실제로 있었다는 증거를 요구한다.
+ *
+ * 증거 1순위: 대화 어딘가에 ⏸ 를 낸 assistant 행 — G2 승인 화면도 ⏸ 로 끝나므로
+ * (approved() 가 이미 그 화면을 요구한다), 정상 진행이면 이 조건은 이미 채워져 있다.
+ * 증거 2순위(비대화형 폴백): 화면 증거가 없으면, 이 실행 자신이 낸 산출물
+ * (draft.outputs · .md·.html) 안에서 "물어보지 못해 기본값으로 갔다" 문구를 찾는다.
+ * §H 순서상 start 시점에는 산출물이 이미 있으므로, 이 실행 자신의 파일 몇 개만
+ * 읽는 것은 범위가 좁고 값싼 I/O 다 — 원장이나 다른 실행을 보지 않는다.
+ *
+ * 실측 2026-09-15 · 원고소스(v9) production 표본 대조 —
+ * · 단계:초안 은 아직 그릇을 고르지 않으므로 이 검사에서 뺀다.
+ * · 062(개별 확인 질문이 화면에 안 뜨고 계획 승인 단계로 흡수된 실제 사례,
+ *   _실행조건.md 「확인된 것」③)도 G2 계획 화면 자체의 ⏸ 로 이미 통과한다 —
+ *   그 ⏸ 를 "이 그릇으로" 문구에 결속하지 않고 대화 전체에서 찾기 때문이다.
+ * · 문구는 실제 산출물(087-partnership-pack.md)에서 축약·의역 없이 그대로
+ *   쓰인 것을 확인했다 — 그래서 부분 문자열 그대로 찾는다.
+ *
+ * run.json 을 못 읽거나 없으면 막지 않는다 — 훅이 세션을 잠그는 쪽이 더 나쁘다.
+ */
+function draftConfirmIssue(cwd, receiptArg, rows) {
+  if (!receiptArg || !cwd) return null;
+  if (rows.some(row => row.role === 'assistant' && row.text.includes('⏸'))) return null;
+  let draft;
+  try {
+    const abs = path.resolve(cwd, receiptArg);
+    if (!inside(cwd, abs) || !fs.existsSync(abs)) return null;
+    draft = JSON.parse(fs.readFileSync(abs, 'utf8'));
+  } catch { return null; }
+  if (String(draft?.단계 || '최종').trim() !== '최종') return null; // 초안 단계는 그릇 확인 대상이 아니다
+  const outputs = Array.isArray(draft?.outputs) ? draft.outputs : [];
+  for (const item of outputs) {
+    const raw = typeof item === 'string' ? item : item?.path;
+    const rel = String(raw || '').replace(/^workspace:/, '');
+    if (!/\.(md|html)$/i.test(rel)) continue; // 문구가 실제로 실리는 자리로 범위를 좁힌다
+    try {
+      const fileAbs = path.resolve(cwd, rel);
+      if (!inside(cwd, fileAbs) || !fs.existsSync(fileAbs)) continue;
+      if (fs.readFileSync(fileAbs, 'utf8').includes(DISCLOSURE_PHRASE)) return null;
+    } catch { /* 한 파일을 못 읽어도 나머지 파일에서 계속 찾는다 */ }
+  }
+  return `⏸ 초안 확인 화면이 대화에 없고, 산출물에도 "${DISCLOSURE_PHRASE}" 밝힘이 없습니다 · ` +
+    `초안을 보여주고 「이 그릇으로 만들까요?」 확인을 받거나, 비대화형이면 산출물에 그 문구를 남긴 뒤 다시 시도하세요.`;
+}
+
 function validateWrite(input) {
   const toolInput = input.tool_input || {};
   const raw = input.tool_name === 'NotebookEdit'
@@ -217,7 +265,7 @@ function pluginScriptCall(input) {
     tokens.push(piece[1] ?? piece[2] ?? piece[3]);
   }
   const flags = tokens.filter(token => token.startsWith('--'));
-  return { script: path.basename(target.replace(/\\/g, '/')), sub: tokens[0] || '', flags };
+  return { script: path.basename(target.replace(/\\/g, '/')), sub: tokens[0] || '', flags, tokens };
 }
 
 /**
@@ -493,6 +541,16 @@ function planApproval(cwd, preferId) {
       const pause = openPause(rows);
       if (pause) {
         deny(`직전 화면이 ⏸ 로 멈췄는데 사용자 답 없이 다음 단계로 넘어가려 합니다: "${pause}" · 사용자의 답을 받은 뒤 다시 시도하세요.`);
+        return;
+      }
+    }
+    // 저위험 자동 승인(autoPlan)은 G2 자체의 ⏸ 도 요구하지 않는 경로다 — 같은 신뢰 경계이므로
+    // 그릇 확인 ⏸ 도 함께 면제한다. 아니면 화면에 ⏸ 가 한 번도 안 뜬 정상 실행이 막힌다
+    // (실측 2026-09-15 · 표본에 없던 조합이라 안전 쪽으로 면제).
+    if (call?.script === 'run-receipt.mjs' && call.sub === 'start' && !autoPlan) {
+      const issue = draftConfirmIssue(cwd, call.tokens?.[1], rows);
+      if (issue) {
+        deny(issue);
         return;
       }
     }

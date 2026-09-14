@@ -324,7 +324,97 @@ try {
     fs.rmSync(planFile, { force: true });
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ✅');
+  // ── ⏸ 초안 확인 증거 · run-receipt start 전 (2026-09-15) ──────────
+  // §H 「② 확인 ⏸ 이 그릇으로 만들까요?」— 대화에 ⏸ 가 전혀 없고, 산출물에도
+  // "물어보지 못해 기본값으로 갔다" 밝힘이 없으면 최종 단계 start 를 막는다.
+  {
+    const rel = 'outputs/2026-09-15/046-roas-budget-rebalance';
+    const dir = path.join(temp, rel);
+    fs.mkdirSync(dir, { recursive: true });
+    const rj = `${rel}/run.json`;
+    const writeReceipt = extra => fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+      schema: 'marketing-team.run/v1', status: 'draft', request: '광고 예산 다시 짜줘',
+      skills: ['046'], data_mode: '샘플',
+      outputs: [`workspace:${rel}/046-roas-budget-rebalance.md`],
+      required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+      ...extra,
+    }, null, 2)}\n`);
+    const startCmd = `node "${pluginRoot}/scripts/run-receipt.mjs" start "${rel}/run.json"`;
+
+    // 대화에 ⏸ 가 전혀 없고(plan 표식도 [승인 요청] 헤더만 씀) 산출물에도 밝힘이 없다 → 막는다
+    writeReceipt({ 단계: '최종' });
+    fs.writeFileSync(path.join(dir, '046-roas-budget-rebalance.md'), '[샘플] 예산 재배분안\n');
+    writeTranscript([active, plan, approval]);
+    result = call('Bash', { command: startCmd });
+    assert.equal(decision(result), 'deny', '⏸ 증거도 밝힘 문구도 없는 최종 단계 start 를 허용했습니다.');
+
+    // 대화 어딘가에 ⏸ 가 있으면(G2 승인 화면 자체) 통과한다 — 확인이 계획 단계로 흡수된
+    // 실제 패턴(062 실행조건 기록)과 같다.
+    const pausedPlan = row('assistant', '[실행 계획]\n046 예산 재배분을 실행합니다.\n[승인 요청]\n⏸ 이대로 진행할까요?');
+    writeTranscript([active, pausedPlan, approval]);
+    result = call('Bash', { command: startCmd });
+    assert.equal(decision(result), 'none', '대화에 ⏸ 가 있는데도 최종 단계 start 를 막았습니다.');
+
+    // ⏸ 가 없어도, 이 실행 자신의 산출물에 밝힘 문구가 있으면 비대화형 폴백으로 통과한다
+    writeTranscript([active, plan, approval]);
+    fs.writeFileSync(path.join(dir, '046-roas-budget-rebalance.md'),
+      '[샘플] 예산 재배분안\n\n> 물어보지 못해 기본값으로 갔다: 그릇 선택 → 기본값(.md) 채택.\n');
+    result = call('Bash', { command: startCmd });
+    assert.equal(decision(result), 'none', '산출물의 밝힘 문구를 비대화형 증거로 인정하지 않았습니다.');
+
+    // 단계:초안 은 아직 그릇을 고르지 않으므로 이 검사 대상이 아니다
+    writeReceipt({ 단계: '초안' });
+    writeTranscript([active, plan, approval]);
+    result = call('Bash', { command: startCmd });
+    assert.equal(decision(result), 'none', '초안 단계 start 에 그릇 확인 증거를 요구했습니다.');
+  }
+
+  // ── 저위험 자동 승인은 그릇 확인도 함께 면제한다 (2026-09-15) ──────
+  // G2 자체의 ⏸ 를 요구하지 않는 경로에서 그릇 확인 ⏸ 만 따로 요구하면,
+  // 화면에 ⏸ 가 한 번도 안 뜨는 정상 저위험 실행이 막힌다 (표본에 없던 조합이라 면제로 처리).
+  {
+    const rel = 'outputs/2026-09-15/자동승인-그릇';
+    const dir = path.join(temp, rel);
+    fs.mkdirSync(dir, { recursive: true });
+    const planFile = path.join(dir, 'plan.json');
+    // 002 는 gate·pii·mutating 이 전부 없어 저위험 자동 승인 대상이다 (위 블록과 동일 계약).
+    const 계획 = {
+      schema: 'marketing-team.plan/v1', plan_id: 'auto2', request: '경쟁사 비교해줘', skills: ['002'],
+      steps: [{ step: 1, skill: '002', inputs: [], reviews: [
+        { kind: 'business', perspective: '브랜드' }, { kind: 'business', perspective: '고객' },
+      ], outputs: [
+        `workspace:${rel}/002-competitor-analysis.xlsx`,
+        `workspace:${rel}/002-competitor-analysis.html`,
+        `workspace:${rel}/002-competitor-analysis.md`,
+      ] }],
+      budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+    };
+    fs.writeFileSync(planFile, `${JSON.stringify(계획, null, 2)}\n`);
+    const pc = (...a) => spawnSync(process.execPath,
+      [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: temp, encoding: 'utf8' });
+    pc('compile', `${rel}/plan.json`);
+    pc('approve', `${rel}/plan.json`);
+
+    fs.writeFileSync(path.join(temp, `${rel}/run.json`), `${JSON.stringify({
+      schema: 'marketing-team.run/v1', status: 'draft', request: '경쟁사 비교해줘',
+      skills: ['002'], data_mode: '샘플', 단계: '최종',
+      outputs: [
+        `workspace:${rel}/002-competitor-analysis.xlsx`,
+        `workspace:${rel}/002-competitor-analysis.html`,
+        `workspace:${rel}/002-competitor-analysis.md`,
+      ],
+      required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+    }, null, 2)}\n`);
+    for (const f of ['002-competitor-analysis.xlsx', '002-competitor-analysis.html', '002-competitor-analysis.md'])
+      fs.writeFileSync(path.join(dir, f), '[샘플]\n');
+
+    // 승인 문장도 ⏸ 도 전혀 없는 대화 — 저위험 자동 승인이라 G2 자체가 이미 문장 없이 통과한다
+    writeTranscript([active, row('user', '경쟁사 비교해줘')]);
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" start "${rel}/run.json"` });
+    assert.equal(decision(result), 'none', '저위험 자동 승인 실행의 최종 단계 start 를 그릇 확인 증거 없이 막았습니다.');
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

@@ -345,6 +345,38 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
   if (ords.size > 1) throw new Error(`재실행 순번이 섞였습니다(${[...ords].sort().join('·')}) — 한 실행의 산출물은 같은 순번을 씁니다.`);
   if (actual.length !== uniqueActual.size) throw new Error('outputs에 같은 파일명이 중복됐습니다.');
 
+  // ⭐ 초안 .md 가 실제로 있었는지 — writes_to 에 .md 를 약속한 스킬은(최종 그릇이
+  // .md 가 아니게 바뀌어도) 그 정본에서 파생된 .md 후보 중 하나가 outputs 안에
+  // 실제로 있어야 한다 (§H 「모든 실행은 .md 초안을 먼저 낸다」). 이 실행 자신의
+  // outputs 만 본다 — 다른 실행·원장을 보지 않는다.
+  //
+  // 실측 2026-09-15 · 원고소스(v9) production 표본 14건 대조 — writes_to 에 .md 가
+  // 아예 없는 스킬(100개 중 14개 · 005·023·025·045·051·062·063·067·072·081·082·085·087·093)은
+  // 이 검사에서 뺀다. 안 빼면 그 스킬들의 실제 완료 실행을 전부 거짓 거부한다.
+  // 초안이름()을 각 정본에(대표 하나가 아니라 전부에) 적용하므로 「-해설.md」처럼
+  // writes_to 가 스스로 다른 이름을 쓰는 산출물도 그대로 후보에 들어간다 — 100개
+  // 스킬 전수 조사 결과 「-해설.md」 말고 다른 접미 변형은 없었다.
+  const skillOfCanonForMd = new Map();
+  const skillExpectsMd = new Map();
+  for (const row of skillRows) {
+    const rawNames = [...new Set((row.writes_to || []).map(v => path.posix.basename(v)))];
+    skillExpectsMd.set(row.id, rawNames.some(name => name.endsWith('.md')));
+    for (const name of rawNames) {
+      const 새 = formatChoice?.[name];
+      const 바뀐 = 새 ? name.replace(/\.[^.]+$/, `.${새}`) : name;
+      for (const candidate of [바뀐, 초안이름(바뀐)]) if (!skillOfCanonForMd.has(candidate)) skillOfCanonForMd.set(candidate, row.id);
+    }
+  }
+  const mdSatisfied = new Set();
+  for (const canon of canonOfActual.values()) {
+    if (!canon.endsWith('.md')) continue;
+    const owner = skillOfCanonForMd.get(canon);
+    if (owner) mdSatisfied.add(owner);
+  }
+  const missingDraft = skillRows.filter(row => skillExpectsMd.get(row.id) && !mdSatisfied.has(row.id));
+  if (missingDraft.length)
+    throw new Error(`writes_to 에 .md 를 약속한 스킬의 초안이 outputs 에 없습니다: ${missingDraft.map(r => r.id).join(' · ')}`);
+
   const receiptDir = path.dirname(file);
   const receiptRel = posix(path.relative(WORK, receiptDir));
 

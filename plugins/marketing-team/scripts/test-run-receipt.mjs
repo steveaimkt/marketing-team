@@ -559,7 +559,56 @@ try {
     }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · ✅');
+  // ⭐ 초안 .md 실재 검사 (2026-09-15) — writes_to 에 .md 를 약속한 스킬은
+  // 최종 그릇이 .md 가 아니게 바뀌어도 그 초안이 outputs 에 실제로 있어야 한다.
+  // 046(writes_to = .md 단독)을 .docx 로 굽도록 그릇을 바꾼 경우로 확인한다 —
+  // 옛 코드는 이 자리에서 초안을 요구하지 않았다(덤은 언제나 선택이었다).
+  {
+    const dir = 'outputs/2026-08-30/046-roas-budget-rebalance';
+    fs.mkdirSync(path.join(temp, dir), { recursive: true });
+    const draft = (name, extra) => {
+      const rj = `${dir}/${name}`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '광고 예산 다시 짜줘',
+        skills: ['046'], data_mode: '샘플',
+        required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+        형식: { '046-roas-budget-rebalance.md': 'docx' },
+        ...extra,
+      }, null, 2)}\n`);
+      return rj;
+    };
+    const 낸다 = (...names) => names.map(n => `workspace:${dir}/${n}`);
+
+    // 그릇만 바꾸고 초안(.md)을 함께 남기지 않으면 — 최종 형식만으론 통과해도 이 검사가 막는다
+    let r = run('start', draft('run-16.json', { outputs: 낸다('046-roas-budget-rebalance.docx') }));
+    assert.notEqual(r.status, 0, '그릇을 바꾸며 초안 .md 를 지워도 통과시켰습니다.');
+    assert.match(`${r.stdout}\n${r.stderr}`, /초안이 outputs 에 없습니다/);
+
+    // 초안을 함께 남기면 통과한다 (§H · 초안은 지우지 않는다)
+    r = run('start', draft('run-17.json', {
+      outputs: 낸다('046-roas-budget-rebalance.docx', '046-roas-budget-rebalance.md'),
+    }));
+    assert.equal(r.status, 0, `그릇을 바꿔도 초안을 함께 두면 통과해야 합니다: ${r.stderr}${r.stdout}`);
+  }
+
+  // writes_to 에 .md 가 아예 없는 스킬(100개 중 14개)은 이 검사에서 빠진다 —
+  // 실측 2026-09-15 · 원고소스(v9) production 표본 045·062 등. 안 빼면 그 스킬들의
+  // 실제 완료 실행을 전부 거짓 거부한다.
+  {
+    const dir = 'outputs/2026-08-30/045-weekly-ads-report';
+    fs.mkdirSync(path.join(temp, dir), { recursive: true });
+    const rj = `${dir}/run-18.json`;
+    fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+      schema: 'marketing-team.run/v1', status: 'draft', request: '광고 주간 리포트 만들어줘',
+      skills: ['045'], data_mode: '샘플',
+      outputs: [`workspace:${dir}/045-weekly-ads-report.html`],
+      required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+    }, null, 2)}\n`);
+    const r = run('start', rj);
+    assert.equal(r.status, 0, `.md 를 약속하지 않은 스킬까지 초안을 요구했습니다: ${r.stderr}${r.stdout}`);
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
