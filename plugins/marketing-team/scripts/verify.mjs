@@ -851,7 +851,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       const id = (t.match(/^id:\s*"?(\d+)/m) || [])[1];
       const nm = (t.match(/^name:\s*(.+)$/m) || [])[1];
       if (!id || !nm) continue;
-      const re = new RegExp(`\\|\\s*${id}\\s*\\|\\s*([^|]+?)\\s*\\|`, 'g');
+      // 줄 맨 앞 칸이 id 인 표(스킬 카탈로그 표)만 본다 — 체인 요약표처럼
+      // id 가 3번째 칸에 오는 다른 표(예: 「순번|이름|id|산출물」)까지 잡으면 오탐이 된다
+      // (2026-09-15 · 08-crm 073·075·077 오탐 확인).
+      const re = new RegExp(`^\\|\\s*${id}\\s*\\|\\s*([^|]+?)\\s*\\|`, 'gm');
       let m;
       while ((m = re.exec(txt))) {
         const v = m[1].trim();

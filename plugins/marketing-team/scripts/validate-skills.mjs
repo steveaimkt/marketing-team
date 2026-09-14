@@ -162,11 +162,11 @@ for (const s of skills) {
   // 8 트리거 최소 3개
   if ((f.match(/^\s*-\s+"/gm) || []).length < 3) add(id, 'WARN', '트리거 3개 미만');
 }
-// 9 체인 15종 무결성 · 2026-08-04
+// 9 체인 17종 무결성 · 2026-08-04 (2026-09-15 · 브랜드마케팅팀·콘텐츠마케팅팀 추가로 15→17)
 //   왜: 체인은 스킬 ID 를 본문 문자열로 들고 있어, 스킬 번호가 바뀌면 **조용히** 깨진다.
 //       ROUTING.md 는 생성물이라 검사 대상이 아니고, 정본은 아래 둘이다.
 //         카테고리 체인 10 = 100-skills/{팀}/PLUGIN.md 의 chain·chain_steps·chain_desc
-//         교차 체인      5 = 100-skills/CHAINS.md
+//         교차 체인      7 = 100-skills/CHAINS.md
 const chains = [];
 for (const cat of fs.readdirSync(M).filter(d => /^\d\d-/.test(d)).sort()) {
   const p = path.join(M, cat, 'PLUGIN.md');
@@ -200,7 +200,7 @@ for (const c of chains) {
   const dn = c.desc ? c.desc.split('→').length : 0;
   if (dn && dn !== sn) add(c.src, 'WARN', `체인 단계/설명 수 불일치: ${c.name} (${sn}단계 vs 설명 ${dn}칸)`);
 }
-if (chains.length !== 15) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 15종)`);
+if (chains.length !== 17) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 17종)`);
 
 // 11 example 이 sample_fallback 실제 데이터와 무관하게 지어낸 것은 아닌가 · 2026-09-14
 //   왜: 006 을 비롯해 67개 스킬에서 example/input.md·output.md 가 sample_fallback 실제

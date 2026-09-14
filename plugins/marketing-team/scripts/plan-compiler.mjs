@@ -292,6 +292,13 @@ if (isCli) {
     const graph = compileChain(plan);
     plan.chain_graph = { schema: graph.schema, chain: graph.chain, nodes: graph.nodes, edges: graph.edges };
     plan.risks = graph.warnings;
+    // 이름 있는 체인은 top-level plan.chain 에도 적어 둔다 (2026-09-15) — run-receipt.mjs 의
+    // 스킬별 자기 폴더 강제(validateExecutionContract)가 chain_graph.chain 이 아니라 이 필드를
+    // 읽는다. 모델이 plan.chain 을 스스로 적지 않아도(정본 순서와 정확히 같으면) compileChain 이
+    // 이미 자동으로 알아낸 이름이 있으므로 여기서 채워 넣는다. 실측 2026-09-14·09-15,
+    // 10장 045→046→043 이 「자기 폴더」 규칙이 이미 있었는데도 마지막 스킬 폴더로 몰렸다 —
+    // plan.json 에 chain 이 끝내 비어 있었기 때문이다.
+    if (graph.chain) plan.chain = graph.chain;
     plan.plan_sha256 = planHash(plan);
     plan.status = 'awaiting-approval';
     plan.approved_sha256 = null;
