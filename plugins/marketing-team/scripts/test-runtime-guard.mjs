@@ -92,6 +92,11 @@ try {
   assert.equal(decision(result), 'none', '따옴표 속 기호를 문법으로 오인해 조회를 막았습니다.');
   result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/run-receipt.mjs" start "outputs/run.json"' });
   assert.equal(decision(result), 'none', '절차가 요구하는 플러그인 스크립트 실행을 막았습니다.');
+  // 064·065 계산 도구 (2026-09-14) — 승인 뒤에는 실행되고, 파일을 쓰지 않으니 P0 허용 목록에 들어간다
+  result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/cohort-retention.mjs" "sample-data/x.csv"' });
+  assert.equal(decision(result), 'none', '승인 뒤 cohort-retention.mjs 실행을 막았습니다.');
+  result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/rfm-segments.mjs" "sample-data/x.csv" --dormancy-days 120' });
+  assert.equal(decision(result), 'none', '승인 뒤 rfm-segments.mjs 실행을 막았습니다.');
   // 굵은 표식도 계획으로 결속된다 (실측 2026-08-31 · 헛 재승인 2회)
   const boldPlan = row('assistant', '**[실행 계획]**\n광고 문구 3안\n**[승인 요청]**\n진행하려면 「진행 승인」');
   writeTranscript([active, boldPlan, approval]);
@@ -272,7 +277,54 @@ try {
     fs.rmSync(planFile, { force: true });
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ✅');
+  // ── ⏸ 열린 질문 뒤 다음 단계 시작 차단 (실측 2026-09-14 · 8장 CRM 체인 1차) ──
+  // 100개 업무 스킬은 Skill 도구를 다시 타지 않고 한 대화 안에서 이어지므로,
+  // 체인의 다음 단계로 넘어가는 실제 경계는 run-receipt.mjs step-start 다.
+  {
+    const pauseMsg = row('assistant', '⏸ 며칠부터 휴면으로 볼지 정해 주세요.\n기본값은 180일입니다.');
+    writeTranscript([active, plan, approval, pauseMsg]);
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" step-start "outputs/run.json" --step 2` });
+    assert.equal(decision(result), 'deny', '⏸ 질문에 답 없이 다음 단계 시작을 허용했습니다.');
+
+    writeTranscript([active, plan, approval, pauseMsg, row('user', '180일로 할게요')]);
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" step-start "outputs/run.json" --step 2` });
+    assert.equal(decision(result), 'none', '사용자 답이 온 뒤에도 다음 단계 시작을 막았습니다.');
+
+    // 막는 것은 "다음 단계 시작"뿐이다 — 지금 단계를 마무리하는 것까지 잠그지 않는다
+    writeTranscript([active, plan, approval, pauseMsg]);
+    result = call('Bash', { command: `node "${pluginRoot}/scripts/run-receipt.mjs" step-done "outputs/run.json" --step 1` });
+    assert.equal(decision(result), 'none', '⏸ 대기 중에 현재 단계 마무리(step-done)까지 막았습니다.');
+  }
+
+  // ── 계획 스코핑 (실측 2026-09-14 · 8장 CRM 체인) ──────────────
+  // 옆 단계(이미 승인된 저위험 계획)의 plan.json 이 더 최근이라는 이유로,
+  // 규제검토가 필요한 다른 단계의 승인·위험판정을 대신하면 안 된다.
+  {
+    const 저위험폴더 = 'outputs/2026-09-14/064-cohort-retention';
+    const 게이트폴더 = 'outputs/2026-09-14/075-kakao-alimtalk';
+    fs.mkdirSync(path.join(temp, 저위험폴더), { recursive: true });
+    fs.mkdirSync(path.join(temp, 게이트폴더), { recursive: true });
+    const 저위험계획 = {
+      schema: 'marketing-team.plan/v1', plan_id: 'p', request: '재구매율 봐줘', skills: ['064'],
+      steps: [{ step: 1, skill: '064', inputs: [], outputs: [`workspace:${저위험폴더}/064-cohort-retention.csv`], reviews: [] }],
+      budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+    };
+    const planFile = path.join(temp, 저위험폴더, 'plan.json');
+    fs.writeFileSync(planFile, `${JSON.stringify(저위험계획, null, 2)}\n`);
+    const pc = (...a) => spawnSync(process.execPath,
+      [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: temp, encoding: 'utf8' });
+    pc('compile', `${저위험폴더}/plan.json`);
+    pc('approve', `${저위험폴더}/plan.json`);
+
+    // 승인 문장이 전혀 없는 대화 · 075 자신의 plan.json 은 아직 없다
+    writeTranscript([active, row('user', '카카오 알림톡도 설계해줘')]);
+    result = call('Write', { file_path: path.join(temp, 게이트폴더, '075-kakao-alimtalk.md') });
+    assert.equal(decision(result), 'deny', '옆 단계(064)의 승인된 저위험 계획을 075 에 대신 썼습니다.');
+
+    fs.rmSync(planFile, { force: true });
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

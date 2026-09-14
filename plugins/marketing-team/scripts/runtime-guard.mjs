@@ -7,15 +7,25 @@ import { fileURLToPath } from 'node:url';
 import { approvalState } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
-const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?^(?:\*\*)?\[승인 요청\]/m;
+const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
 // 줄머리만 — 문장 속 인용은 계획이 아니다 (실측 2026-08-30).
 // 굵은 표식(**[실행 계획]**)도 인정한다 — 모델이 강조로 굵히는 버릇이 있어 승인이 결속되지 않는
 // 헛 재승인이 두 번 실측됐다 (2026-08-31 · 온보딩·빠른 진입).
+// ⏸ 만 있고 리터럴 [승인 요청] 헤더가 없는 계획 화면도 승인 대상으로 인정한다 —
+// [승인 요청] 헤더를 생략한 채 ⏸ 로만 멈추는 스킬(039)에서 정상 "진행 승인"이
+// 영구 거부되는 버그가 실측됐다 (2026-09-13 · 5장 039).
 // 승인 판정 A안 (2026-08-30) · 「진행 승인」으로 시작하면 뒤에 지시가 붙어도 승인이다 (보류·취소류는 제외).
 // 자연 변형(「네 진행해주세요」 등)은 온전한 한 문장일 때만 승인으로 친다.
 const APPROVAL_EXACT = /^\s*(?:네|예|넵)?[\s,]*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?|진행해\s*줘요?|진행해주세요|진행하자)\s*[.!~]?\s*$/;
-const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:보류|취소|아직|말|안\s|못\s))/;
-const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) };
+// 조사(은·는·이·가)가 승인과 부정어 사이에 끼면 부정 lookahead 를 못 걸었다
+// (실측 2026-09-13, 「진행 승인은 아직 못 하겠어요」가 승인으로 오판됨) — 조사를 선택적으로 허용한다.
+const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:은|는|이|가)?\s*(?:보류|취소|아직|말|안\s|못\s))/;
+// 승인 판정 B안 (2026-09-13 · 4장 038) · 사용자가 정보와 승인 의사를 한 문장에 담아
+// 「진행 승인」이 문장 맨 끝에 오면(앞에 다른 말이 있어도) 승인으로 친다. A안(접두)의 반대쪽 —
+// 실제 대화에서 정보를 먼저 말하고 승인으로 문장을 맺는 경우가 실측으로 재현됐다.
+// 부정형 뒤엔 걸리지 않는다("승인 안 함"처럼 승인 뒤에 말이 더 붙으면 $ 에서 끝나지 않아 제외된다).
+const APPROVAL_SUFFIX = /(?:^|[\s,.!?~])(?:진행\s*승인|계획\s*승인|승인합니다|승인)\s*[.!~]?\s*$/;
+const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text) };
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-마케터/SKILL.md', '\\skills\\ai-마케터\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 
@@ -94,6 +104,23 @@ function approved(rows) {
   return { ok: false, reason: '사용자의 명시적 진행 승인이 없습니다.' };
 }
 
+/**
+ * 스킬이 화면에 낸 ⏸ 질문(체인 전용 멈춤 등 Phase 안의 질문)이 사람 답 없이
+ * 다음 단계로 넘어가는 것을 잡는다 (실측 2026-09-14 · 8장 CRM 체인 1차 —
+ * "휴면 경계를 며칠로 볼지" ⏸ 질문에 답이 없는 채 다음 스킬까지 끝까지 진행됐다).
+ * 위 approved()·PLAN_MARKER 는 **G2 실행계획** 화면 하나만 본다 — 이건 실행 **도중**
+ * 각 스킬이 내는 ⏸ 전부를 본다. 마지막 ⏸ 이후에 사용자(user) 행이 하나도 없으면 "열린 채"다.
+ */
+function openPause(rows) {
+  let lastPause = -1;
+  for (let i = 0; i < rows.length; i++)
+    if (rows[i].role === 'assistant' && rows[i].text.includes('⏸')) lastPause = i;
+  if (lastPause < 0) return null;
+  if (rows.slice(lastPause + 1).some(row => row.role === 'user')) return null;
+  const line = rows[lastPause].text.split('\n').find(l => l.includes('⏸'));
+  return (line || '⏸').trim().slice(0, 80);
+}
+
 function inside(base, target) {
   const rel = path.relative(base, target);
   return rel === '' || (!rel.startsWith(`..${path.sep}`) && rel !== '..' && !path.isAbsolute(rel));
@@ -145,7 +172,10 @@ function isReadOnlyBash(input) {
   if (/(?:^|\s)find\s+[^;&|]*(?:-delete|-exec|-ok)(?:\s|$)/.test(command)) return false;
   if (/(^|[^<])>{1,2}(?!&)/.test(command) || /<(?!(?:=|<))/.test(command)) return false;
 
-  const allowed = new Set(['cd', 'pwd', 'ls', 'rg', 'grep', 'head', 'tail', 'sed', 'cat', 'wc', 'stat', 'find', 'jq', 'test', '[', 'echo', 'printf']);
+  // awk/sort/uniq/cut 추가 — 대량 CSV 집계 수단이 없어 모델이 조합별 grep 반복이나
+  // 무한 사고정지로 빠지는 버그가 실측됐다 (2026-09-13 · 7장 073, 11장 065/073).
+  // node/python 은 위험도가 달라 그대로 차단한다.
+  const allowed = new Set(['cd', 'pwd', 'ls', 'rg', 'grep', 'head', 'tail', 'sed', 'cat', 'wc', 'stat', 'find', 'jq', 'test', '[', 'echo', 'printf', 'awk', 'sort', 'uniq', 'cut']);
   const segments = command.split(/&&|\|\||;|\||\n/).map(item => item.trim()).filter(Boolean);
   return segments.length > 0 && segments.every(segment => {
     if (/^[A-Za-z_][A-Za-z0-9_]*=(?:"[^"]*"|'[^']*'|[^\s]+)$/.test(segment) &&
@@ -223,6 +253,10 @@ const SCRIPT_ALLOW = {
     'ledger-stats.mjs': ['--check'],
     'output-checks.mjs': null,
     'pii-check.mjs': null,
+    // 064·065 가 계산을 직접 새로 짜지 않고 쓰는 계산 도구 (2026-09-14) — 파일을 쓰지 않고
+    // 표준출력에 JSON만 낸다. 해석은 여전히 모델의 일이다.
+    'cohort-retention.mjs': null,
+    'rfm-segments.mjs': null,
   },
 };
 
@@ -343,10 +377,27 @@ async function main() {
  * `plan.json` 이 있을 때만 본다. 없으면 예전 문장 게이트 그대로다 (하위 호환).
  * 읽지 못하면 막지 않는다 — 훅이 세션을 잠그는 쪽이 더 나쁘다. 문장 게이트가 남아 있다.
  */
-function newestPlan(cwd) {
+/**
+ * 지금 도구 호출이 어느 스킬(3자리 id)의 것인지 짚는다. 모르면 null —
+ * 모르면 아래 newestPlan 이 예전처럼 전체 중 최신으로 되돌아간다(하위 호환).
+ */
+function currentStepId(input) {
+  if (input.tool_name === 'Skill') {
+    return (String(input.tool_input?.skill || input.tool_input?.name || '').match(/\d{3}/) || [])[0] || null;
+  }
+  if (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name)) {
+    const raw = input.tool_name === 'NotebookEdit'
+      ? (input.tool_input?.notebook_path || input.tool_input?.file_path)
+      : (input.tool_input?.file_path || input.tool_input?.path);
+    return (String(raw || '').match(/outputs[\\/][^\\/]+[\\/](\d{3})-/) || [])[1] || null;
+  }
+  return null;
+}
+
+function newestPlan(cwd, preferId) {
   if (!cwd) return null;
   const root = path.join(cwd, 'outputs');
-  let newest = null;
+  let newest = null, newestScoped = null;
   // 규모 실측 2026-08-31 · 이 탐색은 모든 도구 호출마다 돈다. 폴더 5,000개에서 호출당 ~120ms —
   // 수년치가 쌓이면 수백 ms 다. 계획 게이트가 실제로 물 일이 있는 것은 최근 계획뿐이므로
   // (옛 계획은 완료·승인 상태) 날짜 이름 폴더는 90일 창 밖이면 걷지 않는다.
@@ -365,18 +416,28 @@ function newestPlan(cwd) {
         try {
           const at = fs.statSync(target).mtimeMs;
           if (!newest || at > newest.at) newest = { file: target, at };
+          // 여러 단계가 각자 plan.json 을 갖는 체인에서, 옆 단계(이미 승인된 저위험 계획)가
+          // 최신 파일이라는 이유로 지금 단계의 승인·위험판정을 대신하면 안 된다
+          // (실측 2026-09-14 · 8장 CRM 체인 — 저위험 1단계 계획이 규제검토 필요한 4단계까지 대신 승인했다).
+          // 같은 {id}-슬러그 폴더 안의 plan.json 만 "이 단계 것"으로 인정한다.
+          if (preferId && path.basename(dir).startsWith(`${preferId}-`) &&
+              (!newestScoped || at > newestScoped.at)) newestScoped = { file: target, at };
         } catch { /* 건너뛴다 */ }
       }
     }
   };
   try { if (fs.existsSync(root)) walk(root); } catch { return null; }
-  if (!newest) return null;
-  try { return { file: newest.file, plan: JSON.parse(fs.readFileSync(newest.file, 'utf8')) }; }
+  // preferId 를 아는데 그 폴더 안에 계획이 없으면 "전체 중 최신"으로 물러나지 않는다 —
+  // 물러나면 옆 단계의 계획을 다시 빌려 쓰게 되어 고치려던 문제가 그대로 남는다.
+  // 이 단계 것이 없다는 뜻이므로 null 을 낸다(= 미승인과 같게 취급, 세션을 잠그지 않는다).
+  const picked = preferId ? newestScoped : newest;
+  if (!picked) return null;
+  try { return { file: picked.file, plan: JSON.parse(fs.readFileSync(picked.file, 'utf8')) }; }
   catch { return null; }
 }
 
-function planApproval(cwd) {
-  const found = newestPlan(cwd);
+function planApproval(cwd, preferId) {
+  const found = newestPlan(cwd, preferId);
   if (!found) return null;
   try {
     const state = approvalState(found.plan);
@@ -387,11 +448,12 @@ function planApproval(cwd) {
 
   const approval = approved(rows);
   const cwd = process.env.CLAUDE_PROJECT_DIR || input.cwd;
+  const preferId = currentStepId(input);
 
   // 저위험 단일 업무는 사람 문장 없이 통과한다 (2026-09-07). 계획이 없으면 해당 없다.
   let autoPlan = null;
   if (!approval.ok) {
-    const found = newestPlan(cwd);
+    const found = newestPlan(cwd, preferId);
     if (found && lowRiskPlan(found.plan)) autoPlan = found.plan;
   }
 
@@ -406,7 +468,7 @@ function planApproval(cwd) {
   // 계획 밖 스킬 검사에 쓸 계획 본문 — 자동 승인이면 계획 자체를 글로 삼는다
   const planText = approval.ok ? approval.plan : JSON.stringify(autoPlan);
 
-  const planIssue = planApproval(cwd);
+  const planIssue = planApproval(cwd, preferId);
   // 계획 상태 기계(plan-compiler·run-receipt)는 잠긴 상태에서 빠져나오는 유일한 문이다 —
   // 이 문까지 잠그면 compile 뒤 approve 를 부를 수 없다 (실측 2026-08-30 · 영구 잠금).
   // 읽기 조회는 계획을 위반할 수 없고(R8a), plan.json 자체는 쓰기 차단이 아니라 해시가 지킨다(R8b) —
@@ -423,6 +485,17 @@ function planApproval(cwd) {
     const issue = validateWrite(input);
     if (issue) deny(issue);
   } else if (input.tool_name === 'Bash') {
+    // 다음 단계를 여는 문(step-start) 앞에서, 직전 ⏸ 질문이 아직 안 열렸는지 먼저 본다.
+    // 100개 업무 스킬은 Skill 도구를 다시 타지 않고 한 대화 안에서 이어지므로,
+    // 체인의 다음 단계로 넘어가는 실제 경계는 이 호출이다.
+    const call = pluginScriptCall(input);
+    if (call?.script === 'run-receipt.mjs' && call.sub === 'step-start') {
+      const pause = openPause(rows);
+      if (pause) {
+        deny(`직전 화면이 ⏸ 로 멈췄는데 사용자 답 없이 다음 단계로 넘어가려 합니다: "${pause}" · 사용자의 답을 받은 뒤 다시 시도하세요.`);
+        return;
+      }
+    }
     // 승인은 계획을 허락한 것이지 파일시스템을 연 것이 아니다 — 쓰는 문은 Write/Edit 하나다.
     // (실측 2026-08-30 · 승인 뒤 셸 heredoc·python3 이 경로 규칙을 그대로 지나쳤다)
     // 스크립트도 파일이 있다고 다 허용하지 않는다 — 계획이 요구하는 실행·검증 명령만 (P0 허용 목록).
