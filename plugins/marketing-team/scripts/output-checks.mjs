@@ -118,6 +118,10 @@ export const AVAILABLE_CHECKS = Object.keys(REGISTRY);
 export async function runChecks(run, resolve) {
   const wanted = new Set(Array.isArray(run.checks) ? run.checks : []);
   if (run.pii) wanted.add('pii');            // 블록이 있으면 안 적어도 돈다
+  // .csv 산출물이 있으면 안 적어도 돈다 — BOM 누락은 스킬이 스스로 checks 에 적어야
+  // 잡히는 구조라, 실제로 적는 스킬이 없어 11개 스킬에서 그대로 새 나갔다 (실측 2026-09-13 · 020).
+  if ((run.outputs || []).some(item => /\.csv$/i.test(typeof item === 'string' ? item : item?.path || '')))
+    wanted.add('csv-format');
   const issues = [];
   for (const name of wanted) {
     const fn = REGISTRY[name];

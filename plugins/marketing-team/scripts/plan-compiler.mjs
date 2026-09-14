@@ -45,6 +45,10 @@ export function skillDeclarations() {
   const walk = dir => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const target = path.join(dir, entry.name);
+      // _보류/ 는 등록되지 않은 스킬을 보관하는 폴더다. 배제하지 않으면
+      // 같은 id를 쓰는 보류 스킬이 등록 스킬 계약을 조용히 덮어쓴다
+      // (실측 2026-09-13 · 8장 052 ID 충돌).
+      if (entry.isDirectory() && entry.name === '_보류') continue;
       if (entry.isDirectory()) walk(target);
       else if (entry.name === 'SKILL.md') {
         const text = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
