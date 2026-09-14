@@ -11,7 +11,7 @@ triggers:
   - "행사 일정 짜줘"
   - "이번 시즌 딜 기획해줘"
 inputs: [판매 채널 목록, 상품·원가·마진 정보, 재고 현황(선택), 월 목표 매출(선택)]
-sample_fallback: sample-data/A브랜드-원가구조.csv   # 6장 · 비어 있었다 · 실습마다 다른 자료를 쓴다 (2026-09-08)
+sample_fallback: sample-data/A브랜드-원가구조.csv   # 수분 세럼·진정 크림·클렌징 밤 3종 공헌이익률 실데이터 (2026-09-15 확인)
 outputs: [분기·연간 프로모션 캘린더, 진행 결정표(실마진·마진율 계산), 프로모션 기획안 + D-day 준비 타임라인, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["016"]
