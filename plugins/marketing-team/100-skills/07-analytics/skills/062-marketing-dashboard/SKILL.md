@@ -12,7 +12,7 @@ triggers:
   - "마케팅 현황판 만들어줘"
   - "HTML 리포트 대시보드로 뽑아줘"
 inputs: [멀티채널 데이터 소스(CSV·시트·선행 스킬 산출물), 핵심 지표 정의]
-sample_fallback: sample-data/A브랜드-퍼널-가입구매-90일.csv   # 7장 · 실습마다 다른 자료를 쓴다 (2026-09-08)
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # 2026-09-15 · 7장 원고(v10) 062 실측과 같은 자료 · 매출·세션 카드는 이 파일, 광고비·ROAS·전환·CPA 카드는 A브랜드-메타광고-30일.csv · 이전 퍼널 파일은 매출 열이 없어 기본 6종 중 매출 카드를 못 채웠다
 outputs: [단일 파일 HTML 대시보드, 지표 정의 문서(계산식), 데이터 갱신 가이드, 저장 파일(.html)]
 requires: [brand/profile.md]
 chains_to: ["067"]

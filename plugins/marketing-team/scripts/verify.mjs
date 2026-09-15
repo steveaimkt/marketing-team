@@ -1564,7 +1564,7 @@ for (const link of ['agents', 'skills']) {
       for (const [script, label] of [
         ['test-output-checks.mjs', '산출물 내용 검사 (CSV 형식 · 우리말 · 개인정보)'],
         ['check-flag-counts.mjs', '플래그 개수 문서 일치 (gate · pii · review)'],
-        ['test-plan-compiler.mjs', '계획 스키마·승인 해시 (계획 밖 산출물·순서 변경 차단)'],
+        ['test-plan-compiler.mjs', '계획 스키마·승인 해시·찍힌 화면 (계획 밖 산출물·순서 변경 차단 · 틀 화면 글자 단위 일치)'],
         ['test-router.mjs', '자연어 후보 라우터 (006·046 · 복합 요청 분해)'],
         ['test-chain-compiler.mjs', '일반 체인 그래프 (누락·역순·순환·입력 단절 차단)'],
         ['test-review-policy.mjs', '산출물별 검토 정책 자동 생성'],
