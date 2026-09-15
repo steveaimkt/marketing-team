@@ -44,6 +44,13 @@ write('out/soft.md', '어느 자료가 정본인지 — 아직 못 정했습니�
 r = await runChecks({ outputs: ['workspace:out/soft.md'], checks: ['house-style'] }, resolve);
 check('정본·줄표는 경고로만 낸다', hard(r).length === 0 && r.length >= 2);
 
+write('out/axis.md', '저자극 축은 우리만 채웠습니다. 3축 비교표를 냈습니다.\n');
+r = await runChecks({ outputs: ['workspace:out/axis.md'], checks: ['house-style'] }, resolve);
+check('「축」은 경고로 낸다', hard(r).length === 0 && r.some(l => l.includes('`축` 2회')));
+write('out/axis-ok.md', '마케팅팀을 구축하고 일정을 단축했습니다. 축하드립니다.\n');
+r = await runChecks({ outputs: ['workspace:out/axis-ok.md'], checks: ['house-style'] }, resolve);
+check('구축·단축·축하는 잡지 않는다', r.length === 0);
+
 write('out/clean.md', '결과는 여기 저장했습니다 · outputs/2026-08-30/result.md\n');
 r = await runChecks({ outputs: ['workspace:out/clean.md'], checks: ['house-style'] }, resolve);
 check('깨끗한 문서는 통과한다', r.length === 0);

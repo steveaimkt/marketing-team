@@ -43,6 +43,8 @@ const SOFT_TERMS = [
   ['착지', '「결과는 여기 저장했습니다」'],
   ['원장', '「실행 기록」'],
   ['정본', '「기준으로 삼는 자료」'],
+  // 「축」 · 사용자가 쓰지 않는 말이다. 구축·단축·축하 같은 낱말은 건드리지 않는다 (2026-09-15)
+  [/(?<![구압단건저수함위증비긴응농신])축(?![적소하제약구산복전척출조])/g, '「항목」·「기준」 · 「3축 비교표」는 「포지셔닝·가격·채널 비교표」처럼 이름으로'],
 ];
 
 const GATE_TOKEN = /(^|[^A-Za-z0-9])G[1-5]([^0-9]|$)/;
@@ -93,8 +95,9 @@ function checkHouseStyle(run, resolve) {
       if (n) issues.push(`내부의 말이 산출물에 나왔습니다: \`${term}\` ${n}회 → ${instead} · ${ref}`);
     }
     for (const [term, instead] of SOFT_TERMS) {
-      const n = text.split(term).length - 1;
-      if (n) issues.push(`⚠ 다듬을 말: \`${term}\` ${n}회 → ${instead} · ${ref}`);
+      const n = term instanceof RegExp ? (text.match(term) || []).length : text.split(term).length - 1;
+      const label = term instanceof RegExp ? '축' : term;
+      if (n) issues.push(`⚠ 다듬을 말: \`${label}\` ${n}회 → ${instead} · ${ref}`);
     }
     const dashes = text.split('\n').filter(line => line.includes('—')).length;
     if (dashes) issues.push(`⚠ 줄표(—)가 ${dashes}행에 있습니다. 가운뎃점 · 이나 마침표로 끊습니다 · ${ref}`);

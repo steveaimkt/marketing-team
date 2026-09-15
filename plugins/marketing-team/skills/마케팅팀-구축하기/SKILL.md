@@ -742,7 +742,7 @@ node ${CLAUDE_PLUGIN_ROOT}/scripts/memory.mjs doctor
 그것도 착지 실패다. 옮기고 원장을 고칠지 묻는다.
 
 ```
-outputs/2026-08-22/ads/…            ← 카테고리 축은 없앴다
+outputs/2026-08-22/ads/…            ← 카테고리 폴더는 없앴다
 outputs/인수인계_문서.md              ← 날짜 폴더가 없다
 ```
 
