@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600" font-family="Pretendard, 'Apple SD Gothic Neo', sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F3EEE8"/></linearGradient></defs>
+<rect width="1200" height="1600" fill="url(#g)"/>
+<text x="600" y="112" text-anchor="middle" font-size="26" fill="#747264">실제로 쓰신 분들의 말</text>
+<text x="600" y="176" text-anchor="middle" font-size="48" font-weight="700" fill="#2A2A28">후기 6건을 그대로 옮깁니다</text>
+<text x="600" y="220" text-anchor="middle" font-size="16" fill="#9A9894">* 아이디와 프로필 사진은 가렸습니다 · 효능을 단정한 후기는 싣지 않았습니다</text>
+<rect x="140" y="270" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="304" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="316" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="362" r="8" fill="#747264"/>
+<circle cx="266" cy="362" r="8" fill="#747264"/>
+<circle cx="292" cy="362" r="8" fill="#747264"/>
+<circle cx="318" cy="362" r="8" fill="#747264"/>
+<circle cx="344" cy="362" r="8" fill="#747264"/>
+<text x="1024" y="328" text-anchor="end" font-size="16" fill="#A9A49C">2026.08</text>
+<text x="176" y="410" font-size="20" fill="#2A2A28">다른 거 쓰면 다음 날 올라오는데 이건 안 올라와서 두 통째입니다.</text>
+<rect x="140" y="470" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="504" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="516" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="562" r="8" fill="#747264"/>
+<circle cx="266" cy="562" r="8" fill="#747264"/>
+<circle cx="292" cy="562" r="8" fill="#747264"/>
+<circle cx="318" cy="562" r="8" fill="#747264"/>
+<circle cx="344" cy="562" r="8" fill="#DFDAD2"/>
+<text x="1024" y="528" text-anchor="end" font-size="16" fill="#A9A49C">2026.08</text>
+<text x="176" y="610" font-size="20" fill="#2A2A28">여름에도 안 미끈거려서 좋아요. 아침에 바르고 나가도 번들거림이 없습니다.</text>
+<rect x="140" y="670" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="704" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="716" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="762" r="8" fill="#747264"/>
+<circle cx="266" cy="762" r="8" fill="#747264"/>
+<circle cx="292" cy="762" r="8" fill="#747264"/>
+<circle cx="318" cy="762" r="8" fill="#747264"/>
+<circle cx="344" cy="762" r="8" fill="#747264"/>
+<text x="1024" y="728" text-anchor="end" font-size="16" fill="#A9A49C">2026.07</text>
+<text x="176" y="810" font-size="20" fill="#2A2A28">성분표를 맨 위에 적어 둬서 고르기 편했습니다. 함량까지 있는 건 처음 봤어요.</text>
+<rect x="140" y="870" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="904" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="916" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="962" r="8" fill="#747264"/>
+<circle cx="266" cy="962" r="8" fill="#747264"/>
+<circle cx="292" cy="962" r="8" fill="#747264"/>
+<circle cx="318" cy="962" r="8" fill="#747264"/>
+<circle cx="344" cy="962" r="8" fill="#DFDAD2"/>
+<text x="1024" y="928" text-anchor="end" font-size="16" fill="#A9A49C">2026.07</text>
+<text x="176" y="1010" font-size="20" fill="#2A2A28">두 통쯤 쓰니 확실히 달라진 느낌입니다. 처음엔 잘 모르겠더라고요.</text>
+<rect x="140" y="1070" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="1104" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="1116" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="1162" r="8" fill="#747264"/>
+<circle cx="266" cy="1162" r="8" fill="#747264"/>
+<circle cx="292" cy="1162" r="8" fill="#747264"/>
+<circle cx="318" cy="1162" r="8" fill="#747264"/>
+<circle cx="344" cy="1162" r="8" fill="#747264"/>
+<text x="1024" y="1128" text-anchor="end" font-size="16" fill="#A9A49C">2026.07</text>
+<text x="176" y="1210" font-size="20" fill="#2A2A28">향이 아예 없어서 좋습니다. 향 때문에 못 쓰는 제품이 많았어요.</text>
+<rect x="140" y="1270" width="920" height="180" rx="16" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<rect x="176" y="1304" width="44" height="44" rx="22" fill="#DFDAD2"/>
+<rect x="236" y="1316" width="118" height="20" rx="10" fill="#DFDAD2"/>
+<circle cx="240" cy="1362" r="8" fill="#747264"/>
+<circle cx="266" cy="1362" r="8" fill="#747264"/>
+<circle cx="292" cy="1362" r="8" fill="#747264"/>
+<circle cx="318" cy="1362" r="8" fill="#DFDAD2"/>
+<circle cx="344" cy="1362" r="8" fill="#DFDAD2"/>
+<text x="1024" y="1328" text-anchor="end" font-size="16" fill="#A9A49C">2026.06</text>
+<text x="176" y="1410" font-size="20" fill="#2A2A28">펌프가 조금 헐거운 느낌입니다. 내용물은 만족합니다.</text>
+<text x="600" y="1552" text-anchor="middle" font-size="16" fill="#9A9894">후기는 개인의 사용 경험이며 효과는 사람마다 다를 수 있습니다</text>
+</svg>

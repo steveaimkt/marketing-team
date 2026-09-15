@@ -46,7 +46,7 @@ for (const d of dirs) {
   const id = g('id'), slug = g('slug');
 
   for (const k of REQ) if (!new RegExp(`^${k}:`, 'm').test(f)) err(`${d.name} · ${k} 없음`);
-  if (!/^u\d\d$/.test(id)) err(`${d.name} · id 는 u01~u99 여야 한다 (지금: ${id})`);
+  if (!/^1\d\d$/.test(id) || id === '100') err(`${d.name} · id 는 101~199 여야 한다 (지금: ${id})`);
   if (g('category') !== 'custom') err(`${d.name} · category 는 custom 이어야 한다 (지금: ${g('category')})`);
   if (d.name !== `${id}-${slug}`) err(`${d.name} · 폴더명이 {id}-{slug} 와 다르다 (${id}-${slug})`);
   const trig = [...f.matchAll(/^\s+- "(.+?)"$/gm)].length;

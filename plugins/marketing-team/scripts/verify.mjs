@@ -706,9 +706,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       }
     }
   }
-  if (!R.includes('「진행 승인」 단독이 무엇으로 도는지 그 줄에 적는다'))
-    빠짐.push('승인 줄이 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');
-  if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
+  // 2026-09-07 · 승인 대기를 없애며 이 고지가 「승인 줄」에서 「결과 첫 줄」로 옮겼다.
+  // 요구는 그대로다 — 샘플로 돌았는지 내 데이터로 돌았는지 사용자가 반드시 알아야 한다.
+  if (!R.includes('무엇으로 도는지는 결과 첫 줄에 밝힌다'))
+    빠짐.push('결과가 기본값(샘플이냐 내 데이터냐)을 밝히지 않는다 — 자기 데이터를 가진 사람이 모르고 샘플 결과를 받는다 (사용자 지적 2026-09-01)');  if (!fs.existsSync(path.join(ROOT, 'scripts', '_픽스처', 'run-v1', 'advanced-run.json')))
     빠짐.push('run/v1 회귀 픽스처가 없다 (개선 플랜 Phase 0)');
   // §14 M1 · 일일 자가검증 — 실행기·회귀·정책이 셋 다 있어야 하고, 정책은 실행기 자신을 보호해야 한다
   if (!fs.existsSync(path.join(ROOT, 'scripts', 'daily-health-check.mjs')))
@@ -850,7 +851,10 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       const id = (t.match(/^id:\s*"?(\d+)/m) || [])[1];
       const nm = (t.match(/^name:\s*(.+)$/m) || [])[1];
       if (!id || !nm) continue;
-      const re = new RegExp(`\\|\\s*${id}\\s*\\|\\s*([^|]+?)\\s*\\|`, 'g');
+      // 줄 맨 앞 칸이 id 인 표(스킬 카탈로그 표)만 본다 — 체인 요약표처럼
+      // id 가 3번째 칸에 오는 다른 표(예: 「순번|이름|id|산출물」)까지 잡으면 오탐이 된다
+      // (2026-09-15 · 08-crm 073·075·077 오탐 확인).
+      const re = new RegExp(`^\\|\\s*${id}\\s*\\|\\s*([^|]+?)\\s*\\|`, 'gm');
       let m;
       while ((m = re.exec(txt))) {
         const v = m[1].trim();
@@ -882,8 +886,12 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const q = path.join(d, e.name);
     if (e.isDirectory()) return walk(q);
     if (e.name !== 'SKILL.md') return;
-    const v = (fs.readFileSync(q, 'utf8').match(/^review:\s*(.+)$/m) || [])[1];
-    if (!v) return;
+    const raw = (fs.readFileSync(q, 'utf8').match(/^review:\s*(.+)$/m) || [])[1];
+    if (!raw) return;
+    // 다른 필드(sample_fallback 등)처럼 review: 도 뒤에 "# 왜 이 관점인지" 주석을 달 수 있다
+    // (2026-09-15 · 014·044·067). 주석까지 "·"로 쪼개면 관점이 아닌 말이 "알 수 없는 관점"으로
+    // 잘못 잡힌다 — 주석을 먼저 떼고 잰다.
+    const v = raw.split('#')[0];
     n++;
     for (const k of v.trim().split('·')) if (!관점.includes(k.trim()))
       이상.push(`${path.basename(path.dirname(q))} — 알 수 없는 관점 「${k.trim()}」`);
@@ -1556,7 +1564,7 @@ for (const link of ['agents', 'skills']) {
       for (const [script, label] of [
         ['test-output-checks.mjs', '산출물 내용 검사 (CSV 형식 · 우리말 · 개인정보)'],
         ['check-flag-counts.mjs', '플래그 개수 문서 일치 (gate · pii · review)'],
-        ['test-plan-compiler.mjs', '계획 스키마·승인 해시 (계획 밖 산출물·순서 변경 차단)'],
+        ['test-plan-compiler.mjs', '계획 스키마·승인 해시·찍힌 화면 (계획 밖 산출물·순서 변경 차단 · 틀 화면 글자 단위 일치)'],
         ['test-router.mjs', '자연어 후보 라우터 (006·046 · 복합 요청 분해)'],
         ['test-chain-compiler.mjs', '일반 체인 그래프 (누락·역순·순환·입력 단절 차단)'],
         ['test-review-policy.mjs', '산출물별 검토 정책 자동 생성'],

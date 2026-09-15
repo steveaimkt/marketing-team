@@ -1,0 +1,51 @@
+{
+  "document": "수분 세럼 30ml 상세페이지",
+  "sections": 22,
+  "frames": [
+    {
+      "section": "01",
+      "name": "Hook",
+      "asset": "photo"
+    },
+    {
+      "section": "06",
+      "name": "페인포인트",
+      "asset": "generated"
+    },
+    {
+      "section": "09",
+      "name": "기능 1",
+      "asset": "photo"
+    },
+    {
+      "section": "11",
+      "name": "기능 3",
+      "asset": "photo"
+    },
+    {
+      "section": "12",
+      "name": "기능 4",
+      "asset": "generated"
+    },
+    {
+      "section": "17",
+      "name": "용량 비교",
+      "asset": "generated"
+    },
+    {
+      "section": "20",
+      "name": "고객 후기",
+      "asset": "photo"
+    },
+    {
+      "section": "21",
+      "name": "제품 스펙",
+      "asset": "photo"
+    },
+    {
+      "section": "24",
+      "name": "CTA",
+      "asset": "photo"
+    }
+  ]
+}

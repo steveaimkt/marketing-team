@@ -20,7 +20,8 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { compileChain, validateChainPlan } from './chain-compiler.mjs';
+import os from 'node:os';
+import { canonicalChains, compileChain, validateChainPlan } from './chain-compiler.mjs';
 
 const PLUGIN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SCHEMA = 'marketing-team.plan/v1';
@@ -45,6 +46,10 @@ export function skillDeclarations() {
   const walk = dir => {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
       const target = path.join(dir, entry.name);
+      // _보류/ 는 등록되지 않은 스킬을 보관하는 폴더다. 배제하지 않으면
+      // 같은 id를 쓰는 보류 스킬이 등록 스킬 계약을 조용히 덮어쓴다
+      // (실측 2026-09-13 · 8장 052 ID 충돌).
+      if (entry.isDirectory() && entry.name === '_보류') continue;
       if (entry.isDirectory()) walk(target);
       else if (entry.name === 'SKILL.md') {
         const text = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
@@ -52,10 +57,13 @@ export function skillDeclarations() {
         if (!id) continue;
         cache.set(id, {
           id,
+          dir: path.dirname(target),
           name: ((text.match(/^name:\s*(.+)$/m) || [])[1] || '').trim(),
           gate: /^gate:\s*true\s*$/m.test(text),
           pii: /^pii:\s*true\s*$/m.test(text),
-          review: ((text.match(/^review:\s*(.+)$/m) || [])[1] || '')
+          mutating: /^mutating:\s*true\s*$/m.test(text),
+          // review: 뒤 「# 날짜 · 이유」 주석은 관점이 아니다 (verify.mjs 와 같은 규칙)
+          review: ((text.match(/^review:\s*(.+)$/m) || [])[1] || '').split('#')[0]
             .split(/[·,]/).map(v => v.trim()).filter(Boolean),
           writesTo: frontmatterList(text, 'writes_to'),
           chainsTo: frontmatterList(text, 'chains_to'),
@@ -272,11 +280,229 @@ export function approvalState(plan) {
   return { ok: true, current };
 }
 
+/* ── 계획 화면 · 같은 조건이면 같은 글자 (2026-09-15) ─────────────
+ * 원고의 실습 화면과 코워크 화면이 100% 같아야 한다. 모델이 화면을 지으면 실행마다 칸 이름·순서·
+ * 문장이 흔들렸다(실측 2026-09-14 코워크 · 「근거로 쓰는 것 / 멈추는 곳 없음 / (재실행)」).
+ * 그래서 화면은 스크립트가 찍고 모델은 그대로 옮긴다. 스킬마다 다른 말만 틀(```틀 블록)에 두고
+ * 나머지는 계획과 스킬 선언에서 기계로 채운다. 틀이 없는 스킬은 화면을 찍지 않는다(null).
+ */
+const FORMAT_LABEL = [
+  [/-해설\.md$/, '해설 .md'], [/\.xlsx$/, '표 .xlsx'], [/\.csv$/, '표 .csv'], [/\.html$/, '화면 .html'],
+  [/\.docx$/, '문서 .docx'], [/\.pptx$/, '발표 자료 .pptx'], [/\.pdf$/, '문서 .pdf'], [/\.md$/, '문서 .md'], [/\.jsonl$/, '평가 파일 .jsonl'],
+];
+const formatLabel = base => (FORMAT_LABEL.find(([re]) => re.test(base)) || [null, base])[1];
+/** 받침이 있으면 「으로」, 없거나 ㄹ 받침이면 「로」 */
+const 으로 = word => {
+  const code = String(word).trim().slice(-1).charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return `${word}로`;
+  const 받침 = code % 28;
+  return `${word}${받침 === 0 || 받침 === 8 ? '로' : '으로'}`;
+};
+
+/** ```틀 블록을 읽는다. 「키: 값」 한 줄씩, 「우리 자료로 하려면:」 아래 「- 」 줄은 목록이다. */
+export function parseScreenTemplate(text) {
+  const block = (String(text).replace(/\r\n/g, '\n').match(/^```틀\n([\s\S]*?)^```$/m) || [])[1];
+  if (!block) return null;
+  const tpl = { 목록: {} };
+  let listKey = null;
+  for (const line of block.split('\n')) {
+    if (!line.trim()) continue;
+    const item = line.match(/^-\s+(.*)$/);
+    if (item && listKey) { tpl.목록[listKey].push(item[1].trim()); continue; }
+    const kv = line.match(/^([^:]+):\s*(.*)$/);
+    if (!kv) continue;
+    const key = kv[1].trim();
+    if (kv[2].trim() === '') { listKey = key; tpl.목록[key] = []; continue; }
+    listKey = null;
+    tpl[key] = kv[2].trim();
+  }
+  return tpl;
+}
+
+export function skillScreenTemplate(id) {
+  const found = skillDeclarations().get(String(id));
+  if (!found) return null;
+  const file = path.join(found.dir, 'example', 'plan-screen.md');
+  return fs.existsSync(file) ? parseScreenTemplate(fs.readFileSync(file, 'utf8')) : null;
+}
+
+export function chainScreenTemplate(name) {
+  if (!name) return null;
+  const root = path.join(PLUGIN, '100-skills');
+  const files = [path.join(root, 'CHAINS.md'),
+    ...fs.readdirSync(root, { withFileTypes: true }).filter(e => e.isDirectory() && /^\d\d-/.test(e.name))
+      .map(e => path.join(root, e.name, 'PLUGIN.md'))];
+  for (const file of files) {
+    if (!fs.existsSync(file)) continue;
+    const text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
+    for (const m of text.matchAll(/^```틀\n([\s\S]*?)^```$/gm)) {
+      const tpl = parseScreenTemplate(`\`\`\`틀\n${m[1]}\`\`\``);
+      if (tpl && tpl.체인 === name) return tpl;
+    }
+  }
+  return null;
+}
+
+/** 브랜드 프로필이 비었나 · 없거나, 설치 때 받은 빈 템플릿과 같으면 빈 것이다. */
+export function profileIsEmpty(cwd) {
+  const file = path.join(cwd, 'brand', 'profile.md');
+  if (!fs.existsSync(file)) return true;
+  const template = path.join(PLUGIN, 'brand-templates', 'profile.md');
+  return fs.existsSync(template) && fs.readFileSync(file, 'utf8').trim() === fs.readFileSync(template, 'utf8').trim();
+}
+
+const stopSentences = decl => {
+  const out = [];
+  if (decl.gate) out.push('완성 뒤 AI 규제검토자가 밖에 내기 전 표현을 검사합니다.');
+  if (decl.pii) out.push('완성 뒤 AI 규제검토자에게 개인정보가 새지 않았는지 검사를 맡깁니다.');
+  if (decl.review.length) out.push(`완성 뒤 AI 사업검토자가 ${decl.review.join('·')} 관점으로 봅니다.`);
+  if (decl.mutating) out.push('밖으로 보내거나 올리는 일은 한 번 더 묻고 합니다.');
+  return out;
+};
+
+export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
+  const decl = skillDeclarations();
+  const steps = plan.steps || [];
+  if (!steps.length) return null;
+  const rows = steps.map(step => {
+    const id = String(step.skill || '').trim();
+    return { id, step, decl: decl.get(id), tpl: skillScreenTemplate(id) };
+  });
+  if (rows.some(r => !r.decl || !r.tpl)) return null;
+  const isChain = rows.length > 1;
+  const chainTpl = isChain ? chainScreenTemplate(plan.chain) : null;
+  if (isChain && !chainTpl) return null;
+
+  const rel = ref => String(ref).replace(/^(workspace|plugin):/, '');
+  const choice = normalizeFormatChoice(plan.형식, '계획의');
+  const lines = ['[실행 계획]', `계획: ${isChain ? plan.chain : rows[0].decl.name}`];
+  if (isChain && chainTpl['부르는 팀']) lines.push(`부르는 팀: ${chainTpl['부르는 팀']} · 스킬 ${rows.length}개`);
+  lines.push('', '무엇이 나오나');
+  rows.forEach((r, i) => lines.push(`  ${isChain ? `${i + 1}. ` : ''}스킬 ${r.id} · ${r.decl.name}: ${r.tpl['무엇이 나오나']}`));
+  lines.push('');
+
+  const first = rows[0];
+  const inputs = (first.step.inputs || []).map(String);
+  const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
+  const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
+  const 샘플이유 = first.tpl['샘플 이유'] || 'inputs/ 폴더가 비어 있어';
+  if (own.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
+  else if (sample && first.tpl['샘플 자료']) lines.push(`분석할 자료: ${샘플이유} ${으로(first.tpl['샘플 자료'])} 돌립니다. 결과에는 [샘플]이 붙습니다.`);
+  lines.push(`근거로 쓰는 것: ${profileIsEmpty(cwd) ? '브랜드 프로필이 비어 있어 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}`);
+
+  const firstOut = rel((first.step.outputs || [])[0] || '');
+  const parts = firstOut.split('/');
+  lines.push(`나오는 곳: ${isChain ? parts.slice(0, 2).join('/') : parts.slice(0, 3).join('/')}/`);
+
+  const formatsOf = r => {
+    const 계약 = [...new Set(r.decl.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
+    return applyFormatChoice(계약, choice).map(formatLabel).join(' · ');
+  };
+  if (isChain) {
+    lines.push('나오는 형식:');
+    rows.forEach((r, i) => lines.push(`  ${i + 1}. ${r.decl.name}: ${formatsOf(r)}`));
+  } else lines.push(`나오는 형식: ${formatsOf(first)}`);
+  const allBases = rows.flatMap(r => r.decl.writesTo.map(v => path.posix.basename(v)));
+  if (!choice && allBases.some(b => /\.xlsx$/.test(b)))
+    lines.push('다른 형식: 표를 csv로 받으려면 「진행 승인. 표는 csv로」라고 답해주세요.');
+
+  const stops = [];
+  if (isChain) {
+    rows.forEach((r, i) => {
+      // 체인 안에서는 단독 호출 때 묻던 질문을 건너뛰는 스킬이 있다 · 그 스킬은 「체인에서 멈추는 곳 더」로 적는다 (「없음」이면 덧붙이지 않는다)
+      const extra = '체인에서 멈추는 곳 더' in r.tpl ? r.tpl['체인에서 멈추는 곳 더'] : r.tpl['멈추는 곳 더'];
+      const s = [...stopSentences(r.decl), ...(extra && extra !== '없음' ? [extra] : [])];
+      if (s.length) stops.push(`  ${i + 1}. ${r.decl.name}: ${s.join(' ')}`);
+    });
+    for (const extra of chainTpl.목록['멈추는 곳'] || []) stops.push(`  ${extra}`);
+    lines.push(stops.length ? '멈추는 곳:' : '멈추는 곳: 없음', ...stops);
+  } else {
+    const s = [...stopSentences(first.decl), ...(first.tpl['멈추는 곳 더'] ? [first.tpl['멈추는 곳 더']] : [])];
+    lines.push(`멈추는 곳: ${s.length ? s.join(' ') : '없음'}`);
+  }
+  // 체인 틀에 시간이 없으면 단계별 「a~b분」을 더한다 · 지어낸 숫자를 쓰지 않는다
+  const sumMinutes = () => {
+    let lo = 0, hi = 0;
+    for (const r of rows) {
+      const m = String(r.tpl['걸리는 시간'] || '').match(/(\d+)\s*~\s*(\d+)\s*분/);
+      if (!m) return null;
+      lo += Number(m[1]); hi += Number(m[2]);
+    }
+    return `${lo}~${hi}분`;
+  };
+  const minutes = isChain ? (chainTpl['걸리는 시간'] || sumMinutes()) : first.tpl['걸리는 시간'];
+  if (minutes) lines.push(`걸리는 시간: ${minutes}`);
+
+  // 체인 틀에 같은 키가 있으면 체인 것을 쓴다 · 없으면 첫 단계 스킬 것을 쓴다
+  const pick = key => (isChain && chainTpl.목록[key]) || first.tpl.목록[key] || [];
+  const handoff = pick('우리 자료로 하려면');
+  if (sample && !own.length && handoff.length) {
+    lines.push('', '우리 자료로 하려면');
+    const 안내 = (isChain && chainTpl['우리 자료 안내']) || first.tpl['우리 자료 안내'];
+    if (안내) lines.push(`  ${안내}`);
+    for (const item of handoff) lines.push(`  ${item}`);
+    lines.push('  넣은 뒤 승인할 때 「진행 승인. inputs/파일이름」처럼 파일 이름을 함께 적어주세요.');
+  }
+  const asks = pick('함께 알려주면 좋은 것');
+  if (asks.length) {
+    lines.push('', '함께 알려주면 좋은 것');
+    for (const item of asks) lines.push(`  ${item}`);
+  }
+  lines.push('', '[승인 요청]', '⏸ 이대로 갈까요? 진행하려면 「진행 승인」이라고 답해주세요.');
+  return lines.join('\n');
+}
+
+/**
+ * 문서·테스트용 표준 조건의 계획 · 샘플 자료 · 빈 프로필 · 형식 선택 없음 · 날짜 2026-09-15.
+ * 스킬 하나면 날짜 폴더, 체인이면 `outputs/2026-09-{체인}/` 프로젝트 폴더 아래 스킬별 폴더다.
+ */
+export function canonicalScreenPlan(target, { date = '2026-09-15' } = {}) {
+  const decl = skillDeclarations();
+  let ids = [String(target)];
+  let chain = null;
+  if (!decl.has(String(target))) {
+    const found = canonicalChains().get(String(target));
+    if (!found) return null;
+    ids = found.variants[0];
+    chain = found.name;
+  }
+  const steps = ids.map((id, index) => {
+    const d = decl.get(id);
+    if (!d) return null;
+    const skillText = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8');
+    const fallback = ((skillText.match(/^sample_fallback:\s*(\S+)/m) || [])[1] || '').trim();
+    const files = d.writesTo.filter(v => v.includes('/'));
+    const outputs = files.map(v => chain
+      ? `workspace:outputs/${date.slice(0, 7)}-${chain}/${v.split('/')[2]}/${path.posix.basename(v)}`
+      : `workspace:${v.replace('{날짜}', date)}`);
+    return {
+      step: index + 1, skill: id,
+      inputs: index === 0 ? (fallback ? [`plugin:${fallback}`] : []) : [],
+      outputs,
+      reviews: [...(d.gate ? [{ kind: 'compliance' }] : []), ...d.review.map(p => ({ kind: 'business', perspective: p }))],
+    };
+  });
+  if (steps.some(s => !s)) return null;
+  for (let i = 1; i < steps.length; i += 1) if (steps[i - 1].outputs[0]) steps[i].inputs = [steps[i - 1].outputs[0]];
+  return { request: '화면 표준 조건', skills: ids, ...(chain ? { chain } : {}), steps };
+}
+
 /* ── CLI ───────────────────────────────────────────────────── */
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isCli) {
   const [command, target] = process.argv.slice(2);
-  if (!command || !target) fail('사용: plan-compiler.mjs <compile|approve|check> <plan.json>');
+  if (!command || !target) fail('사용: plan-compiler.mjs <compile|approve|check> <plan.json> · screen <스킬번호|체인이름>');
+  // 틀을 고친 뒤 문서의 「찍힌 화면」을 다시 찍을 때 쓴다 · 빈 폴더(빈 프로필)에서 표준 조건으로 찍는다
+  if (command === 'screen') {
+    const plan = canonicalScreenPlan(target);
+    if (!plan) fail(`그런 스킬이나 체인이 없습니다: ${target}`);
+    const empty = fs.mkdtempSync(path.join(os.tmpdir(), 'plan-screen-'));
+    const screen = renderPlanScreen(plan, { cwd: empty });
+    fs.rmSync(empty, { recursive: true, force: true });
+    if (!screen) fail(`틀이 없어 화면을 찍지 못했습니다: ${target} (스킬 example/plan-screen.md 또는 체인 틀을 확인하세요)`);
+    console.log(screen);
+    process.exit(0);
+  }
   const file = path.resolve(process.cwd(), target);
   if (path.basename(file) !== 'plan.json') fail('계획 파일 이름은 plan.json 이어야 합니다.');
   const plan = read(file);
@@ -288,11 +514,25 @@ if (isCli) {
     const graph = compileChain(plan);
     plan.chain_graph = { schema: graph.schema, chain: graph.chain, nodes: graph.nodes, edges: graph.edges };
     plan.risks = graph.warnings;
+    // 이름 있는 체인은 top-level plan.chain 에도 적어 둔다 (2026-09-15) — run-receipt.mjs 의
+    // 스킬별 자기 폴더 강제(validateExecutionContract)가 chain_graph.chain 이 아니라 이 필드를
+    // 읽는다. 모델이 plan.chain 을 스스로 적지 않아도(정본 순서와 정확히 같으면) compileChain 이
+    // 이미 자동으로 알아낸 이름이 있으므로 여기서 채워 넣는다. 실측 2026-09-14·09-15,
+    // 10장 045→046→043 이 「자기 폴더」 규칙이 이미 있었는데도 마지막 스킬 폴더로 몰렸다 —
+    // plan.json 에 chain 이 끝내 비어 있었기 때문이다.
+    if (graph.chain) plan.chain = graph.chain;
     plan.plan_sha256 = planHash(plan);
     plan.status = 'awaiting-approval';
     plan.approved_sha256 = null;
+    const screen = renderPlanScreen(plan, { cwd: process.cwd() });
+    if (screen) plan.screen = screen; else delete plan.screen;
     write(file, plan);
     console.log(`✅ 계획 확정 · ${plan.skills.join('→')} · ${plan.plan_sha256.slice(0, 12)} · 승인 대기`);
+    if (screen) {
+      console.log('── 아래 화면을 한 글자도 바꾸지 말고 앞뒤에 문장을 붙이지 말고 그대로 사용자에게 낸다 ──');
+      console.log(`\`\`\`text\n${screen}\n\`\`\``);
+      console.log('── 화면 끝 ──');
+    }
     // 계획 흔적을 실행 타래에 남긴다 (P2 · 2026-08-30) — 작업 공간일 때만 · 실패해도 컴파일을 막지 않는다.
     try {
       if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {

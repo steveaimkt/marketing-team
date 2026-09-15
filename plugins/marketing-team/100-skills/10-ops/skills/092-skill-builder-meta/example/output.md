@@ -46,7 +46,7 @@
 | 수집 실패 | 3계정 중 1개라도 실패하면 **그 사실을 산출물에 적는다** |
 
 **안전 규칙 3종**
-- ✅ 읽기 전용 (원본 시트 미수정 · 사본에 append)
+- ✅ 읽기 전용 (원본 시트 미수정, 사본에 append)
 - ✅ 계정명 마스킹 불필요 (공개 계정)
 - ✅ 발행 없음 (내부 기록용)
 
@@ -66,7 +66,7 @@
 ## SKILL.md (발췌)
 
 ```yaml
-id: "u01"
+id: "101"
 name: 경쟁 인스타 주간 변화
 slug: competitor-ig-weekly
 category: custom
@@ -86,26 +86,26 @@ mutating: false
 ## routing-eval.jsonl (5줄)
 
 ```json
-{"intent":"경쟁사 인스타 확인해줘","expected_skill":"u01"}
-{"intent":"이번 주 경쟁 계정 뭐 올렸나","expected_skill":"u01"}
-{"intent":"경쟁 계정 인스타 주간 변화 정리해줘","expected_skill":"u01"}
+{"intent":"경쟁사 인스타 확인해줘","expected_skill":"101"}
+{"intent":"이번 주 경쟁 계정 뭐 올렸나","expected_skill":"101"}
+{"intent":"경쟁 계정 인스타 주간 변화 정리해줘","expected_skill":"101"}
 {"intent":"경쟁사 전체 모니터링 돌려줘","expected_skill":"003"}
 {"intent":"경쟁사 분석 만들어줘","expected_skill":"002"}
 ```
 
 > 3~5번은 **이 스킬이 잡으면 안 되는 질문**이다. 오발동 검사가 절반이다.
 
-## 편입 심사
+## 등록 심사
 
 | 기준 | 결과 |
 |---|---|
 | 기존 스킬과 중복 | ✅ 003 과 범위 분리 확인 |
 | 재사용 가능성 | ✅ 주 1회 |
 | 게이트 존재 | ✅ |
-| **결과** | ✅ **편입** |
+| **결과** | ✅ **등록** (`brand/my-skills/`) |
 
 ## 다음 액션
-→ `brand/my-skills/u01-competitor-ig-weekly/`에 등록 후 첫 실행 · `INDEX.md`에 한 줄 추가 · 4주 뒤 098에서 실제 절감 확인
+→ `brand/my-skills/101-competitor-ig-weekly/`에 등록 후 첫 실행 · `INDEX.md`에 한 줄 추가 · 4주 뒤 098에서 실제 절감 확인
 
 ---
 

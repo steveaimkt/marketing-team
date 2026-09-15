@@ -9,7 +9,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate } from './plan-compiler.mjs';
+import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-plan-'));
@@ -127,7 +128,99 @@ try {
   assert.equal(started.status, 0, `승인 뒤에는 시작해야 한다: ${started.stderr}`);
   assert.equal(JSON.parse(fs.readFileSync(runFile, 'utf8')).plan.plan_sha256, planHash(load()), '영수증에 승인 해시가 남아야 한다');
 
-  console.log('계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · ✅');
+  // 이름 있는 체인은 compile 이 plan.chain 을 채워야 한다 (2026-09-15) —
+  // run-receipt.mjs 의 스킬별 자기 폴더 강제가 chain_graph.chain 이 아니라 이 필드를 읽는다.
+  // 모델이 chain 을 안 적어도, 정본 순서(05-ads PLUGIN.md 「광고애널리틱스」 045→046→043)와
+  // 정확히 같으면 chain-compiler 가 이미 알아낸 이름을 top-level 에도 남겨야 한다.
+  // 실측 2026-09-14·09-15 · 10장 045→046→043 이 이 필드가 비어 각자 폴더 규칙을 못 타고
+  // 마지막 스킬 폴더로 몰렸다.
+  {
+    const chainDir = path.join(temp, 'outputs', '2026-09-추적', '045-weekly-ads-report');
+    fs.mkdirSync(chainDir, { recursive: true });
+    const chainRel = 'outputs/2026-09-추적';
+    const wsRef = (skillDir, name) => `workspace:${chainRel}/${skillDir}/${name}`;
+    const chainPlan = {
+      schema: 'marketing-team.plan/v1',
+      plan_id: 'p-chain',
+      request: '광고애널리틱스 돌려줘',
+      requested_order: ['045', '046', '043'],
+      skills: ['045', '046', '043'],
+      steps: [
+        {
+          step: 1, skill: '045',
+          inputs: ['plugin:sample-data/A브랜드-채널성과-90일.csv'],
+          outputs: [wsRef('045-weekly-ads-report', '045-weekly-ads-report.html')],
+          reviews: [],
+        },
+        {
+          step: 2, skill: '046',
+          inputs: [wsRef('045-weekly-ads-report', '045-weekly-ads-report.html')],
+          outputs: [wsRef('046-roas-budget-rebalance', '046-roas-budget-rebalance.md')],
+          reviews: [{ kind: 'business', perspective: '재무' }],
+        },
+        {
+          step: 3, skill: '043',
+          inputs: [wsRef('046-roas-budget-rebalance', '046-roas-budget-rebalance.md')],
+          outputs: [wsRef('043-meta-ad-copy', '043-meta-ad-copy.xlsx'), wsRef('043-meta-ad-copy', '043-meta-ad-copy.md')],
+          reviews: [{ kind: 'compliance' }],
+        },
+      ],
+      budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+    };
+    assert.equal(chainPlan.chain, undefined, '이 테스트는 chain 을 일부러 비워 둔다 — 모델이 안 적는 실제 상황을 재현한다');
+    const chainPlanFile = path.join(chainDir, '..', 'plan.json');
+    fs.writeFileSync(chainPlanFile, `${JSON.stringify(chainPlan, null, 2)}\n`);
+    const chainPlanRel = `${chainRel}/plan.json`;
+    const compiled = cli('plan-compiler.mjs', 'compile', chainPlanRel);
+    assert.equal(compiled.status, 0, `정본과 정확히 같은 순서의 체인은 compile 이 통과해야 한다: ${compiled.stderr}${compiled.stdout}`);
+    const onDisk = JSON.parse(fs.readFileSync(path.join(temp, chainPlanRel), 'utf8'));
+    assert.equal(onDisk.chain, '광고애널리틱스', 'compile 은 정본과 일치하는 체인 이름을 top-level plan.chain 에 채워야 한다');
+    assert.equal(onDisk.chain_graph.chain, '광고애널리틱스', 'chain_graph.chain 도 그대로 유지돼야 한다');
+  }
+
+  // ── 계획 화면은 스크립트가 찍는다 · 틀이 있는 스킬은 「찍힌 화면」과 글자 단위로 같아야 한다 (2026-09-15) ──
+  //    원고의 실습 화면 = 코워크 화면 100%. 같은 조건(샘플·빈 프로필·형식 선택 없음)이면 같은 글자다.
+  let 화면수 = 0;
+  {
+    const screenCwd = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-screen-'));
+    try {
+      for (const [id, d] of skillDeclarations()) {
+        const refFile = path.join(d.dir, 'example', 'plan-screen.md');
+        if (!fs.existsSync(refFile)) continue;
+        const refText = fs.readFileSync(refFile, 'utf8');
+        if (!parseScreenTemplate(refText)) continue;
+        const expected = (refText.match(/^## 찍힌 화면\n\n````text\n([\s\S]*?)\n````$/m) || [])[1];
+        assert.ok(expected, `${id} · 틀이 있으면 「## 찍힌 화면」 블록도 있어야 한다`);
+        const plan = canonicalScreenPlan(id);
+        const got = renderPlanScreen(plan, { cwd: screenCwd });
+        assert.equal(got, expected, `${id} · 찍힌 화면과 틀 출력이 다르다 — 틀을 고쳤으면 「찍힌 화면」도 다시 찍어 넣는다`);
+        assert.equal(renderPlanScreen(plan, { cwd: screenCwd }), got, `${id} · 같은 조건에서 두 번 찍은 화면이 다르다`);
+        assert.ok(!got.includes('—'), `${id} · 화면에 em dash 가 있다`);
+        화면수 += 1;
+      }
+      assert.ok(화면수 >= 1, '틀을 가진 스킬이 하나도 없다');
+      // 체인 · 틀이 있는 체인은 같은 파일의 「#### 찍힌 화면: {체인}」 블록과 같아야 한다
+      const docs = [path.join(HERE, '..', '100-skills', 'CHAINS.md'),
+        ...fs.readdirSync(path.join(HERE, '..', '100-skills'), { withFileTypes: true })
+          .filter(e => e.isDirectory() && /^\d\d-/.test(e.name)).map(e => path.join(HERE, '..', '100-skills', e.name, 'PLUGIN.md'))]
+        .filter(f => fs.existsSync(f)).map(f => fs.readFileSync(f, 'utf8'));
+      for (const name of canonicalChains().keys()) {
+        if (!chainScreenTemplate(name)) continue;
+        const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const re = new RegExp(`^#### 찍힌 화면: ${esc}\\n\\n\`\`\`\`text\\n([\\s\\S]*?)\\n\`\`\`\`$`, 'm');
+        const expected = docs.map(t => (t.match(re) || [])[1]).find(Boolean);
+        assert.ok(expected, `${name} · 체인 틀이 있으면 「#### 찍힌 화면: ${name}」 블록도 있어야 한다`);
+        const got = renderPlanScreen(canonicalScreenPlan(name), { cwd: screenCwd });
+        assert.equal(got, expected, `${name} · 체인 찍힌 화면과 틀 출력이 다르다`);
+        assert.ok(!got.includes('—'), `${name} · 체인 화면에 em dash 가 있다`);
+        화면수 += 1;
+      }
+    } finally {
+      fs.rmSync(screenCwd, { recursive: true, force: true });
+    }
+  }
+
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

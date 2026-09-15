@@ -1,0 +1,310 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>상품명 기획</title><style>/* ─────────────────────────────────────────────────────────────
+   산출물 디자인 토큰 · 이 파일 하나만 갈아 끼우면 전부 바뀐다
+   2026-09-01 · 저자 디자인 시스템(WMBB)을 그대로 옮겼다
+
+   원본 · WMBB Design System · 「브랜드 톤앤매너.fig」에서 뽑았다
+   저자가 명세를 직접 넘겨 주었다 (2026-09-04 전문 확인). 여기 없는 값은 만들지 않는다.
+
+   결 · 조용하고 종이처럼 따뜻하며 활자가 이끈다. SaaS 제품이 아니라 잘 짜인 잡지에 가깝다.
+        오프화이트 바탕 · 따뜻한 먹빛 글자 · 넉넉한 여백 · 큰 둥근 이미지 블록.
+   🔴 강조는 아껴 쓴다. **한 쪽에 한 번.**
+   ───────────────────────────────────────────────────────────── */
+
+:root{
+  /* 종이 · Paper 가 페이지 바탕, 흰색은 올라온 면에만 쓴다 */
+  --paper:       #F3F3F2;
+  --paper-card:  #FFFFFF;
+  --paper-sunk:  #EBEBEB;
+
+  /* 잉크 · 순검정이 아니라 살짝 따뜻하다. 역상 면의 색이기도 하다 */
+  --ink:         #2A2A28;
+  --ink-mut:     #444444;
+  --ink-cool:    #4C4D59;
+  --ink-faint:   #848383;
+  --ink-fade:    #AFAFAC;
+
+  /* 선 · 헤어라인 1px 하나뿐이다 */
+  --line:        #EBEBEB;
+  --line-strong: #444444;
+
+  /* 강조 · 아껴 쓴다. 모래는 면에, 올리브는 글자와 막대에 */
+  --sand:        #E0CCBE;
+  /* 라벤더 · 컴포넌트 라이브러리 스펙 페이지에만 선다. 고객이 보는 면에는 안 쓴다 */
+  --spec:        #E6E9FF;
+  --spec-line:   #C4C9E5;
+  --olive:       #747264;
+  --mark:        #EBFF2C;
+  --acc:         var(--olive);
+  --acc-deep:    #2A2A28;
+  --acc-band:    rgba(224,204,190,.34);
+  --second:      var(--sand);
+
+  /* 판정 · 원본에 없어 잉크 농담과 기호로 가른다. 채도를 낮췄다 */
+  --up:          #3F5F4A;
+  --up-band:     rgba(63,95,74,.09);
+  --down:        #7A3B36;
+  --down-band:   rgba(122,59,54,.09);
+  --warn:        #6B5A2E;
+  --warn-band:   rgba(224,204,190,.30);
+  --none:        #848383;
+
+  /* 서체 · Pretendard 가 라틴과 한글을 한 벌로 덮는다 */
+  --ff: Pretendard, "Pretendard Variable", Manrope, -apple-system,
+        BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --ff-display: "Bricolage Grotesque", var(--ff);
+  --ff-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  /* 푸터 저작권 한 줄에만 쓴다. 이 시스템에서 Roboto 가 서는 유일한 자리다 */
+  --ff-legal: Roboto, var(--ff);
+  --t-legal: 14px;
+
+  /* 크기 · 글줄 · 자간 */
+  --t-h1: 34px;  --t-h2: 20px;  --t-h3: 15px;
+  --t-body: 15px; --t-small: 13px; --t-tiny: 12px;
+  --t-kpi: 34px;
+  --lh-display: 1.1;
+  --lh-head: 1.15;
+  --lh-body: 1.6;
+  --lh-lead: 1.4;
+  --ls-display: -.01em;
+
+  /* 여백 · 카드 격자는 20, 낱칸은 14 */
+  --sp-1: 5px; --sp-2: 10px; --sp-3: 14px; --sp-4: 20px;
+  --sp-5: 30px; --sp-6: 50px; --sp-7: 100px;
+  --gap-card: 20px; --gap-cell: 14px;
+  --wrap: 1200px; --pad: 100px;
+
+  /* 모서리 · 5 낱칸 · 10 그림 · 13 카드 · 30 큰 면 · 60 히어로 아래 */
+  --r-s: 5px; --r-m: 10px; --r-l: 13px; --r-xl: 30px;
+  --r-sweep: 0 0 60px 60px; --r-pill: 999px;
+
+  /* 그림자 · 카드는 뜨지 않는다. 헤어라인과 아주 옅은 그림자로 앉는다 */
+  --shadow: 0 1px 2px rgba(0,0,0,.04);
+  --shadow-lift: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(0,0,0,.04);
+  --veil: rgba(0,0,0,.61);
+
+  /* 유리 · 딱 두 면뿐이다. 더 늘리지 않는다 */
+  --glass-nav:   rgba(255,255,255,.7);   --glass-nav-blur:  blur(50px);
+  --glass-card:  linear-gradient(rgba(255,255,255,.7), rgba(255,255,255,.35));
+  --glass-card-blur: blur(80px);
+
+  /* 움직임 · 페이드와 색 변화뿐이다. 튀지 않고 스프링도 없다 */
+  --motion:      200ms ease-out;
+  --hover-fade:  .7;                     /* 링크는 흐려진다 */
+  --press-drop:  1px;                    /* 눌리면 1px 내려앉는다 */
+  --focus-ring:  2px;                    /* 먹빛 고리 · offset 2px */
+}
+
+/* 어두운 화면 · 원본에 다크 정의가 없다.
+   다만 잉크가 「역상 면의 색」이라고 못 박혀 있어 그 규칙을 따른다.
+   잉크가 바탕이 되고 종이가 글자가 된다. 색을 새로 만들지 않았다. */
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:      #2A2A28;
+    --paper-card: #333330;
+    --paper-sunk: #3D3D39;
+    --ink:        #F3F3F2;
+    --ink-mut:    #C9C9C5;
+    --ink-cool:   #B6B7BF;
+    --ink-faint:  #AFAFAC;
+    --ink-fade:   #848383;
+    --line:       #444442;
+    --line-strong:#848383;
+    --sand:       #E0CCBE;
+    --olive:      #A9A695;
+    --acc:        var(--olive);
+    --acc-deep:   #E0CCBE;
+    --acc-band:   rgba(224,204,190,.14);
+    --up:         #8FBF9E;  --up-band:   rgba(143,191,158,.14);
+    --down:       #D89A93;  --down-band: rgba(216,154,147,.14);
+    --warn:       #D7BE7E;  --warn-band: rgba(215,190,126,.14);
+    --none:       #AFAFAC;
+    --shadow:     0 1px 2px rgba(0,0,0,.26);
+    --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#2A2A28; --paper-card:#333330; --paper-sunk:#3D3D39;
+  --ink:#F3F3F2; --ink-mut:#C9C9C5; --ink-cool:#B6B7BF;
+  --ink-faint:#AFAFAC; --ink-fade:#848383;
+  --line:#444442; --line-strong:#848383;
+  --sand:#E0CCBE; --olive:#A9A695; --acc:var(--olive); --acc-deep:#E0CCBE;
+  --acc-band:rgba(224,204,190,.14);
+  --up:#8FBF9E; --up-band:rgba(143,191,158,.14);
+  --down:#D89A93; --down-band:rgba(216,154,147,.14);
+  --warn:#D7BE7E; --warn-band:rgba(215,190,126,.14);
+  --none:#AFAFAC;
+  --shadow:0 1px 2px rgba(0,0,0,.26);
+  --shadow-lift:0 1px 2px rgba(0,0,0,.26), 0 6px 18px rgba(0,0,0,.15);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   산출물 공통 컴포넌트 · tokens.css 를 먼저 읽어야 한다
+   색과 서체와 크기를 여기서 정하지 않는다. 전부 토큰을 부른다.
+
+   저자 시스템의 규칙 셋을 지킨다.
+     ① 강조는 드물게 — 모래와 올리브는 면과 막대에만, 노랑은 사람이 판단할 자리에만
+     ② 카드는 뜨지 않는다 — 헤어라인 1px 과 아주 옅은 그림자로 앉는다
+     ③ 바탕에 그러데이션과 무늬를 쓰지 않는다
+   ───────────────────────────────────────────────────────────── */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--ff); font-size:var(--t-body); line-height:var(--lh-body);
+  -webkit-text-size-adjust:100%; word-break:keep-all;
+}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){ .wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)} }
+
+/* ── 머리 ───────────────────────────────────────────── */
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);
+   letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);
+   padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+h3{font-size:var(--t-h3);line-height:var(--lh-head);margin:var(--sp-4) 0 var(--sp-2);
+   color:var(--ink-mut);font-weight:600}
+p{margin:0 0 var(--sp-2)}
+a{color:var(--ink);text-decoration-color:var(--ink-fade);transition:opacity .2s ease-out}
+a:hover{opacity:.7}
+code{font-family:var(--ff-mono);font-size:.88em;background:var(--paper-sunk);
+     padding:1px 5px;border-radius:var(--r-s);overflow-wrap:anywhere}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:var(--r-s)}
+
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;
+     border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:var(--ink)}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+
+/* ── KPI 카드 · 격자 간격 20 ─────────────────────────── */
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));
+     gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);
+      border-radius:var(--r-l);padding:var(--sp-3) var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);
+           line-height:var(--lh-display);margin:var(--sp-1) 0 2px;
+           overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.up{color:var(--up)} .dlt.down{color:var(--down)} .dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.card.empty{background:var(--paper-sunk);border-style:dashed;box-shadow:none}
+.card.empty .val{font-size:17px;font-weight:700;color:var(--ink-fade);margin:5px 0 6px}
+.card.empty .why{font-size:var(--t-tiny);line-height:1.55;color:var(--ink-fade)}
+
+/* ── 표 ─────────────────────────────────────────────── */
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;
+    border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);
+         color:var(--ink-mut);white-space:nowrap;position:sticky;top:0}
+tbody tr:last-child td{border-bottom:0}
+tbody tr{transition:background .2s ease-out}
+tbody tr:hover{background:var(--acc-band)}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;color:var(--ink);width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);
+        color:var(--ink-fade);border-top:1px solid var(--line)}
+
+/* 판정 배지 · 낱칸이라 모서리 5 */
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;
+   border-radius:var(--r-s);white-space:nowrap}
+.b.up{background:var(--up-band);color:var(--up)}
+.b.down{background:var(--down-band);color:var(--down)}
+.b.warn{background:var(--warn-band);color:var(--warn)}
+.b.none{background:var(--paper-sunk);color:var(--none)}
+.b.me{background:var(--mark);color:#2A2A28}   /* 사람이 판단할 자리에만 */
+
+/* ── 강조 상자 ───────────────────────────────────────── */
+.hl,.warn-box,.gate{border:1px solid var(--line);border-radius:var(--r-l);
+     padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}
+.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}
+.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.gate{border-left:3px solid var(--sand);background:var(--acc-band)}
+.gate .t{font-size:var(--t-small);font-weight:700;margin-bottom:var(--sp-1)}
+
+/* ── 차트 ───────────────────────────────────────────── */
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);
+       padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)} .bar.dim{fill:var(--sand)}
+.grid-l{stroke:var(--line);stroke-width:1}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+
+/* 표 안 가로 막대 · 낱칸이라 모서리 5 */
+.mb{position:relative;background:var(--paper-sunk);border-radius:var(--r-s);height:17px;min-width:60px}
+.mb>i{position:absolute;inset:0 auto 0 0;background:var(--olive);border-radius:var(--r-s);display:block}
+.mb>span{position:relative;font-size:11px;font-weight:700;padding-left:5px;line-height:17px}
+
+/* ── 꼬리 ───────────────────────────────────────────── */
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);
+      font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+.src{font-size:var(--t-tiny);color:var(--ink-fade);margin-top:var(--sp-2);
+     padding-top:8px;border-top:1px solid var(--line)}
+
+@media print{
+  body{background:#fff}
+  .card,.chart,.tw{box-shadow:none;break-inside:avoid}
+  h2{break-after:avoid}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head>
+<body><div class="wrap">
+<div class="head"><span class="tag sample">샘플</span></div>
+<h1>상품명 기획</h1>
+<p class="meta">가상의 A브랜드 수분 세럼 30mL · 검색량 실측 · 2026-09-08</p>
+<div class="kpi">
+<div class="card"><div class="lab">검토한 키워드</div><div class="val">11<span class="unit">개</span></div></div>
+<div class="card"><div class="lab">규제로 제외</div><div class="val">2<span class="unit">개</span></div></div>
+<div class="card"><div class="lab">대표 키워드 월 검색량</div><div class="val">8,262<span class="unit">회</span></div></div>
+</div>
+<h2>조건</h2>
+<p>· 검색량이 <b>실측</b>이다. 지난번과 달리 [추정] 태그를 붙이지 않는다.</p>
+<p>· 노출 순위는 페이지 단위 평균이라 키워드 하나의 하루 변동은 담기지 않는다.</p>
+<div class="tw"><table><thead><tr><th>제품</th><th>A브랜드 수분 세럼 30mL · 39,000원 · 무향 · pH 5.5</th></tr></thead><tbody><tr><td>플랫폼</td><td>스마트스토어 · 쿠팡 (자사몰은 검색 규칙 밖)</td></tr><tr><td>데이터</td><td>A브랜드-검색어-플랫폼별.csv · 플랫폼별 월 검색량과 우리 노출 순위</td></tr><tr><td>앞 단계</td><td>015 제품 강점 정리 · 셀링포인트 6건</td></tr></tbody></table></div>
+<h2>키워드 우선순위</h2>
+<p>점수는 <b>검색량 등급 × 적합도 × 경쟁 강도 역가중</b>이다. 셋을 곱하므로 하나가 하면 전체가 내려간다.</p>
+<div class="chart"><div class="cap">점수 · 검색량 등급 × 적합도 × 경쟁 역가중</div><svg viewBox="0 0 640 216" role="img" aria-label="키워드 점수"><g><text class="axis" x="0" y="19">저자극세럼</text><rect class="bar" x="132" y="8" width="380.0" height="15" rx="3"/><text class="val-l" x="520.0" y="20">18</text><text class="axis" x="0" y="45">성분좋은세럼</text><rect class="bar" x="132" y="34" width="380.0" height="15" rx="3"/><text class="val-l" x="520.0" y="46">18</text><text class="axis" x="0" y="71">무향세럼</text><rect class="bar" x="132" y="60" width="380.0" height="15" rx="3"/><text class="val-l" x="520.0" y="72">18</text><text class="axis" x="0" y="97">여름세럼</text><rect class="bar" x="132" y="86" width="253.3" height="15" rx="3"/><text class="val-l" x="393.3" y="98">12</text><text class="axis" x="0" y="123">민감성세럼</text><rect class="bar" x="132" y="112" width="253.3" height="15" rx="3"/><text class="val-l" x="393.3" y="124">12</text><text class="axis" x="0" y="149">수분세럼</text><rect class="bar" x="132" y="138" width="190.0" height="15" rx="3"/><text class="val-l" x="330.0" y="150">9</text><text class="axis" x="0" y="175">끈적임없는세럼</text><rect class="bar" x="132" y="164" width="190.0" height="15" rx="3"/><text class="val-l" x="330.0" y="176">9</text><text class="axis" x="0" y="201">진정세럼</text><rect class="bar dim" x="132" y="190" width="126.7" height="15" rx="3"/><text class="val-l" x="266.7" y="202">6</text></g></svg></div>
+<div class="tw"><table><thead><tr><th class="n">#</th><th>키워드</th><th class="n">월 검색량</th><th>검색량</th><th>적합도</th><th>경쟁</th><th class="n">점수</th><th>역할</th><th>근거</th></tr></thead><tbody><tr><td class="n">1</td><td>저자극세럼</td><td class="n">5,184</td><td>중</td><td>상</td><td>낮음</td><td class="n">18</td><td>보조</td><td>인체적용시험 자극 지수 0.00</td></tr><tr><td class="n">2</td><td>성분좋은세럼</td><td class="n">4,212</td><td>중</td><td>상</td><td>낮음</td><td class="n">18</td><td>보조</td><td>전성분 11종 공개</td></tr><tr><td class="n">3</td><td>무향세럼</td><td class="n">3,078</td><td>중</td><td>상</td><td>낮음</td><td class="n">18</td><td>보조</td><td>향료를 뺐다</td></tr><tr><td class="n">4</td><td>여름세럼</td><td class="n">10,854</td><td>상</td><td>중</td><td>보통</td><td class="n">12</td><td>보조</td><td>워터리 제형 · 흡수 42초 · 시즌성</td></tr><tr><td class="n">5</td><td><span class="b me">민감성세럼</span></td><td class="n">8,262</td><td>중</td><td>상</td><td>보통</td><td class="n">12</td><td>대표</td><td>profile §2 타깃</td></tr><tr><td class="n">6</td><td>수분세럼</td><td class="n">23,976</td><td>상</td><td>상</td><td>높음</td><td class="n">9</td><td>보조</td><td>제품 유형 그대로</td></tr><tr><td class="n">7</td><td>끈적임없는세럼</td><td class="n">2,268</td><td>하</td><td>상</td><td>낮음</td><td class="n">9</td><td>보조</td><td>흡수 42초</td></tr><tr><td class="n">8</td><td>진정세럼</td><td class="n">11,826</td><td>상</td><td>하</td><td>보통</td><td class="n">6</td><td>제외</td><td>‘진정’은 금기 목록에 있다</td></tr><tr><td class="n">9</td><td>30ml세럼</td><td class="n">1,296</td><td>하</td><td>중</td><td>없음</td><td class="n">6</td><td>보조</td><td>용량 · 검색량이 가장 적다</td></tr><tr><td class="n">10</td><td>세럼추천</td><td class="n">36,288</td><td>상</td><td>하</td><td>높음</td><td class="n">3</td><td>제외</td><td>탐색 단계 검색어 · 제품 속성과 무관</td></tr><tr><td class="n">11</td><td>트러블세럼</td><td class="n">14,742</td><td>상</td><td>하</td><td>높음</td><td class="n">3</td><td>제외</td><td>여드름 개선은 금기 표현</td></tr></tbody></table></div>
+<h2>검색량 상위 넷이 전부 대표가 되지 못한다</h2>
+<div class="tw"><table><thead><tr><th class="n">#</th><th>키워드</th><th class="n">월 검색량</th><th>왜 대표가 못 되나</th></tr></thead><tbody><tr><td class="n">1위</td><td>세럼추천</td><td class="n">36,288</td><td>탐색 단계 검색어다. 들어와도 우리 제품을 찾던 사람이 아니다</td></tr><tr><td class="n">2위</td><td>수분세럼</td><td class="n">23,976</td><td>경쟁이 높다. 우리 노출이 스마트스토어 1.7페이지 · 쿠팡 0.9페이지에 머문다</td></tr><tr><td class="n">3위</td><td>트러블세럼</td><td class="n">14,742</td><td>규제로 못 쓴다. 여드름 개선은 화장품이 주장할 수 없다</td></tr><tr><td class="n">4위</td><td>진정세럼</td><td class="n">11,826</td><td>규제로 못 쓴다. ‘진정’은 브랜드 금기 목록에도 있다</td></tr><tr><td class="n">5위</td><td>여름세럼</td><td class="n">10,854</td><td>시즌성이다. 겨울에 유입이 끊긴다</td></tr></tbody></table></div>
+<p>· 검색량 3위와 4위가 규제로 잘린다. 둘을 합치면 월 26,568회다.</p>
+<p>· 상품명은 대외 발행물이라 검색량이 크다는 이유로 쓸 수 없다. 두 자리는 태그에도 넣지 않는다.</p>
+<h2>점수 1위를 대표로 쓰지 않는다</h2>
+<p>· 점수 1~3위는 ‘저자극세럼’·‘성분좋은세럼’·‘무향세럼’이다. 경쟁이 낮아 점수가 높지만 월 검색량이 3,000~5,000회에 그친다.</p>
+<p>· 상품명 맨 앞에 서는 말은 카테고리를 정한다. 그래서 대표는 적합도가 상이면서 경쟁이 높지 않은 것 중 검색량이 가장 큰 ‘민감성세럼’으로 잡는다.</p>
+<p>· 점수 1~3위 셋은 상품명 뒤와 태그로 보낸다. 롱테일은 대표를 대신하는 것이 아니라 대표 뒤에 붙는 것이다.</p>
+<h2>상품명 조합안</h2>
+<div class="tw"><table><thead><tr><th>플랫폼</th><th>안</th><th>상품명</th><th class="n">글자수</th><th>무엇을 노렸나</th></tr></thead><tbody><tr><td>스마트스토어</td><td>A 검색형</td><td>A브랜드 민감성 수분 세럼 30ml 저자극 무향 성분공개</td><td class="n">31</td><td>대표 + 보조 키워드를 최대로 넣었다</td></tr><tr><td>스마트스토어</td><td>B 속성형</td><td>A브랜드 수분 세럼 30ml 판테놀 5% 에어리스 펌프</td><td class="n">30</td><td>스펙을 앞세웠다 · 검색어와 겹치는 말이 적다</td></tr><tr><td>스마트스토어</td><td>C 절충형 ✅</td><td>A브랜드 민감성 수분 세럼 30ml 저자극 무향</td><td class="n">26</td><td>권장안 · 대표 키워드가 맨 앞, 보조 둘까지만</td></tr><tr><td>쿠팡</td><td>A 검색형</td><td>A브랜드 민감성 수분 세럼 30ml</td><td class="n">19</td><td>수식어를 뺀 최소 조합</td></tr><tr><td>쿠팡</td><td>B 속성형</td><td>A브랜드 수분 세럼 30ml 1개입 무향</td><td class="n">22</td><td>수량 표기를 넣었다</td></tr><tr><td>쿠팡</td><td>C 절충형 ✅</td><td>A브랜드 민감성 수분 세럼 30ml 1개입</td><td class="n">23</td><td>권장안 · 대표 키워드 + 수량</td></tr></tbody></table></div>
+<p>· 쿠팡은 수식어를 못 쓴다. ‘저자극’은 속성이 아니라 평가라 쿠팡 안에서 뺐다.</p>
+<p>· 스마트스토어는 50자 이내 권장이라 여유가 있지만 길수록 좋은 것이 아니다.</p>
+<p>· 같은 단어를 두 번 넣으면 노출이 나뉜다. 여섯 안 모두 ‘세럼’을 한 번만 쓴다.</p>
+<h2>태그·카테고리</h2>
+<p>카테고리 · <b>화장품/미용 > 스킨케어 > 에센스/세럼</b></p>
+<p>근거 · 대표 키워드 ‘민감성세럼’의 상위 노출 상품이 모두 이 소분류에 있다.</p>
+<div class="code">세럼추천 · 성분좋은세럼 · 끈적임없는세럼 · 여름세럼 · 에어리스펌프 · 전성분공개</div>
+<p>· ‘민감성세럼’·‘수분세럼’·‘30ml’·‘저자극’·‘무향’은 권장안 상품명에 이미 들어가 태그에서 뺐다.</p>
+<p>· ‘세럼추천’은 상품명에서 버리고 태그로 줍는다. 검색량 1위라 태그 한 자리 값은 한다.</p>
+<h2>규제 검사</h2>
+<p class="verdict warn">판정 · 수정 후 통과 (2건)</p>
+<div class="tw"><table><thead><tr><th>검출</th><th>왜 걸렸나</th><th>어떻게 했나</th></tr></thead><tbody><tr><td>‘트러블세럼’</td><td>여드름 개선으로 읽힌다 · 화장품이 주장할 수 없다</td><td>키워드에서 제외 · 대체어 없음</td></tr><tr><td>‘진정세럼’</td><td>‘진정’이 브랜드 금기 목록에 있다</td><td>키워드에서 제외 · 대체어 없음</td></tr></tbody></table></div>
+<p>· 둘 다 치환이 아니라 제외다. 바꿔 쓸 말이 없으면 안 쓴다.</p>
+<p class="fine">이 결과는 자동 기초 점검이며 법률 자문이 아니다.</p>
+<h2>이 산출물이 모르는 것</h2>
+<p>· <b>전환율</b> — 검색량과 노출 순위만 있고 어느 키워드로 들어와 샀는지는 없다</p>
+<p>· <b>경쟁 상품의 상품명</b> — 우리 노출 순위만 있고 우리 위에 무엇이 있는지는 없다</p>
+<p>· <b>자사몰</b> — 검색 규칙 밖이라 이 문서가 다루지 않는다</p>
+<p class="meta">저장 파일 · outputs/2026-09-상세페이지/053-listing-seo/053-listing-seo.xlsx · 053-listing-seo.html</p>
+</div></body></html>

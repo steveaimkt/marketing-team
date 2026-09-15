@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { planHash } from './plan-compiler.mjs';
 
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'run-receipt.mjs');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-run-receipt-'));
@@ -232,6 +233,54 @@ try {
   const piiSealed = JSON.parse(fs.readFileSync(path.join(temp, piiReceipt), 'utf8'));
   assert.equal(piiSealed.pii.source, 'plugin:sample-data/A브랜드-리뷰-200건.csv', 'start가 pii 블록을 버렸습니다.');
 
+  // ── 초안/최종 두 단계 · 2026-09-09 ──────────────────────────────
+  //    「내용을 먼저 보고 형식을 고른다」 계약. 초안은 .md 만, 최종은 형식 + 초안.
+  const 초안본 = ['workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md',
+                  'workspace:outputs/2026-08-30/006-review-mining/006-review-mining-해설.md'];
+  const 초안영수증 = 'outputs/2026-08-30/006-review-mining/run-11.json';
+  fs.writeFileSync(path.join(temp, 초안영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '초안', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  result = run('start', 초안영수증);
+  assert.equal(result.status, 0, `초안 단계는 .md 만으로 시작돼야 한다: ${result.stderr}`);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(temp, 초안영수증), 'utf8')).단계, '초안');
+
+  // 초안 단계에 최종 형식(.xlsx)을 끼워 넣으면 막는다
+  const 섞은영수증 = 'outputs/2026-08-30/006-review-mining/run-12.json';
+  fs.writeFileSync(path.join(temp, 섞은영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '초안',
+    outputs: [...초안본, 'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.xlsx'],
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 섞은영수증).status, 0, '초안 단계에 최종 형식을 허용했습니다.');
+
+  // 최종 단계 — 형식 전부 + 초안이 함께 있어도 통과한다
+  const 최종영수증 = 'outputs/2026-08-30/006-review-mining/run-13.json';
+  fs.writeFileSync(path.join(temp, 최종영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '최종',
+    outputs: [...piiOutputs, 'workspace:outputs/2026-08-30/006-review-mining/006-review-mining.md'],
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  result = run('start', 최종영수증);
+  assert.equal(result.status, 0, `최종 단계는 초안을 함께 둬도 통과해야 한다: ${result.stderr}`);
+
+  // 최종 단계에서 형식이 빠지면 여전히 막는다
+  const 빠진영수증 = 'outputs/2026-08-30/006-review-mining/run-14.json';
+  fs.writeFileSync(path.join(temp, 빠진영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '최종', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 빠진영수증).status, 0, '최종 단계에서 형식 누락을 허용했습니다.');
+
+  // 모르는 단계는 막는다
+  const 이상영수증 = 'outputs/2026-08-30/006-review-mining/run-15.json';
+  fs.writeFileSync(path.join(temp, 이상영수증), `${JSON.stringify({
+    ...piiDraft, 단계: '중간', outputs: 초안본,
+    pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: ['번호'] },
+  }, null, 2)}\n`);
+  assert.notEqual(run('start', 이상영수증).status, 0, '모르는 단계를 허용했습니다.');
+
   const multiDir = path.join(temp, 'outputs', '2026-08-30', '050-utm-attribution');
   fs.mkdirSync(multiDir, { recursive: true });
   const multiA = 'outputs/2026-08-30/050-utm-attribution/050-utm-attribution.csv';
@@ -386,7 +435,7 @@ try {
       schema: 'marketing-team.plan/v1', plan_id: 'chain', request: '061 → 073 → 065 → 066 조합',
       requested_order: ['061', '073', '065', '066'], skills: ['061', '073', '065', '066'],
       steps: [
-        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html')], reviews: [] },
+        { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html'), ref('061-sales-data-analysis.md')], reviews: [] },
         { step: 2, skill: '073', inputs: [ref('061-sales-data-analysis.xlsx')], outputs: [ref('073-customer-journey-map.xlsx'), ref('073-customer-journey-map.html'), ref('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
         { step: 3, skill: '065', inputs: ['plugin:sample-data/A브랜드-고객마스터.csv'], outputs: [ref('065-rfm-segments.csv'), ref('065-rfm-segments-해설.md')], reviews: [] },
         { step: 4, skill: '066', inputs: [ref('073-customer-journey-map.md'), ref('065-rfm-segments-해설.md')], outputs: [ref('066-kpi-tree.md')], reviews: [] },
@@ -414,7 +463,7 @@ try {
     { const r = run('start', rj); assert.equal(r.status, 0, `단계 있는 실행이 시작돼야 한다: ${r.stderr}${r.stdout}`); }
 
     const make = {
-      1: () => { for (const e of ['xlsx', 'html']) fs.writeFileSync(path.join(dir, `061-sales-data-analysis.${e}`), '061\n'); },
+      1: () => { for (const e of ['xlsx', 'html', 'md']) fs.writeFileSync(path.join(dir, `061-sales-data-analysis.${e}`), '061\n'); },
       2: () => { for (const e of ['xlsx', 'html', 'md']) fs.writeFileSync(path.join(dir, `073-customer-journey-map.${e}`), '073\n'); },
       3: () => { fs.writeFileSync(path.join(dir, '065-rfm-segments.csv'), '\ufeff대체키,세그먼트\nabc,챔피언\n'); fs.writeFileSync(path.join(dir, '065-rfm-segments-해설.md'), '065\n'); },
       4: () => fs.writeFileSync(path.join(dir, '066-kpi-tree.md'), '066\n'),
@@ -438,7 +487,128 @@ try {
     assert.equal(after.steps.find(x => x.step === 4).status, 'pending');
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · ✅');
+  // 이름 있는 체인 · 스킬마다 자기 폴더, run.json 이 있는 프로젝트 폴더 아래 나란히 둔다
+  // 실측 2026-09-14·09-15 · 8장 015→053→051→052, 10장 045→046→043 이 전부 마지막 스킬
+  // 폴더로 몰려 저장됐다 — plan.json 의 chain 이 있으면 각자 자기 폴더를 강제해야 한다.
+  {
+    const proj = 'outputs/2026-09-테스트체인';
+
+    // 옛 버릇 · 전부 마지막 스킬(073) 폴더로 몰면 이름 있는 체인에서는 막혀야 한다
+    {
+      const dir = path.join(temp, proj, '073-customer-journey-map');
+      fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(path.join(dir, 'plan.json'), `${JSON.stringify({ chain: '테스트체인' }, null, 2)}\n`);
+      const rj = `${proj}/073-customer-journey-map/run.json`;
+      const ref = name => `workspace:${proj}/073-customer-journey-map/${name}`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
+        skills: ['061', '073'], data_mode: '샘플',
+        inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
+        profile: 'plugin:sample-data/profile-sample.md',
+        outputs: [
+          ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html'), ref('061-sales-data-analysis.md'),
+          ref('073-customer-journey-map.xlsx'), ref('073-customer-journey-map.html'), ref('073-customer-journey-map.md'),
+        ],
+        required_reviews: [{ kind: 'business', perspective: '경영', artifact: ref('073-customer-journey-map.md') }],
+        reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+      }, null, 2)}\n`);
+      const r = run('start', rj);
+      assert.notEqual(r.status, 0, '이름 있는 체인에서 마지막 스킬 폴더로 산출물을 몰아도 통과시켰습니다.');
+      assert.match(`${r.stdout}\n${r.stderr}`, /자기 폴더/, '옛 방식(주 스킬 폴더 통합)을 이름 있는 체인 오류로 안 잡았습니다.');
+      fs.rmSync(path.join(temp, proj), { recursive: true, force: true });
+    }
+
+    // 고친 방식 · 스킬마다 자기 폴더, 프로젝트 폴더 아래 나란히
+    {
+      const dir1 = path.join(temp, proj, '061-sales-data-analysis');
+      const dir2 = path.join(temp, proj, '073-customer-journey-map');
+      fs.mkdirSync(dir1, { recursive: true });
+      fs.mkdirSync(dir2, { recursive: true });
+      const ref1 = name => `workspace:${proj}/061-sales-data-analysis/${name}`;
+      const ref2 = name => `workspace:${proj}/073-customer-journey-map/${name}`;
+      const plan = {
+        schema: 'marketing-team.plan/v1', plan_id: 'chain-named', request: '061 → 073 조합(이름 있는 체인)',
+        chain: '테스트체인', requested_order: ['061', '073'], skills: ['061', '073'],
+        risks: [],
+        steps: [
+          { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref1('061-sales-data-analysis.xlsx'), ref1('061-sales-data-analysis.html'), ref1('061-sales-data-analysis.md')], reviews: [] },
+          { step: 2, skill: '073', inputs: [ref1('061-sales-data-analysis.xlsx')], outputs: [ref2('073-customer-journey-map.xlsx'), ref2('073-customer-journey-map.html'), ref2('073-customer-journey-map.md')], reviews: [{ kind: 'business', perspective: '경영' }] },
+        ],
+        budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
+      };
+      // plan-compiler.mjs CLI(compile·approve)는 chain 이름을 정본 목록(CHAINS.md 등)과
+      // 대조한다 — 테스트용 가짜 이름은 그 검사에 걸리므로, run-receipt.mjs 가 실제로 보는
+      // 것(승인 해시)만 직접 봉인한다. run-receipt.mjs 의 validateApprovedPlan 은
+      // approvalState() 만 보지 validatePlan() 의 체인 정본 검사는 보지 않는다.
+      const sealed = planHash(plan);
+      fs.writeFileSync(path.join(temp, proj, 'plan.json'),
+        `${JSON.stringify({ ...plan, plan_sha256: sealed, status: 'approved', approved_sha256: sealed }, null, 2)}\n`);
+
+      const rj = `${proj}/run.json`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
+        skills: ['061', '073'], data_mode: '샘플',
+        inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
+        profile: 'plugin:sample-data/profile-sample.md',
+        outputs: plan.steps.flatMap(x => x.outputs),
+        required_reviews: [{ kind: 'business', perspective: '경영', artifact: ref2('073-customer-journey-map.md') }],
+        reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+      }, null, 2)}\n`);
+      const r = run('start', rj);
+      assert.equal(r.status, 0, `스킬마다 자기 폴더에 둔 이름 있는 체인은 통과해야 합니다: ${r.stderr}${r.stdout}`);
+    }
+  }
+
+  // ⭐ 초안 .md 실재 검사 (2026-09-15) — writes_to 에 .md 를 약속한 스킬은
+  // 최종 그릇이 .md 가 아니게 바뀌어도 그 초안이 outputs 에 실제로 있어야 한다.
+  // 046(writes_to = .md 단독)을 .docx 로 굽도록 그릇을 바꾼 경우로 확인한다 —
+  // 옛 코드는 이 자리에서 초안을 요구하지 않았다(덤은 언제나 선택이었다).
+  {
+    const dir = 'outputs/2026-08-30/046-roas-budget-rebalance';
+    fs.mkdirSync(path.join(temp, dir), { recursive: true });
+    const draft = (name, extra) => {
+      const rj = `${dir}/${name}`;
+      fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+        schema: 'marketing-team.run/v1', status: 'draft', request: '광고 예산 다시 짜줘',
+        skills: ['046'], data_mode: '샘플',
+        required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+        형식: { '046-roas-budget-rebalance.md': 'docx' },
+        ...extra,
+      }, null, 2)}\n`);
+      return rj;
+    };
+    const 낸다 = (...names) => names.map(n => `workspace:${dir}/${n}`);
+
+    // 그릇만 바꾸고 초안(.md)을 함께 남기지 않으면 — 최종 형식만으론 통과해도 이 검사가 막는다
+    let r = run('start', draft('run-16.json', { outputs: 낸다('046-roas-budget-rebalance.docx') }));
+    assert.notEqual(r.status, 0, '그릇을 바꾸며 초안 .md 를 지워도 통과시켰습니다.');
+    assert.match(`${r.stdout}\n${r.stderr}`, /초안이 outputs 에 없습니다/);
+
+    // 초안을 함께 남기면 통과한다 (§H · 초안은 지우지 않는다)
+    r = run('start', draft('run-17.json', {
+      outputs: 낸다('046-roas-budget-rebalance.docx', '046-roas-budget-rebalance.md'),
+    }));
+    assert.equal(r.status, 0, `그릇을 바꿔도 초안을 함께 두면 통과해야 합니다: ${r.stderr}${r.stdout}`);
+  }
+
+  // writes_to 에 .md 가 아예 없는 스킬(100개 중 14개)은 이 검사에서 빠진다 —
+  // 실측 2026-09-15 · 원고소스(v9) production 표본 045·062 등. 안 빼면 그 스킬들의
+  // 실제 완료 실행을 전부 거짓 거부한다.
+  {
+    const dir = 'outputs/2026-08-30/045-weekly-ads-report';
+    fs.mkdirSync(path.join(temp, dir), { recursive: true });
+    const rj = `${dir}/run-18.json`;
+    fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
+      schema: 'marketing-team.run/v1', status: 'draft', request: '광고 주간 리포트 만들어줘',
+      skills: ['045'], data_mode: '샘플',
+      outputs: [`workspace:${dir}/045-weekly-ads-report.html`],
+      required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
+    }, null, 2)}\n`);
+    const r = run('start', rj);
+    assert.equal(r.status, 0, `.md 를 약속하지 않은 스킬까지 초안을 요구했습니다: ${r.stderr}${r.stdout}`);
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

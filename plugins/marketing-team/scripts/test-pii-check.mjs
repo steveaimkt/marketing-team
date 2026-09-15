@@ -63,5 +63,25 @@ check('임의 대체키 산출물은 통과한다', goodIssues.length === 0);
 // ⑤ pii 블록이 없으면 건너뛴다
 check('pii 블록이 없으면 통과', (await scanPii({ outputs: [] }, resolve)).length === 0);
 
+// ⑥ 깨진 것 · 1..N 순번을 식별자로 쓰면 결과 문서의 아무 숫자에나 걸린다
+//    실측 2026-09-13 · 4장 006 — `id_columns: ['번호']`로 006이 매 실행마다 "저장실패"가 됐다.
+//    번호 열은 사람을 가리키지 않으므로, 내용을 스캔하기 전에 이 설정 자체를 오류로 잡는다.
+const NUMS = Array.from({ length: 200 }, (_, i) => String(i + 1));
+write('src/리뷰.csv', `번호,본문\n${NUMS.map(n => `${n},괜찮아요`).join('\n')}\n`);
+const rowIndexSpec = { source: 'plugin:src/리뷰.csv', id_columns: ['번호'] };
+write('out/006-review-mining-해설.md', '전체 200건 중 123건이 불만입니다. 2026년 상반기 기준입니다.\n');
+const rowIndexIssues = await scanPii(
+  { outputs: ['workspace:out/006-review-mining-해설.md'], pii: rowIndexSpec }, resolve);
+check('순번 열을 식별자로 쓰면 오류로 막는다',
+  rowIndexIssues.some(l => l.includes('빈틈없는 순번')));
+check('순번 오류가 나면 우연히 겹친 숫자(123·2026)를 원문 노출로 잘못 잡지 않는다',
+  !rowIndexIssues.some(l => l.includes('원문 식별자가 노출')));
+
+// 중복이 있으면(예: 등급처럼 반복되는 값) 순번 오탐 검사에 걸리지 않는다 — 진짜 식별자일 수 있다
+write('src/등급.csv', `등급,이름\n${NUMS.slice(0, 10).map(() => '1,챔피언').join('\n')}\n`);
+const dupIssues = await scanPii(
+  { outputs: [], pii: { source: 'plugin:src/등급.csv', id_columns: ['등급'] } }, resolve);
+check('중복 값은 순번으로 오판하지 않는다', !dupIssues.some(l => l.includes('빈틈없는 순번')));
+
 fs.rmSync(root, { recursive: true, force: true });
-console.log(`개인정보 검사 · 무염해시 복원 1 · 보고서 원문 인용 1 · 대응표 잔존 1 · 정상 통과 1 · 미선언 통과 1 · ✅ (${pass})`);
+console.log(`개인정보 검사 · 무염해시 복원 1 · 보고서 원문 인용 1 · 대응표 잔존 1 · 정상 통과 1 · 미선언 통과 1 · 순번 식별자 오류 3 · ✅ (${pass})`);

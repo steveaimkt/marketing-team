@@ -50,8 +50,8 @@
 [docs/스킬명-대조표.md](plugins/marketing-team/docs/스킬명-대조표.md).
 
 <!-- STATS:START -->
-스킬 100 · 부를 말 477 · 게이트 32 · 상태변경 6 · 체인 15
-저장 형식 md 53 · xlsx 20 · csv 10 · docx 10 · html 3 · pptx 3 · dir 1 · `writes_to` 보유 100 · 샘플 폴백 59
+스킬 100 · 부를 말 482 · 게이트 32 · 상태변경 6 · 체인 17
+저장 형식 md 56 · xlsx 19 · csv 10 · docx 7 · html 4 · pptx 3 · dir 1 · `writes_to` 보유 100 · 샘플 폴백 64
 <!-- STATS:END -->
 
 > 위 숫자는 `node plugins/marketing-team/scripts/build-stats.mjs` 가 정본에서 계산한다. 손으로 고치지 않는다.

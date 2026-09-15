@@ -107,7 +107,8 @@ if (all.length !== 100 || new Set(ids).size !== 100 || expected.some(id => !ids.
 const crossText = fs.readFileSync(path.join(M, 'CHAINS.md'), 'utf8');
 const crossChains = [...crossText.matchAll(/^\|\s*\*\*(.+?)\*\*\s*\|\s*`(.+?)`\s*\|\s*(.+?)\s*\|\s*$/gm)]
   .map(m => ({ name: m[1], steps: m[2], description: m[3] }));
-if (crossChains.length !== 5) throw new Error(`교차 체인은 5개여야 합니다. 현재 ${crossChains.length}개`);
+// 🔴 2026-09-08 · 3부 마케팅팀 넷에 맞춰 브랜드마케팅팀·콘텐츠마케팅팀을 더해 7종이 됐다.
+if (crossChains.length !== 7) throw new Error(`교차 체인은 7개여야 합니다. 현재 ${crossChains.length}개`);
 
 const triggerCount = all.reduce((n, s) => n + s.triggers.length, 0);
 const gateCount = all.filter(s => s.gate).length;
@@ -136,26 +137,39 @@ lines.push(
   `> **G** = 대외 발행물 · 발행 전 AI 규제검토자 판정 (${gateCount}개)`,
   `> **!** = 상태를 바꾼다 (예약·발행·예산) · ⏸ 승인 필수 (${mutatingCount}개)`,
   '',
-  '## 체인 15종 (여러 스킬을 한 번에 잇는 말)',
+  '## 체인 17종 (여러 스킬을 한 번에 잇는 말)',
   '',
   '한 스킬만 부르는 대신 **한 줄로 한 바퀴를 도는** 말이다.',
-  '카테고리마다 하나씩 10종, 카테고리를 넘나드는 것이 5종이다.',
+  '카테고리마다 하나씩 10종, 카테고리를 넘나드는 것이 7종이다.',
   '',
   '| 체인 | 부를 말 | 순서 | 무엇을 하나 |',
   '|---|---|---|---|',
 );
+// 🔴 2026-09-09 · 3부 마케팅팀 넷은 띄어 쓴 팀 이름으로도 부른다 (정본 CHAINS.md).
+const 팀이름 = {
+  '브랜드마케팅팀': '브랜드 마케팅팀',
+  '콘텐츠마케팅팀': '콘텐츠 마케팅팀',
+  '광고애널리틱스': '퍼포먼스 마케팅팀',
+  '리텐션캠페인': '그로스 마케팅팀',
+};
+const 부를말 = c => {
+  const 말 = [`「${md(c.name)} 돌려줘」`];
+  if (팀이름[c.name]) 말.push(`「${md(팀이름[c.name])} 업무 시작하자」`);
+  return 말.join(' · ');
+};
+
 for (const c of chains)
-  lines.push(`| **${md(c.name)}** | 「${md(c.name)} 돌려줘」 · 「${md(c.name)}」 | \`${md(c.steps)}\` | ${md(c.description)} |`);
+  lines.push(`| **${md(c.name)}** | ${부를말(c)} · 「${md(c.name)}」 | \`${md(c.steps)}\` | ${md(c.description)} |`);
 
 lines.push(
   '',
-  '**교차 체인 5종** · 카테고리를 넘나든다 (정본 `100-skills/CHAINS.md`)',
+  `**교차 체인 ${crossChains.length}종** · 카테고리를 넘나든다 (정본 \`100-skills/CHAINS.md\`)`,
   '',
   '| 체인 | 부를 말 | 순서 | 무엇을 하나 |',
   '|---|---|---|---|',
 );
 for (const c of crossChains)
-  lines.push(`| **${md(c.name)}** | 「${md(c.name)} 돌려줘」 | \`${md(c.steps)}\` | ${md(c.description)} |`);
+  lines.push(`| **${md(c.name)}** | ${부를말(c)} | \`${md(c.steps)}\` | ${md(c.description)} |`);
 
 lines.push(
   '',
@@ -175,8 +189,8 @@ if (CHECK) {
     console.error('ROUTING.md가 SKILL.md·PLUGIN.md·CHAINS.md 정본과 다릅니다. `node scripts/build-routing.mjs`를 실행하세요.');
     process.exit(1);
   }
-  console.log(`ROUTING.md 정본 일치 · 스킬 100 · 부를 말 ${triggerCount} · 체인 15`);
+  console.log(`ROUTING.md 정본 일치 · 스킬 100 · 부를 말 ${triggerCount} · 체인 17`);
 } else {
   fs.writeFileSync(OUT, output);
-  console.log(`ROUTING.md 생성 · 스킬 100 · 부를 말 ${triggerCount} · 게이트 ${gateCount} · 상태변경 ${mutatingCount} · 체인 15`);
+  console.log(`ROUTING.md 생성 · 스킬 100 · 부를 말 ${triggerCount} · 게이트 ${gateCount} · 상태변경 ${mutatingCount} · 체인 17`);
 }

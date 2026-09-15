@@ -4,3 +4,6 @@
 {"intent": "반복되는 마케팅 잡무 좀 진단해줘", "expected_skill": "091", "ambiguous_with": ["092"]}
 {"intent": "우리 팀 업무 목록 정리하고 자동화 계획 세워줘", "expected_skill": "091"}
 {"intent": "일이 너무 많은데 업무 구조부터 좀 봐줘", "expected_skill": "091", "ambiguous_with": ["093"]}
+{"intent": "그동안 실행 기록이 얼마나 쌓였는지 한 번 훑어서 정리해줘", "expected_skill": "091"}
+{"intent": "내가 여태 뭘 얼마나 처리했는지 한눈에 보고 싶어", "expected_skill": "091"}
+{"intent": "지난 실행들 모아서 뭘 몇 번 했는지 집계해줘", "expected_skill": "091"}

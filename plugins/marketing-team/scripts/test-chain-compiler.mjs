@@ -2,9 +2,11 @@
 import assert from 'node:assert/strict';
 import { canonicalChains, compileChain } from './chain-compiler.mjs';
 
-assert.equal(canonicalChains().size, 15, '카테고리 10개 + 교차 체인 5개여야 한다.');
+// 2026-09-15 · 브랜드마케팅팀·콘텐츠마케팅팀 두 체인이 늘어 15→17 (카테고리 10개 + 교차 체인 7개).
+assert.equal(canonicalChains().size, 17, '카테고리 10개 + 교차 체인 7개여야 한다.');
 assert.equal(canonicalChains().get('콘텐츠프로덕션').variants.length, 2, '선택 분기를 두 변형으로 컴파일해야 한다.');
-assert.equal(canonicalChains().get('광고애널리틱스').variants.length, 2, '괄호 선택 분기를 두 변형으로 컴파일해야 한다.');
+// 2026-09-15 · 광고애널리틱스는 045 → 046 → 043 으로 정리돼 괄호 분기가 없다 (콘텐츠프로덕션이 분기 케이스를 지킨다).
+assert.equal(canonicalChains().get('광고애널리틱스').variants.length, 1, '분기 없는 체인은 변형 하나여야 한다.');
 
 // 2단계부터 직전 산출물을 입력에 받는다 (P1 · 2026-08-30) — 안 이으면 그래프가 아니라 나열이다.
 const make = (skills, extra = {}) => ({
@@ -61,4 +63,4 @@ assert.match(graph.issues.join('\n'), /아직 만들지 않은/, '앞 단계 없
 graph = compileChain(make(['001', '001']));
 assert.match(graph.issues.join('\n'), /같은 스킬을 두 번/, '중복 단계를 막아야 한다.');
 
-console.log('체인 컴파일러 · 정본 15 · 선택 분기 2 · 누락·역순·순환·입력단절·중복 5 · 위험 고지 1 · 입력 연결 강제 3 · ✅');
+console.log('체인 컴파일러 · 정본 17 · 선택 분기 2 · 누락·역순·순환·입력단절·중복 5 · 위험 고지 1 · 입력 연결 강제 3 · ✅');

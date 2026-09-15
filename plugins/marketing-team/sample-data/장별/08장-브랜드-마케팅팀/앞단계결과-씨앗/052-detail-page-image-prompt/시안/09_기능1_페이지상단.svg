@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600" font-family="Pretendard, 'Apple SD Gothic Neo', sans-serif">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F3EEE8"/></linearGradient></defs>
+<rect width="1200" height="1600" fill="url(#g)"/>
+<rect x="490" y="70" width="220" height="46" rx="23" fill="none" stroke="#747264" stroke-width="2"/>
+<text x="600" y="100" text-anchor="middle" font-size="20" fill="#747264" letter-spacing="3">STEP 1</text>
+<text x="600" y="168" text-anchor="middle" font-size="26" fill="#747264">고를 재료를 먼저 드립니다</text>
+<text x="600" y="236" text-anchor="middle" font-size="58" font-weight="700" fill="#2A2A28">뺄 걸 뺐고,</text>
+<text x="600" y="306" text-anchor="middle" font-size="58" font-weight="700" fill="#2A2A28">뺀 걸 적었습니다</text>
+<rect x="410" y="342" width="380" height="48" rx="24" fill="#EFE3DA"/>
+<text x="600" y="373" text-anchor="middle" font-size="21" fill="#2A2A28">A브랜드 민감성 수분 세럼 30mL</text>
+<text x="600" y="418" text-anchor="middle" font-size="15" fill="#9A9894">* 전성분과 함량은 제조 로트 기준입니다</text>
+<rect x="140" y="466" width="920" height="512" rx="18" fill="#FFFFFF" stroke="#E6E1DA" stroke-width="2"/>
+<text x="180" y="516" font-size="23" font-weight="700" fill="#2A2A28">전성분 11종 · 함량까지 적습니다</text>
+<line x1="180" y1="540" x2="1020" y2="540" stroke="#EBE7E0" stroke-width="2"/>
+<rect x="180" y="550" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="572" font-size="18" fill="#2A2A28">정제수</text>
+<text x="700" y="572" font-size="17" fill="#848383">용매</text>
+<text x="1004" y="572" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<text x="196" y="606" font-size="18" fill="#2A2A28">판테놀</text>
+<text x="700" y="606" font-size="17" fill="#848383">진정 보습</text>
+<text x="1004" y="606" font-size="18" text-anchor="end" fill="#2A2A28">5%</text>
+<rect x="180" y="618" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="640" font-size="18" fill="#2A2A28">베타글루칸</text>
+<text x="700" y="640" font-size="17" fill="#848383">보습</text>
+<text x="1004" y="640" font-size="18" text-anchor="end" fill="#2A2A28">3%</text>
+<text x="196" y="674" font-size="18" fill="#2A2A28">히알루론산 4종 복합</text>
+<text x="700" y="674" font-size="17" fill="#848383">보습</text>
+<text x="1004" y="674" font-size="18" text-anchor="end" fill="#2A2A28">2%</text>
+<rect x="180" y="686" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="708" font-size="18" fill="#2A2A28">글리세린</text>
+<text x="700" y="708" font-size="17" fill="#848383">보습</text>
+<text x="1004" y="708" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<text x="196" y="742" font-size="18" fill="#2A2A28">1,2-헥산다이올</text>
+<text x="700" y="742" font-size="17" fill="#848383">보존</text>
+<text x="1004" y="742" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<rect x="180" y="754" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="776" font-size="18" fill="#2A2A28">부틸렌글라이콜</text>
+<text x="700" y="776" font-size="17" fill="#848383">용해</text>
+<text x="1004" y="776" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<text x="196" y="810" font-size="18" fill="#2A2A28">알란토인</text>
+<text x="700" y="810" font-size="17" fill="#848383">컨디셔닝</text>
+<text x="1004" y="810" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<rect x="180" y="822" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="844" font-size="18" fill="#2A2A28">판테인</text>
+<text x="700" y="844" font-size="17" fill="#848383">점도</text>
+<text x="1004" y="844" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<text x="196" y="878" font-size="18" fill="#2A2A28">소듐하이알루로네이트</text>
+<text x="700" y="878" font-size="17" fill="#848383">보습</text>
+<text x="1004" y="878" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<rect x="180" y="890" width="840" height="34" fill="#FAF8F5"/>
+<text x="196" y="912" font-size="18" fill="#2A2A28">에틸헥실글리세린</text>
+<text x="700" y="912" font-size="17" fill="#848383">보존</text>
+<text x="1004" y="912" font-size="18" text-anchor="end" fill="#2A2A28">—</text>
+<text x="180" y="952" font-size="15" fill="#9A9894">함량을 적지 않은 성분은 배합 목적만 밝힙니다. 순서는 배합비 순입니다.</text>
+<rect x="140" y="1010" width="920" height="470" rx="18" fill="#EFEAE4" stroke="#E6E1DA" stroke-width="2"/>
+<text x="600" y="1232" text-anchor="middle" font-size="22" fill="#A9A49C">제품 사진 · 01 과 같은 컷</text>
+<text x="600" y="1268" text-anchor="middle" font-size="17" fill="#BDB8AF">성분표 아래에 놓는다</text>
+<text x="600" y="1540" text-anchor="middle" font-size="16" fill="#9A9894">화장품법상 효능·효과를 단정하지 않습니다</text>
+</svg>

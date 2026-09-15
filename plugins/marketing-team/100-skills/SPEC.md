@@ -8,7 +8,7 @@
 
 | | 공식 100개 | 사용자 스킬 (092 로 만든 것) |
 |---|---|---|
-| `id` | `001` ~ `100` | **`u01` ~ `u99`** |
+| `id` | `001` ~ `100` | **`101` ~ `199`** |
 | `category` | `01-research` 등 폴더명 | **`custom`** |
 | 어디 사나 | `100-skills/{카테고리}/skills/` (패키지 · 읽기 전용) | **`brand/my-skills/`** (작업 폴더) |
 | 검사 | `node scripts/validate-skills.mjs` | `node scripts/validate-my-skills.mjs {폴더}` |
@@ -19,7 +19,7 @@
 
 | # | 필드 | 무엇 | 예 |
 |---|---|---|---|
-| 1 | `id` | **공식** 3자리 `001~100` · **사용자** `u01~u99` · 따옴표 필수 | `"043"` · `"u01"` |
+| 1 | `id` | **공식** 3자리 `001~100` · **사용자** `101~199` · 따옴표 필수 | `"043"` · `"101"` |
 | 2 | `name` | 사람이 읽는 이름 | `메타 광고 카피 팩` |
 | 3 | `description` | 한 줄 + 「~할 때 사용」 | `"…. 카피를 여러 안으로 뽑아야 할 때 사용."` |
 | 4 | `slug` | 영문 케밥 | `meta-ad-copy` |
@@ -112,12 +112,12 @@ example/output.md   무엇이 나왔나
 
 ```
 outputs/{날짜}/092-skill-builder-meta/     초안·검증 결과
-brand/my-skills/u{NN}-{slug}/SKILL.md      채택본
+brand/my-skills/{NNN}-{slug}/SKILL.md      채택본
 brand/my-skills/INDEX.md                   명부 — AI 마케터가 공식 100개보다 먼저 본다
 ```
 
-- **ID 는 `u01` 부터** (`u01`~`u99`) · `category: custom`
-- `writes_to` 는 `outputs/{날짜}/u{NN}-{slug}/…`
+- **ID 는 `101` 부터** (`101`~`199`) · `category: custom`
+- `writes_to` 는 `outputs/{날짜}/{NNN}-{slug}/…`
 - ⛔ **`gate:` 가 없으면 `true` 로 본다.** 내부 문서임이 `gate: false` 로 명시됐을 때만 건너뛴다.
   명부 밖 스킬일수록 검사가 없어지면 안 된다
 
@@ -126,7 +126,7 @@ brand/my-skills/INDEX.md                   명부 — AI 마케터가 공식 100
 ```markdown
 | ID | 이름 | 부르는 말 | 경로 |
 |---|---|---|---|
-| u01 | 경쟁 인스타 주간 변화 | 경쟁사 인스타 확인해줘 · 경쟁 계정 주간 기록 | brand/my-skills/u01-competitor-ig-weekly/SKILL.md |
+| 101 | 경쟁 인스타 주간 변화 | 경쟁사 인스타 확인해줘 · 경쟁 계정 주간 기록 | brand/my-skills/101-competitor-ig-weekly/SKILL.md |
 ```
 
 - 사용자 문장이 **사용자 스킬의 등록 트리거와 정확히 일치**하면 사용자 스킬을 선택한다

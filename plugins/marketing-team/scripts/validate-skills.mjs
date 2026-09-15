@@ -162,11 +162,11 @@ for (const s of skills) {
   // 8 트리거 최소 3개
   if ((f.match(/^\s*-\s+"/gm) || []).length < 3) add(id, 'WARN', '트리거 3개 미만');
 }
-// 9 체인 15종 무결성 · 2026-08-04
+// 9 체인 17종 무결성 · 2026-08-04 (2026-09-15 · 브랜드마케팅팀·콘텐츠마케팅팀 추가로 15→17)
 //   왜: 체인은 스킬 ID 를 본문 문자열로 들고 있어, 스킬 번호가 바뀌면 **조용히** 깨진다.
 //       ROUTING.md 는 생성물이라 검사 대상이 아니고, 정본은 아래 둘이다.
 //         카테고리 체인 10 = 100-skills/{팀}/PLUGIN.md 의 chain·chain_steps·chain_desc
-//         교차 체인      5 = 100-skills/CHAINS.md
+//         교차 체인      7 = 100-skills/CHAINS.md
 const chains = [];
 for (const cat of fs.readdirSync(M).filter(d => /^\d\d-/.test(d)).sort()) {
   const p = path.join(M, cat, 'PLUGIN.md');
@@ -200,7 +200,56 @@ for (const c of chains) {
   const dn = c.desc ? c.desc.split('→').length : 0;
   if (dn && dn !== sn) add(c.src, 'WARN', `체인 단계/설명 수 불일치: ${c.name} (${sn}단계 vs 설명 ${dn}칸)`);
 }
-if (chains.length !== 15) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 15종)`);
+if (chains.length !== 17) add('CHAIN', 'WARN', `체인 ${chains.length}종 (문서 기준 17종)`);
+
+// 11 example 이 sample_fallback 실제 데이터와 무관하게 지어낸 것은 아닌가 · 2026-09-14
+//   왜: 006 을 비롯해 67개 스킬에서 example/input.md·output.md 가 sample_fallback 실제
+//       파일과 하나도 안 겹치는 채로 방치돼 "산출물이 거짓말"이 됐다 (실측 2026-09-14).
+//       사람이 고치는 일이라 여기서는 **감지만** 한다 — 새 스크립트를 만드는 대신
+//       이미 도는 검사에 한 항목을 더한다 (규칙 최소화).
+//   방법: sample_fallback csv·md 를 쉼표로 쪼개 반복 등장하는 짧은 비-숫자 토큰
+//        (채널명·제품명·분류명 같은 값)을 모으고, example 본문에 그중 하나도 없으면 WARN.
+//        완벽한 대조가 아니라 "완전히 무관한 예시"만 잡는 낮은 오탐 신호다.
+const catTokensCache = new Map();
+function catTokensOf(file) {
+  if (catTokensCache.has(file)) return catTokensCache.get(file);
+  let toks = null;
+  if (/\.(csv|md)$/i.test(file) && fs.existsSync(file) && fs.statSync(file).isFile()) {
+    const rows = fs.readFileSync(file, 'utf8').split('\n').slice(1).filter(r => r.trim());
+    const freq = new Map();
+    for (const row of rows) for (const raw of row.split(',')) {
+      const t = raw.trim().replace(/^["']|["']$/g, '');
+      if (!t || t.length < 2 || t.length > 12) continue;
+      if (/^[\d.\-:/%\s]+$/.test(t)) continue; // 숫자·날짜류 제외
+      freq.set(t, (freq.get(t) || 0) + 1);
+    }
+    const minFreq = Math.max(2, Math.floor(rows.length * 0.03));
+    toks = [...freq].filter(([, n]) => n >= minFreq).map(([t]) => t);
+  }
+  catTokensCache.set(file, toks);
+  return toks;
+}
+for (const s of skills) {
+  const f = fmOf(s.raw), id = fld(f, 'id');
+  const sfLine = (f.match(/^sample_fallback:.*$/m) || [''])[0];
+  if (/고아 필드/.test(sfLine)) continue; // 스킬이 이 파일을 읽지 않는다고 이미 밝혀 둔 경우 (예: 043)
+  const sfRaw = fld(f, 'sample_fallback');
+  if (!sfRaw) continue;
+  const sf = sfRaw.split('#')[0].trim();
+  const sfPath = [path.join(ROOT, sf), path.join(M, sf)].find(x => fs.existsSync(x));
+  if (!sfPath) { add(id, 'ERR', `sample_fallback 파일 없음: ${sf}`); continue; }
+  const toks = catTokensOf(sfPath);
+  if (!toks || toks.length < 5) continue; // 폴더거나 csv/md 가 아니거나 표본이 너무 작아 신뢰 못 함
+  const exDir = path.join(M, s.cat, 'skills', s.dir, 'example');
+  const exFiles = ['input.md', 'output.md'].map(n => path.join(exDir, n)).filter(fs.existsSync);
+  if (!exFiles.length) continue;
+  const exText = exFiles.map(p => fs.readFileSync(p, 'utf8')).join('\n');
+  // 코호트·등급표처럼 집계 결과만 내는 example 은 원본 행의 낱값이 안 남는 게 정상이다.
+  // 파일명을 그대로 인용해 근거를 밝혔으면 그걸로 충분하다 — 낱값 겹침은 추가 증거일 뿐.
+  const citesFile = exText.includes(path.basename(sfPath));
+  if (!citesFile && !toks.some(t => exText.includes(t)))
+    add(id, 'WARN', `example 이 sample_fallback(${path.basename(sfPath)}) 실제 값과 하나도 안 겹치고 파일명 인용도 없다 — 지어낸 예시일 수 있다`);
+}
 
 // 10 배포판 AI 마케터가 팀장 10명을 전부 알고 있는가 · 2026-08-04
 //   왜: 배포판 orchestrator.md 에 저자 개인 인스턴스가 실려 나간 적이 있다.
