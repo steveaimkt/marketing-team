@@ -37,15 +37,19 @@ const HARD_TERMS = [
   ['폴백', '「회사 자료가 없어서 연습용 자료로 갔습니다」'],
 ];
 
-/** 우리끼리 쓰는 말 · 자연스러운 쓰임이 있어 경고로만 낸다. */
+/** 우리끼리 쓰는 말 · 자연스러운 쓰임이 있어 참고로만 낸다 (완료를 막지 않는다). */
 const SOFT_TERMS = [
   ['라우팅', '「이 일에는 이 스킬이 맞겠습니다」'],
   ['착지', '「결과는 여기 저장했습니다」'],
   ['원장', '「실행 기록」'],
   ['정본', '「기준으로 삼는 자료」'],
-  // 「축」 · 사용자가 쓰지 않는 말이다. 구축·단축·축하 같은 낱말은 건드리지 않는다 (2026-09-15)
-  [/(?<![구압단건저수함위증비긴응농신])축(?![적소하제약구산복전척출조])/g, '「항목」·「기준」 · 「3축 비교표」는 「포지셔닝·가격·채널 비교표」처럼 이름으로'],
 ];
+
+/**
+ * 「축」 · 저자가 결과물에서 빼라고 한 말이다 (`docs/쉬운말.md §③` · 2026-09-15).
+ * 구축·단축·축하·가축 같은 낱말은 건드리지 않는다. 이것만 완료를 막는다.
+ */
+const AXIS = /(?<![구압단건저수함위증비긴응농신가목])축(?![적소하제약구산복전척출조의배사가포])/g;
 
 const GATE_TOKEN = /(^|[^A-Za-z0-9])G[1-5]([^0-9]|$)/;
 
@@ -94,15 +98,16 @@ function checkHouseStyle(run, resolve) {
       const n = text.split(term).length - 1;
       if (n) issues.push(`내부의 말이 산출물에 나왔습니다: \`${term}\` ${n}회 → ${instead} · ${ref}`);
     }
+    const axis = (text.match(AXIS) || []).length;
+    if (axis) issues.push(`「축」이 산출물에 ${axis}회 나왔습니다 → 「항목」·「기준」 · 「3축 비교표」는 「포지셔닝·가격·채널 비교표」처럼 이름으로 · ${ref}`);
     for (const [term, instead] of SOFT_TERMS) {
-      const n = term instanceof RegExp ? (text.match(term) || []).length : text.split(term).length - 1;
-      const label = term instanceof RegExp ? '축' : term;
-      if (n) issues.push(`⚠ 다듬을 말: \`${label}\` ${n}회 → ${instead} · ${ref}`);
+      const n = text.split(term).length - 1;
+      if (n) issues.push(`⚠ 참고 다듬을 말: \`${term}\` ${n}회 → ${instead} · ${ref}`);
     }
     const dashes = text.split('\n').filter(line => line.includes('—')).length;
-    if (dashes) issues.push(`⚠ 줄표(—)가 ${dashes}행에 있습니다. 가운뎃점 · 이나 마침표로 끊습니다 · ${ref}`);
+    if (dashes) issues.push(`⚠ 참고 줄표(—)가 ${dashes}행에 있습니다. 가운뎃점 · 이나 마침표로 끊습니다 · ${ref}`);
     const gates = text.split('\n').filter(line => GATE_TOKEN.test(line)).length;
-    if (gates) issues.push(`⚠ 게이트 이름(G1~G5)이 ${gates}행에 있습니다. 지금 무엇을 하는지로 씁니다 · ${ref}`);
+    if (gates) issues.push(`⚠ 참고 게이트 이름(G1~G5)이 ${gates}행에 있습니다. 지금 무엇을 하는지로 씁니다 · ${ref}`);
   }
   return issues;
 }
@@ -125,6 +130,10 @@ export async function runChecks(run, resolve) {
   // 잡히는 구조라, 실제로 적는 스킬이 없어 11개 스킬에서 그대로 새 나갔다 (실측 2026-09-13 · 020).
   if ((run.outputs || []).some(item => /\.csv$/i.test(typeof item === 'string' ? item : item?.path || '')))
     wanted.add('csv-format');
+  // 글로 된 산출물이 있으면 우리말 검사도 안 적어도 돈다 — 적는 스킬이 하나도 없어
+  // 「축」이 그대로 사용자 화면까지 갔다 (실측 2026-09-15 · 002·011 산출물 17회).
+  if ((run.outputs || []).some(item => TEXT_EXT.test(typeof item === 'string' ? item : item?.path || '')))
+    wanted.add('house-style');
   const issues = [];
   for (const name of wanted) {
     const fn = REGISTRY[name];

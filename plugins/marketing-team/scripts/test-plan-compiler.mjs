@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -220,7 +220,22 @@ try {
     }
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · ✅`);
+  // 앞선 실행 입력은 같은 날 가장 늦은 순번으로 (실측 2026-09-15 · 006 을 3번 돌렸다. 011 은 첫 파일을 읽었다)
+  {
+    const prev = path.join(temp, 'outputs', '2026-09-15', '006-review-mining');
+    fs.mkdirSync(prev, { recursive: true });
+    for (const name of ['006-review-mining-해설.md', '006-review-mining-해설-2.md', '006-review-mining-해설-3.md', '006-review-mining.html'])
+      fs.writeFileSync(path.join(prev, name), '');
+    const own = 'workspace:outputs/2026-09-15/011-product-concept-ideation/011-product-concept-ideation.md';
+    const plan = { steps: [{ inputs: ['workspace:outputs/2026-09-15/006-review-mining/006-review-mining-해설.md', 'workspace:outputs/2026-09-15/006-review-mining/006-review-mining.html', 'plugin:sample-data/경쟁사-3곳.md'], outputs: [own] }] };
+    const changed = preferLatestReruns(plan, { cwd: temp });
+    assert.equal(changed.length, 1, '순번이 있는 파일만 바꾼다');
+    assert.equal(plan.steps[0].inputs[0], 'workspace:outputs/2026-09-15/006-review-mining/006-review-mining-해설-3.md');
+    assert.equal(plan.steps[0].inputs[1], 'workspace:outputs/2026-09-15/006-review-mining/006-review-mining.html', '다시 돌린 적 없는 파일은 그대로');
+    assert.equal(plan.steps[0].inputs[2], 'plugin:sample-data/경쟁사-3곳.md');
+  }
+
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

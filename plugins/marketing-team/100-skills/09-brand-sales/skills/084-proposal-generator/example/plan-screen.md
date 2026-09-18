@@ -30,14 +30,14 @@
   저장 위치       outputs/2026-09-15/084-proposal-generator/
   파일 형식       본문 .md, 회람용 .docx, 발표용 .pptx 세 개로
                   저장합니다.
-                  .pptx·.docx는 저희가 직접 굽지 않고 앤트로픽 공식
-                  document-skills 에 굽는 일만 넘깁니다. 안 깔려 있으면
+                  .pptx·.docx는 저희가 직접 만들지 않고 앤트로픽 공식
+                  document-skills 에 만드는 일만 넘깁니다. 안 깔려 있으면
                   .md 로 내고 그렇게 밝힙니다 (설치: `/plugin
                   marketplace add anthropics/skills` →
                   `/plugin install document-skills@anthropic-agent-skills`,
                   강요하지 않습니다).
-                  게이트를 통과한 뒤 "pptx·docx로 구울까요?"를 한 번 더
-                  여쭙고, 답이 없으면 기본 형식(.pptx+.docx)으로 굽습니다.
+                  게이트를 통과한 뒤 "pptx·docx로 만들까요?"를 한 번 더
+                  여쭙고, 답이 없으면 기본 형식(.pptx+.docx)으로 만듭니다.
   확인 절차       Win Theme 3개를 승인받기 전에는 목차·본문을 쓰지
                   않습니다 — 그 답은 이 승인과 별도로 여쭙습니다.
                   디자인 방향(장수·독자·분위기·내용)은 이미 정해진
@@ -72,8 +72,8 @@ HANDOFF → 사용자
   뼈대만 내고 본문을 비워 D3 HANDOFF로 넘긴다는 점이 다르다.
 - **HANDOFF 4줄**: ai-마케터 SKILL.md §G1 "재료가 없으면, 멈추기 전에 셋을 낸다(D2, D3)"의 4줄
   계약 형식(여기까지·여기서 막혔습니다·이렇게 뚫습니다·지금 대신)을 그대로 채웠다.
-- **파일 형식 3종 + 구울까요 재확인**: `writes_to`의 pptx/docx/md 세 경로, Phase 9 "⏸
-  '.pptx·.docx로 구울까요?'를 묻고 답을 받은 뒤에만 굽는다"와 SKILL.md 서두의 `.pptx` 미설치
+- **파일 형식 3종 + 만들까요 재확인**: `writes_to`의 pptx/docx/md 세 경로, Phase 9 "⏸
+  '.pptx·.docx로 만들까요?'를 묻고 답을 받은 뒤에만 만든다"와 SKILL.md 서두의 `.pptx` 미설치
   대체 안내 문구를 그대로 옮겼다.
 - **디자인 되묻지 않음**: Contract 7 "디자인 방향은 앞 단계에서 확정된 값으로 채우고
   사용자에게 되묻지 않는다"와 Phase 8 앞 게이트 표 "고객이 지정한 템플릿·브랜드 서식이 있으면

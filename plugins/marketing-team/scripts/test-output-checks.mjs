@@ -42,14 +42,19 @@ check('에스컬레이션 노출을 잡는다', hard(r).some(l => l.includes('�
 
 write('out/soft.md', '어느 자료가 정본인지 — 아직 못 정했습니다.\n');
 r = await runChecks({ outputs: ['workspace:out/soft.md'], checks: ['house-style'] }, resolve);
-check('정본·줄표는 경고로만 낸다', hard(r).length === 0 && r.length >= 2);
+check('정본·줄표는 참고로만 낸다 (완료를 막지 않는다)', hard(r).length === 0 && r.filter(l => l.startsWith('⚠ 참고')).length >= 2);
 
 write('out/axis.md', '저자극 축은 우리만 채웠습니다. 3축 비교표를 냈습니다.\n');
 r = await runChecks({ outputs: ['workspace:out/axis.md'], checks: ['house-style'] }, resolve);
-check('「축」은 경고로 낸다', hard(r).length === 0 && r.some(l => l.includes('`축` 2회')));
-write('out/axis-ok.md', '마케팅팀을 구축하고 일정을 단축했습니다. 축하드립니다.\n');
+check('「축」은 완료를 막는다', hard(r).some(l => l.includes('「축」이 산출물에 2회')));
+write('out/axis-ok.md', '마케팅팀을 구축하고 일정을 단축했습니다. 가축 사료와 축의금 문구는 별개입니다. 축하드립니다.\n');
 r = await runChecks({ outputs: ['workspace:out/axis-ok.md'], checks: ['house-style'] }, resolve);
-check('구축·단축·축하는 잡지 않는다', r.length === 0);
+check('구축·단축·가축·축의·축하는 잡지 않는다', r.length === 0);
+// 선언하지 않아도 글 산출물이면 돈다 (실측 2026-09-15 · checks 에 house-style 을 적는 스킬이 없었다)
+r = await runChecks({ outputs: ['workspace:out/axis.md'] }, resolve);
+check('선언이 없어도 .md 산출물이면 우리말 검사가 돈다', hard(r).some(l => l.includes('「축」')));
+r = await runChecks({ outputs: ['workspace:out/good.csv'] }, resolve);
+check('표만 낸 실행에는 우리말 검사가 돌지 않는다', hard(r).length === 0);
 
 write('out/clean.md', '결과는 여기 저장했습니다 · outputs/2026-08-30/result.md\n');
 r = await runChecks({ outputs: ['workspace:out/clean.md'], checks: ['house-style'] }, resolve);
@@ -61,10 +66,10 @@ r = await runChecks({ outputs: [], reviews: [{ report: 'workspace:out/review-경
 check('검토 보고서의 내부말도 잡는다', hard(r).some(l => l.includes('폴백')));
 
 // ── 미선언 · 모르는 검사
-check('선언이 없으면 아무것도 안 돈다', (await runChecks({ outputs: ['workspace:out/leak.md'] }, resolve)).length === 0);
+check('선언이 없고 글·표 산출물도 아니면 아무것도 안 돈다', (await runChecks({ outputs: ['workspace:out/표.xlsx'] }, resolve)).length === 0);
 r = await runChecks({ outputs: [], checks: ['없는검사'] }, resolve);
 check('모르는 검사 이름을 잡는다', hard(r).some(l => l.includes('모르는 검사')));
 check('검사 목록이 노출된다', AVAILABLE_CHECKS.includes('pii') && AVAILABLE_CHECKS.includes('csv-format'));
 
 fs.rmSync(root, { recursive: true, force: true });
-console.log(`산출물 검사 · CSV 형식 4 · 우리말 5 · 미선언·오타 3 · ✅ (${pass})`);
+console.log(`산출물 검사 · CSV 형식 4 · 우리말 7 · 미선언·오타 3 · ✅ (${pass})`);

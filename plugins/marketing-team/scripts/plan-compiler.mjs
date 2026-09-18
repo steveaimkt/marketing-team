@@ -217,6 +217,38 @@ export function validatePlan(plan) {
   return issues;
 }
 
+/**
+ * 앞선 실행의 산출물을 입력으로 쓰면 같은 날 다시 돌린 가장 늦은 순번(-2·-3)으로 바꾼다.
+ * 실측 2026-09-15 코워크 · 006 을 3번 돌려 `-3` 까지 생겼다. 그런데 011 계획은 첫 파일을 읽는다고 적었다.
+ * 이 계획 안에서 만드는 산출물은 건드리지 않는다. 바꾼 것은 [원래, 바뀐] 쌍으로 돌려준다.
+ */
+export function preferLatestReruns(plan, { cwd = process.cwd() } = {}) {
+  const changed = [];
+  const produced = new Set((plan.steps || []).flatMap(s => (s.outputs || []).map(String)));
+  for (const step of plan.steps || []) {
+    step.inputs = (step.inputs || []).map(ref => {
+      const value = String(ref);
+      if (!value.startsWith('workspace:outputs/') || produced.has(value)) return ref;
+      const rel = value.slice('workspace:'.length);
+      const m = path.posix.basename(rel).match(/^(.*?)(?:-(\d{1,2}))?(\.[a-z0-9]+)$/i);
+      if (!m) return ref;
+      const dir = path.resolve(cwd, path.posix.dirname(rel));
+      if (!fs.existsSync(dir)) return ref;
+      let best = Number(m[2] || 1);
+      let bestName = null;
+      for (const name of fs.readdirSync(dir)) {
+        const hit = name.match(/^(.*)-(\d{1,2})(\.[a-z0-9]+)$/i);
+        if (hit && hit[1] === m[1] && hit[3] === m[3] && Number(hit[2]) > best) { best = Number(hit[2]); bestName = name; }
+      }
+      if (!bestName) return ref;
+      const next = `workspace:${path.posix.join(path.posix.dirname(rel), bestName)}`;
+      changed.push([value, next]);
+      return next;
+    });
+  }
+  return changed;
+}
+
 /* ── 파일 조작 ──────────────────────────────────────────────── */
 
 const read = file => {
@@ -511,6 +543,7 @@ if (isCli) {
     const issues = validatePlan(plan);
     if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); fail(`계획이 계약과 맞지 않습니다 · ${issues.length}건`); }
     plan.schema = SCHEMA;
+    for (const [from, to] of preferLatestReruns(plan)) console.log(`↻ 같은 날 다시 돌린 결과를 읽습니다 · ${from.replace(/^workspace:/, '')} → ${to.replace(/^workspace:/, '')}`);
     const graph = compileChain(plan);
     plan.chain_graph = { schema: graph.schema, chain: graph.chain, nodes: graph.nodes, edges: graph.edges };
     plan.risks = graph.warnings;
