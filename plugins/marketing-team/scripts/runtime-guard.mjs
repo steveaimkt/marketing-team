@@ -26,7 +26,7 @@ const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:은|는|이|가)?\s*(?:보�
 // 부정형 뒤엔 걸리지 않는다("승인 안 함"처럼 승인 뒤에 말이 더 붙으면 $ 에서 끝나지 않아 제외된다).
 const APPROVAL_SUFFIX = /(?:^|[\s,.!?~])(?:진행\s*승인|계획\s*승인|승인합니다|승인)\s*[.!~]?\s*$/;
 const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text) };
-const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-마케터/SKILL.md', '\\skills\\ai-마케터\\SKILL.md'];
+const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-marketer/SKILL.md', '\\skills\\ai-marketer\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 
 function deny(reason) {

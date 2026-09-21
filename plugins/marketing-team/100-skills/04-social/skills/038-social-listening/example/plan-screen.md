@@ -1,7 +1,7 @@
 # 실습 계획 화면 · 038 소셜 언급 분석 (스펙 기반 재구성)
 
 > ⚠️ **실제 대화 로그 캡처가 아니다.** 이 스킬은 원고소스에 실측 기록이 없어, SKILL.md 계약과
-> ai-마케터 SKILL.md의 G1/G2 규칙에서 그대로 구성했다. 실제로 불러본 결과가 이것과 다르면
+> ai-marketer SKILL.md의 G1/G2 규칙에서 그대로 구성했다. 실제로 불러본 결과가 이것과 다르면
 > 실제 결과가 맞는지, 이 재구성이 계약을 잘못 읽은 것인지 확인하고 필요하면 SKILL.md를 고친다.
 
 ## 나
@@ -46,7 +46,7 @@
 
 ## 이 재구성이 근거로 삼은 것
 
-- SKILL.md frontmatter `mutating: true`, `writes_to`에 `notion`이 포함 — ai-마케터 SKILL.md
+- SKILL.md frontmatter `mutating: true`, `writes_to`에 `notion`이 포함 — ai-marketer SKILL.md
   "⚡ 빠른 진입" 네 조건 중 ①(`mutating: true`, 되돌릴 수 없는 외부 실행)에 걸려 화면을 냈다.
   `gate: false`라 AI 규제검토자는 거치지 않는다.
 - 실제 Notion 적재·자동 실행은 SKILL.md Phase 6·7에서 각각 ⏸ 기본값 "하지 않는다"로 설계돼

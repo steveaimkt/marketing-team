@@ -381,7 +381,7 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
   const receiptRel = posix(path.relative(WORK, receiptDir));
 
   // 이름 있는 체인은 스킬마다 자기 폴더를 쓰고, run.json 이 있는 프로젝트 폴더 아래 나란히
-  // 둔다 — 마지막 스킬 폴더 하나로 몰지 않는다 (ai-마케터 SKILL.md 「착지」 §G3과 같은 규칙).
+  // 둔다 — 마지막 스킬 폴더 하나로 몰지 않는다 (ai-marketer SKILL.md 「착지」 §G3과 같은 규칙).
   // 실측 2026-09-14·09-15 · 8장 015→053→051→052, 10장 045→046→043 이 전부 마지막 스킬
   // 폴더로 몰려 저장됐다 — 문서만 고치고 이 코드를 그대로 두면 다시 같은 일이 난다.
   let chainName = null;

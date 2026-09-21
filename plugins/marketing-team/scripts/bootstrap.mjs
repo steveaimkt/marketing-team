@@ -4,7 +4,7 @@
  *
  * 왜: `.claude/` 는 .gitignore 대상이라 새 클론에는 연결 고리가 없다.
  *     README 는 「클론하면 그대로 뜬다」고 했지만 실제로는 스킬이 하나도 안 뜬다.
- *     그러면 `마케팅팀-구축하기` 도 못 불러 스스로 복구할 수 없다 (2026-08-22 발견).
+ *     그러면 `marketing-team-setup` 도 못 불러 스스로 복구할 수 없다 (2026-08-22 발견).
  *
  * 사용: node plugins/marketing-team/scripts/bootstrap.mjs
  *       node plugins/marketing-team/scripts/bootstrap.mjs --force   (기존 것을 바꿀 때만)

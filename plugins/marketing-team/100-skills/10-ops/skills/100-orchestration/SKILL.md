@@ -42,7 +42,7 @@ success_metrics: [배선된 체인 수, 주간 루틴 가동률, 게이트 지�
 > 없는 스킬을 만드는 것은 **나만의 스킬 만들기(092)**. 여기는 **있는 것을 배선하는 자리**다.
 
 ## Contract
-1. 구조 해설은 **실제 파일**을 근거로 한다: `skills/ai-마케터/` · `agents/staff-*.md` ·
+1. 구조 해설은 **실제 파일**을 근거로 한다: `skills/ai-marketer/` · `agents/staff-*.md` ·
    `100-skills/ROUTING.md` · `gates/` · `docs/`. 없는 파일·없는 담당을 그리지 않는다.
 2. 라우팅 원리는 **Progressive Disclosure** 로 설명한다. 상시로 보는 것은 `ROUTING.md` 한 장,
    개별 `SKILL.md` 는 매칭된 순간에만 연다.

@@ -9,7 +9,7 @@
 
 ```
 plugins/marketing-team/        ← 배포되는 본체. 여기 것만 사용자에게 간다
-  skills/          진입 스킬 3 (등록됨)   ai-마케터 · 마케팅팀-구축하기 · 마케팅팀-업무리스트
+  skills/          진입 스킬 3 (등록됨)   ai-marketer · marketing-team-setup · marketing-team-tasks
   agents/          판정 담당 3 (등록됨)   staff-*
   100-skills/      업무 스킬 100 (일부러 등록 안 함 · 명부만 상시)
   docs/            공통규약 · 헷갈리는-쌍 · 스킬명-대조표 …

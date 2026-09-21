@@ -1,7 +1,7 @@
 # 실습 계획 화면 · 079 리뷰 요청 설계 (스펙 기반 재구성)
 
 > ⚠️ **실제 대화 로그 캡처가 아니다.** 이 스킬은 원고소스에 실측 기록이 없어, SKILL.md 계약과
-> ai-마케터 SKILL.md의 G1/G2 규칙에서 그대로 구성했다. 실제로 불러본 결과가 이것과 다르면
+> ai-marketer SKILL.md의 G1/G2 규칙에서 그대로 구성했다. 실제로 불러본 결과가 이것과 다르면
 > 실제 결과가 맞는지, 이 재구성이 계약을 잘못 읽은 것인지 확인하고 필요하면 SKILL.md를 고친다.
 
 ## 나
@@ -37,10 +37,10 @@
 
 ## 이 재구성이 근거로 삼은 것
 
-- **⚡ 빠른 진입 미적용**: 079 frontmatter의 `mutating: true`(발송 자동화)가 ai-마케터 SKILL.md 325-334행의
+- **⚡ 빠른 진입 미적용**: 079 frontmatter의 `mutating: true`(발송 자동화)가 ai-marketer SKILL.md 325-334행의
   네 가지 disqualifier 중 ①에 해당해, G1/G2 전체 화면을 그대로 낸다(336행 "네 가지 모두 아니면"의
   반대 경우).
-- **결과물 표**: SKILL.md frontmatter `outputs` 필드를 그대로 옮겼다 — "지어내지 않는다"(ai-마케터
+- **결과물 표**: SKILL.md frontmatter `outputs` 필드를 그대로 옮겼다 — "지어내지 않는다"(ai-marketer
   587행).
 - **읽는 자료 + ⚠️ 샘플 고지**: SKILL.md `sample_fallback` 줄("inputs 를 먼저 보고, 없으면 묻지 않고
   바로 이 파일로 완주한다")과 Phase 1, 게이트 표 Phase 1 행("sample_fallback이 있으면 [발송 대기]
@@ -50,12 +50,12 @@
   건강식품 등 효과 체감형은 D+10 → D+{사용주기}로 조정" 문구를 그대로 반영했다.
 - **인센티브 고지**: 게이트 표 Phase 3 행("인센티브가 있으면 대가성 표기 의무가 생긴다고 먼저
   알린다")과 Contract 3을 계획 화면 안에 한 줄로 반영했다 — 기본값이 "고지 후 진행"이라 별도 턴으로
-  분리하지 않았다(ai-마케터 462-473행의 "실행 경로 자체가 갈리는 질문"과 달리, 이 게이트는 진행
+  분리하지 않았다(ai-marketer 462-473행의 "실행 경로 자체가 갈리는 질문"과 달리, 이 게이트는 진행
   여부 자체를 가르지 않고 고지 후 그대로 진행되는 기본값이기 때문).
 - **나오는 곳/형식**: `writes_to: [outputs/{날짜}/079-review-request-automation/079-review-request-automation.md, email]`를
   그대로 따랐다 — 주 산출물은 `.md` 하나뿐이고, `email`은 승인 뒤 Phase 6에서 나오는 이메일 초안이므로
-  "나오는 형식" 줄에 별도로 밝혔다(ai-마케터 636행 "무엇을 몇 개 내는지는 writes_to가 정한다").
-- **멈추는 곳**: ai-마케터 589-591행 규칙대로 `gate: true`(규제)와 `mutating: true`(발송) 두 성격을
+  "나오는 형식" 줄에 별도로 밝혔다(ai-marketer 636행 "무엇을 몇 개 내는지는 writes_to가 정한다").
+- **멈추는 곳**: ai-marketer 589-591행 규칙대로 `gate: true`(규제)와 `mutating: true`(발송) 두 성격을
   같은 "멈추는 곳" 한 줄에 담되, mutating 쪽은 "task brief"가 요구한 대로 어떤 되돌릴 수 없는 외부
   행동(발송)이 보류되는지 구체적으로 적었다. compliance-gate 검사(Contract 4, Phase 4)와 Phase 5
   ⏸ 발송 승인(Contract 5, 게이트 표 Phase 5 행)을 근거로 삼았다.
