@@ -6,7 +6,7 @@ slug: ad-ab-verdict
 category: 05-ads
 tier: EXPERT
 triggers:
-  - "AB 테스트 결과 분석해줘"
+  - "A/B 테스트 결과 분석해줘"
   - "어느 소재가 이겼는지 봐줘"
   - "테스트 결과 유의미해?"
   - "A안 B안 차이가 우연인지 알려줘"
