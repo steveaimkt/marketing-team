@@ -82,7 +82,7 @@ function cmdIndex() {
     fs.appendFileSync(INDEX, added.map(r => JSON.stringify(r)).join('\n') + '\n');
   }
   console.log(`✅ 색인 · 새로 ${added.length}건 · 누적 ${known.size + added.length}건 (${posix(path.relative(WORK, INDEX))})`);
-  console.log('   색인은 캐시다 — 지워져도 이 명령으로 다시 만들어진다. 원본은 outputs/ 의 md 와 영수증이다.');
+  console.log('   색인은 캐시다 — 지워져도 이 명령으로 다시 만들어진다. 원본은 outputs 의 md 와 영수증이다.');
 }
 
 function cmdSearch(args) {

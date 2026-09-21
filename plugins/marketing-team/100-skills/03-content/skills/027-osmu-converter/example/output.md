@@ -2,7 +2,7 @@
 
 ---
 
-[샘플] `inputs/` 비어 있음 → sample_fallback `sample-data/A브랜드-상세페이지.md` 로 묻지 않고 완주 · 보유 4채널
+[샘플] `inputs` 비어 있음 → sample_fallback `sample-data/A브랜드-상세페이지.md` 로 묻지 않고 완주 · 보유 4채널
 
 # 🔀 OSMU: A 브랜드 수분 세럼 상세페이지 (원본 상세페이지 · D-Day 2026-09-02)
 

@@ -65,7 +65,7 @@ description: |
 
 > ⚠️ **경로 규칙은 `docs/공통규약.md §0` 이다.**
 > `100-skills/` · `docs/` · `sample-data/` 는 **패키지 안** (플러그인이면 `${CLAUDE_PLUGIN_ROOT}` 아래, 폴더로 열었으면 현재 폴더).
-> `brand/` · `outputs/` · `logs/` · `inputs/` 는 **언제나 현재 작업 폴더**다.
+> `brand` · `outputs` · `logs` · `inputs` 는 **언제나 현재 작업 폴더**다.
 
 ## ① 무엇을 시킬 수 있나 · 펼쳐 보여준다
 

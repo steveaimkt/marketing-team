@@ -417,7 +417,7 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   const inputs = (first.step.inputs || []).map(String);
   const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
   const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
-  const 샘플이유 = first.tpl['샘플 이유'] || 'inputs/ 폴더가 비어 있어';
+  const 샘플이유 = first.tpl['샘플 이유'] || 'inputs 폴더가 비어 있어';
   if (own.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
   else if (sample && first.tpl['샘플 자료']) lines.push(`분석할 자료: ${샘플이유} ${으로(first.tpl['샘플 자료'])} 돌립니다. 결과에는 [샘플]이 붙습니다.`);
   lines.push(`근거로 쓰는 것: ${profileIsEmpty(cwd) ? '브랜드 프로필이 비어 있어 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}`);

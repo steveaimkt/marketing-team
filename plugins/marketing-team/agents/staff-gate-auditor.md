@@ -18,7 +18,7 @@ tools: Read, Glob, Grep, Write
 
 > ⚠️ **경로 규칙은 `docs/공통규약.md §0` 이다.**
 > `100-skills/` · `docs/` · `sample-data/` 는 **패키지 안** (플러그인이면 `${CLAUDE_PLUGIN_ROOT}` 아래, 폴더로 열었으면 현재 폴더).
-> `brand/` · `outputs/` · `logs/` · `inputs/` 는 **언제나 현재 작업 폴더**다.
+> `brand` · `outputs` · `logs` · `inputs` 는 **언제나 현재 작업 폴더**다.
 
 ## 대상
 
@@ -40,7 +40,7 @@ tools: Read, Glob, Grep, Write
 
    일반 실습은 샘플로 완주해도 된다. **규제 결정만은 예외다.**
 
-   ⭐ **단, 검사 대상 산출물 자체가 `brand/profile.md` 도 `inputs/` 도 없어 `sample-data/profile-sample.md`
+   ⭐ **단, 검사 대상 산출물 자체가 `brand/profile.md` 도 `inputs` 도 없어 `sample-data/profile-sample.md`
    로 처음부터 끝까지 완주된 것이면(AI 마케터가 계획·산출물에 이미 `[샘플] 가상의 A브랜드(화장품)`
    라고 밝혔다) 위 제한을 걸지 않는다.** 그 산출물의 주장 자체가 화장품 문맥으로 쓰였으므로,
    `sample-data/profile-sample.md` §1 의 업종(화장품)까지 로드해 화장품법 위반을 실제로 걸러낸다.

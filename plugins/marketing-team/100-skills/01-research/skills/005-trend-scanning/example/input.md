@@ -9,7 +9,7 @@
 | 무엇 | 어디서 |
 |---|---|
 | 카테고리·제외어 | `brand/profile.md` · 비어 있으면 A 브랜드 |
-| 검색 채널 | `inputs/` 에 실측 데이터가 없으므로 `sample_fallback`(`sample-data/A브랜드-유튜브검색-61편.csv`, 유튜브 검색 결과 61편)로 완주 |
+| 검색 채널 | `inputs` 에 실측 데이터가 없으므로 `sample_fallback`(`sample-data/A브랜드-유튜브검색-61편.csv`, 유튜브 검색 결과 61편)로 완주 |
 | 뉴스·커뮤니티 채널 | 이 fallback 파일에는 없다 — WebSearch 추정 모드로만 보완 (이 예시에서는 생략하고 그 사실을 밝힌다) |
 
 ## sample_fallback이 실제로 담은 것

@@ -630,7 +630,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   //   무엇을 요청할지는 스킬의 `inputs:` 에서 brand/ 파일을 뺀 것 — 실측 · 생성 24개 전부 나온다.
   if (!G.includes('틀을 던지지 않는다. 재료를 먼저 요청한다'))
     빠짐.push('생성 스킬이 빈 틀부터 던진다 — 재료를 먼저 요청해야 한다 (§0-c D3)');
-  if (!G.includes('`inputs:` 에서 `brand/` 파일만 빼면'))
+  if (!G.includes('`inputs:` 에서 `brand` 파일만 빼면'))
     빠짐.push('무엇을 요청할지의 근거가 없다 — 24개를 따로 적게 되고 곧 어긋난다');
   if (!R.includes('재료를 먼저 요청한다'))
     빠짐.push('런타임이 생성 스킬에서 재료를 먼저 요청하지 않는다');

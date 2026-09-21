@@ -4,7 +4,7 @@
 CS 응대 매뉴얼 만들어줘
 ```
 
-`inputs/`에 파일이 없으면 `sample_fallback`인 `sample-data/A브랜드-고객문의-60건.csv`
+`inputs`에 파일이 없으면 `sample_fallback`인 `sample-data/A브랜드-고객문의-60건.csv`
 (문의 60건 · 배송·펌프·용기·반품·교환·성분·자극·주문·결제·가격·혜택 6유형)로 묻지 않고 완주한다.
 리뷰 파일(`A브랜드-리뷰-200건.csv`)은 이 스킬의 fallback이 아니다 — 지정해서 부르고 싶으면 이렇게 한다.
 

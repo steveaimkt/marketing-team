@@ -26,7 +26,7 @@
 | 5 | `category` | **공식** 폴더명과 같아야 한다 · **사용자** 는 `custom` | `05-ads` · `custom` |
 | 6 | `tier` | `EXPERT` · `SPECIALIST` · `CORE` | `EXPERT` |
 | 7 | `triggers` | **3~6개** · 부르는 말 · 리스트 | `- "광고 카피 만들어줘"` |
-| 8 | `inputs` | 무엇이 있어야 하나 · 없으면 어떻게 되나 | `[리뷰 CSV(내보내서 inputs/ 에), 기간]` |
+| 8 | `inputs` | 무엇이 있어야 하나 · 없으면 어떻게 되나 | `[리뷰 CSV(내보내서 inputs 에), 기간]` |
 | 9 | `outputs` | 무엇이 나오나 · **끝에 `저장 파일(.확장자)`** | `[…, 저장 파일(.md)]` |
 | 10 | `requires` | 읽어야 하는 정본 | `[brand/profile.md]` |
 

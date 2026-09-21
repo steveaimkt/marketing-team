@@ -186,7 +186,7 @@ function validateWrite(input) {
   if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw}`;
   const [root] = path.relative(cwd, target).split(path.sep);
   if (!WRITE_ROOTS.has(root))
-    return `AI 마케터가 쓸 수 있는 곳은 brand/ · outputs/ · logs/ · inputs/뿐입니다: ${raw}`;
+    return `AI 마케터가 쓸 수 있는 곳은 brand · outputs · logs · inputs 뿐입니다: ${raw}`;
   return '';
 }
 
