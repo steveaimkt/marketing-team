@@ -57,6 +57,15 @@ try {
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인 보류할게')].join('\n') + '\n');
   r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
   assert.equal(decision(r), 'deny', '보류를 승인으로 오인했다.');
+  // 부정·철회 (작동 검토 2026-09-22 #3)
+  for (const t of ['진행 승인하지 마세요', '진행 승인합니다. 아니, 취소할게요']) {
+    fs.writeFileSync(transcript, [active, plan, row('user', t)].join('\n') + '\n');
+    r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+    assert.equal(decision(r), 'deny', `「${t}」를 승인으로 오인했다.`);
+  }
+  fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인'), row('user', '잠깐, 취소해줘')].join('\n') + '\n');
+  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  assert.equal(decision(r), 'deny', '승인 뒤 철회했는데 승인이 남아 있다.');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
@@ -76,4 +85,4 @@ for (const n of names) {
 const adv = JSON.parse(fs.readFileSync(path.join(FIX, 'advanced-run.json'), 'utf8'));
 assert.equal((adv.steps || []).length, 4, '고급 픽스처에 4단계가 없다');
 
-console.log('빠른 진입·픽스처 · 계약 앵커 11 · 승인 접두 재료 2 · 단독 승인 1 · 보류 거부 1 · run/v1 픽스처 3(단계 4) · ✅');
+console.log('빠른 진입·픽스처 · 계약 앵커 11 · 승인 접두 재료 2 · 단독 승인 1 · 보류 거부 1 · 부정·철회 거부 3 · run/v1 픽스처 3(단계 4) · ✅');

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -235,7 +235,28 @@ try {
     assert.equal(plan.steps[0].inputs[2], 'plugin:sample-data/경쟁사-3곳.md');
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · ✅`);
+  // 작동 검토 2026-09-22 #5·#6·#7
+  {
+    const chain = canonicalScreenPlan('광고애널리틱스');
+    const at043 = chain.steps.findIndex(x => x.skill === '043');
+    const p5 = structuredClone(chain);
+    p5.steps[at043].inputs.push('workspace:inputs/reference.png');
+    assert.deepEqual(validatePlan(p5), [], '체인 뒤 단계의 사용자 원본(inputs) 입력을 막았다 (#5)');
+    const p5b = structuredClone(chain);
+    p5b.steps[at043].inputs.push('workspace:outputs/2026-09-광고애널리틱스/999-x/없는것.md');
+    assert.ok(validatePlan(p5b).some(i => i.includes('앞 단계가 만들지 않은')), '앞 단계가 안 만든 outputs 입력을 놓쳤다');
+    const p6 = structuredClone(chain);
+    const xlsx = p6.steps[at043].outputs.find(o => o.endsWith('.xlsx'));
+    p6.형식 = { [path.posix.basename(xlsx)]: 'csv' };
+    p6.steps[at043].outputs = p6.steps[at043].outputs.map(o => (o === xlsx ? o.replace(/\.xlsx$/, '.csv') : o));
+    assert.deepEqual(validatePlan(p6), [], '한 단계의 형식 변경이 다른 단계에서 거부됐다 (#6)');
+    assert.deepEqual(applyFormatChoice(['084-proposal-generator.pptx', '084-proposal-generator.docx', '084-proposal-generator.md'],
+      { '084-proposal-generator.pptx': 'md', '084-proposal-generator.docx': 'md' }), ['084-proposal-generator.md'],
+      '문서 스킬이 없을 때 .md 대체가 같은 이름 .md 와 합쳐지지 않았다 (#7)');
+    assert.throws(() => applyFormatChoice(['a.xlsx', 'a.csv'], { 'a.xlsx': 'csv' }), /겹칩니다/, '다른 그릇끼리의 이름 충돌은 막아야 한다');
+  }
+
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

@@ -98,17 +98,23 @@ for (const [name, target] of LINKS) {
   }
 }
 
-const okAgents = fs.existsSync(path.join(DOT, 'agents'));
-const okSkills = fs.existsSync(path.join(DOT, 'skills'));
-const nSkills = okSkills ? fs.readdirSync(path.join(DOT, 'skills')).length : 0;
-const nAgents = okAgents ? fs.readdirSync(path.join(DOT, 'agents')).filter(f => f.endsWith('.md')).length : 0;
+// 등록 대상만 센다 · SKILL.md 가 있는 폴더와 .md 담당 (.DS_Store 같은 부스러기는 빼고)
+// 기준 수는 코드에 박지 않고 플러그인 폴더에서 읽는다 (실측 2026-09-22 · 담당이 3명이 됐는데 2로 남아 실패)
+const countSkills = dir => fs.existsSync(dir)
+  ? fs.readdirSync(dir).filter(n => fs.existsSync(path.join(dir, n, 'SKILL.md'))).length : 0;
+const countAgents = dir => fs.existsSync(dir)
+  ? fs.readdirSync(dir).filter(f => f.endsWith('.md')).length : 0;
+const nSkills = countSkills(path.join(DOT, 'skills'));
+const nAgents = countAgents(path.join(DOT, 'agents'));
+const wantSkills = countSkills(path.join(PLUGIN, 'skills'));
+const wantAgents = countAgents(path.join(PLUGIN, 'agents'));
 
 console.log(`\n──────────────────────────────`);
 console.log(`  스킬 ${nSkills}개 · 담당 ${nAgents}명 · 연결 ${made} · 복사 ${copied} · 유지 ${kept}`);
-if (nSkills === 3 && nAgents === 2) {
+if (nSkills === wantSkills && nAgents === wantAgents && wantSkills > 0) {
   console.log(`\n  ✅ 준비됐다. 클로드 코드를 이 폴더에서 새로 열고 —\n`);
   console.log(`     마케팅팀 구축하자\n`);
 } else {
-  console.log(`\n  ⚠️  스킬 3 · 담당 2 가 아니다. plugins/marketing-team/ 이 온전한지 확인하세요.\n`);
+  console.log(`\n  ⚠️  스킬 ${wantSkills} · 담당 ${wantAgents} 가 아니다. plugins/marketing-team/ 이 온전한지 확인하세요.\n`);
   process.exit(1);
 }

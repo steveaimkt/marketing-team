@@ -145,6 +145,7 @@ export function validatePlan(plan) {
     issues.push(`skills 와 steps 의 순서가 다릅니다: ${skills.join('→')} ≠ ${stepSkills.join('→')}`);
 
   const producedSoFar = new Set();
+  const 전체계약 = new Set();
   for (const [index, step] of steps.entries()) {
     const id = String(step.skill || '').trim();
     const found = decl.get(id);
@@ -162,7 +163,8 @@ export function validatePlan(plan) {
     const outs = (step.outputs || []).map(v => path.posix.basename(String(v)));
     const 계약 = [...new Set(found.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
     let allowed = 계약;
-    try { allowed = applyFormatChoice(계약, planFormat); }
+    for (const b of 계약) 전체계약.add(b);
+    try { allowed = applyFormatChoice(계약, scopeFormatChoice(계약, planFormat)); }
     catch (error) { issues.push(`${at} · ${error.message}`); }
     const canonOf = out => (allowed.includes(out) ? out : (allowed.includes(parseOut(out).canon) ? parseOut(out).canon : null));
     const matchCount = new Map(allowed.map(b => [b, 0]));
@@ -195,7 +197,9 @@ export function validatePlan(plan) {
     }
     // 앞 단계 산출물이 뒤 단계 입력으로 이어지는가 (2단계부터, workspace: 입력만 본다)
     if (index > 0) {
-      const fromWorkspace = (step.inputs || []).filter(v => String(v).startsWith('workspace:'));
+      // 앞 단계 산출물만 본다 · inputs·brand 의 사용자 원본은 어느 단계에서든 넣을 수 있다
+      // (실측 2026-09-22 · 작동 검토 #5 — 043 의 필수 입력인 레퍼런스 이미지를 체인 뒤 단계에서 못 넣었다)
+      const fromWorkspace = (step.inputs || []).filter(v => String(v).startsWith('workspace:outputs/'));
       for (const ref of fromWorkspace) {
         if (!producedSoFar.has(String(ref)))
           issues.push(`${at} · 앞 단계가 만들지 않은 작업 폴더 입력입니다: ${ref}`);
@@ -203,6 +207,9 @@ export function validatePlan(plan) {
     }
     for (const ref of step.outputs || []) producedSoFar.add(String(ref));
   }
+  // 단계마다는 제 파일만 바꾸므로, 어느 단계에도 없는 이름은 계획 전체에서 한 번 잡는다
+  for (const 정본 of Object.keys(planFormat || {}))
+    if (!전체계약.has(정본)) issues.push(`그릇을 바꿀 정본이 이 계획의 어느 단계 계약에 없습니다: ${정본}`);
 
   // 같은 파일을 두 단계가 덮어쓰는가
   const seen = new Map();
@@ -288,6 +295,13 @@ export function normalizeFormatChoice(value, where) {
   return Object.keys(out).length ? out : null;
 }
 
+/** 계획 전체의 형식 변경에서 이 단계 파일에 해당하는 것만 남긴다 (작동 검토 2026-09-22 #6) */
+export function scopeFormatChoice(expected, choice) {
+  if (!choice) return null;
+  const kept = Object.fromEntries(Object.entries(choice).filter(([정본]) => expected.includes(정본)));
+  return Object.keys(kept).length ? kept : null;
+}
+
 export function applyFormatChoice(expected, choice) {
   if (!choice) return expected;
   const out = [...expected];
@@ -296,8 +310,12 @@ export function applyFormatChoice(expected, choice) {
     if (i === -1)
       throw new Error(`그릇을 바꿀 정본이 계약에 없습니다: ${정본} · 계약은 ${expected.join(' · ')} 입니다.`);
     const 바뀐 = 정본.replace(/\.[^.]+$/, `.${새}`);
-    if (바뀐 !== 정본 && out.includes(바뀐))
+    if (바뀐 !== 정본 && out.includes(바뀐)) {
+      // 문서 스킬이 없어 .docx·.pptx 를 .md 로 낼 때 같은 이름 .md 가 이미 있으면 그 한 파일에 합친다
+      // (실측 2026-09-22 · 작동 검토 #7 — 084 가 이름 충돌로 대체 경로를 못 탔다). 다른 그릇끼리는 여전히 막는다
+      if (새 === 'md') { out.splice(i, 1); continue; }
       throw new Error(`그릇을 바꾸면 다른 정본과 이름이 겹칩니다: ${바뀐}`);
+    }
     out[i] = 바뀐;
   }
   return out;
@@ -428,7 +446,7 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
 
   const formatsOf = r => {
     const 계약 = [...new Set(r.decl.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
-    return applyFormatChoice(계약, choice).map(formatLabel).join(' · ');
+    return applyFormatChoice(계약, scopeFormatChoice(계약, choice)).map(formatLabel).join(' · ');
   };
   if (isChain) {
     lines.push('나오는 형식:');

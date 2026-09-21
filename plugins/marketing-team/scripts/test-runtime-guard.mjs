@@ -414,7 +414,40 @@ try {
     assert.equal(decision(result), 'none', '저위험 자동 승인 실행의 최종 단계 start 를 그릇 확인 증거 없이 막았습니다.');
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · ✅');
+  // 작동 검토 2026-09-22 #1·#2 · 빈 작업 폴더에서 새로 본다 (앞 검사가 남긴 계획이 끼지 않게)
+  {
+    const fresh = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-guard-review-'));
+    const tr = path.join(fresh, 's.jsonl');
+    const call2 = (tool_name, tool_input) => spawnSync(process.execPath, [SCRIPT], {
+      input: JSON.stringify({ hook_event_name: 'PreToolUse', session_id: 'r', transcript_path: tr, cwd: fresh, tool_name, tool_input }),
+      encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: pluginRoot, CLAUDE_PROJECT_DIR: fresh },
+    });
+    const W = lines => fs.writeFileSync(tr, `${lines.join('\n')}\n`);
+    try {
+      W([active, row('user', '광고 예산 다시 짜줘')]);
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-09-22', '046-x', 'plan.json') })), 'none',
+        '승인 전 첫 plan.json 초안을 막았습니다 (G2 화면을 만들 수 없다).');
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+        '승인 전 산출물 쓰기를 plan.json 예외로 허용했습니다.');
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'brand', 'plan.json') })), 'deny',
+        'outputs 밖 plan.json 을 허용했습니다.');
+      assert.equal(decision(call2('Bash', { command: 'python3 -c "import openpyxl"' })), 'deny',
+        '승인 전 python 실행을 허용했습니다.');
+
+      const p = row('assistant', '[실행 계획]\n046 ROAS 진단을 실행합니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
+      W([active, p, row('user', '진행 승인')]);
+      for (const ok of ['python3 -c "import pptx, docx, openpyxl"', 'python3 outputs/build_report.py',
+        'python3 /tmp/x/skills/xlsx/recalc.py outputs/a.xlsx'])
+        assert.equal(decision(call2('Bash', { command: ok })), 'none', `승인 뒤 문서 생성 명령을 막았습니다: ${ok}`);
+      for (const bad of ['python3 -c "import os; os.remove(\'x\')"', 'python3 outputs/a.py > /etc/x',
+        'python3 /tmp/other.py', 'python3 outputs/a.py && rm -rf brand'])
+        assert.equal(decision(call2('Bash', { command: bad })), 'deny', `승인 뒤 허용 밖 python 을 열었습니다: ${bad}`);
+    } finally {
+      fs.rmSync(fresh, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 7 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

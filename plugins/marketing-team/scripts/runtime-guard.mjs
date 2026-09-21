@@ -25,7 +25,11 @@ const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:은|는|이|가)?\s*(?:보�
 // 실제 대화에서 정보를 먼저 말하고 승인으로 문장을 맺는 경우가 실측으로 재현됐다.
 // 부정형 뒤엔 걸리지 않는다("승인 안 함"처럼 승인 뒤에 말이 더 붙으면 $ 에서 끝나지 않아 제외된다).
 const APPROVAL_SUFFIX = /(?:^|[\s,.!?~])(?:진행\s*승인|계획\s*승인|승인합니다|승인)\s*[.!~]?\s*$/;
-const APPROVAL = { test: text => APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text) };
+// 부정·철회가 한 군데라도 있으면 승인이 아니다 (실측 2026-09-22 · 작동 검토 #3 —
+// 「진행 승인하지 마세요」·「진행 승인합니다. 아니, 취소할게요」가 접두 승인으로 통과했다).
+// 재료에 우연히 걸리면 한 번 더 묻게 될 뿐이다 · 오인 승인보다 안전한 쪽을 고른다.
+const WITHDRAW = /하지\s*마|하지\s*말|말아\s*(?:줘|주세요|요)|취소|보류|철회|중단|멈춰|그만|아니(?:요|[,.\s]|$)|아뇨|잠깐|아직/;
+const APPROVAL = { test: text => !WITHDRAW.test(text) && (APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text)) };
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-marketer/SKILL.md', '\\skills\\ai-marketer\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 
@@ -98,9 +102,14 @@ function approved(rows) {
     if (rows[i].role === 'assistant' && PLAN_MARKER.test(rows[i].text)) latestPlan = i;
   }
   if (latestPlan < 0) return { ok: false, reason: '실행 계획 표식이 없습니다.' };
+  // 마지막으로 뜻을 밝힌 사용자 말이 이긴다 · 승인한 뒤 「취소」하면 승인이 풀린다
+  let ok = false;
   for (let i = latestPlan + 1; i < rows.length; i++) {
-    if (rows[i].role === 'user' && APPROVAL.test(rows[i].text)) return { ok: true, plan: rows[latestPlan].text };
+    if (rows[i].role !== 'user') continue;
+    if (APPROVAL.test(rows[i].text)) ok = true;
+    else if (WITHDRAW.test(rows[i].text)) ok = false;
   }
+  if (ok) return { ok: true, plan: rows[latestPlan].text };
   return { ok: false, reason: '사용자의 명시적 진행 승인이 없습니다.' };
 }
 
@@ -188,6 +197,36 @@ function validateWrite(input) {
   if (!WRITE_ROOTS.has(root))
     return `AI 마케터가 쓸 수 있는 곳은 brand · outputs · logs · inputs 뿐입니다: ${raw}`;
   return '';
+}
+
+/**
+ * 승인 뒤 문서 생성용 Python (실측 2026-09-22 · 작동 검토 #2 — 공통규약 §H 가 python-pptx·docx·openpyxl
+ * 을 쓰라고 하는데 승인 뒤에도 python3 가 전부 막혔다. 개발 저장소 예외 때문에 여기서는 안 드러났다).
+ * 여는 것은 셋뿐이다 · 라이브러리 확인(import 만) · 작업 폴더 outputs 안 스크립트 · 공식 문서 스킬 스크립트.
+ * 명령 하나짜리만 · 파이프·리다이렉션·이어 붙이기·치환은 그대로 막는다.
+ */
+function allowedPython(input) {
+  const command = String(input.tool_input?.command || '').trim();
+  if (/[;&|<>`\n]|\$\(/.test(command.replace(/-c\s+(["'])[^"']*\1/, ''))) return false;
+  const m = command.match(/^python3?\s+(.+)$/);
+  if (!m) return false;
+  const rest = m[1].trim();
+  const c = rest.match(/^-c\s+(["'])([^"']*)\1$/);
+  if (c) return /^\s*(?:import\s+[\w.]+(?:\s*,\s*[\w.]+)*\s*;?\s*)+$/.test(c[2]);
+  const script = (rest.match(/^(["']?)([^"'\s]+\.py)\1(?:\s|$)/) || [])[2];
+  if (!script) return false;
+  const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
+  const abs = path.resolve(cwd, script);
+  if (inside(path.join(cwd, 'outputs'), abs)) return true;
+  return /[\\/]skills[\\/](?:xlsx|docx|pptx|pdf)[\\/]/.test(abs);
+}
+
+function isPlanDraftWrite(input) {
+  if (!['Write', 'Edit'].includes(input.tool_name)) return false;
+  const raw = input.tool_input?.file_path || input.tool_input?.path;
+  if (!raw || path.basename(String(raw)) !== 'plan.json' || validateWrite(input)) return false;
+  const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
+  return path.relative(cwd, path.resolve(cwd, raw)).split(path.sep)[0] === 'outputs';
 }
 
 function validateBash(input) {
@@ -509,6 +548,10 @@ function planApproval(cwd, preferId) {
     // 조회와 라우팅·계획 준비 명령만 승인 전에 돈다 — G1 라우팅·G2 컴파일이 여기 산다 (실측 2026-08-30).
     // 산출물 쓰기(Write/Edit)와 영수증·생성·동기화 스크립트는 승인 뒤에도 허용 목록으로만 돈다 (P0).
     if (input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pre'))) return;
+    // G2 화면은 plan.json 에서 찍는다 · 그 초안은 승인 전에 써야 한다 (실측 2026-09-22 · 작동 검토 #1 ·
+    // 첫 plan.json 이 여기서 막혀 문서의 순서대로는 계획 화면을 만들 수 없었다).
+    // outputs 아래 plan.json 하나만 연다 · 산출물은 여전히 승인과 해시 봉인 뒤에만 쓴다
+    if (isPlanDraftWrite(input)) return;
     deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
     return;
   }
@@ -557,7 +600,7 @@ function planApproval(cwd, preferId) {
     // 승인은 계획을 허락한 것이지 파일시스템을 연 것이 아니다 — 쓰는 문은 Write/Edit 하나다.
     // (실측 2026-08-30 · 승인 뒤 셸 heredoc·python3 이 경로 규칙을 그대로 지나쳤다)
     // 스크립트도 파일이 있다고 다 허용하지 않는다 — 계획이 요구하는 실행·검증 명령만 (P0 허용 목록).
-    if (!isReadOnlyBash(input) && !allowedScript(input, 'run'))
+    if (!isReadOnlyBash(input) && !allowedScript(input, 'run') && !allowedPython(input))
       deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다.');
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, planText);

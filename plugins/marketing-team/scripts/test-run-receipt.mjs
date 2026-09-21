@@ -608,7 +608,41 @@ try {
     assert.equal(r.status, 0, `.md 를 약속하지 않은 스킬까지 초안을 요구했습니다: ${r.stderr}${r.stdout}`);
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · ✅');
+  // 작동 검토 2026-09-22 #4 · 계획은 최종 그릇만 적고, 같은 자리의 .md 초안은 계획 안으로 본다
+  {
+    const pc = (...a) => spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: temp, encoding: 'utf8' });
+    const one = (id, slug, finalExt, fmt, reviews) => {
+      const rel = `outputs/2026-09-22/${id}-${slug}`;
+      fs.mkdirSync(path.join(temp, rel), { recursive: true });
+      const out = ext => `workspace:${rel}/${id}-${slug}.${ext}`;
+      const plan = { schema: 'marketing-team.plan/v1', plan_id: `draft-${id}`, request: '초안 재현', skills: [id],
+        steps: [{ step: 1, skill: id, inputs: ['plugin:sample-data/A브랜드-채널성과-90일.csv'], outputs: [out(finalExt)], reviews }],
+        budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 } };
+      if (fmt) plan.형식 = fmt;
+      fs.writeFileSync(path.join(temp, rel, 'plan.json'), `${JSON.stringify(plan, null, 2)}\n`);
+      assert.equal(pc('compile', `${rel}/plan.json`).status, 0, `${id} 계획이 compile 되지 않는다`);
+      pc('approve', `${rel}/plan.json`);
+      return (단계, exts) => {
+        const receipt = { schema: 'marketing-team.run/v1', status: 'draft', request: '초안 재현', skills: [id], data_mode: '샘플',
+          inputs: [{ path: 'plugin:sample-data/A브랜드-채널성과-90일.csv', period: '2026-05-01~2026-07-29' }],
+          profile: 'plugin:sample-data/profile-sample.md', outputs: exts.map(out),
+          required_reviews: exts.flatMap(e => reviews.map(r => ({ ...r, artifact: out(e) }))), reviews: [],
+          ledger: { path: 'workspace:logs/build-log.md' }, 단계 };
+        if (fmt) receipt.형식 = fmt;
+        fs.writeFileSync(path.join(temp, rel, 'run.json'), `${JSON.stringify(receipt, null, 2)}\n`);
+        return run('start', `${rel}/run.json`);
+      };
+    };
+    let r = one('045', 'weekly-ads-report', 'html', null, [])('초안', ['md']);
+    assert.equal(r.status, 0, `045 html 계획의 .md 초안 start 를 막았다: ${r.stderr}${r.stdout}`);
+    const s046 = one('046', 'roas-budget-rebalance', 'docx', { '046-roas-budget-rebalance.md': 'docx' }, [{ kind: 'business', perspective: '재무' }]);
+    r = s046('초안', ['md']);
+    assert.equal(r.status, 0, `046 docx 계획의 .md 초안 start 를 막았다: ${r.stderr}${r.stdout}`);
+    r = s046('최종', ['docx', 'md']);
+    assert.equal(r.status, 0, `046 최종(docx + 초안 md) start 를 막았다: ${r.stderr}${r.stdout}`);
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

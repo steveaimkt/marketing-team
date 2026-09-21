@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 
@@ -250,7 +250,14 @@ function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows, 
   if (planned.join(',') !== actual.join(','))
     throw new Error(`승인한 계획과 스킬·순서가 다릅니다: 계획 ${planned.join('→')} · 실행 ${actual.join('→')}`);
 
-  const plannedOutputs = new Set((plan.steps || []).flatMap(step => (step.outputs || []).map(String)));
+  // 접두사 없는 outputs/… 는 workspace:outputs/… 와 같은 파일이다 · 영수증과 같은 규칙(resolveRef)으로 맞춘다
+  // (실측 2026-09-22 · 빈 폴더 실행 — 계획은 outputs/…, 영수증은 workspace:outputs/… 로 적어 같은 파일이 「계획에 없는 산출물」이 됐다)
+  const asRef = value => { try { return resolveRef(String(value)).ref; } catch { return String(value); } };
+  const plannedOutputs = new Set((plan.steps || []).flatMap(step => (step.outputs || []).map(asRef)));
+  // 계획은 최종 그릇만 적는다 · 같은 자리의 .md 초안은 그 최종의 앞 단계라 계획 안이다
+  // (실측 2026-09-22 · 작동 검토 #4 — 045 html·046 docx 계획에서 초안 .md 로 start 하면
+  // 「계획에 없는 산출물」로 막혔고, 계획에 .md 를 넣으면 compile 이 계약 위반으로 막았다)
+  for (const ref of [...plannedOutputs]) plannedOutputs.add(path.posix.join(path.posix.dirname(ref), 초안이름(ref)));
   for (const row of outputRows) {
     if (!plannedOutputs.has(row.path))
       throw new Error(`승인한 계획에 없는 산출물입니다: ${row.path} · 새 계획으로 다시 승인받으세요.`);
@@ -398,7 +405,8 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
     for (const row of skillRows) {
       const folder = folderOf(row);
       if (!folder) continue;
-      const names = applyFormatChoice([...new Set((row.writes_to || []).map(v => path.posix.basename(v)))], formatChoice);
+      const own = [...new Set((row.writes_to || []).map(v => path.posix.basename(v)))];
+      const names = applyFormatChoice(own, scopeFormatChoice(own, formatChoice));
       for (const name of [...names, ...names.map(초안이름)]) if (!skillOfCanon.has(name)) skillOfCanon.set(name, { id: row.id, folder });
     }
     for (const item of outputRows) {
