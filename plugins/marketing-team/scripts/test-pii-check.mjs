@@ -83,5 +83,16 @@ const dupIssues = await scanPii(
   { outputs: [], pii: { source: 'plugin:src/등급.csv', id_columns: ['등급'] } }, resolve);
 check('중복 값은 순번으로 오판하지 않는다', !dupIssues.some(l => l.includes('빠짐없는 순번')));
 
+// ⑦ 「식별자 열 없음」 선언 · `id_columns: []` (실측 2026-09-23 · 006 샘플 리뷰에는 식별자 열이 없다)
+//    start 는 id_columns 를 요구하고 finalize 는 행 번호를 거부해 006 을 끝낼 수 없었다.
+const noIdIssues = await scanPii(
+  { outputs: ['workspace:out/006-review-mining-해설.md'], pii: { source: 'plugin:src/리뷰.csv', id_columns: [] } }, resolve);
+check('식별자 열이 없는 원본은 빈 id_columns 로 통과한다', noIdIssues.length === 0);
+const hiddenIdIssues = await scanPii(
+  { outputs: [], pii: { source: 'plugin:src/고객마스터.csv', id_columns: [] } }, resolve);
+check('식별자로 보이는 열(고객ID)이 있으면 빈 id_columns 를 막는다', hiddenIdIssues.some(l => l.includes('고객ID')));
+const missingIssues = await scanPii({ outputs: [], pii: { source: 'plugin:src/리뷰.csv' } }, resolve);
+check('id_columns 를 아예 빠뜨리면 여전히 막는다', missingIssues.some(l => l.includes('비었습니다')));
+
 fs.rmSync(root, { recursive: true, force: true });
-console.log(`개인정보 검사 · 무염해시 복원 1 · 보고서 원문 인용 1 · 대응표 잔존 1 · 정상 통과 1 · 미선언 통과 1 · 순번 식별자 오류 3 · ✅ (${pass})`);
+console.log(`개인정보 검사 · 무염해시 복원 1 · 보고서 원문 인용 1 · 대응표 잔존 1 · 정상 통과 1 · 미선언 통과 1 · 순번 식별자 오류 3 · 식별자 열 없음 3 · ✅ (${pass})`);

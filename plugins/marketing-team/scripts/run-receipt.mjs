@@ -26,6 +26,7 @@ import { runChecks } from './output-checks.mjs';
 import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
+import { identifierLikeHeaders } from './pii-check.mjs';
 
 const PLUGIN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const WORK = path.resolve(process.cwd());
@@ -208,7 +209,17 @@ function normalizePii(value, inputRows) {
   const idColumns = Array.isArray(value.id_columns)
     ? value.id_columns.map(item => String(item).trim()).filter(Boolean)
     : [];
-  if (!idColumns.length) throw new Error('pii.id_columns가 비었습니다. 식별자 열 이름을 적으세요.');
+  if (!idColumns.length) {
+    // 빈 배열은 「원본에 식별자 열이 없다」는 선언이다 (실측 2026-09-23 · 006 샘플 리뷰).
+    // 빠뜨린 것과 구분하려고 배열을 명시해야 하고, 원본 머리글로 확인한다.
+    if (!Array.isArray(value.id_columns))
+      throw new Error('pii.id_columns가 비었습니다. 식별자 열 이름을 적으세요. 원본에 식별자 열이 없으면 "id_columns": [] 로 적으세요.');
+    const like = identifierLikeHeaders(resolveRef(value.source).abs);
+    if (like === null)
+      throw new Error(`pii.id_columns를 비웠지만 원본(${source})이 CSV 가 아니라 식별자 열이 없는지 확인할 수 없습니다. 식별자 열 이름을 적으세요.`);
+    if (like.length)
+      throw new Error(`pii.id_columns를 비웠지만 원본에 식별자로 보이는 열이 있습니다: ${like.join(' · ')} — id_columns 에 적으세요.`);
+  }
   const surrogate = String(value.surrogate_column || '').trim();
   return {
     source,

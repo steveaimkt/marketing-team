@@ -436,10 +436,13 @@ try {
 
       const p = row('assistant', '[실행 계획]\n046 ROAS 진단을 실행합니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
       W([active, p, row('user', '진행 승인')]);
+      // 실측 2026-09-23 · 버전 찍기가 막히자 모델이 xlsx 를 포기했다
       for (const ok of ['python3 -c "import pptx, docx, openpyxl"', 'python3 outputs/build_report.py',
+        'python3 -c "import openpyxl; print(openpyxl.__version__)"',
         'python3 /tmp/x/skills/xlsx/recalc.py outputs/a.xlsx'])
         assert.equal(decision(call2('Bash', { command: ok })), 'none', `승인 뒤 문서 생성 명령을 막았습니다: ${ok}`);
       for (const bad of ['python3 -c "import os; os.remove(\'x\')"', 'python3 outputs/a.py > /etc/x',
+        'python3 -c "import os; print(os.system(1))"', 'python3 -c "print(open(1))"',
         'python3 /tmp/other.py', 'python3 outputs/a.py && rm -rf brand'])
         assert.equal(decision(call2('Bash', { command: bad })), 'deny', `승인 뒤 허용 밖 python 을 열었습니다: ${bad}`);
 
@@ -480,7 +483,7 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 7 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

@@ -69,6 +69,20 @@ function columnValues(file, columns) {
   return { values, missing };
 }
 
+/**
+ * 식별자로 보이는 열 이름 · 「식별자 열 없음」(`id_columns: []`) 선언을 믿기 전에 머리글로 확인한다.
+ * 실측 2026-09-23 · 006 샘플 리뷰(번호·날짜·채널·제품·별점·본문)에는 식별자 열이 없는데,
+ * start 는 id_columns 를 요구하고 finalize 는 행 번호를 거부해 실행을 끝낼 수 없었다.
+ */
+const ID_LIKE = /이름|성명|고객\s*ID|회원\s*ID|아이디|연락처|전화|휴대|이메일|메일|주소|닉네임|user_?id|customer_?id|member_?id|e-?mail|phone|name/i;
+
+/** CSV 머리글 중 식별자로 보이는 열. CSV 가 아니거나 못 읽으면 null(판단 불가). */
+export function identifierLikeHeaders(file) {
+  if (!/\.csv$/i.test(file) || !fs.existsSync(file)) return null;
+  try { return readCsv(file).header.map(h => h.trim()).filter(h => ID_LIKE.test(h)); }
+  catch { return null; }
+}
+
 /** 원문에서 유도할 수 있는 값을 전부 펼친다 — 대체키가 여기 걸리면 복원 가능한 것이다. */
 function derivations(ids) {
   const out = new Map();
@@ -116,7 +130,15 @@ export async function scanPii(run, resolve) {
   if (!fs.existsSync(sourceAbs)) return [`개인정보 원본이 없습니다: ${spec.source}`];
 
   const columns = Array.isArray(spec.id_columns) ? spec.id_columns : [];
-  if (!columns.length) return ['pii.id_columns 가 비었습니다. 식별자 열 이름을 적으세요.'];
+  if (!columns.length) {
+    if (!Array.isArray(spec.id_columns)) return ['pii.id_columns 가 비었습니다. 식별자 열 이름을 적으세요.'];
+    // `id_columns: []` 는 「원본에 식별자 열이 없다」는 선언이다 · 머리글로 확인하고, 맞으면 잴 식별자가 없다.
+    // 본문 속 이름 같은 조합 재식별 위험은 AI 규제검토자가 본다.
+    const like = identifierLikeHeaders(sourceAbs);
+    if (like === null) return [`id_columns 를 비웠지만 원본(${spec.source})이 CSV 가 아니라 식별자 열이 없는지 확인할 수 없습니다. 식별자 열 이름을 적으세요.`];
+    if (like.length) return [`id_columns 를 비웠지만 원본에 식별자로 보이는 열이 있습니다: ${like.join(' · ')} — id_columns 에 적으세요.`];
+    return [];
+  }
 
   const { values: ids, missing } = columnValues(sourceAbs, columns);
   for (const name of missing) issues.push(`원본에 식별자 열이 없습니다: ${name} (${spec.source})`);

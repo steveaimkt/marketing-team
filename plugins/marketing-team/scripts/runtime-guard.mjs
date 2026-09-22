@@ -219,7 +219,10 @@ function allowedPython(input) {
   if (!m) return false;
   const rest = m[1].trim();
   const c = rest.match(/^-c\s+(["'])([^"']*)\1$/);
-  if (c) return /^\s*(?:import\s+[\w.]+(?:\s*,\s*[\w.]+)*\s*;?\s*)+$/.test(c[2]);
+  // import 와 버전 찍기(print(모듈.__version__))만 · 실측 2026-09-23 · `import openpyxl; print(openpyxl.__version__)`
+  // 가 막히자 모델이 「표 파일 도구가 막혔다」고 보고 xlsx 를 포기했다. 값을 찍는 것 말고는 여전히 막는다.
+  if (c) return c[2].split(';').map(part => part.trim()).filter(Boolean).every(part =>
+    /^import\s+[\w.]+(?:\s*,\s*[\w.]+)*$/.test(part) || /^print\(\s*[\w.]+(?:\s*,\s*[\w.]+)*\s*\)$/.test(part));
   const script = (rest.match(/^(["']?)([^"'\s]+\.py)\1(?:\s|$)/) || [])[2];
   if (!script) return false;
   const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
@@ -627,7 +630,8 @@ function planApproval(cwd, preferId) {
     // Write 가 상위 폴더를 알아서 만든다는 것과 작업 폴더 기준 상대 경로를 함께 알린다.
     if (!isReadOnlyBash(input) && !allowedScript(input, 'run') && !allowedPython(input))
       deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다. ' +
-        `폴더는 따로 만들지 않아도 됩니다 · Write 가 상위 폴더를 알아서 만듭니다(mkdir 불필요). 경로는 작업 폴더(${path.resolve(cwd || process.cwd())}) 기준 outputs/… 로 적으세요.`);
+        `폴더는 따로 만들지 않아도 됩니다 · Write 가 상위 폴더를 알아서 만듭니다(mkdir 불필요). 경로는 작업 폴더(${path.resolve(cwd || process.cwd())}) 기준 outputs/… 로 적으세요. ` +
+        'xlsx·docx·pptx 는 만들 수 있습니다 · outputs 안에 .py 를 Write 로 쓰고 python3 outputs/…/make.py 로 실행하세요(한 줄 명령, 파이프·리다이렉션 없이).');
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, planText);
     if (issue) deny(issue);
