@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="960" height="640" font-family="Pretendard, 'Apple SD Gothic Neo', sans-serif">
+  <style>
+    .t{fill:#2A2A28} .d{fill:#2A2A28;opacity:.62} .lbl{fill:#2A2A28;opacity:.5}
+    .box{fill:none;stroke:#2A2A28;stroke-width:1.8}
+    .body{fill:currentColor;stroke:#2A2A28;stroke-width:2.4;stroke-linejoin:round}
+    .eye{fill:#2A2A28}
+    .arrow{stroke:#2A2A28;stroke-width:1.8;fill:none;opacity:.55;stroke-linecap:round;stroke-linejoin:round}
+    .dash{stroke:#2A2A28;stroke-width:1.6;fill:none;opacity:.5;stroke-dasharray:7 6;stroke-linecap:round}
+    .cell{fill:#2A2A28;opacity:.13} .cellon{fill:#FFFFFF;stroke:#2A2A28;stroke-width:1.6}
+    .chip{fill:#FFFFFF;stroke:#2A2A28;stroke-width:1.4}
+  </style>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto"><path d="M0 0.6 L10 5 L0 9.4 z" fill="#2A2A28" opacity=".55"/></marker>
+    <marker id="as" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto"><path d="M0 0.6 L10 5 L0 9.4 z" fill="#2A2A28" opacity=".5"/></marker>
+    <g id="chr">
+      <path class="body" d="M16,0 H104 V32 H120 V62 H96 V80 H89 V62 H83 V80 H76 V62 H44 V80 H37 V62 H28 V80 H21 V62 H0 V32 H16 Z"/>
+      <rect class="eye" x="32" y="13" width="8" height="17"/><rect class="eye" x="80" y="13" width="8" height="17"/>
+    </g>
+  </defs>
+  <rect width="960" height="640" fill="#FFFFFF"/>
+
+  <rect class="box" x="345" y="28" width="270" height="42" rx="13"/>
+  <text class="t" x="480" y="55" font-size="16" font-weight="600" text-anchor="middle">「마케팅 팀 업무 시작하자」</text>
+  <path class="arrow" d="M480,70 V112" marker-end="url(#ah)"/>
+  <text class="lbl" x="494" y="96" font-size="14">계획을 보여 주고 승인받는다</text>
+
+  <g transform="translate(411,120) scale(1.15)"><use href="#chr" color="#D97757"/></g>
+  <text class="t" x="480" y="246" font-size="19" font-weight="700" text-anchor="middle">AI 마케터</text>
+  <text class="d" x="480" y="270" font-size="15" text-anchor="middle">승인받은 계획대로 스킬을 실행한다</text>
+
+  <g transform="translate(137,148) scale(.72)"><use href="#chr" color="#E8CDBE"/></g>
+  <text class="t" x="180" y="232" font-size="17" font-weight="700" text-anchor="middle">AI 규제검토자</text>
+  <text class="d" x="180" y="254" font-size="14.5" text-anchor="middle">외부에 공개되는 글을 검토한다</text>
+  <text class="t" x="180" y="276" font-size="14.5" font-weight="600" text-anchor="middle">⛔ 발행을 막을 수 있다</text>
+
+  <g transform="translate(737,148) scale(.72)"><use href="#chr" color="#E8CDBE"/></g>
+  <text class="t" x="780" y="232" font-size="17" font-weight="700" text-anchor="middle">AI 사업검토자</text>
+  <text class="d" x="780" y="254" font-size="14.5" text-anchor="middle">사업적으로 타당한지 검토한다</text>
+  <text class="d" x="780" y="276" font-size="14.5" text-anchor="middle">결정은 사용자가 한다</text>
+
+  <path class="dash" d="M403,183 H232" marker-end="url(#as)"/>
+  <text class="lbl" x="317" y="173" font-size="14" text-anchor="middle">외부 공개 문구만</text>
+  <path class="dash" d="M557,183 H729" marker-end="url(#as)"/>
+  <text class="lbl" x="643" y="173" font-size="14" text-anchor="middle">사업 판단만</text>
+
+  <path class="arrow" d="M480,286 V316" marker-end="url(#ah)"/>
+  <text class="t" x="52" y="316" font-size="15" font-weight="600">스킬 100개 (업무 영역 10개, 영역마다 10개)</text>
+  <text class="t" x="52" y="348" font-size="13.5" font-weight="600">시장조사</text>
+  <text class="lbl" x="206" y="348" font-size="12" text-anchor="end">001~010</text>
+  <rect class="cell" x="52" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="84" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="116" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="148" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="180" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="52" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="84" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="116" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="148" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="180" y="376" width="26" height="12" rx="3"/>
+  <text class="t" x="228" y="348" font-size="13.5" font-weight="600">제품기획</text>
+  <text class="lbl" x="382" y="348" font-size="12" text-anchor="end">011~020</text>
+  <rect class="cell" x="228" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="260" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="292" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="324" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="356" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="228" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="260" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="292" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="324" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="356" y="376" width="26" height="12" rx="3"/>
+  <text class="t" x="404" y="348" font-size="13.5" font-weight="600">콘텐츠</text>
+  <text class="lbl" x="558" y="348" font-size="12" text-anchor="end">021~030</text>
+  <rect class="cell" x="404" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="436" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="468" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="500" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="532" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="404" y="376" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="436" y="376" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="468" y="376" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="500" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="532" y="376" width="26" height="12" rx="3"/>
+  <text class="t" x="580" y="348" font-size="13.5" font-weight="600">SNS</text>
+  <text class="lbl" x="734" y="348" font-size="12" text-anchor="end">031~040</text>
+  <rect class="cellon" x="580" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="612" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="644" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="676" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="708" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="580" y="376" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="612" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="644" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="676" y="376" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="708" y="376" width="26" height="12" rx="3"/>
+  <text class="t" x="756" y="348" font-size="13.5" font-weight="600">광고</text>
+  <text class="lbl" x="910" y="348" font-size="12" text-anchor="end">041~050</text>
+  <rect class="cell" x="756" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="788" y="358" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="820" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="852" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="884" y="358" width="26" height="12" rx="3"/>
+  <rect class="cell" x="756" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="788" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="820" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="852" y="376" width="26" height="12" rx="3"/>
+  <rect class="cell" x="884" y="376" width="26" height="12" rx="3"/>
+  <text class="t" x="52" y="426" font-size="13.5" font-weight="600">이커머스</text>
+  <text class="lbl" x="206" y="426" font-size="12" text-anchor="end">051~060</text>
+  <rect class="cellon" x="52" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="84" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="116" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="148" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="180" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="52" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="84" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="116" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="148" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="180" y="454" width="26" height="12" rx="3"/>
+  <text class="t" x="228" y="426" font-size="13.5" font-weight="600">데이터</text>
+  <text class="lbl" x="382" y="426" font-size="12" text-anchor="end">061~070</text>
+  <rect class="cell" x="228" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="260" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="292" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="324" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="356" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="228" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="260" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="292" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="324" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="356" y="454" width="26" height="12" rx="3"/>
+  <text class="t" x="404" y="426" font-size="13.5" font-weight="600">CRM</text>
+  <text class="lbl" x="558" y="426" font-size="12" text-anchor="end">071~080</text>
+  <rect class="cell" x="404" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="436" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="468" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="500" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="532" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="404" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="436" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="468" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="500" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="532" y="454" width="26" height="12" rx="3"/>
+  <text class="t" x="580" y="426" font-size="13.5" font-weight="600">브랜딩·세일즈</text>
+  <text class="lbl" x="734" y="426" font-size="12" text-anchor="end">081~090</text>
+  <rect class="cell" x="580" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="612" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="644" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="676" y="436" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="708" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="580" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="612" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="644" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="676" y="454" width="26" height="12" rx="3"/>
+  <rect class="cellon" x="708" y="454" width="26" height="12" rx="3"/>
+  <text class="t" x="756" y="426" font-size="13.5" font-weight="600">운영</text>
+  <text class="lbl" x="910" y="426" font-size="12" text-anchor="end">091~100</text>
+  <rect class="cell" x="756" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="788" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="820" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="852" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="884" y="436" width="26" height="12" rx="3"/>
+  <rect class="cell" x="756" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="788" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="820" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="852" y="454" width="26" height="12" rx="3"/>
+  <rect class="cell" x="884" y="454" width="26" height="12" rx="3"/>
+  <text class="d" x="480" y="506" font-size="14" text-anchor="middle">테두리가 진한 32개는 발행 전에 AI 규제검토자가 검토한다</text>
+  <path class="arrow" d="M480,518 V546" marker-end="url(#ah)"/>
+  <rect class="box" x="240" y="554" width="480" height="62" rx="13"/>
+  <text class="t" x="262" y="580" font-size="15" font-weight="700">작업 폴더</text>
+  <text class="d" x="262" y="602" font-size="13.5">결과물이 파일로 쌓인다</text>
+  <rect class="chip" x="430" y="571" width="62" height="28" rx="7"/>
+  <text class="t" x="461" y="590" font-size="13" text-anchor="middle">brand</text>
+  <rect class="chip" x="500" y="571" width="62" height="28" rx="7"/>
+  <text class="t" x="531" y="590" font-size="13" text-anchor="middle">inputs</text>
+  <rect class="chip" x="570" y="571" width="62" height="28" rx="7"/>
+  <text class="t" x="601" y="590" font-size="13" text-anchor="middle">outputs</text>
+  <rect class="chip" x="640" y="571" width="62" height="28" rx="7"/>
+  <text class="t" x="671" y="590" font-size="13" text-anchor="middle">logs</text>
+</svg>
