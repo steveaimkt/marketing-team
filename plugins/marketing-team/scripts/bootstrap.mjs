@@ -26,7 +26,7 @@ const LINKS = [
   ['skills', path.relative(DOT, path.join(PLUGIN, 'skills'))],
 ];
 
-console.log(`\n마케팅팀 · 폴더로 열어 쓰기 준비\n`);
+console.log(`\n마케팅 팀 · 폴더로 열어 쓰기 준비\n`);
 console.log(`  저장소   ${REPO}`);
 console.log(`  플러그인 ${path.relative(REPO, PLUGIN)}\n`);
 console.log(`할 일 — ${path.relative(REPO, DOT)}/ 아래에 연결 고리를 만든다\n`);
@@ -113,7 +113,7 @@ console.log(`\n─────────────────────�
 console.log(`  스킬 ${nSkills}개 · 담당 ${nAgents}명 · 연결 ${made} · 복사 ${copied} · 유지 ${kept}`);
 if (nSkills === wantSkills && nAgents === wantAgents && wantSkills > 0) {
   console.log(`\n  ✅ 준비됐다. 클로드 코드를 이 폴더에서 새로 열고 —\n`);
-  console.log(`     마케팅팀 구축하자\n`);
+  console.log(`     마케팅 팀 구축하자\n`);
 } else {
   console.log(`\n  ⚠️  스킬 ${wantSkills} · 담당 ${wantAgents} 가 아니다. plugins/marketing-team/ 이 온전한지 확인하세요.\n`);
   process.exit(1);

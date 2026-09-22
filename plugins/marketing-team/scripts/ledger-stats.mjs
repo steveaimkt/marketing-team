@@ -89,7 +89,7 @@ const pct = (n, d) => d ? Math.round((n / d) * 100) : 0;
 if (!fs.existsSync(LEDGER)) {
   // 훅은 모든 세션에서 돈다 — 여기가 마케팅 작업 폴더가 아니면 조용히 빠진다. 이것이 정상 경로다.
   say(`원장이 없습니다 — ${path.relative(WORK, LEDGER)}`);
-  say('「마케팅팀 구축하자」가 brand-templates/build-log.md 를 복사합니다.');
+  say('「마케팅 팀 구축하자」가 brand-templates/build-log.md 를 복사합니다.');
   process.exit(0);
 }
 
@@ -119,7 +119,7 @@ say(`  부피    ${current.length}행 (${span})${archiveFiles.length ? ` · 아�
 if (needRollover) {
   const why = [overRows && `${ROLLOVER_ROWS}행 초과`, staleYear && `${yrs.filter(y => y !== thisYear).join('·')}년 행이 섞여 있음`].filter(Boolean).join(' · ');
   say(`  🟡 롤오버 필요 — ${why}`);
-  say(`     「마케팅팀 구축하자」가 ⏸ 로 물어보고 logs/archive/ 로 옮깁니다. 지우지 않습니다.`);
+  say(`     「마케팅 팀 구축하자」가 ⏸ 로 물어보고 logs/archive/ 로 옮깁니다. 지우지 않습니다.`);
 } else {
   say(`  ✅ 부피 정상 (임계 ${ROLLOVER_ROWS}행 · 연도 ${thisYear})`);
 }
@@ -388,7 +388,7 @@ if (HOOK) {
   if (이상.length) 맥락.push(
     `■ 이상 신호 — 이 팀에 기록된 운영 규칙은 이상 신호를 "먼저 꺼내지 말 것"이다. 사용자가 원장·점검 상태를 물었을 때 참고할 사실이다.\n` +
     이상.map(l => `- ${l}`).join('\n'));
-  맥락.push('전체 데이터는 `node ${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs` 로 다시 계산할 수 있다. 이 상태에 대한 처방 스킬은 「마케팅팀 구축하자」다.');
+  맥락.push('전체 데이터는 `node ${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs` 로 다시 계산할 수 있다. 이 상태에 대한 처방 스킬은 「마케팅 팀 구축하자」다.');
 
   process.stdout.write(JSON.stringify({
     systemMessage: 화면,
@@ -400,6 +400,6 @@ if (HOOK) {
 
 say('');
 if (CHECK && needRollover) {
-  console.error('🟡 롤오버가 필요하다 — 「마케팅팀 구축하자」로 ⏸ 승인을 받아 옮겨라');
+  console.error('🟡 롤오버가 필요하다 — 「마케팅 팀 구축하자」로 ⏸ 승인을 받아 옮겨라');
   process.exit(1);
 }

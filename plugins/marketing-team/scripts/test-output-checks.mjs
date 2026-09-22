@@ -47,7 +47,7 @@ check('정본·줄표는 참고로만 낸다 (완료를 막지 않는다)', hard
 write('out/axis.md', '저자극 축은 우리만 채웠습니다. 3축 비교표를 냈습니다.\n');
 r = await runChecks({ outputs: ['workspace:out/axis.md'], checks: ['house-style'] }, resolve);
 check('「축」은 완료를 막는다', hard(r).some(l => l.includes('「축」이 산출물에 2회')));
-write('out/axis-ok.md', '마케팅팀을 구축하고 일정을 단축했습니다. 가축 사료와 축의금 문구는 별개입니다. 축하드립니다.\n');
+write('out/axis-ok.md', '마케팅 팀을 구축하고 일정을 단축했습니다. 가축 사료와 축의금 문구는 별개입니다. 축하드립니다.\n');
 r = await runChecks({ outputs: ['workspace:out/axis-ok.md'], checks: ['house-style'] }, resolve);
 check('구축·단축·가축·축의·축하는 잡지 않는다', r.length === 0);
 // 선언하지 않아도 글 산출물이면 돈다 (실측 2026-09-15 · checks 에 house-style 을 적는 스킬이 없었다)

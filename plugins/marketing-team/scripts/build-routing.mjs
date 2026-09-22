@@ -107,7 +107,7 @@ if (all.length !== 100 || new Set(ids).size !== 100 || expected.some(id => !ids.
 const crossText = fs.readFileSync(path.join(M, 'CHAINS.md'), 'utf8');
 const crossChains = [...crossText.matchAll(/^\|\s*\*\*(.+?)\*\*\s*\|\s*`(.+?)`\s*\|\s*(.+?)\s*\|\s*$/gm)]
   .map(m => ({ name: m[1], steps: m[2], description: m[3] }));
-// 🔴 2026-09-08 · 3부 마케팅팀 넷에 맞춰 브랜드마케팅팀·콘텐츠마케팅팀을 더해 7종이 됐다.
+// 🔴 2026-09-08 · 3부 마케팅 팀 넷에 맞춰 브랜드마케팅팀·콘텐츠마케팅팀을 더해 7종이 됐다.
 if (crossChains.length !== 7) throw new Error(`교차 체인은 7개여야 합니다. 현재 ${crossChains.length}개`);
 
 const triggerCount = all.reduce((n, s) => n + s.triggers.length, 0);
@@ -145,12 +145,12 @@ lines.push(
   '| 체인 | 부를 말 | 순서 | 무엇을 하나 |',
   '|---|---|---|---|',
 );
-// 🔴 2026-09-09 · 3부 마케팅팀 넷은 띄어 쓴 팀 이름으로도 부른다 (정본 CHAINS.md).
+// 🔴 2026-09-09 · 3부 마케팅 팀 넷은 띄어 쓴 팀 이름으로도 부른다 (정본 CHAINS.md).
 const 팀이름 = {
-  '브랜드마케팅팀': '브랜드 마케팅팀',
-  '콘텐츠마케팅팀': '콘텐츠 마케팅팀',
-  '광고애널리틱스': '퍼포먼스 마케팅팀',
-  '리텐션캠페인': '그로스 마케팅팀',
+  '브랜드마케팅팀': '브랜드 마케팅 팀',
+  '콘텐츠마케팅팀': '콘텐츠 마케팅 팀',
+  '광고애널리틱스': '퍼포먼스 마케팅 팀',
+  '리텐션캠페인': '그로스 마케팅 팀',
 };
 const 부를말 = c => {
   const 말 = [`「${md(c.name)} 돌려줘」`];
