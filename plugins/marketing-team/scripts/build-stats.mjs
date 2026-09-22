@@ -10,6 +10,7 @@
  *
  * 문서에 아래 표식 사이를 갈아 끼운다.
  *   <!-- STATS:START --> ... <!-- STATS:END -->
+ *   <!-- SKILLS:START --> ... <!-- SKILLS:END -->   README 의 스킬 100개·체인 목록 (있을 때만)
  */
 import fs from 'node:fs';
 // ⚠️ 윈도우에서 클론하면 .md 가 CRLF 로 온다 (git 기본값 core.autocrlf=true).
@@ -68,13 +69,43 @@ const BLOCK = `<!-- STATS:START -->
 저장 형식 ${extLine} · \`writes_to\` 보유 ${stats.writesTo} · 샘플 폴백 ${stats.sample}
 <!-- STATS:END -->`;
 
+// README 의 스킬 목록 · 손으로 옮기면 낡는다 (2026-09-22 · README 를 사용자용으로 다시 쓰며 더함)
+// 카테고리 이름과 체인 표는 ROUTING.md, 스킬 한 줄은 SKILL.md frontmatter 가 정본이다
+const ROUTING = fs.readFileSync(path.join(M, 'ROUTING.md'), 'utf8');
+const catName = Object.fromEntries([...ROUTING.matchAll(/^## (\d\d-[a-z-]+) · (.+)$/gm)].map(m => [m[1], m[2].trim()]));
+const cell = v => String(v || '').replace(/\|/g, '\\|').trim();
+const firstTrigger = f => (f.match(/^\s+- "([^"]+)"/m) || [, ''])[1];
+const cats = {};
+for (const f of S) (cats[fld(f, 'category')] ||= []).push(f);
+const skillParts = Object.keys(cats).sort().map(c => {
+  const rows = cats[c].map(f => `| ${fld(f, 'id')} | ${cell(fld(f, 'name'))}${fld(f, 'gate') === 'true' ? ' 🛡' : ''} | ${cell(fld(f, 'when_to_use'))} | 「${cell(firstTrigger(f))}」 |`);
+  return `<details>\n<summary><strong>${c.slice(0, 2)} ${catName[c] || c}</strong> (스킬 ${cats[c].length}개)</summary>\n\n| 번호 | 스킬 | 언제 쓰나 | 이렇게 부른다 |\n|---|---|---|---|\n${rows.join('\n')}\n\n</details>`;
+});
+const chainRows = [...ROUTING.matchAll(/^\| \*\*(.+?)\*\* \| (.+?) \| `(.+?)` \| (.+?) \|$/gm)]
+  .map(m => `| **${m[1]}** | ${m[4]} | ${m[2].split(' · ')[0]} |`);
+const SKILLS_BLOCK = `<!-- SKILLS:START -->
+${skillParts.join('\n\n')}
+
+<details>
+<summary><strong>체인 ${chainRows.length}종</strong> (스킬 여러 개를 한 번에 잇는다)</summary>
+
+| 체인 | 무엇을 잇나 | 이렇게 부른다 |
+|---|---|---|
+${chainRows.join('\n')}
+
+</details>
+
+🛡 는 발행 전에 AI 규제검토자가 표현을 검사하는 스킬이다 (${stats.gate}개).
+<!-- SKILLS:END -->`;
+
 const TARGETS = [path.join(REPO, 'README.md'), path.join(ROOT, 'docs', '공통규약.md')];
 let changed = 0, missing = 0;
 for (const t of TARGETS) {
   if (!fs.existsSync(t)) continue;
   const s = fs.readFileSync(t, 'utf8');
   if (!s.includes('<!-- STATS:START -->')) { missing++; console.log(`  · ${path.relative(REPO, t)} 에 STATS 블록 없음`); continue; }
-  const out = s.replace(/<!-- STATS:START -->[\s\S]*?<!-- STATS:END -->/, BLOCK);
+  let out = s.replace(/<!-- STATS:START -->[\s\S]*?<!-- STATS:END -->/, BLOCK);
+  if (out.includes('<!-- SKILLS:START -->')) out = out.replace(/<!-- SKILLS:START -->[\s\S]*?<!-- SKILLS:END -->/, SKILLS_BLOCK);
   if (out !== s) { if (!CHECK) fs.writeFileSync(t, out); changed++; console.log(`  ${CHECK ? '🔴 어긋남' : '✓ 갱신'} ${path.relative(REPO, t)}`); }
 }
 console.log(`\n${BLOCK.replace(/<!--.*?-->\n?/g, '')}`);
