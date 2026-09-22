@@ -442,12 +442,45 @@ try {
       for (const bad of ['python3 -c "import os; os.remove(\'x\')"', 'python3 outputs/a.py > /etc/x',
         'python3 /tmp/other.py', 'python3 outputs/a.py && rm -rf brand'])
         assert.equal(decision(call2('Bash', { command: bad })), 'deny', `승인 뒤 허용 밖 python 을 열었습니다: ${bad}`);
+
+      // 코워크 실측 2026-09-23 · ① 진입 스킬은 승인 전에도 열린다
+      W([active, row('user', '마케팅팀 업무 시작하자')]);
+      for (const s of ['ai-marketer', 'marketing-team:ai-marketer', 'marketing-team-setup', 'marketing-team:marketing-team-tasks'])
+        assert.equal(decision(call2('Skill', { skill: s })), 'none', `승인 전 진입 스킬 호출을 막았습니다: ${s}`);
+      assert.equal(decision(call2('Skill', { skill: 'dataviz' })), 'deny', '승인 전 다른 스킬 호출을 허용했습니다.');
+
+      // ② 스킬 본문(isMeta)·압축 요약(isCompactSummary)은 사람 말이 아니다 · 승인을 풀지 않는다
+      const meta = JSON.stringify({ isMeta: true, message: { role: 'user', content: [{ type: 'text', text: 'Base directory for this skill\n직접 답하지 말고 · 취소 · 아직' }] } });
+      const compact = JSON.stringify({ isCompactSummary: true, message: { role: 'user', content: 'This session is being continued ... 보류 · 아직 · 취소' } });
+      W([active, p, row('user', '진행 승인'), meta, compact]);
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'none',
+        '스킬 본문·압축 요약 속 낱말이 승인을 풀었습니다.');
+      W([active, p, row('user', '진행 승인'), row('user', '아니 취소할게요')]);
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+        '사람이 친 취소는 여전히 승인을 풀어야 합니다.');
+
+      // ③ 문장 승인은 있고 plan.json 봉인만 빠졌으면 재승인이 아니라 봉인을 알린다
+      const rel3 = 'outputs/2026-09-23/002-x';
+      fs.mkdirSync(path.join(fresh, rel3), { recursive: true });
+      fs.writeFileSync(path.join(fresh, rel3, 'plan.json'), JSON.stringify({ status: 'awaiting-approval', steps: [{ skill: '002' }] }));
+      W([active, p, row('user', '진행 승인')]);
+      const sealed = call2('Write', { file_path: path.join(fresh, rel3, '002-x.md') });
+      assert.equal(decision(sealed), 'deny', '봉인 전 계획으로 산출물 쓰기를 허용했습니다.');
+      const why = JSON.parse(sealed.stdout).hookSpecificOutput.permissionDecisionReason;
+      assert.match(why, /이미 받았습니다/, '봉인만 빠진 경우에도 재승인을 요구했습니다.');
+      assert.match(why, /plan-compiler\.mjs" approve/, '봉인 명령을 알려주지 않았습니다.');
+
+      // ④ mkdir 거부 문구가 Write 의 폴더 자동 생성을 알린다
+      fs.rmSync(path.join(fresh, 'outputs'), { recursive: true, force: true });
+      const mk = call2('Bash', { command: 'mkdir -p outputs/2026-09-23/002-x' });
+      assert.equal(decision(mk), 'deny', '승인 뒤 mkdir 을 허용했습니다.');
+      assert.match(JSON.parse(mk.stdout).hookSpecificOutput.permissionDecisionReason, /mkdir 불필요/, 'mkdir 거부 문구에 안내가 없습니다.');
     } finally {
       fs.rmSync(fresh, { recursive: true, force: true });
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 7 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 7 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

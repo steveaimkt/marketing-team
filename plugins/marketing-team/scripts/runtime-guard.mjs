@@ -32,6 +32,9 @@ const WITHDRAW = /하지\s*마|하지\s*말|말아\s*(?:줘|주세요|요)|취�
 const APPROVAL = { test: text => !WITHDRAW.test(text) && (APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text)) };
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-marketer/SKILL.md', '\\skills\\ai-marketer\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
+// 진입 스킬 셋은 절차를 여는 문이다 · 여는 것 자체는 승인 대상이 아니다
+// (실측 2026-09-23 · 코워크 「마케팅팀 업무 시작하자」에서 ai-marketer 를 열려고 가짜 계획을 지어 승인받음).
+const ENTRY_SKILLS = new Set(['ai-marketer', 'marketing-team-setup', 'marketing-team-tasks']);
 
 function deny(reason) {
   process.stdout.write(`${JSON.stringify({
@@ -77,6 +80,10 @@ function transcriptRows(file) {
       if (!line.trim()) continue;
       try {
         const event = JSON.parse(line);
+        // 사람이 친 말이 아닌 user 행은 뺀다 · 스킬을 열 때 들어오는 SKILL.md 본문(isMeta)과
+        // 컨텍스트 압축 요약(isCompactSummary)이 role:user 로 남는다. 그 안의 「하지 말」·「취소」·「아직」이
+        // WITHDRAW 에 걸려 승인이 풀렸다 (실측 2026-09-23 · 코워크 · 스킬을 연 뒤와 압축 뒤 「진행 승인」을 다시 받음).
+        if (event?.isMeta || event?.isCompactSummary) continue;
         const role = event?.message?.role;
         if (role !== 'assistant' && role !== 'user') continue;
         const text = textOfContent(event.message.content);
@@ -180,7 +187,7 @@ function draftConfirmIssue(cwd, receiptArg, rows) {
     } catch { /* 한 파일을 못 읽어도 나머지 파일에서 계속 찾는다 */ }
   }
   return `⏸ 초안 확인 화면이 대화에 없고, 산출물에도 "${DISCLOSURE_PHRASE}" 밝힘이 없습니다 · ` +
-    `초안을 보여주고 「이 그릇으로 만들까요?」 확인을 받거나, 비대화형이면 산출물에 그 문구를 남긴 뒤 다시 시도하세요.`;
+    `G2 [실행 계획]에서 형식을 확인받은 뒤 시작하거나, 비대화형이면 산출물에 그 문구를 남긴 뒤 다시 시도하세요.`;
 }
 
 function validateWrite(input) {
@@ -192,7 +199,7 @@ function validateWrite(input) {
   // 셸 cd 가 플러그인 폴더에 머물러 있어도 작업 폴더 기준을 잃지 않는다 (실측 2026-08-30 · 3회 오차단).
   const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
   const target = path.resolve(cwd, raw);
-  if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw}`;
+  if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw} · 작업 폴더는 ${cwd} 입니다. outputs/… 처럼 이 폴더 기준 경로로 적으세요.`;
   const [root] = path.relative(cwd, target).split(path.sep);
   if (!WRITE_ROOTS.has(root))
     return `AI 마케터가 쓸 수 있는 곳은 brand · outputs · logs · inputs 뿐입니다: ${raw}`;
@@ -437,6 +444,11 @@ async function main() {
   } catch {
     // 아래 rows가 비면 안전하게 승인 실패로 처리한다.
   }
+  if (input.tool_name === 'Skill') {
+    const name = String(input.tool_input?.skill || input.tool_input?.name || '').trim().split(':').pop();
+    if (ENTRY_SKILLS.has(name)) return;
+  }
+
   const rows = transcriptRows(input.transcript_path);
   if (!isActive(rows, rawTranscript)) return;
 
@@ -529,7 +541,11 @@ function planApproval(cwd, preferId) {
   try {
     const state = approvalState(found.plan);
     if (state.ok) return null;
-    return `${state.reason} (${path.relative(cwd, found.file)})`;
+    return {
+      text: `${state.reason} (${path.relative(cwd, found.file)})`,
+      file: path.relative(cwd, found.file),
+      unsealed: found.plan?.status !== 'approved', // 봉인 전 · 계획이 바뀐 것이 아니다
+    };
   } catch { return null; }
 }
 
@@ -568,7 +584,14 @@ function planApproval(cwd, preferId) {
     path.basename(String(input.tool_input?.file_path || input.tool_input?.notebook_path || '')) === 'plan.json';
   if (planIssue && !planFileWrite &&
       !(input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pending')))) {
-    deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
+    // 사용자가 이미 「진행 승인」했는데 plan.json 봉인만 빠진 경우에 재승인을 시키면
+    // 같은 계획을 두세 번 묻게 된다 (실측 2026-09-23 · 코워크 002). 그때는 봉인만 하라고 알린다.
+    if (approval.ok && planIssue.unsealed) {
+      deny(`사용자의 “진행 승인”은 이미 받았습니다 · 다시 묻지 마세요. 계획 파일을 봉인하지 않았을 뿐입니다: ` +
+        `node "\${CLAUDE_PLUGIN_ROOT}/scripts/plan-compiler.mjs" approve "${planIssue.file}" 를 먼저 실행하고 이어서 하세요.`);
+      return;
+    }
+    deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue.text} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
     return;
   }
 
@@ -600,8 +623,11 @@ function planApproval(cwd, preferId) {
     // 승인은 계획을 허락한 것이지 파일시스템을 연 것이 아니다 — 쓰는 문은 Write/Edit 하나다.
     // (실측 2026-08-30 · 승인 뒤 셸 heredoc·python3 이 경로 규칙을 그대로 지나쳤다)
     // 스크립트도 파일이 있다고 다 허용하지 않는다 — 계획이 요구하는 실행·검증 명령만 (P0 허용 목록).
+    // mkdir 로 폴더를 먼저 만들려다 막히고 되풀이하는 일이 실측됐다 (2026-09-23 · 코워크) ·
+    // Write 가 상위 폴더를 알아서 만든다는 것과 작업 폴더 기준 상대 경로를 함께 알린다.
     if (!isReadOnlyBash(input) && !allowedScript(input, 'run') && !allowedPython(input))
-      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다.');
+      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다. ' +
+        `폴더는 따로 만들지 않아도 됩니다 · Write 가 상위 폴더를 알아서 만듭니다(mkdir 불필요). 경로는 작업 폴더(${path.resolve(cwd || process.cwd())}) 기준 outputs/… 로 적으세요.`);
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, planText);
     if (issue) deny(issue);
