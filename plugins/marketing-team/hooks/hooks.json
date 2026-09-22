@@ -1,5 +1,5 @@
 {
-  "description": "실적 원장을 점검하고 AI 마케터의 실행 전 승인과 저장 경로를 강제한다.",
+  "description": "실적 원장을 점검하고, 마케팅 작업 폴더에서는 AI 마케터를 팀원으로 세우고, 실행 전 승인과 저장 경로를 강제한다.",
   "hooks": {
     "SessionStart": [
       {
@@ -9,6 +9,12 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/ledger-stats.mjs\" --hook 2>/dev/null || true",
             "timeout": 10,
             "statusMessage": "실적 원장 점검"
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/team-context.mjs\" 2>/dev/null || true",
+            "timeout": 5,
+            "statusMessage": "마케팅 팀 맥락을 세우는 중"
           }
         ]
       }
