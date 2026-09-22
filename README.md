@@ -62,112 +62,58 @@ AI 마케터       일을 받고, 계획을 보여 주고, 스킬 100개를 직�
 
 ## 설치
 
-> 📺 설치가 막히면 [설치 영상](https://m.site.naver.com/2f5Qk)을 보고 화면 그대로 따라 한다.
+클로드 **유료 요금제**(Pro, Max, Team, Enterprise)와 **[데스크톱 앱](https://claude.ai/download)**이 필요하다. 설치가 막히면 [설치 영상](https://m.site.naver.com/2f5Qk)을 본다.
 
-유료 요금제(Pro, Max, Team, Enterprise)를 쓰는 클로드 계정과 **클로드 데스크톱 앱**이 필요하다.
-브라우저에서 쓰는 클로드는 내 컴퓨터에 파일을 저장하지 못하고, 무료 요금제에는 플러그인 메뉴가 없다.
+### 클로드 코워크 (추천)
 
-### 클로드 코워크 (Claude Cowork, 추천)
-
-터미널을 쓰지 않는 기본 경로다.
-
-**1. 클로드 데스크톱 앱을 설치한다.** [claude.ai/download](https://claude.ai/download) 에서 맥 또는 윈도우용을 받는다.
-
-![Claude 다운로드 페이지](.docs/images/install/01-claude-download.png)
-
-**2. 입력창에서 「Cowork」를 고르고 「+」 → 「플러그인 추가」를 누른다.**
-
-![입력창의 + 메뉴](.docs/images/install/02-plus-menu.png)
-
-**3. 플러그인 창 오른쪽 위의 「추가」 → 「마켓플레이스 추가」를 누른다.**
-
-![마켓플레이스 추가 메뉴](.docs/images/install/03-add-marketplace.png)
-
-**4. 「저장소에서 추가」를 고른다.** 위쪽의 「Anthropic 소스 탐색」은 고르지 않는다.
-
-![저장소에서 추가](.docs/images/install/04-from-repository.png)
-
-**5. URL 칸에 아래 한 줄을 넣고 「동기화」를 누른다.** 「자동으로 동기화」는 켜 둔다. 붉은 안내문은 정상적으로 표시되는 경고다.
-
-```
-steveaimkt/marketing-team
-```
-
-![저장소 주소 넣고 동기화](.docs/images/install/05-sync-url.png)
-
-**6. 목록에서 「Marketing team」을 찾아 「추가」를 누른다.**
-
-![Marketing team 추가](.docs/images/install/06-install-plugin.png)
-
-**7. 로컬 MCP 서버 안내가 뜨면 「계속」을 누른다.** 공개 웹 페이지를 읽는 브라우저 도구(playwright)다. 붙이지 않아도 스킬은 모두 돈다.
-
-![로컬 MCP 서버 안내](.docs/images/install/07-mcp-notice.png)
-
-**8. 「+」 → 「플러그인」 → 「Marketing team」에 스킬 3개가 보이면 설치가 끝났다.**
-`ai-marketer`, `marketing-team-setup`, `marketing-team-tasks` 가 보이면 정상이다. 업무 스킬 100개가 목록에 보이지 않는 것도 정상이다.
-
-![설치 확인](.docs/images/install/08-check-skills.png)
-
-### 작업 폴더를 고르고 팀 구축하기
-
-AI 마케터와 일할 폴더를 하나 만든다. 앞으로 만드는 결과물은 모두 이 폴더에 저장된다.
-
-**1. 입력창 아래 「프로젝트 또는 폴더」 → 「폴더 추가」를 누른다.**
-
-![폴더 추가](.docs/images/install/09-add-folder.png)
-
-**2. `marketing-team` 처럼 알아보기 쉬운 이름으로 새 폴더를 만들고 고른다.**
-
-![새 폴더 만들기](.docs/images/install/10-new-folder.png)
-
-**3. 입력창에 `/` 를 치고 `marketing-team-setup` 을 고른 뒤 「마케팅 팀 구축하자」를 입력한다.**
+1. 입력창의 **「+」 → 「플러그인 추가」 → 「추가」 → 「마켓플레이스 추가」 → 「저장소에서 추가」**
+2. URL 에 `steveaimkt/marketing-team` 을 넣고 **「동기화」** (「자동으로 동기화」는 켜 둔다)
+3. 목록의 **「Marketing team」 → 「추가」** (로컬 MCP 서버 안내가 뜨면 「계속」)
+4. **작업 폴더**를 고르고(입력창 아래 「프로젝트 또는 폴더」 → 「폴더 추가」) 이렇게 입력한다
 
 ```
 /marketing-team-setup 마케팅 팀 구축하자
 ```
 
-![구축 명령](.docs/images/install/11-setup-command.png)
+![저장소 주소 넣고 동기화](.docs/images/install/05-sync-url.png)
 
-**4. 설치 점검 일곱 항목이 모두 통과하는지 본다.** 이어서 작업 공간을 어디에 세울지 물으면, 방금 고른 폴더에 바로 만드는 쪽을 고른다.
+「+」 → 「플러그인」 → 「Marketing team」에 스킬 3개가 보이면 설치된 것이다. 업무 스킬 100개는 목록에 안 보이는 것이 정상이다.
 
-![구축 결과](.docs/images/install/12-setup-result.png)
+![설치 확인](.docs/images/install/08-check-skills.png)
 
-**5. 회사 정보를 어떻게 할지 고른다.** 3가지 중 어느 것을 골라도 실습은 끝까지 간다.
+<details>
+<summary><strong>화면으로 하나씩 따라 하기</strong> (15장)</summary>
 
-| 선택 | 무엇이 되나 |
-|---|---|
-| ① 준비된 샘플 정보로 시작 (권장) | 가상의 A브랜드(화장품) 정보로 바로 시작한다. 결과에 `[샘플]` 이 붙는다 |
-| ② 우리 회사 정보로 시작 | 회사명, 제품, 고객, 가격, 금지 표현을 차례로 입력한다. 3분이면 끝난다 |
-| ③ 회사 정보 없이 스킬만 사용 | 스킬을 실행할 때마다 필요한 자료를 그때 묻는다 |
+1. 데스크톱 앱 받기 ![](.docs/images/install/01-claude-download.png)
+2. 입력창 「+」 → 「플러그인 추가」 ![](.docs/images/install/02-plus-menu.png)
+3. 「추가」 → 「마켓플레이스 추가」 ![](.docs/images/install/03-add-marketplace.png)
+4. 「저장소에서 추가」 ![](.docs/images/install/04-from-repository.png)
+5. `steveaimkt/marketing-team` 넣고 「동기화」 (붉은 안내문은 정상 경고다) ![](.docs/images/install/05-sync-url.png)
+6. 「Marketing team」 → 「추가」 ![](.docs/images/install/06-install-plugin.png)
+7. 로컬 MCP 서버 안내 → 「계속」 (웹 페이지를 읽는 브라우저 도구다) ![](.docs/images/install/07-mcp-notice.png)
+8. 스킬 3개가 보이면 설치 끝 ![](.docs/images/install/08-check-skills.png)
+9. 「프로젝트 또는 폴더」 → 「폴더 추가」 ![](.docs/images/install/09-add-folder.png)
+10. `marketing-team` 같은 새 폴더를 만들어 고른다 ![](.docs/images/install/10-new-folder.png)
+11. `/marketing-team-setup 마케팅 팀 구축하자` ![](.docs/images/install/11-setup-command.png)
+12. 설치 점검 7항목 통과 확인 ![](.docs/images/install/12-setup-result.png)
+13. 회사 정보 고르기 (샘플로 시작이 권장) ![](.docs/images/install/13-company-info.png)
+14. 준비 끝 ![](.docs/images/install/14-ready.png)
+15. 작업 폴더에 brand, inputs, logs, outputs 가 생긴다 ![](.docs/images/install/15-work-folder.png)
 
-![회사 정보 선택](.docs/images/install/13-company-info.png)
+</details>
 
-나중에 「브랜드 정보 넣을래」라고 하면 언제든 우리 회사 정보로 바꿀 수 있다.
+회사 정보는 **샘플(가상의 A브랜드)로 시작**하면 바로 쓸 수 있다. 나중에 「브랜드 정보 넣을래」라고 하면 우리 회사 정보로 바뀐다. 그다음부터는 **「마케팅 팀 업무 시작하자」** 한마디면 된다.
 
-![준비 끝](.docs/images/install/14-ready.png)
-
-**6. 작업 폴더 안에 폴더 4개가 생겼는지 본다.**
-
-![작업 폴더](.docs/images/install/15-work-folder.png)
-
-이제 **「마케팅 팀 업무 시작하자」** 한마디면 된다.
-
-### 클로드 코드 (Claude Code)
-
-결과를 저장할 폴더에서 터미널을 열고 차례로 입력한다.
+### 클로드 코드
 
 ```bash
 claude plugin marketplace add steveaimkt/marketing-team
 claude plugin install marketing-team@marketing-team
 ```
 
-같은 폴더에서 `claude` 를 실행하고 `/marketing-team-setup 마케팅 팀 구축하자` 부터 따라 한다. 설치 방식이 달라도 쓰는 법은 같다.
+작업 폴더에서 `claude` 를 실행하고 `/marketing-team-setup 마케팅 팀 구축하자` 를 입력한다. 폴더째 여는 방식(고급)은 [CONTRIBUTING.md](CONTRIBUTING.md) 에 있다.
 
-> 저장소를 클론해서 폴더째 여는 방식(고급)은 [CONTRIBUTING.md](CONTRIBUTING.md) 에 있다.
-
-### 업데이트
-
-코워크는 「자동으로 동기화」를 켜 두면 새 버전이 알아서 들어온다. 바로 받고 싶으면 플러그인 관리에서 마켓플레이스를 동기화한 뒤 플러그인을 업데이트하고, **새 대화를 연다.** 이미 열려 있던 대화에는 반영되지 않을 수 있다.
+> **업데이트.** 코워크는 「자동으로 동기화」를 켜 두면 새 버전이 알아서 들어온다. 바로 받으려면 마켓플레이스를 동기화하고 플러그인을 업데이트한 뒤 **새 대화를 연다.**
 
 ## 할 수 있는 일 100가지
 
