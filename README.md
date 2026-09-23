@@ -1,14 +1,39 @@
-[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsteveaimkt%2Fmarketing-team%2Fmain%2F.claude-plugin%2Fmarketplace.json&query=%24.plugins%5B0%5D.version&label=version&style=flat-square&color=blue)](.claude-plugin/marketplace.json)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](LICENSE)
-[![verify](https://github.com/steveaimkt/marketing-team/actions/workflows/verify.yml/badge.svg)](https://github.com/steveaimkt/marketing-team/actions/workflows/verify.yml)
-![GitHub stars](https://img.shields.io/github/stars/steveaimkt/marketing-team?style=flat-square)
+<h1 align="center">마케팅 팀 (marketing-team)</h1>
 
-# 마케팅 팀 (marketing-team): 스킬 100개를 갖춘 AI 마케팅 팀
+<p align="center">
+  <strong>클로드에 설치해 쓰는 AI 마케팅 팀. 스킬 100개로 일하고, 결과는 내 폴더에 파일로 남는다.</strong>
+</p>
 
-> 클로드에 설치해 쓰는 AI 마케팅 팀이다. 조사, 제품 기획, 콘텐츠, SNS, 광고, 이커머스, 데이터, CRM, 브랜딩, 운영 업무를 스킬 100개에 나눠 담았다.
-> **AI 마케터**가 요청을 받아 업무를 실행하고, **AI 규제검토자**와 **AI 사업검토자**가 그 결과를 나눠 검토한다. 결과물은 사용자가 선택한 폴더에 파일로 저장된다.
+<p align="center">
+  <a href=".claude-plugin/marketplace.json"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsteveaimkt%2Fmarketing-team%2Fmain%2F.claude-plugin%2Fmarketplace.json&query=%24.plugins%5B0%5D.version&label=version&style=flat-square&color=blue" alt="Version"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="License: MIT"></a>
+  <a href="https://github.com/steveaimkt/marketing-team/actions/workflows/verify.yml"><img src="https://github.com/steveaimkt/marketing-team/actions/workflows/verify.yml/badge.svg" alt="verify"></a>
+  <img src="https://img.shields.io/github/stars/steveaimkt/marketing-team?style=flat-square" alt="GitHub stars">
+</p>
 
-![사용자가 요청하면 AI 마케터가 계획을 승인받아 스킬 100개로 실행하고, 두 검토자가 결과를 검토한 뒤 작업 폴더에 파일로 저장한다](.docs/images/overview.png)
+<p align="center">
+  <a href="#설치">설치</a> ·
+  <a href="#할-수-있는-일-100가지">할 수 있는 일 100가지</a> ·
+  <a href="plugins/marketing-team/100-skills/ROUTING.md">전체 명부</a> ·
+  <a href="plugins/marketing-team/100-skills/CHAINS.md">체인</a> ·
+  <a href="CONTRIBUTING.md">기여</a> ·
+  <a href="LICENSE">MIT</a>
+</p>
+
+<p align="center">
+  <img src=".docs/images/overview.png" alt="사용자가 요청하면 AI 마케터가 계획을 승인받아 스킬 100개로 실행하고, 두 검토자가 결과를 검토한 뒤 작업 폴더에 파일로 저장한다" width="100%">
+</p>
+
+<p align="center">
+  <sub><em>요청하면 AI 마케터가 계획을 승인받아 실행하고, 두 검토자가 결과를 검토한 뒤 작업 폴더에 저장한다.</em></sub>
+</p>
+
+---
+
+## 이게 뭔가
+
+조사, 제품 기획, 콘텐츠, SNS, 광고, 이커머스, 데이터, CRM, 브랜딩, 운영 업무를 스킬 100개에 나눠 담은 클로드 플러그인이다.
+**AI 마케터**가 요청을 받아 업무를 실행하고, **AI 규제검토자**와 **AI 사업검토자**가 그 결과를 나눠 검토한다. 결과물은 사용자가 선택한 폴더에 파일로 저장된다.
 
 클로드 코워크(Claude Cowork)와 클로드 코드(Claude Code)에서 사용할 수 있다.
 
@@ -30,6 +55,24 @@
 - **외부에 공개되는 글은 발행 전에 검토한다.** 광고 카피, 상세페이지, SNS 게시물, 보도자료 등 산출물 32개는 AI 규제검토자가 표시광고법과 업종 법령(화장품법, 건강기능식품법 등)에 저촉될 만한 표현이 있는지 확인한다.
 - **자료가 없어도 실습할 수 있다.** 회사 정보나 데이터가 없으면 AI 마케터가 가상의 A브랜드 샘플 자료로 업무를 끝까지 실행하고, 결과에 `[샘플]` 을 붙인다.
 - **결과가 파일로 남는다.** 결과물은 `.md`, `.xlsx`, `.csv`, `.docx`, `.pptx`, `.html` 형식으로 작업 폴더에 날짜별로 저장되고, 실행 기록은 실적 원장(`logs/build-log.md`)에 쌓인다.
+
+## 이렇게 쓴다
+
+**월요일 아침 광고 보고.** 「광고 주간 리포트」라고 입력한다. 연결된 매체는 자료를 바로 가져오고, 연결되지 않은 매체는 `inputs/` 에 넣은 CSV로 채워 매체별 성과를 한 장으로 모은다. 예산을 옮길지 고민되면 이어서 「예산 다시 짜줘」라고 하면 된다.
+
+**상세페이지를 올리기 전.** 「상세페이지 만들어줘」라고 입력한다. 구조와 카피가 나온 뒤 AI 규제검토자가 과장 표현이나 업종 법령에 걸릴 만한 문구를 찾는다. ⛔ 가 붙은 문구는 AI 마케터도 그대로 내보낼 수 없다.
+
+**신제품을 준비할 때.** 「신제품런칭 돌려줘」라고 입력한다. 컨셉, 차별점, 가격, 출시 계획이 차례로 이어서 나온다. 가격이나 예산처럼 사업 판단이 들어간 결과는 AI 사업검토자가 재무, 고객 같은 관점을 정해 따로 검토한다.
+
+## 되는 것과 준비가 필요한 것
+
+| ✅ 설치하면 바로 된다 | 🧩 준비하면 된다 |
+|---|---|
+| 스킬 100개와 체인 17종 실행 | 광고, 판매, 고객 데이터 분석 (`inputs/` 에 CSV나 화면 캡처를 넣는다) |
+| 결과물을 `.md`, `.csv`, `.html` 로 저장 | `.pptx`, `.docx`, `.xlsx` 로 받기 ([앤트로픽 공식 문서 스킬](#함께-쓰면-좋은-것) 설치) |
+| 발행물 32종의 표현 검사 | 공개 웹 페이지 직접 읽기 (함께 오는 브라우저 도구가 켜져 있어야 한다) |
+| 가상의 A브랜드 샘플로 실습 | 우리 회사 값으로 실행 (「브랜드 정보 넣을래」) |
+| | 한글(HWP) 파일 (PDF나 워드로 저장한 뒤 넣는다) |
 
 ## 구성
 
@@ -53,8 +96,6 @@ AI 마케터         요청을 받아 계획을 보여 주고, 승인받은 뒤 
 AI 마케터는 모든 업무를 같은 순서로 진행한다. **무엇을 할지 묻고 → 필요한 자료를 알려 주고 → 계획을 승인받고 → 실행하고 → 결과를 보고하고 → 다음 업무를 제안한다.**
 
 AI 규제검토자는 **법에 저촉되는지**, AI 사업검토자는 **사업적으로 타당한지** 확인한다.
-
-> AI 규제검토자는 자동으로 기초 점검을 한다. 법률 자문은 전문가에게 따로 받는다.
 
 ## 설치
 
@@ -367,14 +408,22 @@ claude plugin install marketing-team@marketing-team
 
 ⚠️ 작업 폴더를 여러 개 두면 결과물도 폴더마다 나뉘어 저장된다. 어제 만든 결과물이 보이지 않으면 **지금 열린 폴더가 맞는지** 먼저 확인한다.
 
-## 만든 사람
+## 이것이 아닌 것
 
-[WMBB](https://github.com/steveaimkt)의 한성국이 만들었다. 『퇴근을 앞당기는 AI 마케팅 자동화』의 실습 플러그인이다.
+- **법률 자문이 아니다.** AI 규제검토자는 자동으로 기초 점검만 한다. 중요한 문구는 전문가에게 따로 확인받는다.
+- **사람을 빼는 도구가 아니다.** 계획은 사용자가 승인해야 실행되고, 발행은 사용자가 직접 한다. 메일과 뉴스레터는 설계와 카피까지 만들고 발송 전에 멈춘다.
+- **완성된 제품이 아니다.** 평소 말이 알맞은 스킬로 가는지 실제 모델로 재고, 그 수치를 [CONTRIBUTING.md](CONTRIBUTING.md) 에 그대로 적는다.
 
-## 기여
+## 더 보기
 
-스킬을 고치거나 검사를 돌리려면 [CONTRIBUTING.md](CONTRIBUTING.md) 를 본다.
+- **[100-skills/ROUTING.md](plugins/marketing-team/100-skills/ROUTING.md)** 스킬 100개와 부를 말 전체 명부
+- **[100-skills/CHAINS.md](plugins/marketing-team/100-skills/CHAINS.md)** 체인 17종이 무엇을 어떤 순서로 잇는지
+- **[docs/헷갈리는-쌍.md](plugins/marketing-team/docs/헷갈리는-쌍.md)** 이름이 비슷한 스킬끼리 무엇이 다른지
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** 스킬을 고치고 검사를 돌리는 방법
 
-## 라이선스
+---
 
-MIT. [LICENSE](LICENSE) 를 본다.
+<p align="center">
+  <sub><a href="https://github.com/steveaimkt">WMBB</a> 한성국이 만들었다 · 『퇴근을 앞당기는 AI 마케팅 자동화』의 실습 플러그인</sub><br>
+  <sub>MIT · <a href="LICENSE">LICENSE</a></sub>
+</p>
