@@ -195,6 +195,10 @@ try {
         const got = renderPlanScreen(plan, { cwd: screenCwd });
         assert.equal(got, expected, `${id} · 찍힌 화면과 틀 출력이 다르다 — 틀을 고쳤으면 「찍힌 화면」도 다시 찍어 넣는다`);
         assert.equal(renderPlanScreen(plan, { cwd: screenCwd }), got, `${id} · 같은 조건에서 두 번 찍은 화면이 다르다`);
+        // 입력을 계획 맨 위에 {path} · package: 로 적어도 같은 화면이 찍힌다 (실측 2026-09-24)
+        const moved = { ...plan, inputs: plan.steps[0].inputs.map(v => ({ path: String(v).replace(/^plugin:/, 'package:') })),
+          steps: plan.steps.map((st, i) => (i ? st : { ...st, inputs: [] })) };
+        assert.equal(renderPlanScreen(moved, { cwd: screenCwd }), got, `${id} · 입력을 맨 위에 적으면 화면이 달라진다`);
         assert.ok(!got.includes('—'), `${id} · 화면에 em dash 가 있다`);
         화면수 += 1;
       }

@@ -432,7 +432,10 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   lines.push('');
 
   const first = rows[0];
-  const inputs = (first.step.inputs || []).map(String);
+  // 단계 입력이 비어 있으면 계획 맨 위 inputs 를 본다 · 영수증처럼 {path} 로 적거나 package: 로 적어도 샘플을 알아본다
+  // (실측 2026-09-24 · 모델이 run.json 모양으로 적자 샘플 줄과 「우리 자료로 하려면」이 빠진 화면이 찍혔다)
+  const 입력목록 = (first.step.inputs || []).length ? first.step.inputs : (!isChain && plan.inputs) || [];
+  const inputs = 입력목록.map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
   const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
   const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
   const 샘플이유 = first.tpl['샘플 이유'] || 'inputs 폴더가 비어 있어';
