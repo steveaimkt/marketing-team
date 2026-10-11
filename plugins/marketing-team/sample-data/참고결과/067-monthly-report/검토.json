@@ -1,0 +1,12 @@
+{
+ "출처": "outputs/2026-09-15/067-monthly-report/run.json",
+ "원고_상태": "completed",
+ "검토": [
+  {
+   "kind": "business",
+   "perspective": "재무",
+   "status": "approved",
+   "report": "review.md"
+  }
+ ]
+}

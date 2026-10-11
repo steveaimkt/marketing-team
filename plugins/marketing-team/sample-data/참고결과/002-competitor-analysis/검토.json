@@ -1,0 +1,18 @@
+{
+ "출처": "outputs/2026-09-15/002-competitor-analysis/run.json",
+ "원고_상태": "completed",
+ "검토": [
+  {
+   "kind": "business",
+   "perspective": "브랜드",
+   "status": "approved",
+   "report": "review.md"
+  },
+  {
+   "kind": "business",
+   "perspective": "고객",
+   "status": "approved",
+   "report": "review.md"
+  }
+ ]
+}

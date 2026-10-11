@@ -1,0 +1,18 @@
+{
+ "출처": "outputs/2026-09-16/057-promo-calendar/run.json",
+ "원고_상태": "blocked",
+ "검토": [
+  {
+   "kind": "business",
+   "perspective": "재무",
+   "status": "approved",
+   "report": "review-재무-2.md"
+  },
+  {
+   "kind": "business",
+   "perspective": "경영",
+   "status": "conditional",
+   "report": "review-경영-2.md"
+  }
+ ]
+}

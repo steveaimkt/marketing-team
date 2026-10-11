@@ -852,7 +852,7 @@ async function verify(file) {
  * 기준본 있음」이면 모델이 만들지 않고 `sample-data/참고결과/{폴더}/` 의 원고 결과를 그대로 놓는다.
  * 하나라도 아니면(독자가 브랜드 정보를 넣었거나 자기 자료를 넣었으면) 평소대로 독자 기준으로 만든다.
  */
-function book(target) {
+async function book(target) {
   let planFile;
   try { planFile = resolveRef(target, { workspaceOnly: true }).abs; } catch (error) { fail(error.message); }
   if (path.basename(planFile) !== 'plan.json') fail('book 은 plan.json 을 받는다.');
@@ -868,13 +868,47 @@ function book(target) {
     else fs.copyFileSync(src, out);
   }
   console.log(`📖 책 실습 · 원고 결과를 놓았다 · ${c.outs.map(o => path.basename(o)).join(' · ')}`);
-  console.log('── 분석을 다시 하지 않는다. 검토·영수증은 평소대로 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──');
+  // 검토도 원고 것을 쓴다. 결과를 원고 그대로 두니 검토자를 새로 부르면 지적을 반영할 수 없어 「조건부」로 남고
+  // 실행이 차단됨으로 끝났다 (실측 2026-10-12 · 데스크톱 · 002·011·012). 원고 실행의 판정을 그대로 봉인한다.
+  const reviewed = await bookReviews(plan, c);
+  console.log(reviewed
+    ? `── 분석과 검토를 다시 하지 않는다(검토자를 부르지 않는다). 영수증 마무리(finalize · verify)만 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──`
+    : '── 분석을 다시 하지 않는다. 검토·영수증은 평소대로 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──');
   console.log(fs.readFileSync(path.join(c.ref, '화면.md'), 'utf8').replaceAll('{날짜}', c.day).trimEnd());
   console.log('── 화면 끝 ──');
 }
 
+/** 책 실습 · 원고 검토 보고서를 놓고, 이 실행이 요구하는 검토를 원고 판정으로 봉인한다 · 못 하면 false */
+async function bookReviews(plan, c) {
+  let spec;
+  try { spec = JSON.parse(fs.readFileSync(path.join(c.ref, '검토.json'), 'utf8')); } catch { return false; }
+  const dir = path.dirname(c.outs[0]);
+  const rel = abs => path.relative(WORK, abs).split(path.sep).join('/');
+  for (const name of new Set(spec.검토.map(v => v.report))) {
+    fs.writeFileSync(path.join(dir, name), fs.readFileSync(path.join(c.ref, name), 'utf8').replaceAll('{날짜}', c.day));
+  }
+  // 이 계획으로 시작한 영수증 · 같은 날 다시 돌리면 run-2.json 처럼 순번이 붙는다
+  const receipts = fs.readdirSync(dir).filter(n => /^run(-\d+)?\.json$/.test(n)).map(n => path.join(dir, n))
+    .filter(f => { try { return readJson(f).plan?.plan_sha256 === plan.plan_sha256; } catch { return false; } })
+    .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
+  if (!receipts.length) {
+    console.log('ℹ️ 원고 검토 보고서를 놓았다 · 영수증(run-receipt start)이 아직 없어 봉인하지 못했다 · start 뒤에 book 을 한 번 더 돌린다');
+    return false;
+  }
+  const run = readJson(receipts[0]);
+  const need = run.required_reviews?.length ? run.required_reviews : spec.검토.map(v => ({ kind: v.kind, perspective: v.perspective }));
+  for (const req of need) {
+    const v = spec.검토.find(x => x.kind === req.kind && (x.perspective || '') === (req.perspective || ''));
+    if (!v) continue;
+    await recordReview(receipts[0], { kind: v.kind, perspective: v.perspective, status: v.status,
+      report: rel(path.join(dir, v.report)), artifact: req.artifact || rel(c.outs[0]) });
+  }
+  console.log(`📖 원고 검토로 봉인했다 · ${spec.검토.map(v => `${v.perspective || v.kind} ${v.status}`).join(' · ')} (원고 실행: ${spec.원고_상태})`);
+  return true;
+}
+
 const [command, fileArg, ...rest] = process.argv.slice(2);
-if (command === 'book') { book(fileArg); process.exit(0); }
+if (command === 'book') { await book(fileArg); process.exit(0); }
 const file = receiptPath(fileArg);
 const args = argsOf(rest);
 

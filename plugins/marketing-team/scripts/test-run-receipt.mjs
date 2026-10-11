@@ -665,6 +665,9 @@ try {
       assert.ok(fs.readFileSync(path.join(ws, dir, '006-review-mining.xlsx')).equals(fs.readFileSync(path.join(ref, '006-review-mining.xlsx'))), '원고 xlsx 와 다르다');
       assert.match(fs.readFileSync(path.join(ws, dir, '006-review-mining-해설.md'), 'utf8'), /outputs\/2026-10-12\//, '{날짜} 를 그날로 바꾸지 않았다');
       assert.match(r.stdout, /outputs\/2026-10-12\/006-review-mining\/ 에 세 파일로/, '화면의 날짜를 바꾸지 않았다');
+      // 검토도 원고 것 · 영수증 전이면 보고서만 놓고 봉인은 미룬다 (실측 2026-10-12 · 새로 부른 검토자가 「조건부」를 내 차단됨으로 끝났다)
+      assert.ok(fs.existsSync(path.join(ws, dir, 'gate.md')), '원고 검토 보고서를 놓지 않았다');
+      assert.match(r.stdout, /영수증\(run-receipt start\)이 아직 없어/, '영수증 없이 검토를 봉인한 척했다');
       fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사 · 반려동물 사료\n');
       assert.match(sh(SCRIPT, 'book', planRel).stdout, /해당 없음 · 브랜드 프로필을 채웠다/, '프로필을 채웠는데 원고 결과를 놓았다');
     } finally {
@@ -672,7 +675,7 @@ try {
     }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 5 · ✅');
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 7 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

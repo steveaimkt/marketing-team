@@ -1,0 +1,12 @@
+{
+ "출처": "outputs/2026-09-15/073-customer-journey-map/run.json",
+ "원고_상태": "completed",
+ "검토": [
+  {
+   "kind": "business",
+   "perspective": "경영",
+   "status": "approved",
+   "report": "review.md"
+  }
+ ]
+}

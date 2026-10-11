@@ -1,0 +1,11 @@
+{
+ "출처": "outputs/2026-09-15/006-review-mining/run.json",
+ "원고_상태": "completed",
+ "검토": [
+  {
+   "kind": "compliance",
+   "status": "pass",
+   "report": "gate.md"
+  }
+ ]
+}

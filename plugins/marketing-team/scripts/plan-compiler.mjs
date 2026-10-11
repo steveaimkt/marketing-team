@@ -705,7 +705,7 @@ function 원고결과있음(cwd, folderName) {
   let days = [];
   try { days = fs.readdirSync(path.join(cwd, 'outputs')).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)); } catch { return false; }
   let names = [];
-  try { names = fs.readdirSync(ref).filter(n => n !== '화면.md' && n !== '출처.md' && /\.(md|html|csv)$/.test(n)); } catch { return false; }
+  try { names = fs.readdirSync(ref).filter(n => n !== '화면.md' && n !== '출처.md' && !/^(review|gate)/.test(n) && /\.(md|html|csv)$/.test(n)); } catch { return false; }
   if (!names.length) return false;
   return days.some(day => names.every(n => {
     try { return fs.readFileSync(path.join(ref, n), 'utf8').replaceAll('{날짜}', day) === fs.readFileSync(path.join(cwd, 'outputs', day, folderName, n), 'utf8'); }

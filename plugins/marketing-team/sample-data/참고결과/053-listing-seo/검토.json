@@ -1,0 +1,11 @@
+{
+ "출처": "outputs/2026-09-16/053-listing-seo/run.json",
+ "원고_상태": "blocked",
+ "검토": [
+  {
+   "kind": "compliance",
+   "status": "needs-fix",
+   "report": "gate-2.md"
+  }
+ ]
+}
