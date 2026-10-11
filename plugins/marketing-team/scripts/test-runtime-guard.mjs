@@ -514,7 +514,40 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · ✅');
+  // 책 실습 · 원고 결과를 놓기 전에는 결과 파일을 지어 쓰지 못한다 (실측 2026-10-12 · 맥미니 · book 을 건너뜀)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-bookguard-'));
+    try {
+      const T = path.join(ws, 'session.jsonl');
+      fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
+      fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
+      const dir = 'outputs/2026-10-12/006-review-mining', planRel = `${dir}/plan.json`;
+      fs.mkdirSync(path.join(ws, dir), { recursive: true });
+      const o = n => `workspace:${dir}/${n}`;
+      fs.writeFileSync(path.join(ws, planRel), JSON.stringify({ request: '리뷰 분석해줘', skills: ['006'], steps: [{ step: 1, skill: '006',
+        inputs: ['plugin:sample-data/A브랜드-리뷰-200건.csv'], outputs: [o('006-review-mining.xlsx'), o('006-review-mining.html'), o('006-review-mining-해설.md')], reviews: [{ kind: 'compliance' }] }] }));
+      const node = (...a) => spawnSync(process.execPath, a, { cwd: ws, encoding: 'utf8' });
+      node(path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'compile', planRel);
+      node(path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'approve', planRel);
+      fs.writeFileSync(T, `${[row('user', '# 마케팅 AI 마케터'), row('assistant', '[실행 계획]\n계획: 소비자 리뷰 분석\n[승인 요청]\n⏸ 이대로 갈까요?'), row('user', '진행 승인')].join('\n')}\n`);
+      const w = file => {
+        const r = spawnSync(process.execPath, [SCRIPT], { input: JSON.stringify({ hook_event_name: 'PreToolUse', transcript_path: T, cwd: ws, tool_name: 'Write', tool_input: { file_path: path.join(ws, dir, file) } }),
+          encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: pluginRoot, CLAUDE_PROJECT_DIR: ws } });
+        return r.stdout.trim() ? JSON.parse(r.stdout).hookSpecificOutput : { permissionDecision: 'none' };
+      };
+      const before = w('006-review-mining-해설.md');
+      assert.equal(before.permissionDecision, 'deny', '책 실습인데 결과 파일을 지어 쓰게 두었다');
+      assert.match(before.permissionDecisionReason, /run-receipt\.mjs" book/, '거부 문구에 book 안내가 없다');
+      assert.equal(w('run.json').permissionDecision, 'none', '영수증 초안까지 막았다');
+      const b = node(path.join(path.dirname(SCRIPT), 'run-receipt.mjs'), 'book', planRel);
+      assert.match(b.stdout, /📖/, b.stderr);
+      assert.equal(w('gate.md').permissionDecision, 'none', '원고 결과를 놓은 뒤 검사 보고서를 막았다');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · 책 실습 강제 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

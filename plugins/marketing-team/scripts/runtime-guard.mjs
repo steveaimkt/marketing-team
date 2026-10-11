@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState, frontmatterFlag } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag, bookCheck } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -627,6 +627,24 @@ function planApproval(cwd, preferId) {
     }
     deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue.text} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
     return;
+  }
+
+  // 책 실습인데 원고 결과를 아직 안 놓았으면 결과 파일을 지어 쓰지 못하게 한다 (실측 2026-10-12 · 맥미니 ·
+  // 영수증 단계를 건너뛰어 book 이 한 번도 안 돌았고, 같은 샘플인데 결과가 원고와 달랐다)
+  {
+    const target = String(input.tool_input?.file_path || input.tool_input?.notebook_path || '');
+    const writesOutput = (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && target) || (input.tool_name === 'Bash' && allowedPython(input));
+    if (writesOutput) {
+      const found = newestPlan(cwd, preferId);
+      let c = null;
+      try { c = found && bookCheck(found.plan, cwd); } catch { c = null; }
+      const planned = c?.ok && (input.tool_name === 'Bash' || c.outs.some(o => path.resolve(cwd, target) === o));
+      if (planned && !c.placed) {
+        deny(`책 실습입니다(샘플 자료 · 빈 프로필). 결과를 새로 만들지 않습니다. ` +
+          `node "\${CLAUDE_PLUGIN_ROOT}/scripts/run-receipt.mjs" book "${path.relative(cwd, found.file)}" 를 먼저 돌리면 원고 결과가 놓이고 낼 화면이 나옵니다.`);
+        return;
+      }
+    }
   }
 
   if (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name)) {

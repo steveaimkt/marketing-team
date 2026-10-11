@@ -567,6 +567,43 @@ export function canonicalScreenPlan(target, { date = '2026-09-15' } = {}) {
   return { request: '화면 표준 조건', skills: ids, ...(chain ? { chain } : {}), steps };
 }
 
+/**
+ * 책 실습인가 · 샘플로 책을 따라 하면 원고와 같은 결과가 나와야 한다 (저자 결정 2026-10-12).
+ * 승인된 단일 단계 계획 · 형식 선택 없음 · 빈 프로필 · 입력이 전부 플러그인 샘플이거나 원고 결과와 똑같은
+ * 앞 실습 결과 · 그 스킬의 기준본(sample-data/참고결과/{폴더}/화면.md)이 있으면 책 실습이다.
+ * run-receipt book 이 결과를 놓고, runtime-guard 가 그 전에 모델이 결과를 지어 쓰는 것을 막는다.
+ */
+export function bookCheck(plan, cwd) {
+  const no = reason => ({ ok: false, reason });
+  if (!approvalState(plan).ok) return no('승인 봉인 전');
+  const steps = plan.steps || [];
+  if (steps.length !== 1) return no('여러 단계 계획');
+  if (plan.형식 && Object.keys(plan.형식).length) return no('형식을 골랐다');
+  if (!profileIsEmpty(cwd)) return no('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
+  const folder = skillDeclarations().get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
+  const ref = folder && path.join(PLUGIN, 'sample-data', '참고결과', folder);
+  if (!ref || !fs.existsSync(path.join(ref, '화면.md'))) return no('이 스킬의 기준본이 아직 없다');
+  const text = f => /\.(md|html|csv|txt)$/i.test(f);
+  const sameAsRef = (src, mine, day) => fs.existsSync(src) && fs.existsSync(mine) &&
+    (text(src) ? fs.readFileSync(src, 'utf8').replaceAll('{날짜}', day) === fs.readFileSync(mine, 'utf8')
+      : fs.readFileSync(src).equals(fs.readFileSync(mine)));
+  const canon = name => name.replace(/-\d+(\.[a-z0-9]+)$/i, '$1');
+  const inputs = (steps[0].inputs || []).map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
+  if (!inputs.length) return no('입력이 없다');
+  for (const v of inputs) {
+    if (v.startsWith('plugin:sample-data/')) continue;
+    const rel = v.replace(/^workspace:/, '');
+    const m = rel.match(/^outputs\/([^/]+)\/([^/]+)\/([^/]+)$/);
+    if (!m && rel.startsWith('outputs/') && !path.extname(rel)) continue;   // 폴더 째 가리키면 맥락일 뿐이다
+    if (m && sameAsRef(path.join(PLUGIN, 'sample-data', '참고결과', m[2], canon(m[3])), path.join(cwd, rel), m[1])) continue;
+    return no(`샘플이나 원고 결과가 아닌 자료가 있다 (${rel})`);
+  }
+  const outs = (steps[0].outputs || []).map(v => path.join(cwd, String(v).replace(/^workspace:/, '')));
+  const day = path.relative(cwd, outs[0] || '').split(path.sep)[1] || '';
+  const placed = outs.length > 0 && outs.every(o => sameAsRef(path.join(ref, canon(path.basename(o))), o, day));
+  return { ok: true, ref, outs, day, placed, sameAsRef, canon, text };
+}
+
 /* ── CLI ───────────────────────────────────────────────────── */
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isCli) {

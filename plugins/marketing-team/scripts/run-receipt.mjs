@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, profileIsEmpty } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
@@ -853,53 +853,23 @@ async function verify(file) {
  * 하나라도 아니면(독자가 브랜드 정보를 넣었거나 자기 자료를 넣었으면) 평소대로 독자 기준으로 만든다.
  */
 function book(target) {
-  const notBook = reason => { console.log(`➖ 책 실습 해당 없음 · ${reason} · 평소대로 만든다`); process.exit(0); };
   let planFile;
   try { planFile = resolveRef(target, { workspaceOnly: true }).abs; } catch (error) { fail(error.message); }
   if (path.basename(planFile) !== 'plan.json') fail('book 은 plan.json 을 받는다.');
   const plan = readJson(planFile);
   if (!approvalState(plan).ok) fail('승인 봉인된 계획이 아니다. plan-compiler.mjs approve 뒤에 돌린다.');
-  const steps = plan.steps || [];
-  if (steps.length !== 1) notBook('여러 단계 계획');
-  if (plan.형식 && Object.keys(plan.형식).length) notBook('형식을 골랐다');
-  const inputs = (steps[0].inputs || []).map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
-  // 앞 실습의 결과를 읽는 것은 괜찮다 · 단 그 파일이 책 실습으로 놓인 원고 결과와 같아야 한다
-  // (독자가 고쳤거나 자기 자료로 만든 결과를 읽으면 독자 기준이다)
-  const 원고결과그대로 = ref => {
-    const rel = ref.replace(/^workspace:/, '');
-    const m = rel.match(/^outputs\/([^/]+)\/([^/]+)\/([^/]+)$/);
-    if (!m) return rel.startsWith('outputs/') && !path.extname(rel);   // 폴더 째 가리키면 맥락일 뿐이다
-    const src = path.join(PLUGIN, 'sample-data', '참고결과', m[2], m[3].replace(/-\d+(\.[a-z0-9]+)$/i, '$1'));
-    const mine = path.join(WORK, rel);
-    if (!fs.existsSync(src) || !fs.existsSync(mine)) return false;
-    if (/\.(md|html|csv|txt)$/i.test(src)) return fs.readFileSync(src, 'utf8').replaceAll('{날짜}', m[1]) === fs.readFileSync(mine, 'utf8');
-    return fs.readFileSync(src).equals(fs.readFileSync(mine));
-  };
-  if (!inputs.length) notBook('입력이 없다');
-  for (const v of inputs) {
-    if (v.startsWith('plugin:sample-data/')) continue;
-    if (v.startsWith('workspace:outputs/') && 원고결과그대로(v)) continue;
-    notBook(`샘플이나 원고 결과가 아닌 자료가 있다 (${v.replace(/^workspace:/, '')})`);
-  }
-  if (!profileIsEmpty(WORK)) notBook('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
-  const decl = skills().get(cleanId(steps[0].skill));
-  const folder = decl?.writesTo?.[0]?.split('/')[2];
-  const ref = folder && path.join(PLUGIN, 'sample-data', '참고결과', folder);
-  if (!ref || !fs.existsSync(path.join(ref, '화면.md'))) notBook('이 스킬의 기준본이 아직 없다');
-  const outs = (steps[0].outputs || []).map(v => resolveRef(v, { workspaceOnly: true }).abs);
-  const 날짜 = posix(path.relative(WORK, outs[0] || '')).split('/')[1] || '';
-  const fill = text => text.replaceAll('{날짜}', 날짜);
-  for (const out of outs) {
-    const canon = path.basename(out).replace(/-\d+(\.[a-z0-9]+)$/i, '$1');
-    const src = path.join(ref, canon);
-    if (!fs.existsSync(src)) fail(`기준본에 ${canon} 이 없다 · 기준본과 writes_to 를 맞춰야 한다`);
+  const c = bookCheck(plan, WORK);
+  if (!c.ok) { console.log(`➖ 책 실습 해당 없음 · ${c.reason} · 평소대로 만든다`); return; }
+  for (const out of c.outs) {
+    const src = path.join(c.ref, c.canon(path.basename(out)));
+    if (!fs.existsSync(src)) fail(`기준본에 ${path.basename(src)} 이 없다 · 기준본과 writes_to 를 맞춰야 한다`);
     fs.mkdirSync(path.dirname(out), { recursive: true });
-    if (/\.(md|html|csv|txt)$/i.test(canon)) fs.writeFileSync(out, fill(fs.readFileSync(src, 'utf8')));
+    if (c.text(src)) fs.writeFileSync(out, fs.readFileSync(src, 'utf8').replaceAll('{날짜}', c.day));
     else fs.copyFileSync(src, out);
   }
-  console.log(`📖 책 실습 · 원고 결과를 놓았다 · ${outs.map(o => path.basename(o)).join(' · ')}`);
+  console.log(`📖 책 실습 · 원고 결과를 놓았다 · ${c.outs.map(o => path.basename(o)).join(' · ')}`);
   console.log('── 분석을 다시 하지 않는다. 검토·영수증은 평소대로 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──');
-  console.log(fill(fs.readFileSync(path.join(ref, '화면.md'), 'utf8')).trimEnd());
+  console.log(fs.readFileSync(path.join(c.ref, '화면.md'), 'utf8').replaceAll('{날짜}', c.day).trimEnd());
   console.log('── 화면 끝 ──');
 }
 
