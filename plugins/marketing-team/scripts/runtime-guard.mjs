@@ -474,7 +474,11 @@ async function main() {
     const flat = v => String(v).replace(/\*\*|`|\s+|^text/gm, '');
     if (cur && cur.screen) {
       if (flat(last).includes(flat(cur.screen))) {
-        try { fs.writeFileSync(cur.statePath, JSON.stringify({ ...cur.state, shown: cur.state.pending }, null, 1)); } catch { /* 무시 */ }
+        // 원고 화면 앞뒤에 붙인 말도 원고와 달라진 것이다 (실측 2026-10-12 · 4장 되돌림 차례 앞에
+        // 「Compile passed. Showing the prepared screen as instructed.」가 붙음). 열 글자 넘게 붙었으면 한 번 되돌린다.
+        if (flat(last).length - flat(cur.screen).length > 10)
+          issue = '책 실습 대본 차례다. 원고 답변 앞뒤에 말을 붙이지 않는다. 훅이 넘겨준 <<< >>> 사이의 화면만 그대로 다시 낸다.';
+        else try { fs.writeFileSync(cur.statePath, JSON.stringify({ ...cur.state, shown: cur.state.pending }, null, 1)); } catch { /* 무시 */ }
       } else if (!(cur.turn?.image && /힉스필드|Higgsfield/.test(last) && last.length < cur.screen.length / 2) && !cur.turn?.plan) {
         issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
       }

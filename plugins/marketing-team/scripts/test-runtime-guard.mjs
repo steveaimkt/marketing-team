@@ -587,6 +587,7 @@ try {
       assert.equal(JSON.parse(w.stdout || '{}').hookSpecificOutput?.permissionDecision, 'deny', '대본 진행 중에 결과 파일을 지어 쓰게 두었다');
       const stop = last => { const r = hook({ hook_event_name: 'Stop', last_assistant_message: last }); return r.stdout.trim() ? JSON.parse(r.stdout).decision : 'none'; };
       assert.equal(stop('1단계를 마쳤습니다. 요약하면 ROAS가 낮습니다.'), 'block', '원고와 다른 답변을 통과시켰다');
+      assert.equal(stop('Compile passed. Showing the prepared screen as instructed.\n' + screen), 'block', '원고 답변 앞에 붙인 말을 통과시켰다');
       assert.equal(stop(screen), 'none', '원고 답변 그대로를 막았다');
       assert.match(say('제안해줘'), /2\/6번째/, '다음 차례로 넘어가지 않았다');
       assert.doesNotMatch(say('블로그 글도 하나 써줘'), /책 실습/, '원고에 없는 말에 대본을 이어 붙였다');
@@ -630,7 +631,7 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 7 · 첫 말 대본 3 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
