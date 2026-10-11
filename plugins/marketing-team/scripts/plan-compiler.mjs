@@ -39,6 +39,13 @@ const fail = message => { console.error(`🔴 ${message}`); process.exit(1); };
 // 같은 규칙을 run-receipt · runtime-guard · ledger-stats 가 가져다 쓴다 · 한 곳만 고치면 어긋난다.
 const unquote = v => v.trim().replace(/^(["'])([\s\S]*)\1$/, '$2').trim();
 const stripComment = v => v.replace(/\s+#(?=\s|$).*$/, '');
+// 뒤 주석까지 통째로 따옴표에 들어온 모양 `"[a, b]   # 주석"` 도 있다 (실측 2026-10-12 · v0.69 는 주석 없는
+// 모양만 시험해서 006 의 마지막 파일이 `…해설.md]` 로 읽혔다). 주석을 먼저 떼면 닫는 따옴표까지 잘린다.
+const clean = v => {
+  const a = stripComment(v).trim();
+  if (!/^["']/.test(a) || /^(["'])[\s\S]*\1$/.test(a)) return unquote(a);
+  return unquote(stripComment(unquote(v)));
+};
 const frontmatterOf = text => {
   const t = String(text).replace(/\r\n/g, '\n');
   return (t.match(/^---\n([\s\S]*?)\n---(?:\n|$)/) || [, t])[1];
@@ -47,7 +54,7 @@ const frontmatterOf = text => {
 /** 머리말 한 칸의 값 · 없으면 '' · 따옴표와 뒤 주석은 뗀다 */
 export function frontmatterField(text, key) {
   const m = frontmatterOf(text).match(new RegExp(`^${key}:[ \\t]*(.*)$`, 'm'));
-  return m ? unquote(stripComment(m[1])) : '';
+  return m ? clean(m[1]) : '';
 }
 
 /** 머리말 목록 · `[a, b]` · `"[a, b]"` · 다음 줄부터 `- a` 를 모두 읽는다 */
@@ -55,10 +62,10 @@ export function frontmatterList(text, key) {
   const fm = frontmatterOf(text);
   const m = fm.match(new RegExp(`^${key}:[ \\t]*(.*)$`, 'm'));
   if (!m) return [];
-  let value = unquote(stripComment(m[1]));
+  let value = clean(m[1]);
   if (!value) {
     const block = fm.slice(m.index + m[0].length).match(/^(?:\n[ \t]+-[ \t]*.*)+/);
-    return block ? block[0].split('\n').map(l => l.replace(/^[ \t]+-[ \t]*/, '')).map(v => unquote(stripComment(v))).filter(Boolean) : [];
+    return block ? block[0].split('\n').map(l => l.replace(/^[ \t]+-[ \t]*/, '')).map(clean).filter(Boolean) : [];
   }
   if (value.startsWith('[') && value.endsWith(']')) value = value.slice(1, -1);
   return value.split(',').map(unquote).filter(Boolean);

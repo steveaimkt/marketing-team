@@ -479,7 +479,12 @@ async function main() {
         issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
       }
     }
-    if (!issue && !(cur && flat(last).includes(flat(cur.screen)))) issue = planScreenIssue(last, here);
+    // 계획 화면은 이번 차례의 어느 답변에서 냈든 본다. 마지막 답변만 보면 도구 호출 앞에 손으로 쓴
+    // 계획이 빠져나간다 (실측 2026-10-12 · 데스크톱 · compile 이 실패하자 상자 없는 계획을 낸 뒤 요약으로 끝냈다)
+    const lastUser = rows.map(r => r.role).lastIndexOf('user');
+    const planText = [...rows.slice(lastUser + 1).filter(r => r.role === 'assistant').map(r => r.text), last]
+      .reverse().find(t => /^(?:\*\*)?\[실행 계획\]/m.test(t)) || last;
+    if (!issue && !(cur && flat(last).includes(flat(cur.screen)))) issue = planScreenIssue(planText, here);
     if (issue) process.stdout.write(`${JSON.stringify({ decision: 'block', reason: issue })}\n`);
     return;
   }
@@ -616,6 +621,13 @@ function planApproval(cwd, preferId) {
     // 첫 plan.json 이 여기서 막혀 문서의 순서대로는 계획 화면을 만들 수 없었다).
     // outputs 아래 plan.json 하나만 연다 · 산출물은 여전히 승인과 해시 봉인 뒤에만 쓴다
     if (isPlanDraftWrite(input)) return;
+    // 조회와 플러그인 스크립트를 한 줄에 섞으면 둘 다 허용 모양이 아니다. 계획을 내라고만 하면 모델이 고칠 곳을
+    // 모른다 (실측 2026-10-12 · 데스크톱 · `cd $P; ls …; grep …; node scripts/router.mjs "…"` 가 막힘)
+    if (input.tool_name === 'Bash' && /(?:^|[;&|]\s*)node\s+\S*scripts\/[\w-]+\.mjs/m.test(String(input.tool_input?.command || ''))) {
+      deny('조회 명령과 플러그인 스크립트를 한 줄에 섞지 마세요. 승인 전에는 따로 부릅니다 · ' +
+        '`node "${CLAUDE_PLUGIN_ROOT}/scripts/router.mjs" "요청"` 처럼 node 한 줄만, 조회(ls·grep·cat)는 별도 명령으로. 경로 변수(P=…)와 cd 도 쓰지 마세요.');
+      return;
+    }
     deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
     return;
   }
