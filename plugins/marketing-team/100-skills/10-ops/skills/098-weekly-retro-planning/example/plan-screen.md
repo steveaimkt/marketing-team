@@ -20,7 +20,7 @@
 |---|---|---|
 | 1 | 스킬 098 · 주간 업무 정리 | 주간 회고(완료·성과·배움 3구획) · 다음 조치표(다음 주로/중단/넘김) · 넘어온 횟수 추이 · 업무 유형별 비중 · 다음 주 우선순위 TOP 3 · my-playbook 루틴 갱신 제안 |
 
-- **분석할 자료**: `logs/build-log.md`가 비어 있어 `sample_fallback`(`sample-data/build-log-sample.md`)의 실행 기록으로 완주합니다. 결과에는 `[샘플]`이 붙고, 요일별 흐름 대신 스킬별·카테고리별 건수로 이번 주를 봅니다.
+- **분석할 자료**: `logs/build-log.md`가 비어있어 `sample_fallback`(`sample-data/build-log-sample.md`)의 실행 기록으로 완주합니다. 결과에는 `[샘플]`이 붙고, 요일별 흐름 대신 스킬별·카테고리별 건수로 이번 주를 봅니다.
 - **기준**: `brand/my-playbook.md` §3 주간 루틴, 지난 회고 산출물(최대 8주치, 있는 만큼)
 - **나오는 곳**: `outputs/{날짜}/098-weekly-retro-planning/`
 - **나오는 형식**: 표는 `.xlsx`가 기본이나 공식 xlsx 스킬 미확인 시 `.csv`로 내고 그렇게 표기합니다. 해설은 `.md`로 따로 냅니다.

@@ -20,7 +20,7 @@
 않는다. 그래서 계획 화면·승인 요청을 내지 않고, 요청 한 줄 뒤 곧바로 아래 같은 결과 보고로 간다.
 
 TAM-SAM-SOM 추정입니다 · 연습용 A브랜드(화장품) 프로필 기준입니다 (결과에 [샘플])
-brand/profile.md 가 비어 있어 sample-data/profile-sample.md 의 카테고리·타깃으로 시장을
+brand/profile.md 가 비어있어 sample-data/profile-sample.md 의 카테고리·타깃으로 시장을
 "국내 20~40대 여성 온라인 세럼"으로 잡았습니다. (이 스킬 자체는 샘플 폴백 파일이 없어, 상위
 ai-marketer 층의 프로필 폴백을 그대로 씁니다.)
 
