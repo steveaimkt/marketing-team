@@ -659,6 +659,20 @@ export function replayFind(cwd) {
   } catch { return null; }
 }
 
+/** 오늘 이전 어느 날짜 폴더든 그 스킬의 원고 결과(기준본과 같은 파일)가 놓여 있나 */
+function 원고결과있음(cwd, folderName) {
+  const ref = path.join(PLUGIN, 'sample-data', '참고결과', folderName);
+  let days = [];
+  try { days = fs.readdirSync(path.join(cwd, 'outputs')).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)); } catch { return false; }
+  let names = [];
+  try { names = fs.readdirSync(ref).filter(n => n !== '화면.md' && n !== '출처.md' && /\.(md|html|csv)$/.test(n)); } catch { return false; }
+  if (!names.length) return false;
+  return days.some(day => names.every(n => {
+    try { return fs.readFileSync(path.join(ref, n), 'utf8').replaceAll('{날짜}', day) === fs.readFileSync(path.join(cwd, 'outputs', day, folderName, n), 'utf8'); }
+    catch { return false; }
+  }));
+}
+
 /** 계획 없이 첫 말로 시작하는 대본(13장 등) · 상태는 outputs/.대본-{이름}.json 에 둔다 */
 function replayOpening(cwd, prompt) {
   if (!cwd || !profileIsEmpty(cwd)) return null;
@@ -669,6 +683,7 @@ function replayOpening(cwd, prompt) {
     let data;
     try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
     if (!data.무계획) continue;
+    if (data.이후 && !원고결과있음(cwd, data.이후)) continue;   // 「D로 하자」처럼 앞 결과가 있어야 뜻이 서는 말
     const statePath = path.join(cwd, 'outputs', `.대본-${name}.json`);
     let state = null;
     try { state = JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch { /* 아직 안 열림 */ }
@@ -691,10 +706,12 @@ export function replayStep(cwd, prompt) {
   const fits = t => (t.approve && /^\s*진행\s*승인/.test(String(prompt))) ||
     (t.user || []).some(u => { const a = 말(u); return a && (a === said || (said.length > 1 && (a.includes(said) || said.includes(a)) && Math.min(a.length, said.length) / Math.max(a.length, said.length) > 0.6)); });
   let k = -1;
-  for (let i = Math.max(0, r.state.next - 1); i < Math.min(turns.length, r.state.next + 3); i += 1) {
+  for (let i = r.state.next; i < Math.min(turns.length, r.state.next + 3); i += 1) {
     if (fits(turns[i])) { k = i; break; }
-    if (i >= r.state.next && !turns[i].optional) break;   // 건너뛸 수 있는 것은 덧붙은 턴뿐이다
+    if (!turns[i].optional) break;   // 건너뛸 수 있는 것은 덧붙은 턴뿐이다
   }
+  // 같은 말을 다시 보냈으면(예: 힉스필드를 연결하고 다시 요청) 방금 차례를 한 번 더 낸다
+  if (k < 0 && r.state.next > 0 && fits(turns[r.state.next - 1])) k = r.state.next - 1;
   const save = st => { try { fs.writeFileSync(r.statePath, JSON.stringify(st, null, 1)); } catch { /* 무시 */ } };
   if (k < 0) {
     if (r.state.next === 0) return null;   // 계획 승인 전의 말은 대본 밖이 아니다
@@ -712,8 +729,30 @@ export function replayStep(cwd, prompt) {
     else fs.copyFileSync(src, dst);
   }
   try { fs.mkdirSync(path.dirname(r.statePath), { recursive: true }); } catch { /* 무시 */ }
-  save({ next: k + 1, done: k + 1 >= turns.length, pending: k });
+  save({ next: k + 1, done: k + 1 >= turns.length, pending: k, 날짜: r.날짜 });
   return { turn: t, k, total: turns.length, screen: fill(t.screen), 장: r.data.장, plan: r.planFile ? path.relative(cwd, r.planFile) : null, folder: path.relative(cwd, r.folder), 날짜: r.날짜 };
+}
+
+/** 지금 원고 답변을 기다리는 대본 차례 · 계획이 있는 대본과 첫 말로 시작한 대본을 모두 본다 */
+export function replayCurrent(cwd) {
+  const pick = [];
+  const r = replayFind(cwd);
+  if (r) pick.push({ data: r.data, state: r.state, statePath: r.statePath, 월: r.월, 날짜: r.날짜 });
+  try {
+    for (const f of fs.readdirSync(path.join(cwd, 'outputs')).filter(n => n.startsWith('.대본-') && n.endsWith('.json'))) {
+      const name = f.slice('.대본-'.length, -'.json'.length);
+      const statePath = path.join(cwd, 'outputs', f);
+      const state = JSON.parse(fs.readFileSync(statePath, 'utf8'));
+      const data = JSON.parse(fs.readFileSync(path.join(대본뿌리(), name, '대본.json'), 'utf8'));
+      const at = fs.statSync(statePath).mtimeMs;
+      pick.push({ data, state, statePath, at, 날짜: state.날짜 || '', 월: (state.날짜 || '').slice(0, 7) });
+    }
+  } catch { /* 없으면 없다 */ }
+  const live = pick.filter(p => Number.isInteger(p.state?.pending) && p.state.shown !== p.state.pending);
+  if (!live.length) return null;
+  const p = live.sort((a, b) => (b.at || 0) - (a.at || 0))[0];
+  const t = p.data.turns[p.state.pending];
+  return { ...p, turn: t, screen: String(t?.screen || '').replaceAll('{월}', p.월).replaceAll('{날짜}', p.날짜) };
 }
 
 /** 대본이 진행 중인가 · 진행 중이면 결과 파일을 지어 쓰지 못한다 */

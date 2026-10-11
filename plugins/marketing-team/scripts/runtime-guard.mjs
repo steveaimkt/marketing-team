@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -466,21 +466,20 @@ async function main() {
     const last = typeof input.last_assistant_message === 'string' ? input.last_assistant_message
       : ([...rows].reverse().find(r => r.role === 'assistant')?.text || '');
     const here = input.cwd || process.cwd();
-    let issue = planScreenIssue(last, here);
-    // 책 실습 대본 차례면 원고 답변을 그대로 냈는지 본다
-    if (!issue) {
-      try {
-        const r = replayFind(here);
-        const k = r?.state?.pending;
-        if (r && Number.isInteger(k) && r.state.shown !== k) {
-          const want = String(r.data.turns[k]?.screen || '').replaceAll('{월}', r.월).replaceAll('{날짜}', r.날짜);
-          const flat = v => String(v).replace(/\*\*|`|\s+/g, '');
-          if (want && flat(last).includes(flat(want))) fs.writeFileSync(r.statePath, JSON.stringify({ ...r.state, shown: k }, null, 1));
-          else if (want && !(r.data.turns[k]?.image && /힉스필드|Higgsfield/.test(last) && last.length < want.length / 2))
-            issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
-        }
-      } catch { /* 대본을 못 읽으면 막지 않는다 */ }
+    // 대본 차례면 원고 답변을 그대로 냈는지 본다 · 그대로 냈으면 계획 화면 검사는 하지 않는다
+    // (원고에만 있는 되돌린 계획처럼 스크립트가 찍지 않은 계획 화면이 대본에 들어 있다)
+    let issue = null;
+    let cur = null;
+    try { cur = replayCurrent(here); } catch { cur = null; }
+    const flat = v => String(v).replace(/\*\*|`|\s+|^text/gm, '');
+    if (cur && cur.screen) {
+      if (flat(last).includes(flat(cur.screen))) {
+        try { fs.writeFileSync(cur.statePath, JSON.stringify({ ...cur.state, shown: cur.state.pending }, null, 1)); } catch { /* 무시 */ }
+      } else if (!(cur.turn?.image && /힉스필드|Higgsfield/.test(last) && last.length < cur.screen.length / 2) && !cur.turn?.plan) {
+        issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
+      }
     }
+    if (!issue && !(cur && flat(last).includes(flat(cur.screen)))) issue = planScreenIssue(last, here);
     if (issue) process.stdout.write(`${JSON.stringify({ decision: 'block', reason: issue })}\n`);
     return;
   }
