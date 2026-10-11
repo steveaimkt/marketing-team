@@ -616,6 +616,12 @@ try {
       assert.match(made, /inputs\/광고주간\/\{날짜\}\.csv/, '원고 문장의 {날짜} 자리표시를 오늘 날짜로 바꿨다');
       assert.match(say('좋아 이제 완료하자'), /3\/3번째/, '13장 3턴을 잡지 못했다');
       assert.doesNotMatch(say('3개 모두 제작해줘'), /책 실습/, '대본이 끝난 뒤에도 원고 답변을 넘겼다');
+      // 원고 답변을 기다리던 차례가 남아도, 다음 말이 오면 거둔다 · 남으면 응답 끝 검사가 다음 턴을 지난 화면으로 막았다
+      assert.match(say('‘세럼 따가움’으로 블로그 글 써줘.'), /책 실습 · 5장/, '5장 블로그 첫 말을 잡지 못했다');
+      const blogState = path.join(ws, 'outputs', '.대본-5장-블로그.json');
+      assert.ok(Number.isInteger(JSON.parse(fs.readFileSync(blogState, 'utf8')).pending), '방금 연 차례는 원고 답변을 기다려야 한다');
+      say('채널 성장이 왜 멈췄어?');
+      assert.equal(JSON.parse(fs.readFileSync(blogState, 'utf8')).pending, undefined, '다음 말이 왔는데 지난 차례가 원고 답변을 계속 기다린다');
       fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
       fs.rmSync(path.join(ws, 'outputs', '.대본-13장-스킬제안.json'), { force: true });
       assert.doesNotMatch(say('추가로 내가 만들면 좋을 스킬을 제안해줘'), /책 실습/, '프로필을 채웠는데 대본을 돌렸다');

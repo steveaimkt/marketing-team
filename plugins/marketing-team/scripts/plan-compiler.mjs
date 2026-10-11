@@ -762,7 +762,30 @@ function replayOpening(cwd, prompt) {
 }
 
 /** 사람 말 한 마디를 대본에 대 본다 · 맞으면 그 턴의 파일을 놓고 화면을 돌려준다 */
+/** 새 말이 오면 앞 차례는 끝난 것이다 · 원고 답변을 기다리는 표시(pending)를 모두 거둔다
+ *  안 거두면 응답 끝 검사가 다음 턴(대본과 상관없는 책 실습)을 지난 대본 화면으로 막았다
+ *  (실측 2026-10-12 · v0.72.26 · 5장 인스타 내려받기 차례가 남아 「채널 성장이 왜 멈췄어?」 계획이 막혔다) */
+function 차례거둠(cwd) {
+  const walk = (d, depth) => {
+    let es = [];
+    try { es = fs.readdirSync(d, { withFileTypes: true }); } catch { return; }
+    for (const e of es) {
+      const f = path.join(d, e.name);
+      if (e.isDirectory()) { if (depth < 2) walk(f, depth + 1); continue; }
+      if (!/^\.대본(-.+)?\.json$/.test(e.name)) continue;
+      try {
+        const st = JSON.parse(fs.readFileSync(f, 'utf8'));
+        if (!Number.isInteger(st.pending)) continue;
+        delete st.pending; delete st.shown;
+        fs.writeFileSync(f, JSON.stringify(st, null, 1));
+      } catch { /* 무시 */ }
+    }
+  };
+  walk(path.join(cwd, 'outputs'), 0);
+}
+
 export function replayStep(cwd, prompt, again = true) {
+  if (again) 차례거둠(cwd);
   const found = replayFind(cwd);
   const r = (found && !found.state.done ? found : null) || replayOpening(cwd, prompt);   // 끝난 체인(12장 등) 뒤에도 13장 첫 말은 열린다
   if (!r || r.state.done) return null;
