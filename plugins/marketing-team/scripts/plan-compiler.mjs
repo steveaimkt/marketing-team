@@ -21,6 +21,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
+import { spawnSync } from 'node:child_process';
 import { canonicalChains, compileChain, validateChainPlan } from './chain-compiler.mjs';
 
 const PLUGIN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,6 +31,35 @@ const KINDS = new Set(['business', 'compliance']);
 const PERSPECTIVES = new Set(['경영', '재무', '고객', '법무', '브랜드']);
 
 const fail = message => { console.error(`🔴 ${message}`); process.exit(1); };
+
+/**
+ * 점검이 실패하면 설치본이 저장소보다 낡았는지 먼저 본다. 고친 판이 나왔는데 데스크톱이 옛 판을 계속 쓰면
+ * 같은 오류가 반복되고, 모델은 플러그인 사본을 고쳐 점검을 비켜 가자고 한다 (실측 2026-10-12 · 데스크톱이
+ * 9월 21일 동기화본 v0.61.4 로 돌아 v0.69·v0.72.2 의 수정이 한 번도 닿지 않았다). 못 읽으면 말하지 않는다.
+ */
+export function staleNotice() {
+  try {
+    const mine = JSON.parse(fs.readFileSync(path.join(PLUGIN, '.claude-plugin', 'plugin.json'), 'utf8'));
+    const repo = String(mine.repository || '').match(/github\.com[/:]([^/]+\/[^/.]+)/)?.[1];
+    if (!repo || process.env.MARKETING_TEAM_NO_UPDATE_CHECK) return '';
+    const cacheFile = path.join(os.tmpdir(), `marketing-team-latest-${repo.replace('/', '-')}.json`);
+    let latest = '';
+    try { const c = JSON.parse(fs.readFileSync(cacheFile, 'utf8')); if (Date.now() - c.at < 3600e3) latest = c.version; } catch { /* 없음 */ }
+    if (!latest) {
+      const url = `https://raw.githubusercontent.com/${repo}/main/.claude-plugin/marketplace.json`;
+      const r = spawnSync(process.execPath, ['-e', `fetch(${JSON.stringify(url)}).then(r=>r.ok?r.text():'').then(t=>process.stdout.write(t)).catch(()=>{})`], { encoding: 'utf8', timeout: 4000 });
+      const market = JSON.parse(r.stdout || '{}');
+      latest = (market.plugins || []).find(x => x.name === mine.name)?.version || '';
+      if (latest) try { fs.writeFileSync(cacheFile, JSON.stringify({ at: Date.now(), version: latest })); } catch { /* 무시 */ }
+    }
+    const n = v => String(v).split('.').map(Number);
+    const [a, b] = [n(mine.version), n(latest)];
+    const older = latest && [0, 1, 2].some((i, _, all) => all.slice(0, i).every(j => a[j] === b[j]) && a[i] < b[i]);
+    return older ? `설치본은 v${mine.version}, 저장소 최신은 v${latest}입니다. 이 오류는 최신 판에서 고쳐졌을 수 있습니다. ` +
+      '사용자에게 「마켓플레이스를 먼저 동기화 → 플러그인 업데이트 → 새 대화」를 안내하세요. 플러그인 파일을 복사하거나 고쳐서 점검을 비켜 가지 않습니다.' : '';
+  } catch { return ''; }
+}
+const failPlan = message => { const stale = staleNotice(); if (stale) console.error(`🟡 ${stale}`); fail(message); };
 
 /* ── 스킬 선언 읽기 ─────────────────────────────────────────── */
 
@@ -790,7 +820,7 @@ if (isCli) {
 
   if (command === 'compile') {
     const issues = validatePlan(plan);
-    if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); fail(`계획이 계약과 맞지 않습니다 · ${issues.length}건`); }
+    if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); failPlan(`계획이 계약과 맞지 않습니다 · ${issues.length}건`); }
     plan.schema = SCHEMA;
     for (const [from, to] of preferLatestReruns(plan)) console.log(`↻ 같은 날 다시 돌린 결과를 읽습니다 · ${from.replace(/^workspace:/, '')} → ${to.replace(/^workspace:/, '')}`);
     const graph = compileChain(plan);
@@ -811,7 +841,7 @@ if (isCli) {
     write(file, plan);
     console.log(`✅ 계획 확정 · ${plan.skills.join('→')} · ${plan.plan_sha256.slice(0, 12)} · 승인 대기`);
     if (screen) {
-      console.log('── 아래 화면을 한 글자도 바꾸지 말고 앞뒤에 문장을 붙이지 말고 그대로 사용자에게 낸다 ──');
+      console.log('── 아래 화면을 ```text 상자째, 한 글자도 바꾸지 말고 앞뒤에 문장을 붙이지 말고 그대로 사용자에게 낸다 ──');
       console.log(`\`\`\`text\n${screen}\n\`\`\``);
       console.log('── 화면 끝 ──');
     }
@@ -846,7 +876,7 @@ if (isCli) {
     for (const line of issues) console.error(`⛔ ${line}`);
     const state = approvalState(plan);
     if (!state.ok) fail(state.reason);
-    if (issues.length) fail(`계획이 계약과 맞지 않습니다 · ${issues.length}건`);
+    if (issues.length) failPlan(`계획이 계약과 맞지 않습니다 · ${issues.length}건`);
     console.log(`✅ 승인 유효 · ${state.current.slice(0, 12)} · ${plan.skills.join('→')}`);
   } else fail('명령은 compile · approve · check 중 하나입니다.');
 }
