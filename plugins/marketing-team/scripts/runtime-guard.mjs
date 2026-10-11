@@ -473,7 +473,7 @@ async function main() {
         const r = replayFind(here);
         const k = r?.state?.pending;
         if (r && Number.isInteger(k) && r.state.shown !== k) {
-          const want = String(r.data.turns[k]?.screen || '').replaceAll('{월}', r.월);
+          const want = String(r.data.turns[k]?.screen || '').replaceAll('{월}', r.월).replaceAll('{날짜}', r.날짜);
           const flat = v => String(v).replace(/\*\*|`|\s+/g, '');
           if (want && flat(last).includes(flat(want))) fs.writeFileSync(r.statePath, JSON.stringify({ ...r.state, shown: k }, null, 1));
           else if (want && !(r.data.turns[k]?.image && /힉스필드|Higgsfield/.test(last) && last.length < want.length / 2))

@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>고객 여정 맵 · A브랜드 [샘플]</title>
+<style>
+:root{--paper:#F3F3F2;--paper-card:#FFFFFF;--paper-sunk:#EBEBEB;--ink:#2A2A28;--ink-mut:#444444;--ink-faint:#848383;--ink-fade:#AFAFAC;--line:#EBEBEB;--line-strong:#444444;--sand:#E0CCBE;--olive:#747264;--mark:#EBFF2C;--acc-band:rgba(224,204,190,.34);--up:#3F5F4A;--up-band:rgba(63,95,74,.09);--down:#7A3B36;--down-band:rgba(122,59,54,.09);--warn:#6B5A2E;--warn-band:rgba(224,204,190,.30);--none:#848383;--ff:Pretendard,"Pretendard Variable",Manrope,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--ff-display:"Bricolage Grotesque",var(--ff);--ff-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,monospace;--t-h1:34px;--t-h2:20px;--t-h3:15px;--t-body:15px;--t-small:13px;--t-tiny:12px;--t-kpi:34px;--lh-display:1.1;--lh-head:1.15;--lh-body:1.6;--lh-lead:1.4;--ls-display:-.01em;--sp-1:5px;--sp-2:10px;--sp-3:14px;--sp-4:20px;--sp-5:30px;--sp-6:50px;--gap-card:20px;--wrap:1200px;--r-s:5px;--r-l:13px;--shadow:0 1px 2px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#2A2A28;--paper-card:#333330;--paper-sunk:#3D3D39;--ink:#F3F3F2;--ink-mut:#C9C9C5;--ink-faint:#AFAFAC;--ink-fade:#848383;--line:#444442;--line-strong:#848383;--olive:#A9A695;--acc-band:rgba(224,204,190,.14);--up:#8FBF9E;--up-band:rgba(143,191,158,.14);--down:#D89A93;--down-band:rgba(216,154,147,.14);--warn:#D7BE7E;--warn-band:rgba(215,190,126,.14);--none:#AFAFAC;--shadow:0 1px 2px rgba(0,0,0,.26)}}
+:root[data-theme="dark"]{--paper:#2A2A28;--paper-card:#333330;--paper-sunk:#3D3D39;--ink:#F3F3F2;--ink-mut:#C9C9C5;--ink-faint:#AFAFAC;--ink-fade:#848383;--line:#444442;--line-strong:#848383;--olive:#A9A695;--acc-band:rgba(224,204,190,.14);--up:#8FBF9E;--up-band:rgba(143,191,158,.14);--down:#D89A93;--down-band:rgba(216,154,147,.14);--warn:#D7BE7E;--warn-band:rgba(215,190,126,.14);--none:#AFAFAC;--shadow:0 1px 2px rgba(0,0,0,.26)}
+*{box-sizing:border-box}html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--ff);font-size:var(--t-body);line-height:var(--lh-body);-webkit-text-size-adjust:100%;word-break:keep-all}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:var(--sp-5) var(--sp-4) var(--sp-6)}
+@media (min-width:1000px){.wrap{padding-left:var(--sp-6);padding-right:var(--sp-6)}}
+h1{font-family:var(--ff-display);font-size:var(--t-h1);line-height:var(--lh-display);letter-spacing:var(--ls-display);margin:0 0 var(--sp-2);font-weight:700;text-wrap:balance}
+h2{font-size:var(--t-h2);line-height:var(--lh-head);margin:var(--sp-6) 0 var(--sp-3);padding-bottom:var(--sp-2);border-bottom:1px solid var(--line);font-weight:700}
+p{margin:0 0 var(--sp-2)}
+.head{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--sp-2);margin-bottom:var(--sp-3)}
+.tag{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:3px 10px;border-radius:var(--r-s);background:var(--ink);color:var(--paper)}
+.tag.sample{background:var(--sand);color:#2A2A28}
+.tag.est{background:transparent;color:var(--ink-mut);border:1px solid var(--line-strong)}
+.meta{color:var(--ink-faint);font-size:var(--t-small);line-height:var(--lh-lead);margin:0}
+.kpi{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:var(--gap-card);margin-top:var(--sp-4)}
+.card{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--sp-3);min-width:0;box-shadow:var(--shadow)}
+.card .lab{font-size:var(--t-small);color:var(--ink-faint);font-weight:600;line-height:1.3}
+.card .val{font-size:var(--t-kpi);font-weight:700;letter-spacing:var(--ls-display);line-height:var(--lh-display);margin:var(--sp-1) 0 2px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.card .unit{font-size:15px;font-weight:600;color:var(--ink-faint);margin-left:3px}
+.dlt{font-size:var(--t-tiny);font-weight:700;font-variant-numeric:tabular-nums}
+.dlt.down{color:var(--down)}.dlt.none{color:var(--none);font-weight:500}
+.base{font-size:var(--t-tiny);color:var(--ink-faint);margin-top:2px}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:var(--sp-3) 0;border:1px solid var(--line);border-radius:var(--r-l);background:var(--paper-card)}
+table{border-collapse:collapse;width:100%;font-size:var(--t-small);min-width:480px}
+th,td{padding:10px var(--sp-3);text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--paper);font-weight:700;font-size:var(--t-tiny);color:var(--ink-mut);white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.rank{font-weight:700;width:1%;white-space:nowrap}
+caption{caption-side:bottom;text-align:left;padding:10px var(--sp-3);font-size:var(--t-tiny);color:var(--ink-fade);border-top:1px solid var(--line)}
+.b{display:inline-block;font-size:var(--t-tiny);font-weight:700;padding:2px 8px;border-radius:var(--r-s);white-space:nowrap}
+.b.down{background:var(--down-band);color:var(--down)}.b.warn{background:var(--warn-band);color:var(--warn)}.b.none{background:var(--paper-sunk);color:var(--none)}
+.hl,.warn-box{border:1px solid var(--line);border-radius:var(--r-l);padding:var(--sp-3) var(--sp-4);margin:var(--sp-3) 0;background:var(--paper-card)}
+.hl{border-left:3px solid var(--olive)}.hl .t{font-size:var(--t-small);color:var(--ink-mut);font-weight:700;margin-bottom:3px}
+.warn-box{border-left:3px solid var(--sand);background:var(--warn-band)}.warn-box .t{font-size:var(--t-small);color:var(--warn);font-weight:700;margin-bottom:3px}
+.chart{background:var(--paper-card);border:1px solid var(--line);border-radius:var(--r-l);padding:var(--sp-3) var(--sp-2) var(--sp-2);margin:var(--sp-3) 0;box-shadow:var(--shadow)}
+.chart .cap{font-size:var(--t-small);font-weight:700;padding:0 var(--sp-1) 5px}
+.chart .sub{font-size:var(--t-tiny);color:var(--ink-faint);padding:0 var(--sp-1) var(--sp-2)}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.bar{fill:var(--olive)}.bar.dim{fill:var(--sand)}
+.axis{fill:var(--ink-faint);font-size:11px;font-family:var(--ff)}
+.val-l{fill:var(--ink);font-size:11px;font-weight:700;font-family:var(--ff)}
+.foot{margin-top:var(--sp-6);padding-top:var(--sp-3);border-top:1px solid var(--line);font-size:var(--t-small);color:var(--ink-faint);line-height:var(--lh-lead)}
+.foot .next{font-weight:700;color:var(--ink)}
+@media print{body{background:#fff}.card,.chart,.tw{box-shadow:none;break-inside:avoid}h2{break-after:avoid}}
+</style></head>
+<body><main class="wrap">
+
+<div class="head"><h1>고객 여정 맵</h1><span class="tag sample">[샘플]</span></div>
+<p class="meta">A브랜드(가상) · 리텐션캠페인 3단계 · 주인공 세그먼트 이탈 조짐·잠재 충성 · 기준 2026-09-01 · 사내 분석용</p>
+
+<div class="kpi">
+  <div class="card"><div class="lab">결제완료율 (결제시작 대비)</div><div class="val">22.2<span class="unit">%</span></div><div class="dlt down">▼ 5~6월 48.4%에서</div><div class="base">7월 1~29일 · 퍼널 파일</div></div>
+  <div class="card"><div class="lab">유입 → 가입</div><div class="val">12.6<span class="unit">%</span></div><div class="dlt none">석 달 내내 같은 수준</div><div class="base">90일 · 유입 190,290</div></div>
+  <div class="card"><div class="lab">120일 넘긴 기존 고객</div><div class="val">110<span class="unit">명</span></div><div class="dlt none">전체 320명의 34.4%</div><div class="base">064·065 · 구매이력 파일</div></div>
+  <div class="card"><div class="lab">재구매 알림 접점</div><div class="val">공백</div><div class="dlt none">카카오 채널 없음 · 이메일 월 1회</div><div class="base">연습용 프로필 §5</div></div>
+</div>
+
+<div class="warn-box"><div class="t">자료 충돌 · 두 파일을 섞지 않았습니다</div>퍼널 파일(90일, 결제완료 1,526건)과 구매이력 파일(8개월, 주문 428건)은 만든 기준이 달라 서로 더하거나 나누지 않았습니다. 인지·탐색·구매는 전체 방문자, 재구매는 기존 구매 고객 기준입니다.</div>
+
+<h2>⑧ 퍼널 + ⑨ 감정 곡선</h2>
+<figure class="chart">
+  <p class="cap">어디서 떨어지나 · 5~6월과 7월 <span class="tag sample">[샘플]</span></p>
+  <p class="sub">막대 높이는 로그 눈금 · 넓은 모래색 = 5~6월(61일) · 좁은 올리브색 = 7월(1~29일) · 아래 숫자는 앞 단계 대비 넘어간 비율</p>
+  <svg viewBox="0 0 720 240" role="img" aria-label="결제시작에서 결제완료로 넘어가는 비율이 5~6월 48.4%에서 7월 22.2%로 떨어졌습니다. 가입률 12.6%와 장바구니·결제시작 전환은 두 기간이 거의 같습니다. 재구매는 다른 자료라 퍼널에 잇지 않았습니다.">
+    <text class="val-l" x="90" y="22" text-anchor="middle">유입</text>
+    <text class="val-l" x="200" y="22" text-anchor="middle">가입</text>
+    <text class="val-l" x="310" y="22" text-anchor="middle">장바구니</text>
+    <text class="val-l" x="420" y="22" text-anchor="middle">결제시작</text>
+    <text class="val-l" x="530" y="22" text-anchor="middle">결제완료</text>
+    <text class="val-l" x="650" y="22" text-anchor="middle">재구매</text>
+    <rect class="bar dim" x="58" y="42.1" width="64" height="145.8" rx="3"/>
+    <rect class="bar dim" x="168" y="63.2" width="64" height="103.6" rx="3"/>
+    <rect class="bar dim" x="278" y="76" width="64" height="78.1" rx="3"/>
+    <rect class="bar dim" x="388" y="81.9" width="64" height="66.2" rx="3"/>
+    <rect class="bar dim" x="498" y="89.3" width="64" height="51.4" rx="3"/>
+    <polygon points="107,49.7 183,70.7 183,159.3 107,180.3" fill="var(--olive)" fill-opacity=".18"/>
+    <polygon points="217,70.7 293,83.5 293,146.5 217,159.3" fill="var(--olive)" fill-opacity=".18"/>
+    <polygon points="327,83.5 403,89.4 403,140.6 327,146.5" fill="var(--olive)" fill-opacity=".18"/>
+    <polygon points="437,89.4 513,104.7 513,125.3 437,140.6" fill="var(--down)" fill-opacity=".18"/>
+    <rect class="bar" x="73" y="49.7" width="34" height="130.6" rx="3"/>
+    <rect class="bar" x="183" y="70.7" width="34" height="88.6" rx="3"/>
+    <rect class="bar" x="293" y="83.5" width="34" height="63.1" rx="3"/>
+    <rect class="bar" x="403" y="89.4" width="34" height="51.2" rx="3"/>
+    <rect x="513" y="104.7" width="34" height="20.6" rx="3" fill="var(--down)"/>
+    <rect x="615" y="85" width="70" height="60" rx="3" fill="none" stroke="var(--ink-fade)" stroke-dasharray="4 3"/>
+    <text class="axis" x="650" y="112" text-anchor="middle">다른 자료</text>
+    <text class="axis" x="650" y="126" text-anchor="middle">알림 공백</text>
+    <text class="axis" x="4" y="208">5~6월</text>
+    <text class="axis" x="4" y="226">7월</text>
+    <text class="axis" x="145" y="208" text-anchor="middle">12.6%</text>
+    <text class="axis" x="255" y="208" text-anchor="middle">28.6%</text>
+    <text class="axis" x="365" y="208" text-anchor="middle">55.6%</text>
+    <text class="axis" x="475" y="208" text-anchor="middle">48.4%</text>
+    <text class="axis" x="145" y="226" text-anchor="middle">12.7%</text>
+    <text class="axis" x="255" y="226" text-anchor="middle">28.6%</text>
+    <text class="axis" x="365" y="226" text-anchor="middle">55.7%</text>
+    <text class="axis" x="475" y="226" text-anchor="middle" style="fill:var(--down);font-weight:700">▼ 22.2%</text>
+  </svg>
+  <svg viewBox="0 0 720 170" role="img" aria-label="감정 곡선. 인지 +1, 탐색 0, 구매 -2, 재구매 -2. 구매와 재구매가 가장 낮습니다.">
+    <line x1="40" x2="700" y1="30" y2="30" stroke="var(--line)"/><text class="axis" x="32" y="34" text-anchor="end">+2</text>
+    <line x1="40" x2="700" y1="55" y2="55" stroke="var(--line)"/><text class="axis" x="32" y="59" text-anchor="end">+1</text>
+    <line x1="40" x2="700" y1="80" y2="80" stroke="var(--line-strong)"/><text class="axis" x="32" y="84" text-anchor="end">0</text>
+    <line x1="40" x2="700" y1="105" y2="105" stroke="var(--line)"/><text class="axis" x="32" y="109" text-anchor="end">-1</text>
+    <line x1="40" x2="700" y1="130" y2="130" stroke="var(--line)"/><text class="axis" x="32" y="134" text-anchor="end">-2</text>
+    <polyline fill="none" stroke="var(--olive)" stroke-width="2" points="90,55 255,80 475,130 650,130"/>
+    <circle cx="90" cy="55" r="5" fill="var(--olive)"/>
+    <circle cx="255" cy="80" r="5" fill="var(--olive)"/>
+    <circle cx="475" cy="130" r="5" fill="var(--down)"/>
+    <circle cx="650" cy="130" r="5" fill="var(--down)"/>
+    <text class="axis" x="487" y="148" style="fill:var(--down)">▼ -2 [추정]</text>
+    <text class="axis" x="662" y="148" style="fill:var(--down)">▼ -2</text>
+    <text class="val-l" x="90" y="164" text-anchor="middle">인지</text>
+    <text class="val-l" x="255" y="164" text-anchor="middle">탐색</text>
+    <text class="val-l" x="475" y="164" text-anchor="middle">구매</text>
+    <text class="val-l" x="650" y="164" text-anchor="middle">재구매</text>
+  </svg>
+  <p class="sub">읽기 — 가입과 장바구니 전환은 두 기간이 같습니다. 7월에 새로 꺾인 곳은 결제 단계 하나이고, 모든 채널·기기에서 같은 폭이라 결제 페이지 쪽 변화가 의심됩니다. 실제 주문 감소인지 추적 누락인지는 몰 관리자 주문 수로 확인해야 합니다. 감정은 인지·탐색·구매가 [추정], 재구매만 리뷰 인용입니다.</p>
+</figure>
+
+<h2>이탈점 TOP 3</h2>
+<div class="tw"><table>
+  <thead><tr><th>#</th><th>지점</th><th>모집단</th><th>근거</th><th>개입 스킬</th></tr></thead>
+  <tbody>
+    <tr><td class="rank">1</td><td>구매 · 결제시작→결제완료 <span class="b down">▼ 7월 급락</span></td><td>전체 방문자</td><td>5~6월 48.4% → 7월 22.2% · 7/1 첫 주 22.4%, 직전 주 49.0% · 채널별 15.8~24.3%로 전부 같은 폭</td><td>체인 밖 · 7월 주문 수 대조 → 필요하면 048</td></tr>
+    <tr><td class="rank">2</td><td>재구매 · 알림 공백 <span class="b warn">체인 우선</span></td><td>기존 구매 고객 320명</td><td>120일 넘긴 110명(34.4%) · 재구매 간격 중앙값 77일 · 「다 쓴 줄도 몰랐다」</td><td>075 · 077 · 074</td></tr>
+    <tr><td class="rank">3</td><td>탐색 · 가입→장바구니</td><td>전체 방문자</td><td>가입자의 71.4% 이탈 · 모바일 26.5% vs PC 36.0% · 유입의 78%가 모바일</td><td>048 · 051</td></tr>
+  </tbody>
+  <caption>모집단이 달라 규모를 직접 비교하지 않았습니다 · 순위는 감정 낙폭 → 최근 악화 → 규모 순</caption>
+</table></div>
+
+<h2>재구매 단계 · 세그먼트별</h2>
+<div class="tw"><table>
+  <thead><tr><th></th><th>잠재 충성</th><th>이탈 조짐</th></tr></thead>
+  <tbody>
+    <tr><td>규모</td><td>76명 · 매출 기여 18.0%</td><td>64명 · 매출 기여 18.1%</td></tr>
+    <tr><td>지금 어디</td><td>첫 구매 후 33~107일 · 재구매가 몰리는 구간</td><td>108~164일 · 평소 주기를 벗어나는 중</td></tr>
+    <tr><td>감정</td><td>-1 [추정]</td><td>-2 「다 쓴 줄도 몰랐다」</td></tr>
+    <tr><td>개입</td><td>075 · 첫 구매 후 50~60일 소진 리마인드</td><td>075·077 · 120일 도달 전 리마인드 + 기한 있는 혜택</td></tr>
+  </tbody>
+</table></div>
+
+<div class="hl"><div class="t">체인 밖 별도 권고</div>7월 결제 급락은 확정이 아니라 확인할 일입니다. 운영자가 3영업일 안에 자사몰 7월 결제완료 주문 수를 퍼널의 275건과 대조합니다. 실제 감소면 048을 따로 돌리고 077의 할인·쿠폰 발송만 미룹니다. 기다리는 동안 120일을 새로 넘는 이탈 조짐 고객은 3일 안 0명, 7일 안 11명입니다.</div>
+
+<div class="foot">
+  <p class="next">다음 · 4단계 075 카카오 알림 설계</p>
+  <p>자료: A브랜드-퍼널-가입구매-90일.csv(2026-05-01~07-29) · 064·065 산출물 · 연습용 프로필 · 모두 [샘플]</p>
+  <p>해설 073-customer-journey-map.md · 표 073-customer-journey-map.xlsx</p>
+</div>
+</main></body></html>

@@ -621,8 +621,13 @@ export function replayFind(cwd) {
   for (const name of names) {
     const file = path.join(대본뿌리(), name, '대본.json');
     if (!fs.existsSync(file)) continue;
+    // 체인 장은 outputs/{월}-{체인}/ · 스킬 하나로 이어지는 장(12장 091 등)은 outputs/{날짜}/{스킬 폴더}/
     let dirs = [];
-    try { dirs = fs.readdirSync(path.join(cwd, 'outputs')).filter(d => d.endsWith(`-${name}`)); } catch { continue; }
+    try {
+      const top = fs.readdirSync(path.join(cwd, 'outputs'));
+      dirs = /^\d{3}-/.test(name) ? top.filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)).map(d => path.join(d, name))
+        : top.filter(d => d.endsWith(`-${name}`));
+    } catch { continue; }
     for (const d of dirs) {
       const folder = path.join(cwd, 'outputs', d);
       const planFile = path.join(folder, 'plan.json');
@@ -636,24 +641,50 @@ export function replayFind(cwd) {
     const plan = JSON.parse(fs.readFileSync(best.planFile, 'utf8'));
     if (!['awaiting-approval', 'approved'].includes(plan.status)) return null;
     if (plan.형식 && Object.keys(plan.형식).length) return null;
-    const own = `outputs/${path.basename(best.folder)}/`;
+    const own = `${path.relative(cwd, best.folder).split(path.sep).join('/')}/`;
+    const 기록장 = /^\d{3}-/.test(best.name);   // 기록을 읽는 장은 작업 폴더의 기록·결과가 재료다
     for (const st of plan.steps || []) for (const v of st.inputs || []) {
       const ref = String(v?.path ?? v).replace(/^package:/, 'plugin:');
       const rel = ref.replace(/^workspace:/, '');
       if (ref.startsWith('plugin:sample-data/') || rel.startsWith(own) || rel.startsWith('inputs/')) continue;
+      if (기록장 && /^(logs|outputs|brand)\//.test(rel)) continue;
       return null;   // 독자 자료가 섞였으면 독자 기준
     }
     const data = JSON.parse(fs.readFileSync(best.file, 'utf8'));
     const statePath = path.join(best.folder, '.대본.json');
     let state = { next: 0, done: false };
     try { state = { ...state, ...JSON.parse(fs.readFileSync(statePath, 'utf8')) }; } catch { /* 처음 */ }
-    return { ...best, plan, data, state, statePath, 월: path.basename(best.folder).slice(0, 7) };
+    const 날짜폴더 = path.basename(path.dirname(best.folder));
+    return { ...best, plan, data, state, statePath, 월: (/^\d{3}-/.test(best.name) ? 날짜폴더 : path.basename(best.folder)).slice(0, 7), 날짜: 날짜폴더 };
   } catch { return null; }
+}
+
+/** 계획 없이 첫 말로 시작하는 대본(13장 등) · 상태는 outputs/.대본-{이름}.json 에 둔다 */
+function replayOpening(cwd, prompt) {
+  if (!cwd || !profileIsEmpty(cwd)) return null;
+  let names = [];
+  try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
+  for (const name of names) {
+    const file = path.join(대본뿌리(), name, '대본.json');
+    let data;
+    try { data = JSON.parse(fs.readFileSync(file, 'utf8')); } catch { continue; }
+    if (!data.무계획) continue;
+    const statePath = path.join(cwd, 'outputs', `.대본-${name}.json`);
+    let state = null;
+    try { state = JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch { /* 아직 안 열림 */ }
+    const first = (data.turns?.[0]?.user || []).some(u => 말(u) === 말(prompt));
+    if (state?.done) { if (!first) continue; state = null; }   // 다 끝난 대본도 첫 말을 다시 하면 처음부터
+    if (!state && !first) continue;
+    const d = new Date(); const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;   // 사용자 시각 기준
+    const folder = path.join(cwd, 'outputs', today);
+    return { name, file, folder, planFile: null, plan: null, data, state: state || { next: 0, done: false }, statePath, 월: today.slice(0, 7), 날짜: today };
+  }
+  return null;
 }
 
 /** 사람 말 한 마디를 대본에 대 본다 · 맞으면 그 턴의 파일을 놓고 화면을 돌려준다 */
 export function replayStep(cwd, prompt) {
-  const r = replayFind(cwd);
+  const r = replayFind(cwd) || replayOpening(cwd, prompt);
   if (!r || r.state.done) return null;
   const turns = r.data.turns || [];
   const said = 말(prompt);
@@ -667,11 +698,12 @@ export function replayStep(cwd, prompt) {
   const save = st => { try { fs.writeFileSync(r.statePath, JSON.stringify(st, null, 1)); } catch { /* 무시 */ } };
   if (k < 0) {
     if (r.state.next === 0) return null;   // 계획 승인 전의 말은 대본 밖이 아니다
+    try { fs.mkdirSync(path.dirname(r.statePath), { recursive: true }); } catch { /* 무시 */ }
     save({ ...r.state, done: true, reason: '원고에 없는 말' });
     return { ended: true };
   }
   const t = turns[k];
-  const fill = v => v.replaceAll('{월}', r.월);
+  const fill = v => v.replaceAll('{월}', r.월).replaceAll('{날짜}', r.날짜);
   for (const rel of t.files || []) {
     const src = path.join(path.dirname(r.file), 'files', rel);
     const dst = path.join(r.folder, rel);
@@ -679,8 +711,9 @@ export function replayStep(cwd, prompt) {
     if (/\.(md|html|csv|txt)$/i.test(rel)) fs.writeFileSync(dst, fill(fs.readFileSync(src, 'utf8')));
     else fs.copyFileSync(src, dst);
   }
+  try { fs.mkdirSync(path.dirname(r.statePath), { recursive: true }); } catch { /* 무시 */ }
   save({ next: k + 1, done: k + 1 >= turns.length, pending: k });
-  return { turn: t, k, total: turns.length, screen: fill(t.screen), 장: r.data.장, plan: path.relative(cwd, r.planFile), folder: path.relative(cwd, r.folder) };
+  return { turn: t, k, total: turns.length, screen: fill(t.screen), 장: r.data.장, plan: r.planFile ? path.relative(cwd, r.planFile) : null, folder: path.relative(cwd, r.folder), 날짜: r.날짜 };
 }
 
 /** 대본이 진행 중인가 · 진행 중이면 결과 파일을 지어 쓰지 못한다 */

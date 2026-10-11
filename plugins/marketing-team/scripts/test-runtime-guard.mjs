@@ -584,7 +584,27 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · 책 실습 강제 4 · 대본 7 · ✅');
+  // 계획 없이 첫 말로 시작하는 대본(13장) · 프로필을 채우면 돌지 않는다
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-opening-'));
+    try {
+      fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.mkdirSync(path.join(ws, 'outputs'));
+      fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
+      const say = prompt => {
+        const r = spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'team-context.mjs')], { input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', cwd: ws, prompt }), encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: ws } });
+        return r.stdout.trim() ? JSON.parse(r.stdout).hookSpecificOutput.additionalContext : '';
+      };
+      assert.match(say('추가로 내가 만들면 좋을 스킬을 제안해줘'), /책 실습 · 13장/, '첫 말로 시작하는 대본을 잡지 못했다');
+      assert.doesNotMatch(say('3개 모두 제작해줘'), /책 실습/, '대본이 끝난 뒤에도 원고 답변을 넘겼다');
+      fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
+      fs.rmSync(path.join(ws, 'outputs', '.대본-13장-스킬제안.json'), { force: true });
+      assert.doesNotMatch(say('추가로 내가 만들면 좋을 스킬을 제안해줘'), /책 실습/, '프로필을 채웠는데 대본을 돌렸다');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · 책 실습 강제 4 · 대본 7 · 첫 말 대본 3 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
