@@ -56,6 +56,15 @@ check('선언이 없어도 .md 산출물이면 우리말 검사가 돈다', hard
 r = await runChecks({ outputs: ['workspace:out/good.csv'] }, resolve);
 check('표만 낸 실행에는 우리말 검사가 돌지 않는다', hard(r).length === 0);
 
+// 책 실습 · 기준본(원고 결과)을 그대로 놓은 파일은 원고에 남은 「축」으로 막지 않는다 · 한 글자라도 바꾸면 잡는다
+const 원고 = fs.readFileSync(new URL('../sample-data/참고결과/002-competitor-analysis/002-competitor-analysis.md', import.meta.url), 'utf8');
+write('outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md', 원고.replaceAll('{날짜}', '2026-10-12'));
+r = await runChecks({ outputs: ['workspace:outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md'] }, resolve);
+check('책 실습으로 놓은 원고 결과는 「축」으로 막지 않는다', !hard(r).some(l => l.includes('「축」')));
+write('outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md', 원고.replaceAll('{날짜}', '2026-10-12') + '\n3축 정리\n');
+r = await runChecks({ outputs: ['workspace:outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md'] }, resolve);
+check('원고 결과를 고친 파일은 「축」을 잡는다', hard(r).some(l => l.includes('「축」')));
+
 write('out/clean.md', '결과는 여기 저장했습니다 · outputs/2026-08-30/result.md\n');
 r = await runChecks({ outputs: ['workspace:out/clean.md'], checks: ['house-style'] }, resolve);
 check('깨끗한 문서는 통과한다', r.length === 0);
@@ -72,4 +81,4 @@ check('모르는 검사 이름을 잡는다', hard(r).some(l => l.includes('모�
 check('검사 목록이 노출된다', AVAILABLE_CHECKS.includes('pii') && AVAILABLE_CHECKS.includes('csv-format'));
 
 fs.rmSync(root, { recursive: true, force: true });
-console.log(`산출물 검사 · CSV 형식 4 · 우리말 7 · 미선언·오타 3 · ✅ (${pass})`);
+console.log(`산출물 검사 · CSV 형식 4 · 우리말 9 · 미선언·오타 3 · ✅ (${pass})`);

@@ -88,12 +88,32 @@ function checkCsvFormat(run, resolve) {
   return issues;
 }
 
+/** 책 실습으로 놓은 원고 결과인가 · 기준본(sample-data/참고결과)의 같은 이름 파일과 날짜만 다르면 그렇다 */
+const 참고결과 = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'sample-data', '참고결과');
+let 기준본목록 = null;
+function 원고결과다(abs, text) {
+  if (!기준본목록) {
+    기준본목록 = new Map();
+    const walk = d => { for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const f = path.join(d, e.name);
+      if (e.isDirectory()) walk(f); else if (TEXT_EXT.test(e.name)) 기준본목록.set(e.name, [...(기준본목록.get(e.name) || []), f]);
+    } };
+    try { walk(참고결과); } catch { /* 기준본이 없으면 없다 */ }
+  }
+  const day = (abs.split(path.sep).join('/').match(/\/outputs\/(\d{4}-\d{2}-\d{2})\//) || [])[1];
+  const month = (abs.split(path.sep).join('/').match(/\/outputs\/(\d{4}-\d{2})/) || [])[1];
+  return (기준본목록.get(path.basename(abs)) || []).some(f =>
+    fs.readFileSync(f, 'utf8').replaceAll('{날짜}', day ?? '{날짜}').replaceAll('{월}', month ?? '{월}') === text);
+}
+
 /** 우리 내부의 말이 사용자 화면에 나갔는가 */
 function checkHouseStyle(run, resolve) {
   const issues = [];
   for (const [ref, abs] of targetsOf(run, resolve)) {
     if (!TEXT_EXT.test(abs)) continue;
     const text = fs.readFileSync(abs, 'utf8');
+    // 책 실습은 원고 결과를 글자 그대로 놓는다 · 원고 파일에 남은 「축」으로 차단하면 원고 화면을 낼 수 없다 (실측 2026-10-12 · 002)
+    if (원고결과다(abs, text)) continue;
     for (const [term, instead] of HARD_TERMS) {
       const n = text.split(term).length - 1;
       if (n) issues.push(`내부의 말이 산출물에 나왔습니다: \`${term}\` ${n}회 → ${instead} · ${ref}`);
