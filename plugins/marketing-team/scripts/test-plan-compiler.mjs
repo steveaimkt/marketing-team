@@ -135,9 +135,9 @@ try {
   // 실측 2026-09-14·09-15 · 10장 045→046→043 이 이 필드가 비어 각자 폴더 규칙을 못 타고
   // 마지막 스킬 폴더로 몰렸다.
   {
-    const chainDir = path.join(temp, 'outputs', '2026-09-추적', '045-weekly-ads-report');
+    const chainDir = path.join(temp, 'outputs', '2026-09-광고애널리틱스', '045-weekly-ads-report');
     fs.mkdirSync(chainDir, { recursive: true });
-    const chainRel = 'outputs/2026-09-추적';
+    const chainRel = 'outputs/2026-09-광고애널리틱스';
     const wsRef = (skillDir, name) => `workspace:${chainRel}/${skillDir}/${name}`;
     const chainPlan = {
       schema: 'marketing-team.plan/v1',
@@ -176,6 +176,14 @@ try {
     const onDisk = JSON.parse(fs.readFileSync(path.join(temp, chainPlanRel), 'utf8'));
     assert.equal(onDisk.chain, '광고애널리틱스', 'compile 은 정본과 일치하는 체인 이름을 top-level plan.chain 에 채워야 한다');
     assert.equal(onDisk.chain_graph.chain, '광고애널리틱스', 'chain_graph.chain 도 그대로 유지돼야 한다');
+    // 팀 이름으로 폴더를 지으면 막는다 · 원고와 책 실습 대본은 outputs/{YYYY-MM}-광고애널리틱스/ 다 (실측 2026-10-12 · 10장)
+    const teamRel = 'outputs/2026-09-퍼포먼스마케팅팀';
+    fs.mkdirSync(path.join(temp, teamRel), { recursive: true });
+    const teamPlan = JSON.parse(JSON.stringify(chainPlan).replaceAll(chainRel, teamRel));
+    fs.writeFileSync(path.join(temp, teamRel, 'plan.json'), `${JSON.stringify(teamPlan, null, 2)}\n`);
+    const team = cli('plan-compiler.mjs', 'compile', `${teamRel}/plan.json`);
+    assert.notEqual(team.status, 0, '체인 폴더가 아닌 곳(팀 이름 폴더)에 둔 체인 계획은 compile 이 막아야 한다');
+    assert.match(team.stderr + team.stdout, /outputs\/\{YYYY-MM\}-광고애널리틱스\//, '어디로 옮길지 알려야 한다');
   }
 
   // ── 계획 화면은 스크립트가 찍는다 · 틀이 있는 스킬은 「찍힌 화면」과 글자 단위로 같아야 한다 (2026-09-15) ──
@@ -294,7 +302,7 @@ try {
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · ✅`);
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

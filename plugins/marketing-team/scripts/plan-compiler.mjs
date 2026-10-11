@@ -868,6 +868,18 @@ if (isCli) {
     // 10장 045→046→043 이 「자기 폴더」 규칙이 이미 있었는데도 마지막 스킬 폴더로 몰렸다 —
     // plan.json 에 chain 이 끝내 비어 있었기 때문이다.
     if (graph.chain) plan.chain = graph.chain;
+    // 이름 있는 체인은 outputs/{YYYY-MM}-{체인}/ 에 쌓는다 · 팀 이름으로 부르면 모델이 「2026-10-퍼포먼스마케팅팀」처럼
+    // 폴더를 지어 원고(광고애널리틱스)와 달라지고 책 실습 대본도 열리지 않았다 (실측 2026-10-12 · 10장)
+    if (plan.chain) {
+      const 자리 = new RegExp(`^(workspace:)?outputs/\\d{4}-\\d{2}-${plan.chain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`);
+      const 틀림 = (plan.steps || []).flatMap(st => st.outputs || []).map(v => String(v?.path ?? v)).filter(v => !자리.test(v));
+      const 여기 = path.relative(process.cwd(), path.dirname(file)).split(path.sep).join('/');
+      if (!자리.test(`${여기}/`)) 틀림.unshift(`plan.json (${여기}/)`);
+      if (틀림.length) {
+        for (const v of 틀림) console.error(`⛔ 체인 「${plan.chain}」의 결과는 outputs/{YYYY-MM}-${plan.chain}/ 아래에 둡니다 · ${v}`);
+        failPlan(`체인 폴더 이름이 다릅니다 · plan.json 과 outputs 를 outputs/{YYYY-MM}-${plan.chain}/ 아래로 옮겨 다시 compile 하세요`);
+      }
+    }
     plan.plan_sha256 = planHash(plan);
     plan.status = 'awaiting-approval';
     plan.approved_sha256 = null;
