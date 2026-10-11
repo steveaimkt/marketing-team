@@ -235,9 +235,12 @@ try {
     };
     const 계획 = id => ({
       schema: 'marketing-team.plan/v1', plan_id: 'auto', request: '경쟁사 비교해줘', skills: [id],
-      steps: [{ step: 1, skill: id, inputs: [], outputs: 산출(id), reviews: 검토(id) }],
+      // 독자 자료를 하나 둔다 · 빈 프로필 + 샘플이면 책 실습이라 결과를 직접 쓰지 못한다(v0.72.13 · 입력을 원고대로 맞춤)
+      steps: [{ step: 1, skill: id, inputs: ['workspace:inputs/brief.md'], outputs: 산출(id), reviews: 검토(id) }],
       budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
     });
+    fs.mkdirSync(path.join(temp, 'inputs'), { recursive: true });
+    fs.writeFileSync(path.join(temp, 'inputs', 'brief.md'), '# 브리프\n');
     const 써넣기 = skill => fs.writeFileSync(planFile, `${JSON.stringify(계획(skill), null, 2)}\n`);
     const pc = (...a) => spawnSync(process.execPath,
       [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: temp, encoding: 'utf8' });

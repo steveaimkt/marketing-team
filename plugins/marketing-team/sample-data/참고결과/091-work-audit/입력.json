@@ -1,0 +1,1 @@
+{ "설명": "책 실습 계획의 입력 · 원고 계획 화면의 「분석할 자료」 줄이 이 입력으로 찍힌다", "입력": ["workspace:logs/build-log.md", "workspace:outputs"] }

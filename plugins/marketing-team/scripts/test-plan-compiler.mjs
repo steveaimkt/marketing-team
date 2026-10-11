@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -273,7 +273,28 @@ try {
     assert.equal(frontmatterList(정본, 'writes_to').length, 2, '정본 목록을 못 읽었다');
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · ✅`);
+  // 책 실습이면 계획 입력을 원고 계획의 입력으로 맞춘다 (실측 2026-10-12 · 「분석할 자료」 줄이 모델 입력에 따라 흔들렸다)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'book-inputs-'));
+    try {
+      const D = '2026-10-12';
+      for (const f of ['006-review-mining/006-review-mining-해설.md', '002-competitor-analysis/002-competitor-analysis.md']) {
+        fs.mkdirSync(path.join(ws, 'outputs', D, path.dirname(f)), { recursive: true });
+        fs.writeFileSync(path.join(ws, 'outputs', D, f), 'x');
+      }
+      const 계획 = (skill, folder, inputs) => ({ steps: [{ step: 1, skill, inputs, outputs: [`workspace:outputs/${D}/${folder}/${folder}.md`] }] });
+      const a = 계획('002', '002-competitor-analysis', ['plugin:sample-data/경쟁사-3곳.md', `workspace:outputs/${D}/006-review-mining/006-review-mining-해설.md`]);
+      assert.deepEqual(bookInputs(a, ws), ['plugin:sample-data/경쟁사-3곳.md'], '002 는 원고처럼 샘플만 입력이어야 한다');
+      const b = 계획('011', '011-product-concept-ideation', ['plugin:sample-data/profile-sample.md']);
+      assert.equal(bookInputs(b, ws)?.length, 2, '011 은 원고처럼 006·002 결과를 입력으로 맞춰야 한다');
+      const c = 계획('011', '011-product-concept-ideation', ['workspace:inputs/내자료.md']);
+      assert.equal(bookInputs(c, ws), null, '독자 자료가 있는데 입력을 바꿨다');
+      fs.mkdirSync(path.join(ws, 'brand')); fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
+      assert.equal(bookInputs(계획('011', '011-product-concept-ideation', []), ws), null, '프로필을 채웠는데 입력을 바꿨다');
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

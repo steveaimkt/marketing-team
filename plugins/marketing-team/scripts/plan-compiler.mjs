@@ -641,6 +641,30 @@ export function bookCheck(plan, cwd) {
   return { ok: true, ref, outs, day, placed, sameAsRef, canon, text };
 }
 
+/**
+ * 책 실습이면 계획의 입력을 원고 계획의 입력으로 맞춘다. 계획 화면의 「분석할 자료」 줄은 모델이 plan.json 에
+ * 적은 입력으로 찍히는데, 모델마다 앞 결과를 넣기도 빼기도 해서 원고와 달라졌다 (실측 2026-10-12 · 002 에 006 을
+ * 넣어 원고의 샘플 문장이 빠짐 · 011·091 은 앞 결과를 빼먹음). 기준본의 입력.json 이 원고 화면을 찍는 입력이다.
+ * 빈 프로필이고 inputs/ 의 자기 자료가 없을 때만, 입력.json 의 앞 결과가 실제로 있을 때만 맞춘다.
+ */
+export function bookInputs(plan, cwd) {
+  if (!cwd || !profileIsEmpty(cwd)) return null;
+  const steps = plan.steps || [];
+  if (steps.length !== 1) return null;
+  const folder = skillDeclarations().get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
+  let spec;
+  try { spec = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'sample-data', '참고결과', folder, '입력.json'), 'utf8')); } catch { return null; }
+  const cur = (steps[0].inputs || []).map(v => String(v?.path ?? v));
+  if (cur.some(v => /^workspace:inputs(\/|$)/.test(v))) return null;   // 독자가 자기 자료를 넣었다
+  const day = String(steps[0].outputs?.[0] ?? '').replace(/^workspace:/, '').split('/')[1] || '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null;
+  const want = spec.입력.map(v => v.replaceAll('{날짜}', day));
+  if (!want.every(v => !v.startsWith('workspace:') || fs.existsSync(path.join(cwd, v.slice('workspace:'.length))))) return null;
+  if (JSON.stringify(cur) === JSON.stringify(want)) return null;
+  steps[0].inputs = want;
+  return want;
+}
+
 /* ── 책 실습 대본 · 여러 턴으로 이어지는 장(8~13장) ──────────────────
  * 체인 장은 계획 승인 뒤에도 「제안해줘」「소재 6개 모두 제작」처럼 사람 말이 이어진다. 턴마다 원고 결과
  * 파일과 원고 답변이 정해져 있어 `sample-data/참고결과/대본/{체인}/대본.json` 에 적어 두었다.
@@ -828,6 +852,8 @@ if (isCli) {
   const plan = read(file);
 
   if (command === 'compile') {
+    const forced = bookInputs(plan, process.cwd());
+    if (forced) console.log(`📖 책 실습 · 원고 계획의 입력으로 맞췄다 · ${forced.map(v => v.replace(/^(workspace|plugin):/, '')).join(' · ')}`);
     const issues = validatePlan(plan);
     if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); failPlan(`계획이 계약과 맞지 않습니다 · ${issues.length}건`); }
     plan.schema = SCHEMA;
