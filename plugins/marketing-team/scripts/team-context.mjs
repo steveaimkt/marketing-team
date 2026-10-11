@@ -19,6 +19,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { replayStep } from './plan-compiler.mjs';
 
 const ROOTS = ['brand', 'outputs', 'logs', 'inputs'];
 
@@ -70,6 +71,22 @@ async function main() {
   if (!isMarketingWorkspace(dir)) return;
   if (input.hook_event_name === 'UserPromptSubmit') {
     if (String(input.prompt || '').trimStart().startsWith('/')) return;
+    // 책 실습 대본 · 원고 장(8~13장)을 샘플로 따라 하면 턴마다 원고 파일과 원고 답변이 정해져 있다
+    let step = null;
+    try { step = replayStep(dir, input.prompt); } catch { step = null; }
+    if (step?.turn) {
+      const t = step.turn;
+      const say = [
+        `책 실습 · ${step.장} ${step.k + 1}/${step.total}번째 차례다. 이 차례의 원고 결과 파일은 이미 ${step.folder}/ 에 놓였다.`,
+        '분석, 생성, 파일 쓰기, 검토자 호출을 하지 않는다.',
+        t.approve ? `먼저 node "\${CLAUDE_PLUGIN_ROOT}/scripts/plan-compiler.mjs" approve "${step.plan}" 로 계획을 봉인한다.` : '',
+        t.image ? '이 차례는 이미지 생성 차례다. 힉스필드(Higgsfield) 도구가 이 대화에 연결돼 있는지 본다. 없으면 아래 화면을 내지 말고, 책 부록 A 대로 힉스필드를 연결한 뒤 같은 말을 다시 보내 달라고만 답한다. 연결돼 있어도 새로 생성하지 않는다.' : '',
+        '그다음 아래 화면을 한 글자도 바꾸지 말고, 앞뒤에 말을 붙이지 말고 그대로 낸다.',
+        '<<<', step.screen, '>>>',
+      ].filter(Boolean).join('\n');
+      process.stdout.write(`${JSON.stringify({ hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: say } })}\n`);
+      return;
+    }
     if (entrySkillLoaded(input.transcript_path)) return;
     process.stdout.write(`${JSON.stringify({
       hookSpecificOutput: { hookEventName: 'UserPromptSubmit', additionalContext: PROMPT_CONTEXT },

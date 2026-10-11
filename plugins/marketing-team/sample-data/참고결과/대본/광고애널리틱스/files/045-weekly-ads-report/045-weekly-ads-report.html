@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>주간 광고 리포트 W12 [샘플]</title>
+<style>
+:root{--bg:#f7f6f3;--card:#ffffff;--ink:#1d1d1f;--sub:#6b6b70;--line:#e3e1dc;--accent:#2f5bea;--prev:#c9c7c1;--good:#1f8a4c;--warn:#b7791f;--bad:#c2372b;--bep:#c2372b}
+@media (prefers-color-scheme:dark){:root{--bg:#141416;--card:#1e1e21;--ink:#f1f1f3;--sub:#a0a0a8;--line:#333338;--accent:#7b9bff;--prev:#55555c;--good:#4cc184;--warn:#e0a84a;--bad:#ff6b5e;--bep:#ff6b5e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:22px;margin:0 0 4px}
+h2{font-size:17px;margin:28px 0 10px}
+.meta{color:var(--sub);font-size:13px}
+.tag{display:inline-block;background:var(--ink);color:var(--bg);font-size:12px;padding:1px 8px;border-radius:10px;margin-right:6px}
+.head{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-top:14px}
+.head ol{margin:6px 0 0;padding-left:20px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media (max-width:620px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+.kpi .l{font-size:12px;color:var(--sub)}
+.kpi .v{font-size:21px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi .d{font-size:12px;margin-top:2px}
+.up{color:var(--good)}.down{color:var(--bad)}.flat{color:var(--sub)}
+.tbl{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--sub);font-weight:600;background:transparent}
+tr:last-child td{border-bottom:0}
+.note{font-size:12px;color:var(--sub);margin-top:6px}
+.chart{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px}
+svg{width:100%;height:auto;display:block}
+svg text{fill:var(--ink);font-size:11px}
+svg .s{fill:var(--sub)}
+.legend{font-size:12px;color:var(--sub);margin-bottom:6px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 4px 0 10px;vertical-align:-1px}
+ul.act{list-style:none;padding:0;margin:0}
+ul.act li{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.box h3{font-size:14px;margin:0 0 6px}
+.box ul{margin:0;padding-left:18px}
+footer{margin-top:28px;font-size:12px;color:var(--sub)}
+</style>
+</head>
+<body>
+<main>
+<p><span class="tag">[샘플]</span><span class="meta">가상의 A브랜드(화장품) · 연습용 광고 성과 12주치 · 수치는 실제 우리 브랜드 것이 아닙니다</span></p>
+<h1>주간 광고 리포트 — W12 (8/17~8/23 주)</h1>
+<p class="meta">비교: W11 (8/10~8/16 주) · 매체 4곳 모두 같은 7일 · 손익분기 ROAS 2.0 (공헌이익률 50%, 샘플 프로필 §4)</p>
+
+<div class="head">
+<strong>헤드라인 3줄</strong>
+<ol>
+<li>통합 ROAS <strong>1.55</strong> (전주 2.20, −0.65) · 손익분기 2.0 미달로 <strong>이번 주 약 51만 원 적자</strong>. 12주 중 가장 낮습니다.</li>
+<li>최고 매체는 <strong>쿠팡 3.87</strong> · 광고비를 55% 줄였는데 전환은 17 → 32건으로 늘었습니다.</li>
+<li>조치 필요: <strong>메타 0.71</strong> (광고비 +41%, 클릭률 1.19% → 0.45%) · <strong>네이버쇼핑 0.97</strong> (클릭 1,596 → 536).</li>
+</ol>
+</div>
+
+<div class="kpis">
+<div class="kpi"><div class="l">광고비</div><div class="v">226만</div><div class="d flat">2,261,259원 · 전주 대비 −1.9%</div></div>
+<div class="kpi"><div class="l">광고 매출</div><div class="v">351만</div><div class="d down">3,508,474원 · −30.7%</div></div>
+<div class="kpi"><div class="l">통합 ROAS</div><div class="v down">1.55</div><div class="d down">전주 2.20 · −0.65 · 손익분기 2.0</div></div>
+<div class="kpi"><div class="l">전환</div><div class="v">87건</div><div class="d down">전주 126건 · −31.0%</div></div>
+</div>
+
+<h2>매체 비교표</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>매체</th><th>광고비</th><th>전주 대비</th><th>매출</th><th>ROAS</th><th>전주 ROAS</th><th>CPA</th><th>CTR</th><th>전환율</th><th>주간 손익*</th><th>신호</th></tr></thead>
+<tbody>
+<tr><td>쿠팡</td><td>337,077</td><td>−54.8%</td><td>1,304,000</td><td><strong>3.87</strong></td><td>0.94</td><td>10,533</td><td>1.71%</td><td>1.27%</td><td>+314,923</td><td>🟢</td></tr>
+<tr><td>구글</td><td>861,588</td><td>+19.2%</td><td>1,346,944</td><td>1.56</td><td>1.52</td><td>26,924</td><td>1.49%</td><td>2.20%</td><td>−188,116</td><td>🔴</td></tr>
+<tr><td>네이버쇼핑</td><td>397,921</td><td>+9.3%</td><td>386,150</td><td>0.97</td><td>6.47</td><td>39,792</td><td>0.59%</td><td>1.87%</td><td>−204,846</td><td>🔴</td></tr>
+<tr><td>메타</td><td>664,673</td><td>+40.7%</td><td>471,380</td><td>0.71</td><td>1.91</td><td>51,128</td><td>0.45%</td><td>3.95%</td><td>−428,983</td><td>🔴</td></tr>
+<tr><td><strong>합계</strong></td><td><strong>2,261,259</strong></td><td>−1.9%</td><td><strong>3,508,474</strong></td><td><strong>1.55</strong></td><td>2.20</td><td>25,991</td><td>—</td><td>—</td><td><strong>−507,022</strong></td><td>🔴</td></tr>
+</tbody>
+</table>
+</div>
+<p class="note">* 주간 손익 = 매출 × 공헌이익률 50% − 광고비. 신호: 🟢 ROAS 2.4 초과 · 🟡 1.6~2.4 (손익분기 ±20%) · 🔴 1.6 미만.<br>
+⚠️ 매체마다 전환을 세는 기준(클릭 후 며칠, 조회 기여 포함 여부)이 달라 ROAS를 그대로 맞대면 과신하게 됩니다. 쿠팡은 매체 안 구매, 메타는 조회 기여가 섞일 수 있습니다.<br>
+캠페인 목적 열: 샘플 자료에 캠페인 단위와 목적이 없어 매체 단위로만 비교했습니다. 전부 전환 목적으로 가정했습니다.</p>
+
+<h2>차트 ① 매체별 ROAS · 전주 vs 이번 주</h2>
+<div class="chart">
+<div class="legend"><span class="sw" style="background:var(--prev)"></span>W11 전주<span class="sw" style="background:var(--accent)"></span>W12 이번 주<span class="sw" style="background:var(--bep)"></span>손익분기 2.0</div>
+<svg viewBox="0 0 340 226" role="img" aria-label="매체별 ROAS 막대 차트">
+<g>
+<text x="0" y="28">메타</text>
+<rect x="75" y="12" width="65.5" height="14" rx="2" style="fill:var(--prev)"/><text x="145" y="23" class="s">1.91</text>
+<rect x="75" y="30" width="24.3" height="14" rx="2" style="fill:var(--accent)"/><text x="104" y="41">0.71</text>
+<text x="0" y="80">쿠팡</text>
+<rect x="75" y="64" width="32.2" height="14" rx="2" style="fill:var(--prev)"/><text x="112" y="75" class="s">0.94</text>
+<rect x="75" y="82" width="132.7" height="14" rx="2" style="fill:var(--accent)"/><text x="212" y="93">3.87</text>
+<text x="0" y="132">네이버쇼핑</text>
+<rect x="75" y="116" width="221.9" height="14" rx="2" style="fill:var(--prev)"/><text x="301" y="127" class="s">6.47</text>
+<rect x="75" y="134" width="33.3" height="14" rx="2" style="fill:var(--accent)"/><text x="113" y="145">0.97</text>
+<text x="0" y="184">구글</text>
+<rect x="75" y="168" width="52.1" height="14" rx="2" style="fill:var(--prev)"/><text x="132" y="179" class="s">1.52</text>
+<rect x="75" y="186" width="53.5" height="14" rx="2" style="fill:var(--accent)"/><text x="133" y="197">1.56</text>
+</g>
+<line x1="143.6" y1="6" x2="143.6" y2="206" style="stroke:var(--bep)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="143.6" y="220" text-anchor="middle" style="fill:var(--bep)">BEP 2.0</text>
+<line x1="75" y1="206" x2="315" y2="206" style="stroke:var(--line)"/>
+</svg>
+</div>
+
+<h2>차트 ② 예산 점유율 vs 매출 기여율 · 이번 주</h2>
+<div class="chart">
+<div class="legend"><span class="sw" style="background:var(--prev)"></span>광고비 점유율<span class="sw" style="background:var(--accent)"></span>매출 기여율</div>
+<svg viewBox="0 0 340 214" role="img" aria-label="예산 점유율과 매출 기여율 비교">
+<text x="0" y="28">메타</text>
+<rect x="75" y="12" width="141.1" height="14" rx="2" style="fill:var(--prev)"/><text x="221" y="23" class="s">29.4%</text>
+<rect x="75" y="30" width="64.3" height="14" rx="2" style="fill:var(--accent)"/><text x="144" y="41">13.4% 과대투자</text>
+<text x="0" y="80">쿠팡</text>
+<rect x="75" y="64" width="71.5" height="14" rx="2" style="fill:var(--prev)"/><text x="151" y="75" class="s">14.9%</text>
+<rect x="75" y="82" width="178.6" height="14" rx="2" style="fill:var(--accent)"/><text x="258" y="93">37.2% 과소투자</text>
+<text x="0" y="132">네이버쇼핑</text>
+<rect x="75" y="116" width="84.5" height="14" rx="2" style="fill:var(--prev)"/><text x="164" y="127" class="s">17.6%</text>
+<rect x="75" y="134" width="52.8" height="14" rx="2" style="fill:var(--accent)"/><text x="133" y="145">11.0%</text>
+<text x="0" y="184">구글</text>
+<rect x="75" y="168" width="182.9" height="14" rx="2" style="fill:var(--prev)"/><text x="263" y="179" class="s">38.1%</text>
+<rect x="75" y="186" width="184.3" height="14" rx="2" style="fill:var(--accent)"/><text x="264" y="197">38.4%</text>
+<line x1="75" y1="206" x2="315" y2="206" style="stroke:var(--line)"/>
+</svg>
+</div>
+
+<h2>차트 ③ ROAS 랭킹 · 이번 주 (매체 단위)</h2>
+<div class="chart">
+<svg viewBox="0 0 340 196" role="img" aria-label="이번 주 매체 ROAS 순위">
+<text x="0" y="24">1 쿠팡</text><rect x="75" y="12" width="206.4" height="16" rx="2" style="fill:var(--good)"/><text x="286" y="24">3.87</text>
+<text x="0" y="60">2 구글</text><rect x="75" y="48" width="83.2" height="16" rx="2" style="fill:var(--bad)"/><text x="163" y="60">1.56</text>
+<text x="0" y="96">3 네이버쇼핑</text><rect x="75" y="84" width="51.7" height="16" rx="2" style="fill:var(--bad)"/><text x="131" y="96">0.97</text>
+<text x="0" y="132">4 메타</text><rect x="75" y="120" width="37.9" height="16" rx="2" style="fill:var(--bad)"/><text x="118" y="132">0.71</text>
+<text x="0" y="168" class="s">통합</text><rect x="75" y="156" width="82.7" height="16" rx="2" style="fill:var(--prev)"/><text x="163" y="168" class="s">1.55</text>
+<line x1="181.7" y1="4" x2="181.7" y2="178" style="stroke:var(--bep)" stroke-width="1.5" stroke-dasharray="4 3"/>
+<text x="181.7" y="192" text-anchor="middle" style="fill:var(--bep)">BEP 2.0</text>
+</svg>
+<p class="note">샘플 자료에 캠페인 단위가 없어 TOP 3 / BOTTOM 3 를 매체 4곳 순위로 대신했습니다. 캠페인 단위 파일을 넣으면 캠페인 랭킹으로 바뀝니다.</p>
+</div>
+
+<h2>TOP / BOTTOM + 원인 가설</h2>
+<div class="two">
+<div class="box"><h3>🟢 TOP</h3><ul>
+<li><strong>쿠팡 3.87</strong> — 가설: 광고비를 34만 원대로 낮춘 주에 효율이 오르는 패턴. 12주 중 광고비가 적은 주의 ROAS 6.01, 많은 주 2.00.</li>
+</ul></div>
+<div class="box"><h3>🔴 BOTTOM</h3><ul>
+<li><strong>메타 0.71</strong> — 가설: 광고비를 늘리면서 같은 사람에게 반복 노출돼 소재 피로. CTR 1.19% → 0.45%, CPC 442 → 2,020원.</li>
+<li><strong>네이버쇼핑 0.97</strong> — 가설: 입찰 경쟁으로 노출 순위 하락. CPC 228 → 742원, 클릭 3분의 1로 감소.</li>
+<li><strong>구글 1.56</strong> — 가설: 일시 하락이 아니라 구조적 미달. 12주 중 8주가 손익분기 아래.</li>
+</ul></div>
+</div>
+
+<h2>전주 대비 해석</h2>
+<div class="two">
+<div class="box"><h3>오른 것</h3><ul>
+<li>쿠팡 전환 17 → 32건 (+88%) · 광고비는 줄었는데 늘었다 → 적정 광고비 구간이 전주보다 낮다는 신호 (가설)</li>
+<li>구글 CTR 0.60% → 1.49% · 클릭은 늘었으나 전환율 3.14% → 2.20%로 떨어져 ROAS는 제자리 (가설: 넓은 타깃 유입)</li>
+</ul></div>
+<div class="box"><h3>내린 것</h3><ul>
+<li>메타 ROAS 1.91 → 0.71 · 광고비 +41%가 성과로 이어지지 않음 (가설: 소재 피로)</li>
+<li>네이버쇼핑 ROAS 6.47 → 0.97 · 전주가 이례적으로 높았고 이번 주 전환 10건이라 흔들림이 큽니다 (가설: 경쟁 입찰 + 전주 반짝 효과)</li>
+</ul></div>
+</div>
+
+<h2>12주 흐름 · 통합 ROAS</h2>
+<div class="tbl"><table>
+<thead><tr><th>주</th><th>6/01</th><th>6/08</th><th>6/15</th><th>6/22</th><th>6/29</th><th>7/06</th><th>7/13</th><th>7/20</th><th>7/27</th><th>8/03</th><th>8/10</th><th>8/17</th></tr></thead>
+<tbody><tr><td>ROAS</td><td>2.53</td><td>3.21</td><td>3.91</td><td>2.94</td><td>1.80</td><td>2.33</td><td>1.68</td><td>3.22</td><td>2.67</td><td>1.62</td><td>2.20</td><td><strong>1.55</strong></td></tr></tbody>
+</table></div>
+<p class="note">12주 중 손익분기 미달 주는 4번(6/29 · 7/13 · 8/03 · 8/17). 주마다 흔들림이 커서, 한 주 결과만으로 매체를 끄는 결정은 이릅니다.</p>
+
+<h2>다음 액션</h2>
+<ul class="act">
+<li>☐ <strong>메타 소재 교체</strong> — 광고비를 더 넣기 전에 소재부터 (메타 광고 카피 작성, 스킬 043)</li>
+<li>☐ <strong>예산 재배분 시나리오</strong> — 메타·구글에서 쿠팡·네이버쇼핑으로 옮길 폭을 12주 기준으로 계산 (ROAS 진단, 스킬 046)</li>
+<li>☐ <strong>네이버쇼핑 입찰 확인</strong> — CPC 3배 상승 원인 (네이버 쇼핑광고 진단, 스킬 042)</li>
+<li>☐ <strong>쿠팡 적정 광고비 구간 확인</strong> — 증액 전에 한계 효율 확인 (쿠팡 광고 분석, 스킬 041)</li>
+</ul>
+
+<footer>
+이 결론이 뒤집히는 조건 · 매체별 전환 집계 기준이 다릅니다. 같은 기여 기준(예: 클릭 후 7일)으로 다시 뽑으면 메타·구글 순위가 바뀔 수 있습니다.<br>
+데이터 출처: 연습용 A브랜드 광고매체통합 12주 CSV (메타·쿠팡·네이버쇼핑·구글 모두 CSV, 광고 계정 연결 없음) · 읽기 전용 · 캠페인과 예산은 바꾸지 않았습니다.<br>
+외부 발송·매주 자동 실행: 광고애널리틱스 체인 안이라 묻지 않고 걸지 않았습니다 · Notion 아카이브 미연결.<br>
+정규화 기준: 지출=광고비 · ROAS=매출÷광고비 · CPA=광고비÷전환 · CTR=클릭÷노출 · 전환율=전환÷클릭.<br>
+저장 파일: outputs/{월}-광고애널리틱스/045-weekly-ads-report/045-weekly-ads-report.html
+</footer>
+</main>
+</body>
+</html>

@@ -604,6 +604,91 @@ export function bookCheck(plan, cwd) {
   return { ok: true, ref, outs, day, placed, sameAsRef, canon, text };
 }
 
+/* ── 책 실습 대본 · 여러 턴으로 이어지는 장(8~13장) ──────────────────
+ * 체인 장은 계획 승인 뒤에도 「제안해줘」「소재 6개 모두 제작」처럼 사람 말이 이어진다. 턴마다 원고 결과
+ * 파일과 원고 답변이 정해져 있어 `sample-data/참고결과/대본/{체인}/대본.json` 에 적어 두었다.
+ * 사람 말이 들어올 때(team-context · UserPromptSubmit) 다음 턴과 대조해 맞으면 그 턴의 파일을 놓고 답변을
+ * 넘긴다. 원고에 없는 말이 오면 대본을 끝내고 평소대로 돈다 (저자 결정 2026-10-12).
+ */
+const 대본뿌리 = () => path.join(PLUGIN, 'sample-data', '참고결과', '대본');
+const 말 = v => String(v || '').replace(/[\s.,!?~·'"「」]/g, '');
+
+export function replayFind(cwd) {
+  if (!cwd || !profileIsEmpty(cwd)) return null;
+  let names = [];
+  try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
+  let best = null;
+  for (const name of names) {
+    const file = path.join(대본뿌리(), name, '대본.json');
+    if (!fs.existsSync(file)) continue;
+    let dirs = [];
+    try { dirs = fs.readdirSync(path.join(cwd, 'outputs')).filter(d => d.endsWith(`-${name}`)); } catch { continue; }
+    for (const d of dirs) {
+      const folder = path.join(cwd, 'outputs', d);
+      const planFile = path.join(folder, 'plan.json');
+      if (!fs.existsSync(planFile)) continue;
+      const at = fs.statSync(planFile).mtimeMs;
+      if (!best || at > best.at) best = { at, name, file, folder, planFile };
+    }
+  }
+  if (!best) return null;
+  try {
+    const plan = JSON.parse(fs.readFileSync(best.planFile, 'utf8'));
+    if (!['awaiting-approval', 'approved'].includes(plan.status)) return null;
+    if (plan.형식 && Object.keys(plan.형식).length) return null;
+    const own = `outputs/${path.basename(best.folder)}/`;
+    for (const st of plan.steps || []) for (const v of st.inputs || []) {
+      const ref = String(v?.path ?? v).replace(/^package:/, 'plugin:');
+      const rel = ref.replace(/^workspace:/, '');
+      if (ref.startsWith('plugin:sample-data/') || rel.startsWith(own) || rel.startsWith('inputs/')) continue;
+      return null;   // 독자 자료가 섞였으면 독자 기준
+    }
+    const data = JSON.parse(fs.readFileSync(best.file, 'utf8'));
+    const statePath = path.join(best.folder, '.대본.json');
+    let state = { next: 0, done: false };
+    try { state = { ...state, ...JSON.parse(fs.readFileSync(statePath, 'utf8')) }; } catch { /* 처음 */ }
+    return { ...best, plan, data, state, statePath, 월: path.basename(best.folder).slice(0, 7) };
+  } catch { return null; }
+}
+
+/** 사람 말 한 마디를 대본에 대 본다 · 맞으면 그 턴의 파일을 놓고 화면을 돌려준다 */
+export function replayStep(cwd, prompt) {
+  const r = replayFind(cwd);
+  if (!r || r.state.done) return null;
+  const turns = r.data.turns || [];
+  const said = 말(prompt);
+  const fits = t => (t.approve && /^\s*진행\s*승인/.test(String(prompt))) ||
+    (t.user || []).some(u => { const a = 말(u); return a && (a === said || (said.length > 1 && (a.includes(said) || said.includes(a)) && Math.min(a.length, said.length) / Math.max(a.length, said.length) > 0.6)); });
+  let k = -1;
+  for (let i = Math.max(0, r.state.next - 1); i < Math.min(turns.length, r.state.next + 3); i += 1) {
+    if (fits(turns[i])) { k = i; break; }
+    if (i >= r.state.next && !turns[i].optional) break;   // 건너뛸 수 있는 것은 덧붙은 턴뿐이다
+  }
+  const save = st => { try { fs.writeFileSync(r.statePath, JSON.stringify(st, null, 1)); } catch { /* 무시 */ } };
+  if (k < 0) {
+    if (r.state.next === 0) return null;   // 계획 승인 전의 말은 대본 밖이 아니다
+    save({ ...r.state, done: true, reason: '원고에 없는 말' });
+    return { ended: true };
+  }
+  const t = turns[k];
+  const fill = v => v.replaceAll('{월}', r.월);
+  for (const rel of t.files || []) {
+    const src = path.join(path.dirname(r.file), 'files', rel);
+    const dst = path.join(r.folder, rel);
+    fs.mkdirSync(path.dirname(dst), { recursive: true });
+    if (/\.(md|html|csv|txt)$/i.test(rel)) fs.writeFileSync(dst, fill(fs.readFileSync(src, 'utf8')));
+    else fs.copyFileSync(src, dst);
+  }
+  save({ next: k + 1, done: k + 1 >= turns.length, pending: k });
+  return { turn: t, k, total: turns.length, screen: fill(t.screen), 장: r.data.장, plan: path.relative(cwd, r.planFile), folder: path.relative(cwd, r.folder) };
+}
+
+/** 대본이 진행 중인가 · 진행 중이면 결과 파일을 지어 쓰지 못한다 */
+export function replayActive(cwd) {
+  const r = replayFind(cwd);
+  return r && r.state.next > 0 && !r.state.done ? r : null;
+}
+
 /* ── CLI ───────────────────────────────────────────────────── */
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isCli) {

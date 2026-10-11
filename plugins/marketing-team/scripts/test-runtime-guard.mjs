@@ -547,7 +547,44 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · 책 실습 강제 4 · ✅');
+  // 책 실습 대본 · 여러 턴 장(10장) · 턴마다 원고 파일 · 진행 중에는 지어 쓰지 못함 · 원고에 없는 말이면 끝 (2026-10-12)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-replay-'));
+    try {
+      const T = path.join(ws, 'session.jsonl');
+      fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
+      fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
+      const pc = await import(path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'));
+      const folder = path.join(ws, 'outputs', '2026-10-광고애널리틱스');
+      fs.mkdirSync(folder, { recursive: true });
+      fs.writeFileSync(path.join(folder, 'plan.json'), JSON.stringify(pc.canonicalScreenPlan('광고애널리틱스', { date: '2026-10-12' })));
+      spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'compile', 'outputs/2026-10-광고애널리틱스/plan.json'], { cwd: ws });
+      const say = prompt => {
+        const r = spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'team-context.mjs')], { input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', cwd: ws, prompt }),
+          encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: ws } });
+        return r.stdout.trim() ? JSON.parse(r.stdout).hookSpecificOutput.additionalContext : '';
+      };
+      const ctx = say('진행 승인 그리고 input 폴더에 있는 광고 소재 레퍼런스 참고해서 진행하자');
+      assert.match(ctx, /책 실습 · 10장/, '대본 첫 차례를 잡지 못했다');
+      assert.ok(fs.existsSync(path.join(folder, '045-weekly-ads-report', '045-weekly-ads-report.html')), '첫 차례 원고 파일을 놓지 않았다');
+      const screen = ctx.split('<<<\n')[1].split('\n>>>')[0];
+      spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'approve', 'outputs/2026-10-광고애널리틱스/plan.json'], { cwd: ws });
+      fs.writeFileSync(T, `${[row('user', '# 마케팅 AI 마케터'), row('assistant', '[실행 계획]\n계획: 광고애널리틱스\n[승인 요청]\n⏸'), row('user', '진행 승인')].join('\n')}\n`);
+      const hook = (inp) => spawnSync(process.execPath, [SCRIPT], { input: JSON.stringify({ transcript_path: T, cwd: ws, ...inp }), encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: pluginRoot, CLAUDE_PROJECT_DIR: ws } });
+      const w = hook({ hook_event_name: 'PreToolUse', tool_name: 'Write', tool_input: { file_path: path.join(folder, '046-roas-budget-rebalance', '046-roas-budget-rebalance.md') } });
+      assert.equal(JSON.parse(w.stdout || '{}').hookSpecificOutput?.permissionDecision, 'deny', '대본 진행 중에 결과 파일을 지어 쓰게 두었다');
+      const stop = last => { const r = hook({ hook_event_name: 'Stop', last_assistant_message: last }); return r.stdout.trim() ? JSON.parse(r.stdout).decision : 'none'; };
+      assert.equal(stop('1단계를 마쳤습니다. 요약하면 ROAS가 낮습니다.'), 'block', '원고와 다른 답변을 통과시켰다');
+      assert.equal(stop(screen), 'none', '원고 답변 그대로를 막았다');
+      assert.match(say('제안해줘'), /2\/6번째/, '다음 차례로 넘어가지 않았다');
+      assert.doesNotMatch(say('블로그 글도 하나 써줘'), /책 실습/, '원고에 없는 말에 대본을 이어 붙였다');
+      assert.equal(JSON.parse(fs.readFileSync(path.join(folder, '.대본.json'), 'utf8')).done, true, '원고에 없는 말 뒤에도 대본이 끝나지 않았다');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 6 · 책 실습 강제 4 · 대본 7 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

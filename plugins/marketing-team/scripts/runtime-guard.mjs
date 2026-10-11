@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState, frontmatterFlag, bookCheck } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -465,7 +465,22 @@ async function main() {
     if (input.stop_hook_active) return;
     const last = typeof input.last_assistant_message === 'string' ? input.last_assistant_message
       : ([...rows].reverse().find(r => r.role === 'assistant')?.text || '');
-    const issue = planScreenIssue(last, input.cwd || process.cwd());
+    const here = input.cwd || process.cwd();
+    let issue = planScreenIssue(last, here);
+    // 책 실습 대본 차례면 원고 답변을 그대로 냈는지 본다
+    if (!issue) {
+      try {
+        const r = replayFind(here);
+        const k = r?.state?.pending;
+        if (r && Number.isInteger(k) && r.state.shown !== k) {
+          const want = String(r.data.turns[k]?.screen || '').replaceAll('{월}', r.월);
+          const flat = v => String(v).replace(/\*\*|`|\s+/g, '');
+          if (want && flat(last).includes(flat(want))) fs.writeFileSync(r.statePath, JSON.stringify({ ...r.state, shown: k }, null, 1));
+          else if (want && !(r.data.turns[k]?.image && /힉스필드|Higgsfield/.test(last) && last.length < want.length / 2))
+            issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
+        }
+      } catch { /* 대본을 못 읽으면 막지 않는다 */ }
+    }
     if (issue) process.stdout.write(`${JSON.stringify({ decision: 'block', reason: issue })}\n`);
     return;
   }
@@ -627,6 +642,17 @@ function planApproval(cwd, preferId) {
     }
     deny(`승인한 계획과 지금 계획이 맞지 않습니다: ${planIssue.text} · 새 [실행 계획]을 제시하고 다시 “진행 승인”을 받은 뒤, plan-compiler.mjs approve 로 봉인하세요.`);
     return;
+  }
+
+  // 책 실습 대본이 진행 중이면 그 장의 결과 폴더에 지어 쓰지 못한다 · 턴마다 원고 파일이 이미 놓인다
+  {
+    const target = String(input.tool_input?.file_path || input.tool_input?.notebook_path || '');
+    const r = (() => { try { return replayActive(cwd); } catch { return null; } })();
+    const inside = target && r && path.resolve(cwd, target).startsWith(r.folder + path.sep) && path.basename(target) !== 'plan.json';
+    if (r && ((['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && inside) || (input.tool_name === 'Bash' && allowedPython(input)))) {
+      deny('책 실습 대본이 진행 중입니다. 이 차례의 원고 결과 파일은 이미 놓였습니다. 새로 만들지 말고 훅이 넘겨준 원고 답변을 그대로 내세요.');
+      return;
+    }
   }
 
   // 책 실습인데 원고 결과를 아직 안 놓았으면 결과 파일을 지어 쓰지 못하게 한다 (실측 2026-10-12 · 맥미니 ·
