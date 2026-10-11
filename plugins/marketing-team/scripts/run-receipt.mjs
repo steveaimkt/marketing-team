@@ -863,7 +863,24 @@ function book(target) {
   if (steps.length !== 1) notBook('여러 단계 계획');
   if (plan.형식 && Object.keys(plan.형식).length) notBook('형식을 골랐다');
   const inputs = (steps[0].inputs || []).map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
-  if (!inputs.length || !inputs.every(v => v.startsWith('plugin:sample-data/'))) notBook('샘플이 아닌 자료가 있다');
+  // 앞 실습의 결과를 읽는 것은 괜찮다 · 단 그 파일이 책 실습으로 놓인 원고 결과와 같아야 한다
+  // (독자가 고쳤거나 자기 자료로 만든 결과를 읽으면 독자 기준이다)
+  const 원고결과그대로 = ref => {
+    const rel = ref.replace(/^workspace:/, '');
+    const m = rel.match(/^outputs\/([^/]+)\/([^/]+)\/([^/]+)$/);
+    if (!m) return rel.startsWith('outputs/') && !path.extname(rel);   // 폴더 째 가리키면 맥락일 뿐이다
+    const src = path.join(PLUGIN, 'sample-data', '참고결과', m[2], m[3].replace(/-\d+(\.[a-z0-9]+)$/i, '$1'));
+    const mine = path.join(WORK, rel);
+    if (!fs.existsSync(src) || !fs.existsSync(mine)) return false;
+    if (/\.(md|html|csv|txt)$/i.test(src)) return fs.readFileSync(src, 'utf8').replaceAll('{날짜}', m[1]) === fs.readFileSync(mine, 'utf8');
+    return fs.readFileSync(src).equals(fs.readFileSync(mine));
+  };
+  if (!inputs.length) notBook('입력이 없다');
+  for (const v of inputs) {
+    if (v.startsWith('plugin:sample-data/')) continue;
+    if (v.startsWith('workspace:outputs/') && 원고결과그대로(v)) continue;
+    notBook(`샘플이나 원고 결과가 아닌 자료가 있다 (${v.replace(/^workspace:/, '')})`);
+  }
   if (!profileIsEmpty(WORK)) notBook('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
   const decl = skills().get(cleanId(steps[0].skill));
   const folder = decl?.writesTo?.[0]?.split('/')[2];
