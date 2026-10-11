@@ -272,7 +272,7 @@ function isReadOnlyBash(input) {
   // awk/sort/uniq/cut 추가 — 대량 CSV 집계 수단이 없어 모델이 조합별 grep 반복이나
   // 무한 사고정지로 빠지는 버그가 실측됐다 (2026-09-13 · 7장 073, 11장 065/073).
   // node/python 은 위험도가 달라 그대로 차단한다.
-  const allowed = new Set(['cd', 'pwd', 'ls', 'rg', 'grep', 'head', 'tail', 'sed', 'cat', 'wc', 'stat', 'find', 'jq', 'test', '[', 'echo', 'printf', 'awk', 'sort', 'uniq', 'cut']);
+  const allowed = new Set(['cd', 'pwd', 'ls', 'rg', 'grep', 'head', 'tail', 'sed', 'cat', 'wc', 'stat', 'find', 'jq', 'test', '[', 'echo', 'printf', 'awk', 'sort', 'uniq', 'cut', 'du', 'file']);
   const segments = command.split(/&&|\|\||;|\||\n/).map(item => item.trim()).filter(Boolean);
   return segments.length > 0 && segments.every(segment => {
     if (/^[A-Za-z_][A-Za-z0-9_]*=(?:"[^"]*"|'[^']*'|[^\s]+)$/.test(segment) &&
@@ -626,6 +626,13 @@ function planApproval(cwd, preferId) {
     if (input.tool_name === 'Bash' && /(?:^|[;&|]\s*)node\s+\S*scripts\/[\w-]+\.mjs/m.test(String(input.tool_input?.command || ''))) {
       deny('조회 명령과 플러그인 스크립트를 한 줄에 섞지 마세요. 승인 전에는 따로 부릅니다 · ' +
         '`node "${CLAUDE_PLUGIN_ROOT}/scripts/router.mjs" "요청"` 처럼 node 한 줄만, 조회(ls·grep·cat)는 별도 명령으로. 경로 변수(P=…)와 cd 도 쓰지 마세요.');
+      return;
+    }
+    // 쓰기가 없는 셸 명령이 허용 목록 밖이라 막힐 때도 「계획 표식이 없다」만 들으면 이유를 모른다
+    // (실측 2026-10-12 · 데스크톱 · `du -sh …` 가 그렇게 막혔다)
+    if (input.tool_name === 'Bash') {
+      deny(`승인 전에는 조회 명령만 돕니다 (ls·cat·grep·rg·find·head·tail·wc·du·stat·jq·awk·sort 등, 쓰기·리디렉션 없이). ` +
+        `이 명령은 그 모양이 아닙니다. 조회라면 그 명령들로 바꾸고, 산출물을 만들거나 바꾸는 일이면 먼저 [실행 계획]과 [승인 요청]을 내고 “진행 승인”을 받으세요.`);
       return;
     }
     deny(`${approval.reason} 먼저 [실행 계획]과 [승인 요청]을 한 화면에 제시하고, 사용자에게 정확히 “진행 승인”을 받으세요.`);
