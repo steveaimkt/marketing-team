@@ -1,5 +1,5 @@
 {
-  "description": "실적 원장을 점검하고, 마케팅 작업 폴더에서는 AI 마케터를 팀원으로 세우고, 실행 전 승인과 저장 경로를 강제한다.",
+  "description": "실적 원장을 점검하고, 마케팅 작업 폴더에서는 AI 마케터를 팀원으로 세우고, 실행 전 승인과 저장 경로를 강제한다. 계획 화면은 점검을 통과한 그대로 냈는지 응답 끝에 확인한다.",
   "hooks": {
     "SessionStart": [
       {
@@ -39,6 +39,17 @@
             "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/runtime-guard.mjs\"",
             "timeout": 5,
             "statusMessage": "AI 마케터 실행 승인과 저장 경로를 확인하는 중"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/runtime-guard.mjs\"",
+            "timeout": 5
           }
         ]
       }

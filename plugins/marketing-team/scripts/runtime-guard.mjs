@@ -461,6 +461,15 @@ async function main() {
   const devRoot = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
   try { if (fs.existsSync(path.join(devRoot, '.claude-plugin', 'marketplace.json'))) return; } catch { /* 무시 */ }
 
+  if (input.hook_event_name === 'Stop') {
+    if (input.stop_hook_active) return;
+    const last = typeof input.last_assistant_message === 'string' ? input.last_assistant_message
+      : ([...rows].reverse().find(r => r.role === 'assistant')?.text || '');
+    const issue = planScreenIssue(last, input.cwd || process.cwd());
+    if (issue) process.stdout.write(`${JSON.stringify({ decision: 'block', reason: issue })}\n`);
+    return;
+  }
+
   if (input.tool_name === 'Bash') {
     const issue = validateBash(input);
     if (issue) {
@@ -493,6 +502,28 @@ function currentStepId(input) {
       : (input.tool_input?.file_path || input.tool_input?.path);
     return (String(raw || '').match(/outputs[\\/][^\\/]+[\\/](\d{3})-/) || [])[1] || null;
   }
+  return null;
+}
+
+/**
+ * 응답을 마칠 때(Stop) 계획 화면을 확인한다 (실측 2026-10-12 · 맥미니 006 · 두 번 모두 text 상자 없이
+ * 계획을 냈다. 한 번은 compile 이 실패해서, 한 번은 plan.json 없이 예시 화면을 손으로 옮겨서였다).
+ * 이 응답에 [실행 계획]이 있으면 ① 점검을 통과한 plan.json 이 있어야 하고 ② ```text 상자 안이어야 하고
+ * ③ 스크립트가 찍은 화면(plan.screen)이 있으면 글자가 같아야 한다. 어기면 한 번 되돌려 고치게 한다.
+ * stop_hook_active 면 이미 한 번 되돌린 것이라 다시 막지 않는다 · 무한 반복을 막는다.
+ */
+function planScreenIssue(text, cwd) {
+  if (!/^(?:\*\*)?\[실행 계획\]/m.test(text)) return null;
+  const how = '계획 화면은 손으로 쓰지 않는다. plan.json 을 쓰고 `plan-compiler.mjs compile` 이 통과할 때까지 고친 뒤, 그 출력의 ```text 상자를 한 글자도 바꾸지 않고 다시 낸다.';
+  const found = newestPlan(cwd);
+  const state = found?.plan?.status;
+  if (!found || !['awaiting-approval', 'approved'].includes(state) || !found.plan.plan_sha256)
+    return `[실행 계획]을 냈는데 점검을 통과한 plan.json 이 없다. ${how}`;
+  const boxed = text.match(/```text\n(\[실행 계획\][\s\S]*?)\n```/);
+  if (!boxed) return `[실행 계획]을 text 상자 없이 냈다. ${how}`;
+  const tidy = v => String(v).replace(/[ \t]+$/gm, '').trim();
+  if (found.plan.screen && tidy(boxed[1]) !== tidy(found.plan.screen))
+    return `[실행 계획] 화면이 compile 이 찍은 화면과 다르다. ${how}`;
   return null;
 }
 
