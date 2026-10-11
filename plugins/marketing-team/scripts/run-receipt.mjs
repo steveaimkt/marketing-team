@@ -23,7 +23,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
@@ -48,11 +48,6 @@ const fail = message => {
 const iso = () => new Date().toISOString();
 const cleanId = value => String(value || '').match(/\d{3}/)?.[0] || '';
 const posix = value => value.split(path.sep).join('/');
-
-function frontmatterList(text, key) {
-  const value = (text.match(new RegExp(`^${key}:\\s*\\[([^\\]]*)\\]`, 'm')) || [])[1] || '';
-  return value.split(',').map(item => item.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
-}
 
 function inside(base, target) {
   const rel = path.relative(base, target);
@@ -165,16 +160,15 @@ function skills() {
       if (entry.isDirectory()) walk(target);
       else if (entry.name === 'SKILL.md') {
         const text = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
-        const id = cleanId((text.match(/^id:\s*["']?([^\n"']+)/m) || [])[1]);
-        const name = ((text.match(/^name:\s*["']?([^\n"']+)/m) || [])[1] || '').trim();
+        const id = cleanId(frontmatterField(text, 'id'));
+        const name = frontmatterField(text, 'name');
         if (id) skillIndex.set(id, {
           id,
           name,
           path: target,
-          pii: /^pii:\s*true\s*$/m.test(text),
-          gate: /^gate:\s*true\s*$/m.test(text),
-          review: ((text.match(/^review:\s*(.+)$/m) || [])[1] || '')
-            .split(/[·,]/).map(part => part.trim()).filter(Boolean),
+          pii: frontmatterFlag(text, 'pii'),
+          gate: frontmatterFlag(text, 'gate'),
+          review: frontmatterField(text, 'review').split(/[·,]/).map(part => part.trim()).filter(Boolean),
           writesTo: frontmatterList(text, 'writes_to').filter(value => value.startsWith('outputs/') && path.extname(value)),
         });
       }

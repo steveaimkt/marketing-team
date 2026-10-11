@@ -237,7 +237,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   if (!bad) ok.push('유령 담당 없음 (skills · docs · agents 전역)');
 }
 
-// ⑥-d 버전이 두 곳에 있다 · 한쪽만 올리면 코워크가 「새것 없음」으로 판정한다
+// ⑥-d 버전이 두 곳에 있다 · 한쪽만 올리면 마켓플레이스가 「새것 없음」으로 본다
 {
   const repoRoot = fs.existsSync(path.join(ROOT, '..', '..', '.claude-plugin', 'marketplace.json'))
     ? path.resolve(ROOT, '..', '..') : null;
@@ -320,7 +320,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
   }
 }
 
-// ⑥-g0 스킬 설명 길이 · 1,024자를 넘으면 코워크가 그 스킬을 아예 등록하지 않는다
+// ⑥-g0 스킬 설명 길이 · 1,024자는 Agent Skills 공통 한도다 (코워크는 넘으면 아예 등록하지 않았다)
 //   왜: 2026-09-07 · ai-marketer(설명 1,178자)가 코워크에서 통째로 사라졌다. 파일은 갔는데
 //       목록에 안 떴고 「스킬 2개」로 보였다. 클로드 코드는 통과시켜서 로컬에서는 멀쩡했다.
 //       688자로 줄이니 바로 떴다. 문법 오류가 아니라 조용히 빠지는 종류라 기계가 지켜야 한다.
@@ -333,7 +333,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     const fm = (fs.readFileSync(f, 'utf8').match(/^---\n([\s\S]*?)\n---\n/) || [, ''])[1];
     const m = fm.match(/^description:\s*\|\n((?:  .*\n?|\n)*)/m);
     const n = m ? m[1].length : (fm.match(/^description:\s*(.*)$/m) || [, ''])[1].length;
-    if (n > LIMIT) err(`${d} 설명이 ${n.toLocaleString()}자다 (한도 ${LIMIT}) — 코워크가 이 스킬을 등록하지 않는다 (실측 2026-09-07)`);
+    if (n > LIMIT) err(`${d} 설명이 ${n.toLocaleString()}자다 (한도 ${LIMIT}) — Agent Skills 한도를 넘어 이 스킬이 등록되지 않을 수 있다 (코워크 실측 2026-09-07)`);
     else if (n > LIMIT * 0.85) warn(`${d} 설명 ${n}자 · 한도 ${LIMIT} 에 가깝다`);
     else ok.push(`${d} 설명 ${n}자`);
   }
@@ -341,7 +341,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 
 // ⑥-g1 버전 · 배포되는 파일이 바뀌었는데 버전이 그대로면 기존 사용자에게 안 간다
 //   왜: 2026-08-23 · plugins/ 안에서 12개 파일 +930줄을 고쳐 놓고 0.14.0 을 그대로 뒀다.
-//       코워크는 버전으로 「새것이 있나」를 판정한다. 그대로면 이미 깐 사람은 업데이트를 못 받는다.
+//       마켓플레이스는 버전으로 「새것이 있나」를 본다. 그대로면 이미 깐 사람은 업데이트를 못 받는다.
 //       윈도우 CRLF 수정도 라우팅 개선도 안 갔을 뻔했다.
 //   검사: 마지막 버전 변경 커밋 이후에 plugins/ 가 바뀌었나 (저장소 안에서만 · git 이 있을 때만)
 {
@@ -363,7 +363,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       //    버전은 **릴리스 때** 올리는 것이지 커밋마다 올리는 게 아니다.
       //    그래서 개발 중(로컬)에는 알려만 주고, CI 에서만 막는다 — 거기가 나가는 자리다.
       if (n) {
-        const m = `버전이 ${ver} 인 채로 배포 파일 ${n}개가 바뀌었다 — 이대로 나가면 코워크가 ` +
+        const m = `버전이 ${ver} 인 채로 배포 파일 ${n}개가 바뀌었다 — 이대로 나가면 마켓플레이스가 ` +
                   '「새것 없음」으로 판정해 기존 사용자에게 안 간다';
         if (process.env.CI) err(m + '. plugin.json 과 marketplace.json 을 함께 올려라');
         else warn(m + '. **릴리스 전에** 두 곳을 함께 올려라 (지금 커밋은 막지 않는다)');

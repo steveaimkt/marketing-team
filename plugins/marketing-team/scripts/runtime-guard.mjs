@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -410,9 +410,9 @@ function skillFlags(id) {
     let text;
     try { text = fs.readFileSync(path.join(dir, hit, 'SKILL.md'), 'utf8'); } catch { return null; }
     return {
-      gate: /^gate:\s*true\s*$/m.test(text),
-      pii: /^pii:\s*true\s*$/m.test(text),
-      mutating: /^mutating:\s*true\s*$/m.test(text),
+      gate: frontmatterFlag(text, 'gate'),
+      pii: frontmatterFlag(text, 'pii'),
+      mutating: frontmatterFlag(text, 'mutating'),
     };
   }
   return null;

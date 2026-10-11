@@ -33,11 +33,39 @@ const fail = message => { console.error(`🔴 ${message}`); process.exit(1); };
 
 /* ── 스킬 선언 읽기 ─────────────────────────────────────────── */
 
-function frontmatterList(text, key) {
-  const line = (text.match(new RegExp(`^${key}:\\s*\\[(.*)\\]`, 'm')) || [])[1];
-  if (!line) return [];
-  return line.split(',').map(v => v.trim().replace(/^["']|["']$/g, '')).filter(Boolean);
+// 머리말은 우리가 쓴 모양 그대로 도착하지 않는다 (실측 2026-10-12 · 데스크톱 클라우드 동기화본에서
+// `writes_to: "[a, b, c]"` 처럼 따옴표로 감싸여 와서 계약이 빈 목록으로 읽혔고, 정상 산출물 셋이
+// 「계약에 없는 산출물」로 거부됐다). 따옴표·뒤 주석·여러 줄 목록을 모두 같은 값으로 읽는다.
+// 같은 규칙을 run-receipt · runtime-guard · ledger-stats 가 가져다 쓴다 · 한 곳만 고치면 어긋난다.
+const unquote = v => v.trim().replace(/^(["'])([\s\S]*)\1$/, '$2').trim();
+const stripComment = v => v.replace(/\s+#(?=\s|$).*$/, '');
+const frontmatterOf = text => {
+  const t = String(text).replace(/\r\n/g, '\n');
+  return (t.match(/^---\n([\s\S]*?)\n---(?:\n|$)/) || [, t])[1];
+};
+
+/** 머리말 한 칸의 값 · 없으면 '' · 따옴표와 뒤 주석은 뗀다 */
+export function frontmatterField(text, key) {
+  const m = frontmatterOf(text).match(new RegExp(`^${key}:[ \\t]*(.*)$`, 'm'));
+  return m ? unquote(stripComment(m[1])) : '';
 }
+
+/** 머리말 목록 · `[a, b]` · `"[a, b]"` · 다음 줄부터 `- a` 를 모두 읽는다 */
+export function frontmatterList(text, key) {
+  const fm = frontmatterOf(text);
+  const m = fm.match(new RegExp(`^${key}:[ \\t]*(.*)$`, 'm'));
+  if (!m) return [];
+  let value = unquote(stripComment(m[1]));
+  if (!value) {
+    const block = fm.slice(m.index + m[0].length).match(/^(?:\n[ \t]+-[ \t]*.*)+/);
+    return block ? block[0].split('\n').map(l => l.replace(/^[ \t]+-[ \t]*/, '')).map(v => unquote(stripComment(v))).filter(Boolean) : [];
+  }
+  if (value.startsWith('[') && value.endsWith(']')) value = value.slice(1, -1);
+  return value.split(',').map(unquote).filter(Boolean);
+}
+
+/** 머리말 참·거짓 · `true` · `"true"` · `true  # 주석` 모두 참 */
+export const frontmatterFlag = (text, key) => frontmatterField(text, key).toLowerCase() === 'true';
 
 let cache = null;
 export function skillDeclarations() {
@@ -53,18 +81,17 @@ export function skillDeclarations() {
       if (entry.isDirectory()) walk(target);
       else if (entry.name === 'SKILL.md') {
         const text = fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n');
-        const id = ((text.match(/^id:\s*["']?(\d{3})/m) || [])[1] || '').trim();
+        const id = (frontmatterField(text, 'id').match(/^\d{3}/) || [''])[0];
         if (!id) continue;
         cache.set(id, {
           id,
           dir: path.dirname(target),
-          name: ((text.match(/^name:\s*(.+)$/m) || [])[1] || '').trim(),
-          gate: /^gate:\s*true\s*$/m.test(text),
-          pii: /^pii:\s*true\s*$/m.test(text),
-          mutating: /^mutating:\s*true\s*$/m.test(text),
+          name: frontmatterField(text, 'name'),
+          gate: frontmatterFlag(text, 'gate'),
+          pii: frontmatterFlag(text, 'pii'),
+          mutating: frontmatterFlag(text, 'mutating'),
           // review: 뒤 「# 날짜 · 이유」 주석은 관점이 아니다 (verify.mjs 와 같은 규칙)
-          review: ((text.match(/^review:\s*(.+)$/m) || [])[1] || '').split('#')[0]
-            .split(/[·,]/).map(v => v.trim()).filter(Boolean),
+          review: frontmatterField(text, 'review').split(/[·,]/).map(v => v.trim()).filter(Boolean),
           writesTo: frontmatterList(text, 'writes_to'),
           chainsTo: frontmatterList(text, 'chains_to'),
         });

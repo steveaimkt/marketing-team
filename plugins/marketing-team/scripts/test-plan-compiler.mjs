@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -260,7 +260,18 @@ try {
     assert.throws(() => applyFormatChoice(['a.xlsx', 'a.csv'], { 'a.xlsx': 'csv' }), /겹칩니다/, '다른 그릇끼리의 이름 충돌은 막아야 한다');
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · ✅`);
+  // 머리말이 다른 모양으로 와도 같은 값 (실측 2026-10-12 · 데스크톱 클라우드 동기화본이 `writes_to: "[…]"` 로
+  // 따옴표를 씌워 계약이 빈 목록이 됐고 006 정상 산출물 셋이 「계약에 없는 산출물」로 거부됐다)
+  {
+    const 정본 = '---\nid: "006"\ngate: true\npii: true\nreview: 브랜드·고객   # 주석\nwrites_to: [outputs/{날짜}/a/a.xlsx, outputs/{날짜}/a/a-해설.md]   # 주석\n---\n';
+    const 따옴표 = '---\nid: \'006\'\ngate: "true"\npii: \'true\'\nreview: "브랜드·고객"\nwrites_to: "[outputs/{날짜}/a/a.xlsx, outputs/{날짜}/a/a-해설.md]"\n---\n';
+    const 여러줄 = '---\nid: 006\ngate: true\npii: "true"\nreview: \'브랜드·고객\'\nwrites_to:\n  - outputs/{날짜}/a/a.xlsx\n  - "outputs/{날짜}/a/a-해설.md"\n---\n# 본문\nwrites_to: [가짜]\n';
+    const 읽기 = t => [frontmatterField(t, 'id'), frontmatterFlag(t, 'gate'), frontmatterFlag(t, 'pii'), frontmatterField(t, 'review'), frontmatterList(t, 'writes_to')];
+    for (const [이름, t] of [['따옴표', 따옴표], ['여러 줄', 여러줄]]) assert.deepEqual(읽기(t), 읽기(정본), `머리말 ${이름} 모양을 정본과 다르게 읽었다`);
+    assert.equal(frontmatterList(정본, 'writes_to').length, 2, '정본 목록을 못 읽었다');
+  }
+
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 3 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

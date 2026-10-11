@@ -26,6 +26,7 @@ fs.readFileSync = (p, o) =>
     : _readFileSync(p, o);
 
 import path from 'node:path';
+import { frontmatterField, frontmatterList } from './plan-compiler.mjs';
 
 const CHECK = process.argv.includes('--check');
 const SUMMARY = process.argv.includes('--summary');
@@ -186,10 +187,10 @@ for (const s of skills) {
       if (e.isDirectory()) return walk(q);
       if (e.name !== 'SKILL.md') return;
       const t = fs.readFileSync(q, 'utf8');
-      const id = (t.match(/^id:\s*"?(\d+)/m) || [])[1];
-      const w = (t.match(/^writes_to:\s*\[([^\]]+)/m) || [])[1];
-      if (id && w) {
-        const ext = (w.split(',')[0].trim().match(/\.(\w+)$/) || [])[1];
+      const id = (frontmatterField(t, 'id').match(/^\d+/) || [])[0];
+      const w = frontmatterList(t, 'writes_to');
+      if (id && w.length) {
+        const ext = (w[0].match(/\.(\w+)$/) || [])[1];
         if (ext) 정본형식.set(id, ext);
       }
     });

@@ -35,7 +35,7 @@
 조사, 제품 기획, 콘텐츠, SNS, 광고, 이커머스, 데이터, CRM, 브랜딩, 운영 업무를 스킬 100개에 나눠 담은 클로드 플러그인이다.
 **AI 마케터**가 요청을 받아 업무를 실행하고, **AI 규제검토자**와 **AI 사업검토자**가 그 결과를 나눠 검토한다. 결과물은 사용자가 선택한 폴더에 파일로 저장된다.
 
-클로드 코워크(Claude Cowork)와 클로드 코드(Claude Code)에서 사용할 수 있다.
+클로드 데스크톱 앱과 클로드 코드(Claude Code)에서 사용할 수 있다.
 
 ## 여기서 시작
 
@@ -101,25 +101,24 @@ AI 규제검토자는 **법에 저촉되는지**, AI 사업검토자는 **사업
 
 클로드 **유료 요금제**(Pro, Max, Team, Enterprise)와 **[데스크톱 앱](https://claude.ai/download)**이 필요하다. 설치가 막히면 [설치 영상](https://m.site.naver.com/2f5Qk)을 본다.
 
-### 클로드 코워크 (추천)
+### 클로드 데스크톱 앱 (추천)
 
-1. 입력창의 **「+」 → 「플러그인 추가」 → 「추가」 → 「마켓플레이스 추가」 → 「저장소에서 추가」**
-2. URL 에 `steveaimkt/marketing-team` 을 넣고 **「동기화」** (「자동으로 동기화」는 켜 둔다)
-3. 목록의 **「Marketing team」 → 「추가」** (로컬 MCP 서버 안내가 뜨면 「계속」)
-4. **작업 폴더**를 고르고(입력창 아래 「프로젝트 또는 폴더」 → 「폴더 추가」) 이렇게 입력한다
+1. 왼쪽 사이드바 **「Customize」 → 「Plugins」 → 「Add」 → 「Add marketplace」**
+2. 저장소에 `steveaimkt/marketing-team` 을 넣는다 (마켓플레이스의 「Sync automatically」는 켜 둔다)
+3. **「Discover」** 에서 **「Marketing team」 → 「Add」**
+4. 대화에 **작업 폴더** 접근을 허용하고(허용한 폴더는 설정의 「Trusted folders」에 남는다) 이렇게 입력한다
 
 ```
 /marketing-team-setup 마케팅 팀 구축하자
 ```
 
-![저장소 주소 넣고 동기화](.docs/images/install/05-sync-url.png)
+「Customize」 → 「Plugins」 → 「Marketing team」에 스킬 3개가 보이면 설치된 것이다. 업무 스킬 100개는 목록에 안 보이는 것이 정상이다.
 
-「+」 → 「플러그인」 → 「Marketing team」에 스킬 3개가 보이면 설치된 것이다. 업무 스킬 100개는 목록에 안 보이는 것이 정상이다.
-
-![설치 확인](.docs/images/install/08-check-skills.png)
+> **채팅과 코워크는 「Claude」 하나로 합쳐졌다** (2026-09-16 · Pro·Max 먼저). 플러그인 메뉴는 「Customize」로 옮겨졌다.
+> 입력창에 아직 「Chat」·「Cowork」 선택지가 보이면(Team·Enterprise 등) 아래 옛 화면대로 하면 된다.
 
 <details>
-<summary><strong>화면으로 하나씩 따라 하기</strong> (15장)</summary>
+<summary><strong>옛 코워크 화면으로 하나씩 따라 하기</strong> (15장)</summary>
 
 1. 데스크톱 앱 받기 ![](.docs/images/install/01-claude-download.png)
 2. 입력창 「+」 → 「플러그인 추가」 ![](.docs/images/install/02-plus-menu.png)
@@ -150,7 +149,7 @@ claude plugin install marketing-team@marketing-team
 
 작업 폴더에서 `claude` 를 실행하고 `/marketing-team-setup 마케팅 팀 구축하자` 를 입력한다. 폴더째 여는 방식(고급)은 [CONTRIBUTING.md](CONTRIBUTING.md) 에 있다.
 
-> **업데이트.** 코워크는 「자동으로 동기화」를 켜 두면 새 버전이 알아서 들어온다. 바로 받으려면 마켓플레이스를 동기화하고 플러그인을 업데이트한 뒤 **새 대화를 연다.**
+> **업데이트.** 데스크톱 앱은 「Sync automatically」를 켜 두면 새 버전이 알아서 들어온다. 바로 받으려면 마켓플레이스에서 「Check for updates」를 누른 뒤 **새 대화를 연다.**
 
 ## 할 수 있는 일 100가지
 
