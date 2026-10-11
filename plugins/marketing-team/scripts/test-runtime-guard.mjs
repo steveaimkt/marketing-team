@@ -603,7 +603,15 @@ try {
         const r = spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'team-context.mjs')], { input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', cwd: ws, prompt }), encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: ws } });
         return r.stdout.trim() ? JSON.parse(r.stdout).hookSpecificOutput.additionalContext : '';
       };
+      // 12장(091)이 끝난 폴더여도 13장 첫 말은 열린다
+      const audit = path.join(ws, 'outputs', '2026-10-12', '091-work-audit'); fs.mkdirSync(audit, { recursive: true });
+      fs.writeFileSync(path.join(audit, 'plan.json'), JSON.stringify({ status: 'approved', steps: [{ skill: '091', inputs: [] }] }));
+      fs.writeFileSync(path.join(audit, '.대본.json'), JSON.stringify({ next: 4, done: true }));
       assert.match(say('추가로 내가 만들면 좋을 스킬을 제안해줘'), /책 실습 · 13장/, '첫 말로 시작하는 대본을 잡지 못했다');
+      const made = say('3개 모두 제작해줘');
+      assert.match(made, /2\/3번째/, '13장 2턴을 잡지 못했다');
+      assert.match(made, /inputs\/광고주간\/\{날짜\}\.csv/, '원고 문장의 {날짜} 자리표시를 오늘 날짜로 바꿨다');
+      assert.match(say('좋아 이제 완료하자'), /3\/3번째/, '13장 3턴을 잡지 못했다');
       assert.doesNotMatch(say('3개 모두 제작해줘'), /책 실습/, '대본이 끝난 뒤에도 원고 답변을 넘겼다');
       fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
       fs.rmSync(path.join(ws, 'outputs', '.대본-13장-스킬제안.json'), { force: true });

@@ -649,6 +649,9 @@ export function bookCheck(plan, cwd) {
  */
 const 대본뿌리 = () => path.join(PLUGIN, 'sample-data', '참고결과', '대본');
 const 말 = v => String(v || '').replace(/[\s.,!?~·'"「」]/g, '');
+// 화면·파일의 {월}·{날짜} 를 채운다 · 원고 문장에 글자 그대로 남는 자리표시(13장 「inputs/광고주간/{날짜}.csv」)는 {{날짜}} 로 적는다
+const 채움 = (v, 월, 날짜) => String(v).replaceAll('{{날짜}}', '\0d').replaceAll('{{월}}', '\0m')
+  .replaceAll('{월}', 월).replaceAll('{날짜}', 날짜).replaceAll('\0d', '{날짜}').replaceAll('\0m', '{월}');
 
 export function replayFind(cwd) {
   if (!cwd || !profileIsEmpty(cwd)) return null;
@@ -725,7 +728,7 @@ function replayOpening(cwd, prompt) {
     let state = null;
     try { state = JSON.parse(fs.readFileSync(statePath, 'utf8')); } catch { /* 아직 안 열림 */ }
     const first = (data.turns?.[0]?.user || []).some(u => 말(u) === 말(prompt));
-    if (state?.done) { if (!first) continue; state = null; }   // 다 끝난 대본도 첫 말을 다시 하면 처음부터
+    if (state?.done) { if (!first || data.이후) continue; state = null; }   // 다 끝난 대본도 첫 말을 다시 하면 처음부터 · 「이후」 대본은 한 번만
     if (!state && !first) continue;
     const d = new Date(); const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;   // 사용자 시각 기준
     const folder = path.join(cwd, 'outputs', today);
@@ -735,9 +738,15 @@ function replayOpening(cwd, prompt) {
 }
 
 /** 사람 말 한 마디를 대본에 대 본다 · 맞으면 그 턴의 파일을 놓고 화면을 돌려준다 */
-export function replayStep(cwd, prompt) {
-  const r = replayFind(cwd) || replayOpening(cwd, prompt);
+export function replayStep(cwd, prompt, again = true) {
+  const found = replayFind(cwd);
+  const r = (found && !found.state.done ? found : null) || replayOpening(cwd, prompt);   // 끝난 체인(12장 등) 뒤에도 13장 첫 말은 열린다
   if (!r || r.state.done) return null;
+  const 다른첫말 = () => {   // 이 대본 밖의 말이 다른 첫 말 대본(5장 블로그 → 인스타그램 등)의 첫 말인가
+    if (!again) return null;
+    const n = replayStep(cwd, prompt, false);
+    return n?.turn ? n : null;
+  };
   const turns = r.data.turns || [];
   const said = 말(prompt);
   const fits = t => (t.approve && /^\s*진행\s*승인/.test(String(prompt))) ||
@@ -751,13 +760,13 @@ export function replayStep(cwd, prompt) {
   if (k < 0 && r.state.next > 0 && fits(turns[r.state.next - 1])) k = r.state.next - 1;
   const save = st => { try { fs.writeFileSync(r.statePath, JSON.stringify(st, null, 1)); } catch { /* 무시 */ } };
   if (k < 0) {
-    if (r.state.next === 0) return null;   // 계획 승인 전의 말은 대본 밖이 아니다
+    if (r.state.next === 0) return r.planFile ? 다른첫말() : null;   // 계획 승인 전의 말은 대본 밖이 아니다
     try { fs.mkdirSync(path.dirname(r.statePath), { recursive: true }); } catch { /* 무시 */ }
     save({ ...r.state, done: true, reason: '원고에 없는 말' });
-    return { ended: true };
+    return 다른첫말() || { ended: true };
   }
   const t = turns[k];
-  const fill = v => v.replaceAll('{월}', r.월).replaceAll('{날짜}', r.날짜);
+  const fill = v => 채움(v, r.월, r.날짜);
   for (const rel of t.files || []) {
     const src = path.join(path.dirname(r.file), 'files', rel);
     const dst = path.join(r.folder, rel);
@@ -789,7 +798,7 @@ export function replayCurrent(cwd) {
   if (!live.length) return null;
   const p = live.sort((a, b) => (b.at || 0) - (a.at || 0))[0];
   const t = p.data.turns[p.state.pending];
-  return { ...p, turn: t, screen: String(t?.screen || '').replaceAll('{월}', p.월).replaceAll('{날짜}', p.날짜) };
+  return { ...p, turn: t, screen: 채움(t?.screen || '', p.월, p.날짜) };
 }
 
 /** 대본이 진행 중인가 · 진행 중이면 결과 파일을 지어 쓰지 못한다 */
