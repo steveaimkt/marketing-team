@@ -202,7 +202,7 @@ G5  다음     다음 제안 2개까지 + 「결과물 어떠세요?」         
 1. 산출물보다 먼저 `run.json` 초안을 쓰고 `node "${CLAUDE_PLUGIN_ROOT}/scripts/run-receipt.mjs" start "{run.json}"`.
    `"단계": "최종"` 으로 시작하고, 계획에 `steps` 가 있으면 `step-start --step N` / `step-done --step N` 을 부른다.
 2. 스킬 본문(Contract → Phases → Output Format), `docs/도메인-금기.md` 해당 번호대, 프로필 값을 겹쳐 읽고 완주한다.
-   `sample-data/참고결과/{번호}-{슬러그}/` 가 있으면 모양만 맞추고 숫자·문장은 베끼지 않는다.
+   **만들기 전에** `node "${CLAUDE_PLUGIN_ROOT}/scripts/run-receipt.mjs" book "{plan.json}"` 을 돌린다. 「📖 책 실습」이면 만들지 않는다. 검토와 영수증을 마친 뒤 그 화면을 그대로 낸다. 「➖ 해당 없음」이면 평소대로 만들고, `sample-data/참고결과/{번호}-{슬러그}/` 의 모양만 맞춘다.
 3. **초안 `.md` 를 먼저 쓰고** 계획에서 정한 형식으로 완성한다. 초안 뒤에 형식을 다시 묻지 않는다. 초안은 지우지 않는다.
 4. 착지 경로는 스킬 본문 끝 「⛔ 착지」 블록 그대로, `{날짜}` 만 바꾼다. 같은 날 다시 돌리면 `-2` 와 `run-2.json`.
    이름 있는 체인은 `outputs/{YYYY-MM}-{프로젝트명}/` 아래 스킬마다 자기 폴더다. 화면이 길어지면 멈추고 파일부터 쓴다.

@@ -11,6 +11,7 @@
  *     --report outputs/.../review-재무.md --artifact outputs/.../result.md
  *   node scripts/run-receipt.mjs finalize outputs/.../run.json --status completed
  *   node scripts/run-receipt.mjs verify outputs/.../run.json
+ *   node scripts/run-receipt.mjs book outputs/.../plan.json      책 실습이면 기준본을 착지에 놓는다
  *
  * run.json 의 `checks` 배열(과 `pii` 블록)이 있으면 finalize·verify 가
  * scripts/output-checks.mjs 를 함께 돌린다 — pii · csv-format · house-style.
@@ -23,7 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, profileIsEmpty } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
@@ -844,7 +845,49 @@ async function verify(file) {
   }
 }
 
+/**
+ * 책 실습 · 샘플 자료로 돌리면 원고와 같은 결과가 나와야 한다 (저자 결정 2026-10-12).
+ * 판단이 드는 칸(점수·묶음 이름·표 구성·결론 문장)은 모델이 돌릴 때마다 달라진다. 그래서
+ * 「승인된 계획 · 입력이 전부 플러그인 샘플 · 브랜드 프로필이 비어 있음 · 형식 선택 없음 ·
+ * 기준본 있음」이면 모델이 만들지 않고 `sample-data/참고결과/{폴더}/` 의 원고 결과를 그대로 놓는다.
+ * 하나라도 아니면(독자가 브랜드 정보를 넣었거나 자기 자료를 넣었으면) 평소대로 독자 기준으로 만든다.
+ */
+function book(target) {
+  const notBook = reason => { console.log(`➖ 책 실습 해당 없음 · ${reason} · 평소대로 만든다`); process.exit(0); };
+  let planFile;
+  try { planFile = resolveRef(target, { workspaceOnly: true }).abs; } catch (error) { fail(error.message); }
+  if (path.basename(planFile) !== 'plan.json') fail('book 은 plan.json 을 받는다.');
+  const plan = readJson(planFile);
+  if (!approvalState(plan).ok) fail('승인 봉인된 계획이 아니다. plan-compiler.mjs approve 뒤에 돌린다.');
+  const steps = plan.steps || [];
+  if (steps.length !== 1) notBook('여러 단계 계획');
+  if (plan.형식 && Object.keys(plan.형식).length) notBook('형식을 골랐다');
+  const inputs = (steps[0].inputs || []).map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
+  if (!inputs.length || !inputs.every(v => v.startsWith('plugin:sample-data/'))) notBook('샘플이 아닌 자료가 있다');
+  if (!profileIsEmpty(WORK)) notBook('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
+  const decl = skills().get(cleanId(steps[0].skill));
+  const folder = decl?.writesTo?.[0]?.split('/')[2];
+  const ref = folder && path.join(PLUGIN, 'sample-data', '참고결과', folder);
+  if (!ref || !fs.existsSync(path.join(ref, '화면.md'))) notBook('이 스킬의 기준본이 아직 없다');
+  const outs = (steps[0].outputs || []).map(v => resolveRef(v, { workspaceOnly: true }).abs);
+  const 날짜 = posix(path.relative(WORK, outs[0] || '')).split('/')[1] || '';
+  const fill = text => text.replaceAll('{날짜}', 날짜);
+  for (const out of outs) {
+    const canon = path.basename(out).replace(/-\d+(\.[a-z0-9]+)$/i, '$1');
+    const src = path.join(ref, canon);
+    if (!fs.existsSync(src)) fail(`기준본에 ${canon} 이 없다 · 기준본과 writes_to 를 맞춰야 한다`);
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    if (/\.(md|html|csv|txt)$/i.test(canon)) fs.writeFileSync(out, fill(fs.readFileSync(src, 'utf8')));
+    else fs.copyFileSync(src, out);
+  }
+  console.log(`📖 책 실습 · 원고 결과를 놓았다 · ${outs.map(o => path.basename(o)).join(' · ')}`);
+  console.log('── 분석을 다시 하지 않는다. 검토·영수증은 평소대로 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──');
+  console.log(fill(fs.readFileSync(path.join(ref, '화면.md'), 'utf8')).trimEnd());
+  console.log('── 화면 끝 ──');
+}
+
 const [command, fileArg, ...rest] = process.argv.slice(2);
+if (command === 'book') { book(fileArg); process.exit(0); }
 const file = receiptPath(fileArg);
 const args = argsOf(rest);
 
@@ -856,4 +899,4 @@ else if (command === 'step-start') await stepStart(file, args);
 else if (command === 'step-done') await stepDone(file, args);
 else if (command === 'resume') await resume(file);
 else if (command === 'metric') await metric(file, args);
-else fail('명령은 start · step-start · step-done · resume · review · metric · finalize · verify 중 하나입니다.');
+else fail('명령은 start · step-start · step-done · resume · review · metric · finalize · verify · book 중 하나입니다.');

@@ -642,7 +642,37 @@ try {
     assert.equal(r.status, 0, `046 최종(docx + 초안 md) start 를 막았다: ${r.stderr}${r.stdout}`);
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · ✅');
+  // 책 실습 · 샘플 + 빈 프로필이면 원고 결과를 그대로 놓는다 · 프로필을 채우면 독자 기준 (저자 결정 2026-10-12)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-book-'));
+    try {
+      const P = path.resolve(path.dirname(SCRIPT), '..');
+      const sh = (...a) => spawnSync(process.execPath, a, { cwd: ws, encoding: 'utf8' });
+      fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
+      fs.copyFileSync(path.join(P, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
+      const dir = 'outputs/2026-10-12/006-review-mining', planRel = `${dir}/plan.json`;
+      fs.mkdirSync(path.join(ws, dir), { recursive: true });
+      const o = n => `workspace:${dir}/${n}`;
+      const 계획 = (inputs) => fs.writeFileSync(path.join(ws, planRel), JSON.stringify({ request: '리뷰 분석해줘', skills: ['006'], steps: [{ step: 1, skill: '006',
+        inputs, outputs: [o('006-review-mining.xlsx'), o('006-review-mining.html'), o('006-review-mining-해설.md')], reviews: [{ kind: 'compliance' }] }] }));
+      계획(['plugin:sample-data/A브랜드-리뷰-200건.csv']);
+      sh(path.join(P, 'scripts', 'plan-compiler.mjs'), 'compile', planRel);
+      assert.notEqual(sh(SCRIPT, 'book', planRel).status, 0, '승인 전 계획으로 기준본을 놓았다');
+      sh(path.join(P, 'scripts', 'plan-compiler.mjs'), 'approve', planRel);
+      const r = sh(SCRIPT, 'book', planRel);
+      assert.equal(r.status, 0, r.stderr); assert.match(r.stdout, /📖 책 실습/);
+      const ref = path.join(P, 'sample-data', '참고결과', '006-review-mining');
+      assert.ok(fs.readFileSync(path.join(ws, dir, '006-review-mining.xlsx')).equals(fs.readFileSync(path.join(ref, '006-review-mining.xlsx'))), '원고 xlsx 와 다르다');
+      assert.match(fs.readFileSync(path.join(ws, dir, '006-review-mining-해설.md'), 'utf8'), /outputs\/2026-10-12\//, '{날짜} 를 그날로 바꾸지 않았다');
+      assert.match(r.stdout, /outputs\/2026-10-12\/006-review-mining\/ 에 세 파일로/, '화면의 날짜를 바꾸지 않았다');
+      fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사 · 반려동물 사료\n');
+      assert.match(sh(SCRIPT, 'book', planRel).stdout, /해당 없음 · 브랜드 프로필을 채웠다/, '프로필을 채웠는데 원고 결과를 놓았다');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 5 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
