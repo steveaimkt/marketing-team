@@ -665,6 +665,24 @@ export function bookInputs(plan, cwd) {
   return want;
 }
 
+/**
+ * 첫 단계 입력이 비었고 작업 공간 inputs/ 에도 자료가 없으면 그 스킬의 sample_fallback 으로 채운다.
+ * 스킬은 그때 어차피 샘플로 완주하는데, 계획에 [] 로 적히면 「분석할 자료」 줄이 빠지고 책 실습도
+ * 「입력이 없다」로 꺼졌다 (실측 2026-10-12 · 4·8·9·10·11장 첫 턴 · 4장 006 이 원고와 다르게 분석됨).
+ */
+export function sampleInputs(plan, cwd) {
+  const first = (plan.steps || [])[0];
+  if (!cwd || !first || (first.inputs || []).length || (plan.inputs || []).length) return null;
+  try { if (fs.readdirSync(path.join(cwd, 'inputs')).some(n => !n.startsWith('.'))) return null; } catch { /* inputs/ 없음 */ }
+  const d = skillDeclarations().get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
+  if (!d) return null;
+  const skillText = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8');
+  const fallback = ((skillText.match(/^sample_fallback:\s*(\S+)/m) || [])[1] || '').trim();
+  if (!fallback) return null;
+  first.inputs = [`plugin:${fallback}`];
+  return first.inputs;
+}
+
 /* ── 책 실습 대본 · 여러 턴으로 이어지는 장(8~13장) ──────────────────
  * 체인 장은 계획 승인 뒤에도 「제안해줘」「소재 6개 모두 제작」처럼 사람 말이 이어진다. 턴마다 원고 결과
  * 파일과 원고 답변이 정해져 있어 `sample-data/참고결과/대본/{체인}/대본.json` 에 적어 두었다.
@@ -718,8 +736,12 @@ export function replayFind(cwd) {
     const statePath = path.join(best.folder, '.대본.json');
     let state = { next: 0, done: false };
     try { state = { ...state, ...JSON.parse(fs.readFileSync(statePath, 'utf8')) }; } catch { /* 처음 */ }
-    const 날짜폴더 = path.basename(path.dirname(best.folder));
-    return { ...best, plan, data, state, statePath, 월: (/^\d{3}-/.test(best.name) ? 날짜폴더 : path.basename(best.folder)).slice(0, 7), 날짜: 날짜폴더 };
+    // 스킬 장은 outputs/{날짜}/{스킬}/ 이라 위 폴더가 날짜다 · 체인 장은 outputs/{월}-{체인}/ 이라 위가 「outputs」라
+    // 날짜로 「outputs」가 적혔다 (실측 2026-10-12) · 체인은 처음 연 날을 적어 두고 이어 쓴다
+    const d = new Date(); const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const 날짜 = /^\d{3}-/.test(best.name) ? path.basename(path.dirname(best.folder))
+      : (/^\d{4}-\d{2}-\d{2}$/.test(state.날짜 || '') ? state.날짜 : today);
+    return { ...best, plan, data, state, statePath, 월: (/^\d{3}-/.test(best.name) ? 날짜 : path.basename(best.folder)).slice(0, 7), 날짜 };
   } catch { return null; }
 }
 
@@ -875,6 +897,8 @@ if (isCli) {
   const plan = read(file);
 
   if (command === 'compile') {
+    const filled = sampleInputs(plan, process.cwd());
+    if (filled) console.log(`📎 inputs 가 비어 샘플 자료로 채웠다 · ${filled[0].replace(/^plugin:/, '')}`);
     const forced = bookInputs(plan, process.cwd());
     if (forced) console.log(`📖 책 실습 · 원고 계획의 입력으로 맞췄다 · ${forced.map(v => v.replace(/^(workspace|plugin):/, '')).join(' · ')}`);
     const issues = validatePlan(plan);

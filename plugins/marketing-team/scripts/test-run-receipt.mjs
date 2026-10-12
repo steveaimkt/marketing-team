@@ -655,8 +655,9 @@ try {
       const o = n => `workspace:${dir}/${n}`;
       const 계획 = (inputs) => fs.writeFileSync(path.join(ws, planRel), JSON.stringify({ request: '리뷰 분석해줘', skills: ['006'], steps: [{ step: 1, skill: '006',
         inputs, outputs: [o('006-review-mining.xlsx'), o('006-review-mining.html'), o('006-review-mining-해설.md')], reviews: [{ kind: 'compliance' }] }] }));
-      계획(['plugin:sample-data/A브랜드-리뷰-200건.csv']);
-      sh(path.join(P, 'scripts', 'plan-compiler.mjs'), 'compile', planRel);
+      // 입력을 [] 로 적어도 compile 이 샘플로 채운다 (실측 2026-10-12 · 「분석할 자료」 줄이 빠지고 책 실습이 꺼졌다)
+      계획([]);
+      assert.match(sh(path.join(P, 'scripts', 'plan-compiler.mjs'), 'compile', planRel).stdout, /📎 inputs 가 비어 샘플 자료로 채웠다 · sample-data\/A브랜드-리뷰-200건\.csv/, '빈 입력을 샘플로 채우지 않았다');
       assert.notEqual(sh(SCRIPT, 'book', planRel).status, 0, '승인 전 계획으로 기준본을 놓았다');
       sh(path.join(P, 'scripts', 'plan-compiler.mjs'), 'approve', planRel);
       const r = sh(SCRIPT, 'book', planRel);
@@ -664,7 +665,8 @@ try {
       const ref = path.join(P, 'sample-data', '참고결과', '006-review-mining');
       assert.ok(fs.readFileSync(path.join(ws, dir, '006-review-mining.xlsx')).equals(fs.readFileSync(path.join(ref, '006-review-mining.xlsx'))), '원고 xlsx 와 다르다');
       assert.match(fs.readFileSync(path.join(ws, dir, '006-review-mining-해설.md'), 'utf8'), /outputs\/2026-10-12\//, '{날짜} 를 그날로 바꾸지 않았다');
-      assert.match(r.stdout, /outputs\/2026-10-12\/006-review-mining\/ 에 세 파일로/, '화면의 날짜를 바꾸지 않았다');
+      assert.doesNotMatch(r.stdout, /화면 끝/, '영수증 전인데 화면을 냈다');
+      assert.match(r.stdout, /검토자를 부르지 않는다/, '영수증 전 안내가 검토자를 부르게 둔다');
       // 검토도 원고 것 · 영수증 전이면 보고서만 놓고 봉인은 미룬다 (실측 2026-10-12 · 새로 부른 검토자가 「조건부」를 내 차단됨으로 끝났다)
       assert.ok(fs.existsSync(path.join(ws, dir, 'gate.md')), '원고 검토 보고서를 놓지 않았다');
       assert.match(r.stdout, /영수증\(run-receipt start\)이 아직 없어/, '영수증 없이 검토를 봉인한 척했다');
@@ -675,7 +677,7 @@ try {
     }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 7 · ✅');
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

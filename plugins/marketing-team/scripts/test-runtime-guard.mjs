@@ -631,7 +631,37 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · ✅');
+  // 스킬 하나짜리 책 실습도 응답 끝에 원고 화면을 냈는지 본다 (실측 2026-10-12 · 002 가 「발행 보류」를 내고 통과)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-bookstop-'));
+    try {
+      fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
+      fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
+      const dir = 'outputs/2026-10-12/006-review-mining', planRel = `${dir}/plan.json`;
+      fs.mkdirSync(path.join(ws, dir), { recursive: true });
+      const o = n => `workspace:${dir}/${n}`;
+      fs.writeFileSync(path.join(ws, planRel), JSON.stringify({ request: '리뷰 분석해줘', skills: ['006'], steps: [{ step: 1, skill: '006', inputs: [],
+        outputs: [o('006-review-mining.xlsx'), o('006-review-mining.html'), o('006-review-mining-해설.md')], reviews: [{ kind: 'compliance' }] }] }));
+      const sh = (...a) => spawnSync(process.execPath, a, { cwd: ws, encoding: 'utf8' });
+      sh(path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'compile', planRel);
+      sh(path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), 'approve', planRel);
+      sh(path.join(path.dirname(SCRIPT), 'run-receipt.mjs'), 'book', planRel);
+      const stateFile = path.join(ws, dir, '.책실습.json');
+      fs.writeFileSync(stateFile, JSON.stringify({ screen: '리뷰 200건을 읽었습니다.\n불만 1위는 따가움입니다.', shown: false }));
+      const T = path.join(ws, 't.jsonl');
+      fs.writeFileSync(T, `${[row('user', '# 마케팅 AI 마케터'), row('user', '진행 승인')].join('\n')}\n`);
+      const stop = last => { const r = spawnSync(process.execPath, [SCRIPT], { input: JSON.stringify({ transcript_path: T, cwd: ws, hook_event_name: 'Stop', last_assistant_message: last }),
+        encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: pluginRoot, CLAUDE_PROJECT_DIR: ws } }); return r.stdout.trim() ? JSON.parse(r.stdout).decision : 'none'; };
+      assert.equal(stop('조건부라 발행 보류합니다.'), 'block', '원고 화면 대신 다른 답을 낸 책 실습을 통과시켰다');
+      assert.equal(stop('리뷰 200건을 읽었습니다.\n불만 1위는 따가움입니다.'), 'none', '원고 화면 그대로를 막았다');
+      assert.equal(JSON.parse(fs.readFileSync(stateFile, 'utf8')).shown, true, '낸 화면을 기록하지 않았다');
+      assert.equal(stop('다음은 무엇을 할까요?'), 'none', '이미 낸 책 실습 화면을 다음 턴에도 요구했다');
+    } finally {
+      fs.rmSync(ws, { recursive: true, force: true });
+    }
+  }
+
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

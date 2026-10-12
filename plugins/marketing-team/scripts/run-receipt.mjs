@@ -871,14 +871,20 @@ async function book(target) {
   // 검토도 원고 것을 쓴다. 결과를 원고 그대로 두니 검토자를 새로 부르면 지적을 반영할 수 없어 「조건부」로 남고
   // 실행이 차단됨으로 끝났다 (실측 2026-10-12 · 데스크톱 · 002·011·012). 원고 실행의 판정을 그대로 봉인한다.
   const reviewed = await bookReviews(plan, c);
+  // 검토 보고서를 놓기만 하고 봉인을 못 했을 때 「검토는 평소대로」라고 하면 검토자를 새로 불러 조건부로 끝났다
+  // (실측 2026-10-12 · 002 · 원고 화면 대신 「발행 보류」). 원고 검토가 있으면 검토자를 부르지 않는다.
+  if (reviewed === 'later') { console.log('── 검토자를 부르지 않는다. run-receipt start 를 한 뒤 이 book 을 한 번 더 돌리면 원고 검토로 봉인되고 화면이 나온다 ──'); return; }
   console.log(reviewed
-    ? `── 분석과 검토를 다시 하지 않는다(검토자를 부르지 않는다). 영수증 마무리(finalize · verify)만 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──`
+    ? `── 분석과 검토를 다시 하지 않는다(검토자를 부르지 않는다). 영수증 마무리(finalize · verify)만 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다. 도구 사이에 설명 말을 쓰지 않는다 ──`
     : '── 분석을 다시 하지 않는다. 검토·영수증은 평소대로 하고, 끝나면 아래 화면을 한 글자도 바꾸지 말고 그대로 낸다 ──');
-  console.log(fs.readFileSync(path.join(c.ref, '화면.md'), 'utf8').replaceAll('{날짜}', c.day).trimEnd());
+  const screen = fs.readFileSync(path.join(c.ref, '화면.md'), 'utf8').replaceAll('{날짜}', c.day).trimEnd();
+  // Stop 훅이 이 화면을 냈는지 본다 (runtime-guard · 대본 장과 같은 대조)
+  try { fs.writeFileSync(path.join(path.dirname(c.outs[0]), '.책실습.json'), JSON.stringify({ screen, shown: false }, null, 1)); } catch { /* 무시 */ }
+  console.log(screen);
   console.log('── 화면 끝 ──');
 }
 
-/** 책 실습 · 원고 검토 보고서를 놓고, 이 실행이 요구하는 검토를 원고 판정으로 봉인한다 · 못 하면 false */
+/** 책 실습 · 원고 검토 보고서를 놓고, 이 실행이 요구하는 검토를 원고 판정으로 봉인한다 · 원고 검토가 없으면 false · 영수증 전이면 'later' */
 async function bookReviews(plan, c) {
   let spec;
   try { spec = JSON.parse(fs.readFileSync(path.join(c.ref, '검토.json'), 'utf8')); } catch { return false; }
@@ -892,8 +898,8 @@ async function bookReviews(plan, c) {
     .filter(f => { try { return readJson(f).plan?.plan_sha256 === plan.plan_sha256; } catch { return false; } })
     .sort((a, b) => fs.statSync(b).mtimeMs - fs.statSync(a).mtimeMs);
   if (!receipts.length) {
-    console.log('ℹ️ 원고 검토 보고서를 놓았다 · 영수증(run-receipt start)이 아직 없어 봉인하지 못했다 · start 뒤에 book 을 한 번 더 돌린다');
-    return false;
+    console.log('ℹ️ 원고 검토 보고서를 놓았다 · 영수증(run-receipt start)이 아직 없어 봉인하지 못했다');
+    return 'later';
   }
   const run = readJson(receipts[0]);
   const need = run.required_reviews?.length ? run.required_reviews : spec.검토.map(v => ({ kind: v.kind, perspective: v.perspective }));

@@ -483,6 +483,20 @@ async function main() {
         issue = '책 실습 대본 차례다. 이 차례의 원고 답변을 한 글자도 바꾸지 말고 그대로 다시 낸다 (훅이 넘겨준 <<< >>> 사이의 화면).';
       }
     }
+    // 스킬 하나짜리 책 실습도 book 이 준 원고 화면을 냈는지 본다 (실측 2026-10-12 · 002 가 원고 화면 대신
+    // 「발행 보류」를 냈는데 대본 장만 대조해 그대로 통과했다)
+    if (!issue && !(cur && cur.screen)) {
+      try {
+        const found = newestPlan(here);
+        const c = found && bookCheck(found.plan, here);
+        const stateFile = c?.ok && c.placed && path.join(path.dirname(c.outs[0]), '.책실습.json');
+        const st = stateFile && fs.existsSync(stateFile) ? JSON.parse(fs.readFileSync(stateFile, 'utf8')) : null;
+        if (st && !st.shown && st.screen) {
+          if (flat(last).includes(flat(st.screen))) fs.writeFileSync(stateFile, JSON.stringify({ ...st, shown: true }, null, 1));
+          else issue = '책 실습이다. run-receipt book 이 준 원고 화면(「── 화면 끝 ──」 앞까지)을 한 글자도 바꾸지 말고 그대로 낸다. 검토자를 새로 부르지 않는다.';
+        }
+      } catch { /* 무시 */ }
+    }
     // 계획 화면은 이번 차례의 어느 답변에서 냈든 본다. 마지막 답변만 보면 도구 호출 앞에 손으로 쓴
     // 계획이 빠져나간다 (실측 2026-10-12 · 데스크톱 · compile 이 실패하자 상자 없는 계획을 낸 뒤 요약으로 끝냈다)
     const lastUser = rows.map(r => r.role).lastIndexOf('user');
