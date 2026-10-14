@@ -63,6 +63,11 @@ try {
   assert.equal(decision(result), 'deny', '작업 폴더 밖 쓰기를 허용했습니다.');
   result = call('Write', { file_path: path.join(temp, 'tmp', 'result.md') });
   assert.equal(decision(result), 'deny', '허용되지 않은 최상위 폴더 쓰기를 허용했습니다.');
+  // 예외 하나 · 구축 ③-d 의 작업 폴더 맨 위 CLAUDE.md · 다른 맨 위 파일은 여전히 막는다
+  result = call('Write', { file_path: path.join(temp, 'CLAUDE.md') });
+  assert.equal(decision(result), 'none', '작업 폴더 맨 위 CLAUDE.md 쓰기를 막았습니다.');
+  result = call('Write', { file_path: path.join(temp, 'NOTES.md') });
+  assert.equal(decision(result), 'deny', '맨 위의 다른 파일 쓰기를 허용했습니다.');
 
   const secondPlan = row('assistant', '[실행 계획]\n새 캠페인 카피를 만듭니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
   writeTranscript([active, plan, approval, secondPlan]);
@@ -276,6 +281,23 @@ try {
     써넣기('999');
     pc('compile', `${rel}/plan.json`);
     assert.equal(쓰기시도(), 'deny', '모르는 스킬을 저위험으로 통과시켰습니다.');
+
+    // 사용자 스킬(brand/my-skills) · gate 를 안 적었으면 true 라 막고, gate: false 라고 적었을 때만 저위험이다 (SPEC §6)
+    const 내스킬 = gate => {
+      const d = path.join(temp, 'brand', 'my-skills', '101-ad-stop-judge');
+      fs.mkdirSync(d, { recursive: true });
+      fs.writeFileSync(path.join(d, 'SKILL.md'), `---\nid: "101"\nname: 광고 소재 중단 판정\ncategory: custom\n${gate}writes_to: [outputs/{날짜}/101-ad-stop-judge/101-ad-stop-judge.md]\n---\n`);
+      fs.writeFileSync(planFile, `${JSON.stringify({ ...계획('101'), steps: [{ step: 1, skill: '101', inputs: ['workspace:inputs/brief.md'],
+        outputs: [`workspace:${rel}/101-ad-stop-judge.md`], reviews: gate ? [] : [{ kind: 'compliance' }] }] }, null, 2)}\n`);
+      pc('compile', `${rel}/plan.json`);
+      pc('approve', `${rel}/plan.json`);
+    };
+    쓸파일 = '101-ad-stop-judge.md';
+    내스킬('');
+    assert.equal(쓰기시도(), 'deny', 'gate 를 안 적은 사용자 스킬을 저위험으로 통과시켰습니다.');
+    내스킬('gate: false\nmutating: false\n');
+    assert.equal(쓰기시도(), 'none', 'gate: false 사용자 스킬을 저위험으로 보지 않았습니다.');
+    fs.rmSync(path.join(temp, 'brand', 'my-skills'), { recursive: true, force: true });
 
     fs.rmSync(planFile, { force: true });
   }
@@ -661,7 +683,7 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

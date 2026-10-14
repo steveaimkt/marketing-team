@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { loadRoutingIndex, routeOne, routeRequest } from './router.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+// 공식 색인만 재는 자리는 빈 작업 폴더에서 돈다 · 돌린 자리에 brand/my-skills 가 있어도 숫자가 흔들리지 않는다
+const EMPTY = fs.mkdtempSync(path.join(os.tmpdir(), 'router-empty-'));
+const at = { cwd: EMPTY };
 assert.equal(loadRoutingIndex().length, 100, '라우팅 색인에는 스킬 100개가 있어야 한다.');
 
 // 평가셋 누수 차단 (P2 · 2026-08-30 최종 검토) — routing-eval.jsonl 문장이 운영 색인에 들어가면
@@ -28,7 +32,7 @@ for (const [id, rel] of Object.entries(evalFiles)) {
     const intent = JSON.parse(line).intent;
     if (!intent) continue;
     scoped++;
-    const routed = routeOne(intent);
+    const routed = routeOne(intent, at);
     if (routed.candidates.some(row => row.id === id)) top3++;
     if (routed.candidates[0]?.id === id) top1++;
   }
@@ -39,11 +43,32 @@ assert.ok(top1 >= 2, `홀드아웃 top1 이 바닥(2/12) 밑으로 내려갔다 
 
 // 「예산을 채널별로 나눠줘」는 046(ROAS 재배분)↔095(예산 플래너)가 갈리는 경계 문장이다 —
 // 어휘층은 후보에 올리는 것까지가 약속이고, 가르는 것은 헷갈리는-쌍 문서와 모델의 몫이다.
-assert.ok(routeOne('광고 예산을 채널별로 어떻게 나눌지 다시 정해줘').candidates.some(row => row.id === '046'),
+assert.ok(routeOne('광고 예산을 채널별로 어떻게 나눌지 다시 정해줘', at).candidates.some(row => row.id === '046'),
   '046 이 경계 문장의 top3 후보에도 없다.');
-assert.equal(routeOne('소비자 리뷰에서 불만과 구매 이유를 뽑아줘').candidates[0].id, '006');
-const compound = routeRequest('리뷰 불만을 분석하고 광고 예산을 다시 나눠줘');
+assert.equal(routeOne('소비자 리뷰에서 불만과 구매 이유를 뽑아줘', at).candidates[0].id, '006');
+const compound = routeRequest('리뷰 불만을 분석하고 광고 예산을 다시 나눠줘', at);
 assert.equal(compound.request_class, 'compound');
 assert.deepEqual(compound.subrequests.map(row => row.candidates[0].id), ['006', '046']);
 
-console.log(`자연어 후보 라우터 · 색인 100 · 누수 차단 1 · 홀드아웃 top3 ${top3}/12 · top1 ${top1}/12 (어휘층 바닥 지킴 · 실품질은 B층) · 새 표현 2 · 복합 분해 1 · ✅`);
+// 사용자 스킬(brand/my-skills · 101~199) · 등록한 부를 말이 그대로 들어 있으면 맨 앞 · 뜻만 겹치면 묻는다 (G3 §2)
+const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'router-mine-'));
+const mySkill = (dir, id, triggers) => {
+  fs.mkdirSync(path.join(ws, 'brand', 'my-skills', dir), { recursive: true });
+  fs.writeFileSync(path.join(ws, 'brand', 'my-skills', dir, 'SKILL.md'),
+    `---\nid: "${id}"\nname: 광고 소재 중단 판정\ncategory: custom\ntriggers:\n${triggers.map(t => `  - "${t}"`).join('\n')}\nwrites_to: [outputs/{날짜}/${dir}/${dir}.md]\n---\n`);
+};
+mySkill('101-ad-stop-judge', '101', ['이 소재 끌까 말까', '광고 소재 중단 판정해줘', '이번 주 끌 소재 골라줘']);
+mySkill('046-copycat', '046', ['광고 예산 다시 짜줘']);   // 공식 번호와 겹친다 · 무시
+const mine = routeOne('이 소재 끌까 말까', { cwd: ws });
+assert.equal(mine.decision, '101', '등록한 부를 말 그대로인데 사용자 스킬을 고르지 않았다');
+assert.equal(mine.candidates[0].id, '101');
+assert.equal(mine.needs_user_choice, false);
+assert.equal(routeOne('이 소재 끌까 말까', at).candidates.some(row => row.id === '101'), false, '작업 폴더 밖의 사용자 스킬이 색인에 들어왔다');
+const near = routeOne('광고 소재 성과 정리', { cwd: ws });
+if (near.candidates[0]?.id === '101') assert.equal(near.needs_user_choice, true, '뜻만 겹치는 사용자 스킬을 묻지 않고 골랐다');
+assert.ok(!routeOne('광고 예산 다시 짜줘', { cwd: ws }).candidates.some(row => row.user), '공식 번호와 겹치는 사용자 스킬을 색인에 넣었다');
+assert.equal(loadRoutingIndex().length, 100, '사용자 스킬이 공식 색인에 섞였다');
+fs.rmSync(ws, { recursive: true, force: true });
+fs.rmSync(EMPTY, { recursive: true, force: true });
+
+console.log(`자연어 후보 라우터 · 색인 100 · 누수 차단 1 · 홀드아웃 top3 ${top3}/12 · top1 ${top1}/12 (어휘층 바닥 지킴 · 실품질은 B층) · 새 표현 2 · 복합 분해 1 · 사용자 스킬 5 · ✅`);

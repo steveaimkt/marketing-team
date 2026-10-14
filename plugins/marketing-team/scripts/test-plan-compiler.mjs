@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -302,7 +302,108 @@ try {
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
 
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · ✅`);
+  // 사용자 스킬 · brand/my-skills/{NNN}-{slug}/SKILL.md 의 계획이 compile 을 지난다 (2026-10-14 · 「그런 스킬이 없습니다」)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'my-skills-'));
+    try {
+      const mine = (dir, head) => {
+        fs.mkdirSync(path.join(ws, 'brand', 'my-skills', dir), { recursive: true });
+        fs.writeFileSync(path.join(ws, 'brand', 'my-skills', dir, 'SKILL.md'), `---\n${head}\n---\n# 본문\n`);
+      };
+      mine('101-ad-stop-judge', 'id: "101"\nname: 광고 소재 중단 판정\ncategory: custom\nwrites_to: [outputs/{날짜}/101-ad-stop-judge/101-ad-stop-judge.md]');
+      mine('046-copycat', 'id: "046"\nname: 베낀 것\ncategory: custom\nwrites_to: [outputs/{날짜}/046-copycat/046-copycat.md]');
+      mine('102-bad-path', 'id: "102"\nname: 경로 틀림\ncategory: custom\nwrites_to: [outputs/102-bad-path.md]');
+      mine('103-not-custom', 'id: "103"\nname: 종류 틀림\ncategory: 05-ads\nwrites_to: [outputs/{날짜}/103-not-custom/103-not-custom.md]');
+      const u = userSkills(ws);
+      assert.deepEqual([...u.map.keys()], ['101'], '형식이 맞는 사용자 스킬만 읽어야 한다');
+      assert.equal(u.warnings.length, 3, '공식 번호 겹침 · 경로 틀림 · 종류 틀림을 각각 경고해야 한다');
+      assert.equal(u.map.get('101').gate, true, 'gate 를 안 적은 사용자 스킬은 true 로 본다');
+      assert.equal(skillDeclarations(ws).get('046').name, skillDeclarations(os.tmpdir()).get('046').name, '사용자 스킬이 공식 046 을 덮었다');
+      const D = '2026-10-14';
+      const dir101 = path.join(ws, 'outputs', D, '101-ad-stop-judge');
+      fs.mkdirSync(dir101, { recursive: true });
+      const p101 = { request: '이 소재 끌까 말까', skills: ['101'], steps: [{ step: 1, skill: '101', inputs: ['plugin:sample-data/A브랜드-메타광고-30일.csv'],
+        outputs: [`workspace:outputs/${D}/101-ad-stop-judge/101-ad-stop-judge.md`], reviews: [{ kind: 'compliance' }] }] };
+      fs.writeFileSync(path.join(dir101, 'plan.json'), JSON.stringify(p101));
+      const r = spawnSync(process.execPath, [path.join(HERE, 'plan-compiler.mjs'), 'compile', `outputs/${D}/101-ad-stop-judge/plan.json`], { cwd: ws, encoding: 'utf8' });
+      assert.equal(r.status, 0, `사용자 스킬 계획이 compile 에서 막혔다: ${r.stderr}`);
+      assert.match(r.stdout, /공식 스킬 번호와 겹칩니다/, '공식 번호와 겹치는 사용자 스킬을 경고하지 않았다');
+      const noGate = structuredClone(p101); noGate.steps[0].reviews = [];
+      assert.ok(validatePlan(noGate, { cwd: ws }).some(i => i.includes('gate: true')), 'gate 를 안 적은 사용자 스킬의 규제 검사 누락을 놓쳤다');
+      assert.ok(validatePlan(p101, { cwd: os.tmpdir() }).some(i => i.includes('그런 스킬이 없습니다')), '다른 작업 폴더의 사용자 스킬이 보였다');
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  // 스킬별 보완(brand/skill-notes/{번호}.md) · 형식 기본값 · 화면 줄 · 책 실습 끔 (2026-10-14)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-notes-'));
+    try {
+      const note = (id, body) => { fs.mkdirSync(path.join(ws, 'brand', 'skill-notes'), { recursive: true }); fs.writeFileSync(path.join(ws, 'brand', 'skill-notes', `${id}.md`), body); };
+      // (a) 형식 줄이 있고 계획에 형식이 없으면 채운다 · 산출물 확장자도 따라간다
+      note('046', '# 046 우리 규칙\n형식: docx\n양식 원본: inputs/양식/예산안.docx\n');
+      const p = canonicalScreenPlan('046');
+      const said = notesFormat(p, ws);
+      assert.deepEqual(p.형식, { '046-roas-budget-rebalance.md': 'docx' }, '보완 파일의 형식으로 계획을 채우지 않았다');
+      assert.ok(p.steps[0].outputs[0].endsWith('046-roas-budget-rebalance.docx'), '채운 형식에 산출물 확장자가 따라가지 않았다');
+      assert.equal(said.length, 1); assert.match(said[0], /형식을 docx로 채웠다/);
+      assert.deepEqual(validatePlan(p, { cwd: ws }), [], '형식을 채운 계획이 계약 검사를 못 지났다');
+      const kept = canonicalScreenPlan('046'); kept.형식 = { '046-roas-budget-rebalance.md': 'pdf' };
+      kept.steps[0].outputs = kept.steps[0].outputs.map(o => o.replace(/\.md$/, '.pdf'));
+      assert.deepEqual(notesFormat(kept, ws), [], '계획에 형식이 있으면 보완 파일이 덮지 않는다');
+      assert.deepEqual(kept.형식, { '046-roas-budget-rebalance.md': 'pdf' });
+      note('045', '형식: hwp\n');
+      const bad = canonicalScreenPlan('045'); notesFormat(bad, ws);
+      assert.equal(bad.형식, undefined, '모르는 그릇을 계획에 넣었다');
+      // (b) 화면 · 보완 파일이 있으면 「근거로 쓰는 것」 끝에 붙는다 · 없으면 원고 화면 그대로(위 「찍힌 화면」 대조)
+      const plain = renderPlanScreen(canonicalScreenPlan('046'), { cwd: fs.mkdtempSync(path.join(os.tmpdir(), 'skill-notes-empty-')) });
+      const withNote = renderPlanScreen(canonicalScreenPlan('046'), { cwd: ws });
+      const 근거 = t => t.split('\n').find(l => l.startsWith('근거로 쓰는 것:'));
+      assert.equal(근거(withNote), `${근거(plain)} · 우리 양식 brand/skill-notes/046.md`, '보완 파일 줄이 화면에 붙지 않았다');
+      assert.equal(withNote.replace(' · 우리 양식 brand/skill-notes/046.md', ''), plain, '보완 파일 줄 말고도 화면이 바뀌었다');
+      // (c) 책 실습 · 보완 파일이나 회사 양식(inputs/양식/)이 있으면 원고 결과를 놓지 않는다
+      const seal = plan => { plan.status = 'approved'; plan.approved_sha256 = planHash(plan); return plan; };
+      const book = seal(canonicalScreenPlan('002'));
+      assert.equal(bookCheck(book, fs.mkdtempSync(path.join(os.tmpdir(), 'book-plain-'))).ok, true, '보완 파일 없는 빈 프로필 002 는 책 실습이어야 한다');
+      note('002', '# 002 우리 구조\n제외   17 경쟁사 비교\n');
+      assert.equal(bookCheck(book, ws).ok, false, '보완 파일이 있는데 책 실습을 켰다');
+      assert.equal(bookInputs(canonicalScreenPlan('002'), ws), null, '보완 파일이 있는데 원고 입력으로 바꿨다');
+      const form = canonicalScreenPlan('002'); form.steps[0].inputs.push('workspace:inputs/양식/경쟁사-양식.xlsx'); seal(form);
+      const ws2 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-form-'));
+      assert.match(bookCheck(form, ws2).reason || '', /회사 양식/, '회사 양식 파일이 있는데 책 실습을 켰다');
+      // 대본 장 · 첫 말로 여는 대본(6장 043)과 계획으로 이어지는 대본(10장 광고애널리틱스)
+      const ws3 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-'));
+      fs.mkdirSync(path.join(ws3, 'outputs'), { recursive: true });
+      assert.ok(replayStep(ws3, '광고 카피 뽑아줘.')?.turn, '보완 파일 없으면 6장 대본이 열려야 한다');
+      const ws4 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-note-'));
+      fs.mkdirSync(path.join(ws4, 'outputs'), { recursive: true });
+      fs.mkdirSync(path.join(ws4, 'brand', 'skill-notes'), { recursive: true }); fs.writeFileSync(path.join(ws4, 'brand', 'skill-notes', '043.md'), '형식: docx\n');
+      assert.equal(replayStep(ws4, '광고 카피 뽑아줘.')?.turn, undefined, '043 보완 파일이 있는데 6장 대본을 열었다');
+      const chain = canonicalScreenPlan('광고애널리틱스');
+      const chainDir = path.join(ws4, 'outputs', '2026-09-광고애널리틱스');
+      fs.mkdirSync(chainDir, { recursive: true });
+      fs.writeFileSync(path.join(chainDir, 'plan.json'), JSON.stringify({ ...chain, status: 'awaiting-approval' }));
+      assert.equal(replayFind(ws4), null, '체인 단계(043)에 보완 파일이 있는데 대본을 이었다');
+      fs.rmSync(path.join(ws4, 'brand'), { recursive: true });
+      assert.ok(replayFind(ws4), '보완 파일이 없으면 체인 대본이 이어져야 한다');
+      chain.steps[0].inputs.push('workspace:inputs/양식/주간보고.pptx');
+      fs.writeFileSync(path.join(chainDir, 'plan.json'), JSON.stringify({ ...chain, status: 'awaiting-approval' }));
+      assert.equal(replayFind(ws4), null, '회사 양식 입력이 있는데 대본을 이었다');
+      for (const d of [ws2, ws3, ws4]) fs.rmSync(d, { recursive: true, force: true });
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  // 빈 프로필 판정 · §8 우리 팀과 내 역할은 뒤에 붙인 선택 절이다 · 옛 템플릿으로 구축한 빈 프로필도 빈 것이다 (2026-10-14)
+  {
+    const tpl = fs.readFileSync(path.join(path.dirname(path.dirname(fileURLToPath(import.meta.url))), 'brand-templates', 'profile.md'), 'utf8');
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'profile-empty-'));
+    fs.mkdirSync(path.join(ws, 'brand'));
+    const 판정 = text => { fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), text); return profileIsEmpty(ws); };
+    assert.equal(판정(tpl), true, '새 템플릿 그대로인 프로필을 채움으로 봤다');
+    assert.equal(판정(tpl.replace(/\n## 8\. 우리 팀과 내 역할[\s\S]*$/, '\n')), true, '§8 이 없는 옛 템플릿 프로필을 채움으로 봤다 · 책 실습이 꺼진다');
+    assert.equal(판정(tpl.replace(/(\| 내 역할 \| )[^|]+\|/, '$1팀장 |')), false, '§8 만 채운 프로필을 빈 것으로 봤다');
+    fs.rmSync(ws, { recursive: true, force: true });
+  }
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 3 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

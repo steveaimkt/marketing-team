@@ -55,9 +55,19 @@ try {
   r = say(dev, '안녕', fresh);
   assert.equal(r.stdout.trim(), '', '개발 저장소에서 말에 끼어들었다');
 
+  // 책 실습 대본 · 우리 양식(brand/skill-notes/043.md)이 있으면 6장 대본을 열지 않고 평소대로 돈다 (2026-10-14)
+  const book = path.join(temp, 'book'); fs.mkdirSync(path.join(book, 'outputs'), { recursive: true });
+  r = say(book, '광고 카피 뽑아줘.', fresh);
+  assert.ok(r.stdout.includes('책 실습'), '보완 파일이 없는데 6장 대본을 열지 않았다');
+  const noted = path.join(temp, 'noted'); fs.mkdirSync(path.join(noted, 'outputs'), { recursive: true });
+  fs.mkdirSync(path.join(noted, 'brand', 'skill-notes'), { recursive: true });
+  fs.writeFileSync(path.join(noted, 'brand', 'skill-notes', '043.md'), '# 043 우리 규칙\n형식: docx\n');
+  r = say(noted, '광고 카피 뽑아줘.', fresh);
+  assert.ok(!r.stdout.includes('책 실습') && r.stdout.includes('ai-marketer'), '보완 파일이 있는데 책 실습 대본을 열었다');
+
   const bad = spawnSync(process.execPath, [SCRIPT], { input: 'not json', encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: plain } });
   assert.equal(bad.status, 0, '입력을 못 읽으면 세션을 막았다');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
-console.log('팀원 맥락 훅 · 다른 작업 무개입 1 · 마케팅 폴더 맥락 6 · 개발 저장소 무개입 1 · 말 걸면 AI 마케터 6 · 입력 오류 무해 1 · ✅');
+console.log('팀원 맥락 훅 · 다른 작업 무개입 1 · 마케팅 폴더 맥락 6 · 개발 저장소 무개입 1 · 말 걸면 AI 마케터 6 · 보완 파일 대본 끔 2 · 입력 오류 무해 1 · ✅');

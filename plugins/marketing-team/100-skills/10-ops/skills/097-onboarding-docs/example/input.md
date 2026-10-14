@@ -22,7 +22,7 @@
 
 ## 실업무를 자동 추출한다
 
-`brand/my-playbook.md` §3 주간 루틴 + `logs/build-log.md` 최근 4~8주.
+`brand/my-playbook.md` §1 주간 루틴 + `logs/build-log.md` 최근 4~8주.
 없으면 **091 을 먼저** 권한다.
 
 ## 바꿔서 해 보기

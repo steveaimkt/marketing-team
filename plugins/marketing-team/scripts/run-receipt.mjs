@@ -24,7 +24,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck, userSkills } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
@@ -176,6 +176,11 @@ function skills() {
     }
   };
   walk(root);
+  // 사용자 스킬(brand/my-skills · 101~199) · 규칙은 plan-compiler 의 userSkills 하나다
+  for (const [id, d] of userSkills(WORK).map) {
+    if (!skillIndex.has(id)) skillIndex.set(id, { id, name: d.name, path: d.path, user: true, pii: d.pii, gate: d.gate, review: d.review,
+      writesTo: d.writesTo.filter(value => value.startsWith('outputs/') && path.extname(value)) });
+  }
   return skillIndex;
 }
 
@@ -186,7 +191,7 @@ async function skillSnapshot(value) {
   return {
     id,
     name: found.name,
-    path: `plugin:${posix(path.relative(PLUGIN, found.path))}`,
+    path: found.user ? `workspace:${posix(path.relative(WORK, found.path))}` : `plugin:${posix(path.relative(PLUGIN, found.path))}`,
     sha256: await hashFile(found.path),
     pii: found.pii,
     gate: found.gate,

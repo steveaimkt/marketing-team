@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -201,6 +201,8 @@ function validateWrite(input) {
   const target = path.resolve(cwd, raw);
   if (!inside(cwd, target)) return `작업 폴더 밖에는 쓸 수 없습니다: ${raw} · 작업 폴더는 ${cwd} 입니다. outputs/… 처럼 이 폴더 기준 경로로 적으세요.`;
   const [root] = path.relative(cwd, target).split(path.sep);
+  // 예외 하나 · 구축 ③-d 가 쓰는 작업 폴더 맨 위 CLAUDE.md (공통규약 §0 · 2026-10-14)
+  if (path.relative(cwd, target) === 'CLAUDE.md') return '';
   if (!WRITE_ROOTS.has(root))
     return `AI 마케터가 쓸 수 있는 곳은 brand · outputs · logs · inputs 뿐입니다: ${raw}`;
   return '';
@@ -397,7 +399,10 @@ const PLUGIN_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const SKILLS_ROOT = path.join(PLUGIN_ROOT, '100-skills');
 
 /** 스킬 하나의 위험 표시. 못 찾거나 못 읽으면 null — 모르면 저위험으로 치지 않는다. */
-function skillFlags(id) {
+function skillFlags(id, cwd) {
+  // 사용자 스킬(101~199)은 작업 폴더에서 읽는다 · gate 를 안 적었으면 true 다 (SPEC §6)
+  const mine = cwd && /^1\d\d$/.test(id) ? userSkills(cwd).map.get(id) : null;
+  if (mine) return { gate: mine.gate, pii: mine.pii, mutating: mine.mutating };
   let areas;
   try { areas = fs.readdirSync(SKILLS_ROOT, { withFileTypes: true }); } catch { return null; }
   for (const area of areas) {
@@ -419,13 +424,13 @@ function skillFlags(id) {
 }
 
 /** 계획의 모든 단계가 저위험이어야 저위험이다. 하나라도 모르면 false. */
-function lowRiskPlan(plan) {
+function lowRiskPlan(plan, cwd) {
   const steps = plan?.steps;
   if (!Array.isArray(steps) || steps.length === 0) return false;
   for (const step of steps) {
     const id = (String(step?.skill ?? '').match(/\d{3}/) || [])[0];
     if (!id) return false;
-    const flags = skillFlags(id);
+    const flags = skillFlags(id, cwd);
     if (!flags || flags.gate || flags.pii || flags.mutating) return false;
   }
   return true;
@@ -628,7 +633,7 @@ function planApproval(cwd, preferId) {
   let autoPlan = null;
   if (!approval.ok) {
     const found = newestPlan(cwd, preferId);
-    if (found && lowRiskPlan(found.plan)) autoPlan = found.plan;
+    if (found && lowRiskPlan(found.plan, cwd)) autoPlan = found.plan;
   }
 
   if (!approval.ok && !autoPlan) {

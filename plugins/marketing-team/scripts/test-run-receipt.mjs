@@ -670,6 +670,11 @@ try {
       // 검토도 원고 것 · 영수증 전이면 보고서만 놓고 봉인은 미룬다 (실측 2026-10-12 · 새로 부른 검토자가 「조건부」를 내 차단됨으로 끝났다)
       assert.ok(fs.existsSync(path.join(ws, dir, 'gate.md')), '원고 검토 보고서를 놓지 않았다');
       assert.match(r.stdout, /영수증\(run-receipt start\)이 아직 없어/, '영수증 없이 검토를 봉인한 척했다');
+      // 우리 양식(brand/skill-notes/006.md)을 정했으면 원고 결과를 놓지 않는다 (2026-10-14)
+      fs.mkdirSync(path.join(ws, 'brand', 'skill-notes'), { recursive: true });
+      fs.writeFileSync(path.join(ws, 'brand', 'skill-notes', '006.md'), '# 006 우리 규칙\n형식: docx\n');
+      assert.match(sh(SCRIPT, 'book', planRel).stdout, /해당 없음 · 우리 양식/, '보완 파일이 있는데 원고 결과를 놓았다');
+      fs.rmSync(path.join(ws, 'brand', 'skill-notes'), { recursive: true });
       fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사 · 반려동물 사료\n');
       assert.match(sh(SCRIPT, 'book', planRel).stdout, /해당 없음 · 브랜드 프로필을 채웠다/, '프로필을 채웠는데 원고 결과를 놓았다');
     } finally {
@@ -677,7 +682,29 @@ try {
     }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · ✅');
+  // 사용자 스킬(brand/my-skills · 101~199)도 영수증을 연다 · 스킬 사본은 작업 폴더 기준으로 봉인한다 (2026-10-14)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-my-skill-'));
+    try {
+      const sk = path.join(ws, 'brand', 'my-skills', '101-ad-stop-judge');
+      fs.mkdirSync(sk, { recursive: true });
+      fs.writeFileSync(path.join(sk, 'SKILL.md'), '---\nid: "101"\nname: 광고 소재 중단 판정\ncategory: custom\nwrites_to: [outputs/{날짜}/101-ad-stop-judge/101-ad-stop-judge.md]\n---\n');
+      const dir = 'outputs/2026-10-14/101-ad-stop-judge';
+      fs.mkdirSync(path.join(ws, dir), { recursive: true });
+      fs.mkdirSync(path.join(ws, 'logs'), { recursive: true });
+      const art = `workspace:${dir}/101-ad-stop-judge.md`;
+      fs.writeFileSync(path.join(ws, dir, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '이 소재 끌까 말까', skills: ['101'],
+        data_mode: '샘플', inputs: [{ path: 'plugin:sample-data/A브랜드-메타광고-30일.csv', period: '30일' }], outputs: [art],
+        required_reviews: [{ kind: 'compliance', artifact: art }], reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
+      const r = spawnSync(process.execPath, [SCRIPT, 'start', `${dir}/run.json`], { cwd: ws, encoding: 'utf8' });
+      assert.equal(r.status, 0, `사용자 스킬 영수증 start 가 막혔다: ${r.stderr}${r.stdout}`);
+      const sealed = JSON.parse(fs.readFileSync(path.join(ws, dir, 'run.json'), 'utf8'));
+      assert.equal(sealed.skills[0].path, 'workspace:brand/my-skills/101-ad-stop-judge/SKILL.md', '사용자 스킬 사본 경로가 작업 폴더 기준이 아니다');
+      assert.equal(sealed.skills[0].gate, true, 'gate 를 안 적은 사용자 스킬은 true 로 봉인한다');
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · 보완 파일 책 실습 끔 1 · 사용자 스킬 영수증 3 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

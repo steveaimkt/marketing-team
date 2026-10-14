@@ -13,6 +13,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { userSkills } from './plan-compiler.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKILLS = path.join(ROOT, '100-skills');
@@ -59,6 +60,17 @@ function blockList(fm, key) {
   return out;
 }
 
+const indexRow = (text, id) => {
+  const fm = frontmatter(text);
+  const row = { id, name: scalar(fm, 'name'), description: scalar(fm, 'description'), whenToUse: scalar(fm, 'when_to_use'), triggers: blockList(fm, 'triggers') };
+  return { ...row, triggerGrams: row.triggers.map(grams), nameGrams: grams(row.name), descGrams: grams(`${row.description} ${row.whenToUse}`) };
+};
+
+/** 작업 폴더의 사용자 스킬(brand/my-skills · 101~199) · 형식이 틀린 것은 userSkills 가 이미 뺐다 */
+export function loadUserIndex(cwd = process.cwd()) {
+  return [...userSkills(cwd).map.values()].map(d => ({ ...indexRow(fs.readFileSync(d.path, 'utf8'), d.id), user: true }));
+}
+
 let cached;
 export function loadRoutingIndex() {
   if (cached) return cached;
@@ -92,10 +104,10 @@ export function loadRoutingIndex() {
   return cached;
 }
 
-export function routeOne(request, { limit = 3 } = {}) {
+export function routeOne(request, { limit = 3, cwd = process.cwd() } = {}) {
   const query = grams(request);
   const compact = norm(request);
-  const candidates = loadRoutingIndex().map(skill => {
+  const candidates = [...loadRoutingIndex(), ...loadUserIndex(cwd)].map(skill => {
     const bestTrigger = Math.max(0, ...skill.triggerGrams.map(value => dice(query, value)));
     const exactTrigger = skill.triggers.some(value => {
       const phrase = norm(value);
@@ -103,13 +115,22 @@ export function routeOne(request, { limit = 3 } = {}) {
     });
     const score = Math.min(1, (exactTrigger ? 0.5 : 0) + bestTrigger * 0.42 +
       dice(query, skill.nameGrams) * 0.14 + dice(query, skill.descGrams) * 0.1);
-    return { id: skill.id, name: skill.name, score: Number(score.toFixed(4)), reason: skill.whenToUse || skill.description };
+    return { id: skill.id, name: skill.name, score: Number(score.toFixed(4)), reason: skill.whenToUse || skill.description,
+      // 사용자 스킬의 「정확히 일치」는 등록한 말이 요청 안에 통째로 있을 때다 · 요청이 트리거의 일부인 것은 아니다
+      ...(skill.user ? { user: true, exact: skill.triggers.some(value => { const p = norm(value); return p.length >= 4 && compact.includes(p); }) } : {}) };
   }).sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
+  // 사용자 스킬은 등록한 부를 말이 그대로 들어 있을 때만 고른다 (docs/G3-분기절차.md §2) · 그때는 맨 앞이다
+  const mine = candidates.find(row => row.user && row.exact);
+  if (mine) {
+    const rest = candidates.filter(row => row !== mine).slice(0, limit - 1);
+    return { request, candidates: [mine, ...rest], decision: mine.id, confidence: 'high', needs_user_choice: false };
+  }
   const top = candidates.slice(0, Math.max(2, limit));
   const margin = (top[0]?.score || 0) - (top[1]?.score || 0);
   // 낮은 절대 점수보다 후보 간 분리를 우선한다. 짧은 한국어 요청은 2-gram 점수가 원래 낮다.
   const low = (top[0]?.score || 0) < 0.18;
-  const tied = margin < 0.06;
+  // 뜻만 겹치는 사용자 스킬이 맨 앞이면 공식 스킬과 구분이 안 되는 것이다 · 한 번 묻는다
+  const tied = margin < 0.06 || Boolean(top[0]?.user);
   return {
     request,
     candidates: top.slice(0, limit),
@@ -120,11 +141,11 @@ export function routeOne(request, { limit = 3 } = {}) {
   };
 }
 
-export function routeRequest(request) {
+export function routeRequest(request, { cwd = process.cwd() } = {}) {
   const parts = String(request).split(/(?:\s*(?:그리고|하고|동시에|한 번에|그다음|→)\s*)/)
     .map(value => value.trim()).filter(Boolean).slice(0, 4);
-  if (parts.length <= 1) return { request_class: 'single', ...routeOne(request) };
-  return { request_class: 'compound', request, subrequests: parts.map(part => routeOne(part)) };
+  if (parts.length <= 1) return { request_class: 'single', ...routeOne(request, { cwd }) };
+  return { request_class: 'compound', request, subrequests: parts.map(part => routeOne(part, { cwd })) };
 }
 
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
