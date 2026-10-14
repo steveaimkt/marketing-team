@@ -738,6 +738,44 @@ try {
       r = spawnSync(process.execPath, [SCRIPT, 'finalize', `${dir}/run-5.json`, '--status', 'interrupted'], { cwd: ws, encoding: 'utf8' });
       assert.notEqual(r.status, 0, '봉인 뒤 「실데이터」로 고친 영수증을 finalize 가 통과시켰다');
       assert.match(r.stderr, /「실데이터」로 적을 수 없습니다/);
+
+      // (3) 자료를 읽어야 하는 045 가 업무 자료 없이 「실데이터」 · 회사 B S6·A 067 · 「틀」(또는 「추정」)이 맞다
+      fs.mkdirSync(path.join(ws, 'inputs', '양식'), { recursive: true });
+      fs.writeFileSync(path.join(ws, 'inputs', '양식', '월간보고_양식.docx'), 'docx');
+      fs.mkdirSync(path.join(ws, 'brand', '디자인'), { recursive: true });
+      fs.writeFileSync(path.join(ws, 'brand', '디자인', '가이드.md'), '# 가이드\n');
+      r = go('실데이터', [], 'run-6.json');
+      assert.notEqual(r.status, 0, '광고 자료 없이 만든 045 를 「실데이터」로 시작했다');
+      assert.match(r.stderr, /스킬 045, 광고 주간 성과 분석\. 읽는 자료는 「매체별 광고 데이터 소스」입니다\. 이 자료가 입력에 없어[\s\S]*「틀」[\s\S]*「추정」/, '「틀」·「추정」을 안내하지 않았다');
+      r = go('실데이터', [{ path: 'workspace:inputs/양식/월간보고_양식.docx', period: '-' }, { path: 'workspace:brand/디자인/가이드.md', period: '-' }], 'run-7.json');
+      assert.notEqual(r.status, 0, '회사 양식과 brand/ 만 입력으로 적은 045 를 「실데이터」로 시작했다');
+      r = go('틀', [], 'run-8.json');
+      assert.equal(r.status, 0, `「틀」을 data_mode 로 받지 않았다: ${r.stderr}`);
+      r = go('추정', [], 'run-9.json');
+      assert.equal(r.status, 0, r.stderr);
+      // 프로필만으로 만드는 생성 스킬(028 링크드인 글)은 입력 없이도 「실데이터」 그대로다
+      const d028 = 'outputs/2026-10-14/028-linkedin-post';
+      fs.mkdirSync(path.join(ws, d028), { recursive: true });
+      fs.writeFileSync(path.join(ws, d028, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '링크드인 글 써줘', skills: ['028'],
+        data_mode: '실데이터', inputs: [], profile: 'workspace:brand/profile.md', outputs: [`workspace:${d028}/028-linkedin-post.md`], ledger: { path: 'workspace:logs/build-log.md' } }));
+      r = spawnSync(process.execPath, [SCRIPT, 'start', `${d028}/run.json`], { cwd: ws, encoding: 'utf8' });
+      assert.equal(r.status, 0, `생성 스킬(028)의 「실데이터」를 막았다: ${r.stderr}`);
+
+      // (8) 앞 결과가 샘플로 만든 것이면 샘플로 센다 · 책 실습 4장 011 · 「혼합이 맞다」 경고가 잘못 나왔다
+      const d006 = 'outputs/2026-10-14/006-review-mining';
+      fs.mkdirSync(path.join(ws, d006), { recursive: true });
+      const 앞결과 = `workspace:${d006}/006-review-mining-해설.md`;
+      fs.writeFileSync(path.join(ws, d006, '006-review-mining-해설.md'), '# 해설\n');
+      const 앞영수증 = mode => fs.writeFileSync(path.join(ws, d006, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', run_id: 'r-006', status: 'completed', data_mode: mode, outputs: [{ path: 앞결과 }] }));
+      앞영수증('샘플');
+      r = go('샘플', [{ path: 앞결과, period: '-' }, 샘플], 'run-10.json');
+      assert.equal(r.status, 0, r.stderr);
+      assert.doesNotMatch(r.stderr, /혼합/, '샘플로 만든 앞 결과와 샘플을 「섞였다」고 했다');
+      r = go('실데이터', [{ path: 앞결과, period: '-' }], 'run-11.json');
+      assert.notEqual(r.status, 0, '샘플로 만든 앞 결과만 읽고 「실데이터」로 시작했다');
+      앞영수증('실데이터');
+      r = go('샘플', [{ path: 앞결과, period: '-' }, 샘플], 'run-12.json');
+      assert.match(r.stderr, /「혼합」이 맞습니다/, '실데이터 앞 결과와 샘플이 섞였는데 알리지 않았다');
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
 
@@ -754,6 +792,8 @@ try {
       const 하위 = skillDeclarations().get('092').writesTo.filter(v => v.split('/').length > 4).map(v => path.posix.basename(v));
       const 자리 = sub => 하위.map(n => `workspace:${dir}/${sub}/${n}`);
       const 열기 = (planSub, realSub, extra = []) => {
+        // 시도마다 새 실행이다 · 앞 시도의 영수증이 남아 있으면 compile 이 「이미 돈 계획」으로 막는다 (같은 날 재실행 규칙)
+        fs.rmSync(path.join(ws, dir, 'run.json'), { force: true });
         fs.writeFileSync(path.join(ws, dir, 'plan.json'), JSON.stringify({ request: '내 업무를 스킬로 만들자', skills: ['092'],
           steps: [{ step: 1, skill: '092', inputs: [], outputs: [rep, ...자리(planSub)], reviews: [] }] }));
         const c = pc('compile', `${dir}/plan.json`);
@@ -775,7 +815,7 @@ try {
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · 보완 파일 책 실습 끔 1 · 사용자 스킬 영수증 3 · 데이터 표시 근거 7 · 092 새 스킬 폴더 4 · ✅');
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · 보완 파일 책 실습 끔 1 · 사용자 스킬 영수증 3 · 데이터 표시 근거 7 · 틀·업무 자료 6 · 앞 결과 모드 3 · 092 새 스킬 폴더 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

@@ -65,6 +65,17 @@ write('outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md', �
 r = await runChecks({ outputs: ['workspace:outputs/2026-10-12/002-competitor-analysis/002-competitor-analysis.md'] }, resolve);
 check('원고 결과를 고친 파일은 「축」을 잡는다', hard(r).some(l => l.includes('「축」')));
 
+// 저자가 빼라고 한 낱말 · 참고 경고만 낸다(완료를 막지 않는다) · 「구분·경우·가지」로 바꾸라고 알린다 · 책 실습 원고 결과는 건너뛴다 (2026-10-14)
+const 갈 = '갈' + '\uB798';
+write('out/branch.md', `세 ${갈}로 나눴습니다. 두 번째 ${갈}는 보류입니다.\n`);
+r = await runChecks({ outputs: ['workspace:out/branch.md'] }, resolve);
+check(`「${갈}」는 참고 경고로 낸다`, hard(r).length === 0 && r.some(l => l.startsWith('⚠ 참고') && l.includes(`\`${갈}\` 2회`) && l.includes('「구분」·「경우」·「가지」')));
+const 원고043 = fs.readFileSync(new URL('../sample-data/참고결과/대본/광고애널리틱스/files/043-meta-ad-copy/043-meta-ad-copy.md', import.meta.url), 'utf8');
+check(`기준본에 「${갈}」가 있어야 이 시험이 뜻이 있다`, 원고043.includes(갈));
+write('outputs/2026-10-광고애널리틱스/043-meta-ad-copy/043-meta-ad-copy.md', 원고043.replaceAll('{월}', '2026-10'));
+r = await runChecks({ outputs: ['workspace:outputs/2026-10-광고애널리틱스/043-meta-ad-copy/043-meta-ad-copy.md'] }, resolve);
+check(`책 실습 원고 결과의 「${갈}」는 건너뛴다`, !r.some(l => l.includes(갈)));
+
 write('out/clean.md', '결과는 여기 저장했습니다 · outputs/2026-08-30/result.md\n');
 r = await runChecks({ outputs: ['workspace:out/clean.md'], checks: ['house-style'] }, resolve);
 check('깨끗한 문서는 통과한다', r.length === 0);
@@ -81,4 +92,4 @@ check('모르는 검사 이름을 잡는다', hard(r).some(l => l.includes('모�
 check('검사 목록이 노출된다', AVAILABLE_CHECKS.includes('pii') && AVAILABLE_CHECKS.includes('csv-format'));
 
 fs.rmSync(root, { recursive: true, force: true });
-console.log(`산출물 검사 · CSV 형식 4 · 우리말 9 · 미선언·오타 3 · ✅ (${pass})`);
+console.log(`산출물 검사 · CSV 형식 4 · 우리말 12 · 미선언·오타 3 · ✅ (${pass})`);

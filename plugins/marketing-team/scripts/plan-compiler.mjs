@@ -436,6 +436,190 @@ export function preferLatestReruns(plan, { cwd = process.cwd() } = {}) {
   return changed;
 }
 
+/* ── 같은 날 다시 돌리기 · 순번 하나 (2026-10-14 · 회사 B S7) ──────────────────────
+ * 같은 날 006 을 실데이터로 돌린 뒤 「샘플로 실습」을 돌리자 앞 실행의 plan.json 이 샘플 계획으로 덮였다.
+ * 계획은 006-review-mining-2/ 폴더에, 산출물은 006-review-mining/ 에 생겼고 빈 폴더가 남았다.
+ * 규칙은 하나다 · 폴더는 그대로(outputs/{날짜}/{번호}-{슬러그}/ · 체인은 outputs/{YYYY-MM}-{체인}/) ·
+ * N번째 실행은 계획 plan-N.json · 영수증 run-N.json · 산출물 {정본 이름}-N.{확장자}(006-review-mining-해설-2.md) ·
+ * 첫 실행은 순번 없이 plan.json · run.json · 정본 이름. 앞 실행의 plan·run 은 덮지 않는다.
+ * plan-compiler · run-receipt · runtime-guard 가 이 함수들을 같이 쓴다.
+ */
+export const slotName = (kind, n) => (n > 1 ? `${kind}-${n}.json` : `${kind}.json`);
+/** plan.json → 1 · plan-3.json → 3 · run-2.json → 2 · 아니면 null */
+export const slotOf = name => { const m = path.basename(String(name)).match(/^(?:plan|run)(?:-(\d+))?\.json$/); return m ? Number(m[1] || 1) : null; };
+/** 정본 이름에 순번을 붙인다 · 이미 순번이 붙은 이름은 정본으로 되돌린 뒤 붙인다 · 계약 이름이 숫자로 끝나도(051-detail-page-24) 안 깨진다 */
+export function slotOutput(base, n, contract = []) {
+  const m = base.match(/^(.*)-(\d+)(\.[a-z0-9]+)$/i);
+  const canon = contract.includes(base) || !m || !contract.includes(m[1] + m[3]) ? base : m[1] + m[3];
+  return n > 1 ? canon.replace(/(\.[a-z0-9]+)$/i, `-${n}$1`) : canon;
+}
+/** 그 자리(순번)의 영수증이 이미 시작됐으면 그 영수증 · 아니면 null */
+export function sealedRun(folder, n) {
+  try { const run = JSON.parse(fs.readFileSync(path.join(folder, slotName('run', n)), 'utf8')); return run?.run_id ? run : null; }
+  catch { return null; }
+}
+/** 그 폴더의 다음 빈 순번 · plan-N·run-N 이 하나라도 있는 순번은 찬 것이다 */
+export function nextSlot(folder) {
+  let max = 0;
+  try { for (const n of fs.readdirSync(folder)) { const k = slotOf(n); if (k && k > max) max = k; } } catch { /* 없는 폴더 */ }
+  return max + 1;
+}
+/** 단계 산출물의 계약 이름 · 고른 그릇을 반영한다 */
+function stepContract(step, choice, cwd) {
+  const d = skillDeclarations(cwd).get(String(step.skill || '').trim());
+  const 계약 = [...new Set((d?.writesTo || []).map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
+  try { return applyFormatChoice(계약, scopeFormatChoice(계약, choice)); } catch { return 계약; }
+}
+/** 「형식」 칸에 순번 붙은 이름을 적었으면 정본 이름으로 (실측 2026-10-14 · 회사 B 「006-review-mining-2.xlsx」) */
+function canonFormatKeys(plan, cwd) {
+  if (!plan.형식 || typeof plan.형식 !== 'object') return;
+  const all = new Set((plan.steps || []).flatMap(st => {
+    const d = skillDeclarations(cwd).get(String(st.skill || '').trim());
+    return (d?.writesTo || []).map(v => path.posix.basename(v));
+  }));
+  const out = {};
+  for (const [k, v] of Object.entries(plan.형식)) {
+    const m = path.posix.basename(k).match(/^(.*)-(\d+)(\.[a-z0-9]+)$/i);
+    const key = all.has(path.posix.basename(k)) || !m || !all.has(m[1] + m[3]) ? k : m[1] + m[3];
+    out[key] = v;
+  }
+  plan.형식 = out;
+}
+
+/**
+ * compile·approve 전에 계획을 바른 자리에 둔다 · 돌려주는 것 { file, said[], block } ·
+ *   체인 · plan.json 이 outputs/{YYYY-MM}-{체인}/ 이 아니면 그리로 옮기고 산출물을 {체인 폴더}/{스킬 폴더}/ 로 고친다 ·
+ *         바른 폴더에 이미 다른 plan.json 이 있으면 덮지 않고 막는다 (실측 2026-10-14 · 10장 팀 이름 폴더가 두 번 연속 남았다)
+ *   스킬 하나 · plan 이 그 스킬 번호로 시작하는 다른 폴더(006-review-mining-2/ 등)에 있으면 outputs/{날짜}/{스킬 폴더}/ 의 다음 순번 자리로 옮긴다
+ *   그 자리의 영수증이 이미 시작됐으면(앞 실행의 계획이면) 막고 새 자리를 알려 준다 · 덮으면 앞 실행의 근거가 사라진다
+ *   계획 순번과 산출물 순번이 다르면 계획 순번으로 맞춘다 (plan-2.json → …-2.xlsx)
+ * 옮기고 나서 비게 된 옛 폴더는 지운다 · 다른 파일이 있으면 그대로 둔다.
+ */
+const 실경로 = p => { try { return fs.realpathSync(p); } catch { return path.resolve(p); } };
+/** child 가 parent 안(같은 자리 포함)인가 · 없는 경로는 있는 윗자리까지 실경로로 맞춰 잰다 (/tmp ↔ /private/tmp) */
+export function isInside(child, parent) {
+  const realish = p => {
+    let d = path.resolve(p);
+    const rest = [];
+    while (!fs.existsSync(d) && path.dirname(d) !== d) { rest.unshift(path.basename(d)); d = path.dirname(d); }
+    return path.join(실경로(d), ...rest);
+  };
+  const rel = path.relative(realish(parent), realish(child));
+  return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+}
+
+/**
+ * 작업 폴더 · 계획 파일 경로에서 찾는다 · 셸의 현재 폴더는 믿지 않는다.
+ * 실측 2026-10-14 · 책 실습 11장 · 모델이 `cd {플러그인}/100-skills && head …` 를 돌린 뒤 바른 자리의 plan.json 을
+ * 절대 경로로 compile 했다 · cwd 기준으로 재자 계획이 플러그인 안 100-skills/outputs/ 로 옮겨지고 원본이 지워졌다.
+ * 찾는 순서 · ① 계획 위로 올라가며 가장 가까운 outputs/ 의 부모 ② outputs/ 를 품은 윗폴더 ③ CLAUDE_PROJECT_DIR ④ 셸 cwd
+ * 플러그인 폴더 안은 작업 폴더가 아니다 · 못 찾으면 null.
+ */
+export function workspaceOf(file, { env = process.env, cwd = process.cwd() } = {}) {
+  const 밖 = d => d && !isInside(d, PLUGIN);
+  const start = path.dirname(path.resolve(cwd, file));
+  // 플러그인 안의 계획은 위로 올라가 바깥 폴더를 작업 폴더로 삼지 않는다
+  if (밖(start)) {
+    for (let d = start; ; d = path.dirname(d)) {
+      if (path.basename(d) === 'outputs' && 밖(path.dirname(d))) return path.dirname(d);
+      if (path.dirname(d) === d) break;
+    }
+    for (let d = start; ; d = path.dirname(d)) {
+      if (fs.existsSync(path.join(d, 'outputs'))) return d;
+      if (path.dirname(d) === d) break;
+    }
+  }
+  for (const d of [env.CLAUDE_PROJECT_DIR, cwd]) if (d && 밖(path.resolve(d))) return path.resolve(d);
+  return null;
+}
+
+export function placePlan(file, plan, { cwd = process.cwd(), chain = plan.chain } = {}) {
+  const said = [];
+  // 옮길 자리·지울 자리가 모두 작업 폴더 안이어야 한다 · 플러그인 안에는 쓰지 않는다 (실측 2026-10-14 · 11장)
+  const 안전 = abs => isInside(abs, cwd) && !isInside(abs, PLUGIN);
+  const 밖막음 = (what) => ({ file, said, block: [`${what} · 계획 ${file} · 작업 폴더 ${cwd} · 아무것도 옮기거나 지우지 않았습니다`,
+    '계획을 작업 폴더의 outputs/ 아래에 두고 다시 compile 하세요 · 플러그인 폴더 안에는 쓰지 않습니다'] });
+  const relOf = abs => path.relative(cwd, abs).split(path.sep).join('/');
+  const here = relOf(path.dirname(file));
+  const steps = plan.steps || [];
+  const choice = (() => { try { return normalizeFormatChoice(plan.형식, '계획의'); } catch { return null; } })();
+  const folderOf = st => (skillDeclarations(cwd).get(String(st.skill || '').trim())?.writesTo || []).find(v => v.startsWith('outputs/'))?.split('/')[2] || '';
+  const d0 = new Date();
+  const today = `${d0.getFullYear()}-${String(d0.getMonth() + 1).padStart(2, '0')}-${String(d0.getDate()).padStart(2, '0')}`;
+  const outRels = steps.flatMap(st => st.outputs || []).map(v => String(v?.path ?? v).replace(/^workspace:/, ''));
+  let right;
+  if (chain) {
+    const month = (here.match(/^outputs\/(\d{4}-\d{2})/) || [])[1] || outRels.map(v => (v.match(/^outputs\/(\d{4}-\d{2})/) || [])[1]).find(Boolean) || today.slice(0, 7);
+    right = `outputs/${month}-${chain}`;
+  } else if (steps.length === 1 && folderOf(steps[0])) {
+    // 그 스킬 번호로 시작하는 폴더(006-review-mining-2/ 등)만 바로잡는다 · 다른 이름 폴더는 영수증 start 가 막는다
+    const id = String(steps[0].skill || '').trim();
+    if (!path.posix.basename(here).startsWith(`${id}-`)) return { file, said };
+    const day = [path.posix.basename(path.posix.dirname(here)), ...outRels.map(v => v.split('/')[1])].find(v => /^\d{4}-\d{2}-\d{2}$/.test(v || '')) || today;
+    right = `outputs/${day}/${folderOf(steps[0])}`;
+  } else return { file, said };
+
+  const rightAbs = path.join(cwd, right);
+  let target = file;
+  let n = slotOf(file) || 1;
+  if (here !== right) {
+    if (!안전(file)) return 밖막음('계획 파일이 작업 폴더 밖(또는 플러그인 안)에 있습니다');
+    if (!안전(rightAbs)) return 밖막음(`옮길 자리 ${right}/ 가 작업 폴더 밖(또는 플러그인 안)입니다`);
+    if (chain) {
+      if (fs.existsSync(path.join(rightAbs, 'plan.json')))
+        return { file, said, block: [`체인 「${chain}」의 결과는 ${right}/ 아래에 둡니다 · 그 폴더에 이미 다른 plan.json 이 있어 옮기지 않았습니다 · ${here}/`,
+          `체인 폴더 이름이 다릅니다 · plan.json 과 outputs 를 outputs/{YYYY-MM}-${chain}/ 아래로 옮겨 다시 compile 하세요`] };
+      n = 1;
+    } else n = nextSlot(rightAbs);
+    target = path.join(rightAbs, slotName('plan', n));
+  } else {
+    const run = sealedRun(rightAbs, n);
+    if (run && run.plan?.plan_sha256 && run.plan.plan_sha256 === planHash(plan) && plan.status === 'approved') return { file, said, sealed: run };
+    if (run) {
+      const m = nextSlot(rightAbs);
+      const ex = steps.flatMap(st => stepContract(st, choice, cwd)).map(b => slotOutput(b, m)).join(' · ');
+      return { file, said, block: [`${relOf(file)} 은 이미 돈 실행(${slotName('run', n)} · ${run.run_id})의 계획입니다 · 앞 실행의 계획과 영수증은 덮지 않습니다`,
+        `같은 날 다시 돌리면 같은 폴더에 새 순번으로 씁니다 · 계획 ${right}/${slotName('plan', m)} · 영수증 ${slotName('run', m)} · 산출물 ${ex}`] };
+    }
+  }
+  // 산출물 · 바른 폴더 아래 스킬 자리(하위 자리 {NNN}-{slug}/ 는 그대로) · 순번은 계획 순번으로 (첫 실행이면 이름은 그대로)
+  const norm = v => String(v?.path ?? v).replace(/^(?!workspace:)/, 'workspace:');
+  const place = (st, v) => {
+    const rel = norm(v).slice('workspace:'.length);
+    const folder = folderOf(st);
+    const at = rel.split('/').indexOf(folder);
+    const rest = at >= 0 ? rel.split('/').slice(at + 1) : [path.posix.basename(rel)];
+    if (n > 1) rest[rest.length - 1] = slotOutput(rest[rest.length - 1], n, stepContract(st, choice, cwd));
+    const want = chain ? `workspace:${right}/${folder}/${rest.join('/')}` : `workspace:${right}/${rest.join('/')}`;
+    return want === norm(v) ? v : want;
+  };
+  const map = new Map();
+  for (const st of steps) {
+    st.outputs = (st.outputs || []).map(v => { const next = place(st, v); if (next !== v) map.set(norm(v), next); return next; });
+  }
+  const oldPrefix = here !== right ? `workspace:${here}/` : null;
+  const fix = v => {
+    const s0 = norm(v);
+    if (map.has(s0)) return map.get(s0);
+    if (oldPrefix && s0.startsWith(oldPrefix)) return `workspace:${right}/${s0.slice(oldPrefix.length)}`;
+    return v;
+  };
+  for (const st of steps) st.inputs = (st.inputs || []).map(v => (String(v?.path ?? v).startsWith('plugin:') ? v : fix(v)));
+  canonFormatKeys(plan, cwd);
+  if (target !== file) {
+    fs.mkdirSync(rightAbs, { recursive: true });
+    fs.writeFileSync(target, `${JSON.stringify(plan, null, 2)}\n`);
+    fs.rmSync(file, { force: true });
+    try { if (!fs.readdirSync(path.dirname(file)).length) fs.rmdirSync(path.dirname(file)); } catch { /* 남은 파일이 있으면 그대로 */ }
+    said.push(chain
+      ? `📁 체인 폴더로 옮겼다 · ${relOf(file)} → ${relOf(target)} · 산출물도 ${right}/ 아래로 고쳤다`
+      : `📁 스킬 폴더로 옮겼다 · ${relOf(file)} → ${relOf(target)}${n > 1 ? ` · 같은 날 ${n}번째 실행 · 산출물 이름 끝에 -${n} · 영수증 ${slotName('run', n)}` : ''}`);
+  } else if (map.size) {
+    said.push(`↻ 산출물 자리를 계획에 맞췄다 · ${[...map].map(([a, b2]) => `${a.replace(/^workspace:/, '')} → ${b2.replace(/^workspace:/, '')}`).join(' · ')}`);
+  }
+  return { file: target, said };
+}
+
 /* ── 파일 조작 ──────────────────────────────────────────────── */
 
 const read = file => {
@@ -710,12 +894,11 @@ export function skillSampleFallback(d) {
 /** 스킬 inputs 에서 자료를 가리키는 칸 하나 · 괄호 안 설명은 뗀다 (괄호 안 쉼표로 쪼개지 않는다)
  *  고르는 순서 · (선택) 이 아닌 칸 중 자료 낱말이 든 첫 칸 → (선택) 이 아닌 첫 칸 → 첫 칸 */
 const 자료말 = /데이터|자료|리포트|보고서|리뷰|댓글|CSV|XLSX|엑셀|시트|이력|기록|로그|내보내기|녹취|메모|스냅샷|원가|VoC|문의/i;
-export function skillDataNeed(d) {
-  if (!d?.dir) return '';
+/** 스킬 inputs 칸을 하나씩 · { raw, name } · raw 는 괄호 설명까지, name 은 괄호를 뗀 이름 · brand/ 칸은 뺀다 */
+function inputItems(d) {
+  if (!d?.dir) return [];
   let text = '';
-  try { text = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'); } catch { return ''; }
-  // 실행 기록을 읽는 스킬(091·097·098·100)은 inputs 가 아니라 logs/build-log.md 가 자료다
-  if (/build-log/.test(skillSampleFallback(d)?.file || '')) return '실행 기록(logs/build-log.md)';
+  try { text = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'); } catch { return []; }
   let value = frontmatterField(text, 'inputs');
   if (value.startsWith('[') && value.endsWith(']')) value = value.slice(1, -1);
   const items = [];
@@ -727,9 +910,161 @@ export function skillDataNeed(d) {
   }
   items.push(cur);
   const tidy = v => 줄정리(v.replace(/\([^()]*\)|（[^（）]*）/g, '').replace(/[`*]/g, '').replace(/^있으면\s+/, ''));
-  const list = items.map(raw => ({ raw, name: tidy(raw) })).filter(v => v.name && !/^brand\//.test(v.name));
+  return items.map(raw => ({ raw, name: tidy(raw) })).filter(v => v.name && !/^brand\//.test(v.name));
+}
+export function skillDataNeed(d) {
+  if (!d?.dir) return '';
+  // 실행 기록을 읽는 스킬(091·097·098·100)은 inputs 가 아니라 logs/build-log.md 가 자료다
+  if (/build-log/.test(skillSampleFallback(d)?.file || '')) return '실행 기록(logs/build-log.md)';
+  const list = inputItems(d);
   const must = list.filter(v => !/선택/.test(v.raw));
   return (must.find(v => 자료말.test(v.raw)) || must[0] || list[0])?.name || '';
+}
+
+/* ── 이 스킬이 우리 자료를 읽어야 하나 · 무엇이 우리 자료인가 (2026-10-14 · v0.72.31 실측 회사 A·B) ──────
+ * 회사 A 는 inputs/양식/ 의 회사 양식과 brand/ 만 있는데 067 계획이 「우리 자료가 없습니다」를 내지 않았고,
+ * 회사 B 는 리뷰 csv 만 있는데 045(광고) 계획이 자료가 있다고 봤다. inputs/ 에 파일이 있느냐가 아니라
+ * 그 스킬의 자료 칸에 맞는 파일이 있느냐를 본다. 확신이 없으면 없다고 본다 · 샘플을 넣지 않는 쪽이 안전하다.
+ */
+
+/**
+ * 자료를 읽어야 하는 스킬인가 · 그 자료 칸 이름을 돌려준다 · 아니면 ''.
+ *   sample_fallback 이 있고 고아가 아니면 · 자료 칸(skillDataNeed)에 자료 낱말(자료요구말)이 있을 때만
+ *     (예: 006 「리뷰·댓글·CS 데이터」 · 045 「매체별 광고 데이터 소스」) · 실행 기록을 읽는 스킬은 그 기록
+ *   sample_fallback 이 없으면 · (선택)·(…시) 가 아닌 칸이 파일을 요구할 때만 (데이터·CSV·엑셀·내보내기·견적서·녹취·이력)
+ *     (예: 050 「현재 UTM 사용 현황(GA4 유입 내보내기 …)」 · 096 「견적서 2개 이상」)
+ *   프로필만으로 만드는 생성 스킬(카피·상세페이지·이름 짓기 · 013·028·051 등)은 '' 다.
+ */
+const 파일요구말 = /데이터|CSV|XLSX|엑셀|내보내기|견적서|녹취|이력/i;
+// 자료 칸을 볼 때 쓴다 · 자료말과 같되 「블로그」·「로그인」의 로그는 자료가 아니고, 광고 성과 칸(노출·클릭·광고비)은 자료다
+const 자료요구말 = /데이터|자료|리포트|보고서|리뷰|댓글|CSV|XLSX|엑셀|시트|이력|기록|(?<!블)로그(?!인)|내보내기|녹취|메모|스냅샷|원가|VoC|문의|광고비/i;
+export function skillNeedsData(d) {
+  if (!d?.dir) return '';
+  const fb = skillSampleFallback(d);
+  if (fb?.orphan) return '';
+  if (fb) {
+    if (/build-log/.test(fb.file)) return skillDataNeed(d);
+    const need = skillDataNeed(d);
+    const item = inputItems(d).find(v => v.name === need);
+    return item && 자료요구말.test(item.raw) ? need : '';
+  }
+  return inputItems(d).find(v => !/선택/.test(v.raw) && !/^\s*[(（]/.test(v.raw) && 파일요구말.test(v.raw))?.name || '';
+}
+
+// 자료 낱말 묶음 · 자료 칸에 한 낱말이 있으면 묶음 전체로 파일 이름을 본다 (영문은 낱말 경계로만 · 「ad」가 download 에 걸리지 않게)
+const 자료묶음 = [
+  ['리뷰', 'review', '후기', '상품평', '구매평', '별점'],
+  ['댓글', 'comment', 'dm'],
+  ['cs', '문의', 'voc', 'qna', '상담', '클레임', '고객의소리'],
+  ['광고', 'ads', 'ad', '메타', 'meta', 'facebook', '페이스북', '구글', 'google', '네이버', 'naver', '쿠팡', 'coupang', '캠페인', 'campaign', '매체', 'roas', 'gfa', '파워링크'],
+  ['매출', '판매', 'sales', '주문', 'order', 'orders', '구매', '결제', 'revenue'],
+  ['고객', 'customer', 'customers', '회원', 'member', 'crm'],
+  ['키워드', 'keyword', 'keywords', '검색어', '검색량'],
+  ['성과', '지표', '인사이트', 'insight', 'insights', '통계', 'ga4', 'analytics', '유입', '트래픽', 'traffic'],
+  ['설문', 'survey', 'nps', '응답'],
+  ['콘텐츠', 'content', '게시물', '포스트', 'post', 'posts', '피드'],
+  ['원가', 'cost', '마진', '단가'],
+  ['경쟁', 'competitor', '경쟁사'],
+  ['회의', '미팅', 'meeting', '녹취', '회의록'],
+  ['유튜브', 'youtube', '영상'],
+  ['인스타', 'instagram'],
+  ['재고', 'inventory', 'stock'],
+  ['퍼널', 'funnel', '전환'],
+  ['견적', 'quote', 'estimate'],
+];
+const 빈말 = new Set(['데이터', '자료', '소스', '파일', '목록', '정보', '기간', '분석', '기본', '최근', '최대', '건수', '또는', '있으면', '선택',
+  '권장', '산출물', '브랜드', 'a브랜드', 'csv', 'xlsx', '엑셀', '텍스트', '캡처', '시트', '구글시트', '로그인', '크롤링', '불가', '내보내서',
+  '내보내기', 'inputs', '중', '이상', '모드', '필수', '연결', '탐색', '보고서', '리포트', '로우데이터', 'api', 'mcp', '통합']);
+const 영문낱말 = w => /^[a-z0-9]+$/.test(w);
+/** 그 스킬의 자료를 알아보는 낱말 · 자료 칸(자료 낱말이 든 필수 칸 전부)과 sample_fallback 파일 이름에서 뽑는다 */
+export function skillDataWords(d) {
+  const need = skillNeedsData(d) || skillDataNeed(d);
+  const items = inputItems(d).filter(v => (!/선택/.test(v.raw) && 자료말.test(v.raw)) || v.name === need);
+  const fb = path.posix.basename(skillSampleFallback(d)?.file || '').replace(/\.[^.]+$/, '');
+  const tokens = [...items.map(v => v.name), fb].join(' ').toLowerCase().split(/[^0-9a-z가-힣]+/)
+    .map(t => t.replace(/별$/, '')).filter(t => t.length >= 2 && !/^\d/.test(t) && !빈말.has(t));
+  const words = new Set(tokens);
+  for (const g of 자료묶음) if (tokens.some(t => g.some(w => (영문낱말(w) ? t === w : t.includes(w))))) for (const w of g) words.add(w);
+  return [...words].filter(w => w.length >= 2);
+}
+const 낱말맞음 = (name, words) => {
+  const s = String(name).toLowerCase();
+  return words.some(w => (영문낱말(w) ? new RegExp(`(^|[^a-z])${w}s?([^a-z]|$)`).test(s) : s.includes(w)));
+};
+
+/** 프로필 §8 「자주 쓰는 회사 양식」에 적힌 파일 · 경로와 파일 이름 둘 다 */
+function 회사양식(cwd) {
+  const out = new Set();
+  for (const r of profileRows(cwd) || []) {
+    if (r.section !== '8' || !/회사 양식/.test(r.label)) continue;
+    for (const f of String(r.line).match(/[^\s`'"·,()|]+\.[a-z0-9]{2,5}/gi) || []) { out.add(f.replace(/^workspace:/, '')); out.add(path.posix.basename(f)); }
+  }
+  return out;
+}
+// 참고로 넣은 것 · 레퍼런스 이미지 · 좋았던 글 · 예시 · 양식 (폴더 이름에 있어도 같다)
+const 참고말 = /레퍼런스|참고|reference|좋았던|예시|example|샘플|sample|양식|template|템플릿/i;
+const 그림 = /\.(png|jpe?g|webp|gif|heic)$/i;
+
+/** 작업 폴더의 이 파일이 업무 자료가 아니라 회사 양식·참고 자료인가 · rel 은 작업 폴더 기준 */
+export function referenceFile(cwd, rel) {
+  const r = String(rel?.path ?? rel).replace(/^workspace:/, '').split(path.sep).join('/');
+  if (/^brand(\/|$)/.test(r) || /^inputs\/양식(\/|$)/.test(r)) return true;
+  const 양식 = 회사양식(cwd);
+  if (양식.has(r) || 양식.has(path.posix.basename(r))) return true;
+  return r.split('/').slice(r.startsWith('inputs/') ? 1 : 0).some(seg => 참고말.test(seg));
+}
+
+/** inputs/ 아래 이 스킬의 자료 칸에 맞는 파일 · 확장자와 이름 낱말로만 고른다 · 참고 자료는 세지 않는다 */
+export function matchingInputs(cwd, d) {
+  if (!cwd || !d) return [];
+  const words = skillDataWords(d);
+  if (!words.length) return [];
+  const 그림됨 = inputItems(d).some(v => /캡처|스크린샷|이미지|사진/.test(v.raw));
+  const out = [];
+  const walk = (dir, rel, depth) => {
+    let es = [];
+    try { es = fs.readdirSync(dir, { withFileTypes: true }); } catch { return; }
+    for (const e of es) {
+      if (e.name.startsWith('.')) continue;
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) { if (depth < 3) walk(path.join(dir, e.name), r, depth + 1); continue; }
+      const full = `inputs/${r}`;
+      if (referenceFile(cwd, full)) continue;
+      if (!/\.(csv|tsv|xlsx|xls|json|txt|md|pdf|docx|hwp|hwpx)$/i.test(e.name) && !(그림됨 && 그림.test(e.name))) continue;
+      if (낱말맞음(r, words)) out.push(full);
+    }
+  };
+  walk(path.join(cwd, 'inputs'), '', 0);
+  return out;
+}
+
+/** 그 폴더(와 위 폴더)의 영수증에서 이 산출물을 낸 실행의 data_mode · 못 찾으면 null */
+export function outputDataMode(cwd, rel) {
+  const r = String(rel?.path ?? rel).replace(/^workspace:/, '');
+  if (!cwd || !r.startsWith('outputs/')) return null;
+  const ref = `workspace:${r}`;
+  for (const dir of [path.posix.dirname(r), path.posix.dirname(path.posix.dirname(r))]) {
+    if (!dir.startsWith('outputs/')) continue;
+    let names = [];
+    try { names = fs.readdirSync(path.join(cwd, dir)).filter(n => /^run(-\d+)?\.json$/.test(n)); } catch { continue; }
+    for (const n of names) {
+      try {
+        const run = JSON.parse(fs.readFileSync(path.join(cwd, dir, n), 'utf8'));
+        const outs = (run.outputs || []).map(o => String(o?.path ?? o).replace(/^(?!workspace:)/, 'workspace:'));
+        if (outs.includes(ref) && run.data_mode) return run.data_mode;
+      } catch { /* 못 읽으면 다음 것 */ }
+    }
+  }
+  return null;
+}
+
+/** 계획·영수증에 적힌 입력이 업무 자료인가 · 회사 양식·참고 자료는 아니다 · 앞 결과는 그 실행의 data_mode 를 따른다 */
+export function workInput(cwd, ref) {
+  const v = String(ref?.path ?? ref);
+  if (!v.startsWith('workspace:')) return false;
+  if (referenceFile(cwd, v)) return false;
+  const mode = outputDataMode(cwd, v);
+  return !mode || mode === '실데이터' || mode === '혼합';
 }
 
 /** 받침이 있으면 「을」, 없으면 「를」 · 한글로 안 끝나면 「을(를)」 */
@@ -741,22 +1076,26 @@ const 을를 = word => {
 
 /**
  * 우리 자료를 달라고 할 때인가 · 그 스킬이 무엇을 받는지(inputs 의 자료 칸)를 돌려준다 · 아니면 null.
- * 판단 규칙 · 프로필 「채움」 · 실습 아님 · 첫 단계 입력과 계획 맨 위 입력이 비었고 inputs/ 도 비었다 ·
- * 그 스킬에 sample_fallback 이 있고 「고아 필드」가 아니다 (= 그 스킬은 자료 파일을 읽는다).
- * sample_fallback 이 없는 스킬(카피·이름 짓기처럼 프로필만으로 되는 생성)은 묻지 않고 그대로 돈다.
+ * 판단 규칙 · 프로필 「채움」 · 실습 아님 · 그 스킬이 자료를 읽어야 한다(skillNeedsData) ·
+ * 계획에 적힌 입력에 업무 자료가 없다(workInput · brand/·회사 양식·참고 자료·샘플로 만든 앞 결과는 세지 않는다) ·
+ * inputs/ 에 그 스킬의 자료 칸에 맞는 파일이 없다(matchingInputs · 확장자와 이름 낱말).
+ * 프로필만으로 되는 생성 스킬(카피·상세페이지·이름 짓기)은 묻지 않고 그대로 돈다.
+ * sample_fallback 이 없어도 파일을 요구하는 스킬(050·096 등)이면 묻는다 (2026-10-14 · 회사 B 045 계획에 줄이 없었다).
  */
 export function dataRequest(plan, cwd) {
   const first = (plan?.steps || [])[0];
   if (!cwd || !first || plan.실습 === true) return null;
-  if ((first.inputs || []).length || (plan.inputs || []).length) return null;
-  try { if (fs.readdirSync(path.join(cwd, 'inputs')).some(n => !n.startsWith('.'))) return null; } catch { /* inputs/ 없음 */ }
+  const listed = [...(first.inputs || []), ...(plan.inputs || [])];
+  if (listed.some(v => String(v?.path ?? v).replace(/^package:/, 'plugin:').startsWith('plugin:sample-data/'))) return null;   // 샘플을 적었으면 화면이 샘플 줄을 낸다
+  if (listed.some(v => workInput(cwd, v))) return null;
   if (profileState(cwd) !== '채움') return null;
   const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
-  const fb = skillSampleFallback(d);
-  if (!fb || fb.orphan) return null;
+  const need = skillNeedsData(d);
+  if (!need) return null;
   // 실행 기록을 읽는 스킬은 logs/build-log.md 에 기록이 있으면 그것이 우리 자료다
-  if (/build-log/.test(fb.file)) { try { if (fs.readFileSync(path.join(cwd, 'logs', 'build-log.md'), 'utf8').trim()) return null; } catch { /* 없음 */ } }
-  return skillDataNeed(d) || '이 업무의 자료';
+  if (/build-log/.test(skillSampleFallback(d)?.file || '')) { try { if (fs.readFileSync(path.join(cwd, 'logs', 'build-log.md'), 'utf8').trim()) return null; } catch { /* 없음 */ } }
+  else if (matchingInputs(cwd, d).length) return null;
+  return need || '이 업무의 자료';
 }
 
 /** 화면 「분석할 자료」 줄 · 우리 자료가 없을 때 (문서가 같은 문장을 쓴다 · docs/공통규약.md §0-b) */
@@ -815,16 +1154,24 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   const inputs = 입력목록.map(v => String(v?.path ?? v).replace(/^package:/, 'plugin:'));
   const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
   const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
-  const 샘플이유 = first.tpl['샘플 이유'] || 'inputs 폴더가 비어있어';
+  // 업무 자료 · brand/·회사 양식·참고 자료·샘플로 만든 앞 결과는 빼고 센다 (2026-10-14 · 회사 A 067 은 양식과 brand/ 만 적고 「읽습니다」가 찍혔다)
+  const ownData = inputs.filter(v => v.startsWith('workspace:') && workInput(cwd, v));
+  // 「샘플로 실습」을 고른 채움 프로필이면 그렇게 적는다 · 틀의 이유(「inputs 폴더에 리뷰 파일이 없어」)는 사실과 다를 수 있다
+  // (실측 2026-10-14 · 회사 B S7 · 리뷰 csv 가 있는데 「리뷰 파일이 없어」) · 빈 프로필(책 실습) 화면은 원고 글자 그대로다
+  const 샘플이유 = plan.실습 === true && profileState(cwd) === '채움' ? '실습을 고르셔서' : (first.tpl['샘플 이유'] || 'inputs 폴더가 비어있어');
   // 프로필 「채움」 · 실습 아님 · 자료 없음이면 샘플을 넣지 않고 우리 자료를 달라고 적는다 (빈 프로필 화면은 그대로)
-  const need = !own.length && !sample ? dataRequest(plan, cwd) : null;
-  if (own.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
-  else if (sample && first.tpl['샘플 자료']) lines.push(`분석할 자료: ${샘플이유} ${으로(first.tpl['샘플 자료'])} 돌립니다. 결과에는 [샘플]이 붙습니다.`);
+  const need = !ownData.length && !sample ? dataRequest(plan, cwd) : null;
+  if (ownData.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
+  else if (!own.length && sample && first.tpl['샘플 자료']) lines.push(`분석할 자료: ${샘플이유} ${으로(first.tpl['샘플 자료'])} 돌립니다. 결과에는 [샘플]이 붙습니다.`);
   else if (need) lines.push(자료없음줄(need));
+  else if (own.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
   // 보완 파일이 있는 스킬만 덧붙인다 · 없으면 원고 화면과 글자까지 같다
   const 우리양식 = [...new Set(rows.map(r => skillNotes(cwd, r.id)?.rel).filter(Boolean))].map(v => ` · 우리 양식 ${v}`).join('');
   const facts = profileFacts(cwd);
-  lines.push(`근거로 쓰는 것: ${facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${우리양식}`);
+  // 「샘플로 실습」(plan.실습) · 채움 프로필이어도 샘플 해석에는 연습용 A브랜드 프로필을 쓴다 · 회사 기준·우리 양식을 붙이지 않는다
+  // (실측 2026-10-14 · 회사 A·B · 실습 화면에 brand/profile.md 가 찍혀 회사 기준이 샘플 해석에 섞였다) · 빈 프로필 화면은 그대로다
+  const 연습 = plan.실습 === true && facts.state !== '빈';
+  lines.push(`근거로 쓰는 것: ${facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 연습 ? '실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${연습 ? '' : 우리양식}`);
 
   const firstOut = rel((first.step.outputs || [])[0] || '');
   const parts = firstOut.split('/');
@@ -873,7 +1220,7 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   // 체인 틀에 같은 키가 있으면 체인 것을 쓴다 · 없으면 첫 단계 스킬 것을 쓴다
   const pick = key => (isChain && chainTpl.목록[key]) || first.tpl.목록[key] || [];
   const handoff = pick('우리 자료로 하려면');
-  if ((sample || need) && !own.length && handoff.length) {
+  if (((sample && !own.length) || need) && handoff.length) {
     lines.push('', '우리 자료로 하려면');
     const 안내 = (isChain && chainTpl['우리 자료 안내']) || first.tpl['우리 자료 안내'];
     if (안내) lines.push(`  ${안내}`);
@@ -941,7 +1288,7 @@ export function bookCheck(plan, cwd) {
   // 우리 양식을 정했거나 회사 양식(inputs/양식/)을 넣었으면 원고 결과를 놓지 않는다 (2026-10-14)
   if (notesOfPlan(plan, cwd)) return no('우리 양식(brand/skill-notes)이 있다 · 독자 기준으로 만든다');
   if ((steps[0].inputs || []).some(양식입력)) return no('회사 양식(inputs/양식/)을 넣었다 · 독자 기준으로 만든다');
-  const folder = skillDeclarations().get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
+  const folder = skillDeclarations(cwd).get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
   const ref = folder && path.join(PLUGIN, 'sample-data', '참고결과', folder);
   if (!ref || !fs.existsSync(path.join(ref, '화면.md'))) return no('이 스킬의 기준본이 아직 없다');
   const text = f => /\.(md|html|csv|txt)$/i.test(f);
@@ -975,7 +1322,7 @@ export function bookInputs(plan, cwd) {
   if (!cwd || !profileIsEmpty(cwd) || notesOfPlan(plan, cwd)) return null;
   const steps = plan.steps || [];
   if (steps.length !== 1) return null;
-  const folder = skillDeclarations().get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
+  const folder = skillDeclarations(cwd).get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
   let spec;
   try { spec = JSON.parse(fs.readFileSync(path.join(PLUGIN, 'sample-data', '참고결과', folder, '입력.json'), 'utf8')); } catch { return null; }
   const cur = (steps[0].inputs || []).map(v => String(v?.path ?? v));
@@ -990,7 +1337,7 @@ export function bookInputs(plan, cwd) {
 }
 
 /**
- * 첫 단계 입력이 비었고 작업 공간 inputs/ 에도 자료가 없으면 그 스킬의 sample_fallback 으로 채운다.
+ * 첫 단계 입력이 비었고 작업 공간 inputs/ 에도 그 스킬의 자료 칸에 맞는 파일이 없으면(matchingInputs) 그 스킬의 sample_fallback 으로 채운다.
  * 스킬은 그때 어차피 샘플로 완주하는데, 계획에 [] 로 적히면 「분석할 자료」 줄이 빠지고 책 실습도
  * 「입력이 없다」로 꺼졌다 (실측 2026-10-12 · 4·8·9·10·11장 첫 턴 · 4장 006 이 원고와 다르게 분석됨).
  */
@@ -1000,9 +1347,10 @@ export function sampleInputs(plan, cwd) {
   // 샘플로 채우는 것은 프로필이 「빈」이거나 사용자가 「샘플로 실습」을 말했을 때(plan.실습)뿐이다 (2026-10-14 · 검토 P0)
   // 우리 회사 프로필에 A브랜드 리뷰를 넣으면 그 리뷰의 고객·제품은 여전히 A브랜드 것이다
   if (plan.실습 !== true && profileState(cwd) !== '빈') return null;
-  try { if (fs.readdirSync(path.join(cwd, 'inputs')).some(n => !n.startsWith('.'))) return null; } catch { /* inputs/ 없음 */ }
   const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
   if (!d) return null;
+  // inputs/ 에 그 스킬의 자료 칸에 맞는 파일이 있으면 채우지 않는다 · 회사 양식·레퍼런스·좋았던 글은 자료가 아니다 (2026-10-14)
+  if (matchingInputs(cwd, d).length) return null;
   const fallback = skillSampleFallback(d)?.file || '';
   if (!fallback) return null;
   first.inputs = [`plugin:${fallback}`];
@@ -1223,30 +1571,46 @@ if (isCli) {
     console.log(screen);
     process.exit(0);
   }
-  const file = path.resolve(process.cwd(), target);
-  if (path.basename(file) !== 'plan.json') fail('계획 파일 이름은 plan.json 이어야 합니다.');
+  let file = path.resolve(process.cwd(), target);
+  // 작업 폴더는 계획 파일 경로에서 찾는다 · 셸 cwd 가 플러그인 안에 남아 있어도 결과가 같아야 한다 (실측 2026-10-14 · 11장)
+  if (isInside(file, PLUGIN)) fail(`계획 파일이 플러그인 폴더 안에 있습니다 · 플러그인 안에는 쓰지 않습니다 · 작업 폴더의 outputs/ 아래에 plan.json 을 두세요 · ${file}`);
+  const ws = workspaceOf(file) || process.cwd();
+  // 같은 날 다시 돌리면 plan-2.json · run-2.json 처럼 순번이 붙는다 (2026-10-14 · 회사 B S7)
+  if (!/^plan(-\d+)?\.json$/.test(path.basename(file))) fail('계획 파일 이름은 plan.json 이어야 합니다 · 같은 날 다시 돌리면 plan-2.json 처럼 순번을 붙입니다.');
   const plan = read(file);
 
   if (command === 'compile') {
-    const filled = sampleInputs(plan, process.cwd());
+    // 계획을 바른 자리에 둔다 · 체인 폴더 · 스킬 폴더 · 같은 날 다시 돌리면 다음 순번 · 앞 실행의 계획은 덮지 않는다
+    let chainName = plan.chain || null;
+    if (!chainName) try { chainName = compileChain(plan).chain || null; } catch { chainName = null; }
+    const placed = placePlan(file, plan, { cwd: ws, chain: chainName });
+    for (const line of placed.said) console.log(line);
+    if (placed.block) { console.error(`⛔ ${placed.block[0]}`); failPlan(placed.block[1]); }
+    if (placed.sealed) {
+      console.log(`✅ 이미 승인되어 실행한 계획입니다 · ${slotName('run', slotOf(file) || 1)} · ${placed.sealed.run_id} · 다시 compile 하지 않습니다`);
+      process.exit(0);
+    }
+    file = placed.file;
+    const filled = sampleInputs(plan, ws);
     if (filled) console.log(`📎 inputs 가 비어 샘플 자료로 채웠다 · ${filled[0].replace(/^plugin:/, '')}`);
-    else { const need = dataRequest(plan, process.cwd()); if (need) console.log(자료없음안내(need)); }
-    for (const line of userSkills(process.cwd()).warnings) console.log(`🟡 ${line}`);
-    for (const line of notesFormat(plan, process.cwd())) console.log(line);
+    else { const need = dataRequest(plan, ws); if (need) console.log(자료없음안내(need)); }
+    if (plan.실습 === true && profileState(ws) === '채움') console.log('📖 실습은 연습용 A브랜드 프로필로 읽는다 · 회사 기준(brand/profile.md · 우리 양식)을 샘플 해석에 붙이지 않는다');
+    for (const line of userSkills(ws).warnings) console.log(`🟡 ${line}`);
+    for (const line of notesFormat(plan, ws)) console.log(line);
     for (const st of plan.steps || []) {
-      const note = skillNotes(process.cwd(), String(st.skill || '').match(/\d{3}/)?.[0]);
+      const note = skillNotes(ws, String(st.skill || '').match(/\d{3}/)?.[0]);
       if (!note?.양식원본) continue;
-      const there = fs.existsSync(path.resolve(process.cwd(), note.양식원본.replace(/^workspace:/, '')));
+      const there = fs.existsSync(path.resolve(ws, note.양식원본.replace(/^workspace:/, '')));
       console.log(there ? `📎 우리 양식 원본 · ${note.양식원본} 의 틀을 따른다` : `🟡 ${note.rel} 의 양식 원본이 없습니다 · ${note.양식원본}`);
     }
     // 할 일 줄 · 화면 밖 안내다 · 계획 화면 글자는 바꾸지 않는다
-    for (const line of todoLines(plan, process.cwd())) console.log(line);
-    const forced = bookInputs(plan, process.cwd());
+    for (const line of todoLines(plan, ws)) console.log(line);
+    const forced = bookInputs(plan, ws);
     if (forced) console.log(`📖 책 실습 · 원고 계획의 입력으로 맞췄다 · ${forced.map(v => v.replace(/^(workspace|plugin):/, '')).join(' · ')}`);
-    const issues = validatePlan(plan);
+    const issues = validatePlan(plan, { cwd: ws });
     if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); failPlan(`계획이 계약과 맞지 않습니다 · ${issues.length}건`); }
     plan.schema = SCHEMA;
-    for (const [from, to] of preferLatestReruns(plan)) console.log(`↻ 같은 날 다시 돌린 결과를 읽습니다 · ${from.replace(/^workspace:/, '')} → ${to.replace(/^workspace:/, '')}`);
+    for (const [from, to] of preferLatestReruns(plan, { cwd: ws })) console.log(`↻ 같은 날 다시 돌린 결과를 읽습니다 · ${from.replace(/^workspace:/, '')} → ${to.replace(/^workspace:/, '')}`);
     const graph = compileChain(plan);
     plan.chain_graph = { schema: graph.schema, chain: graph.chain, nodes: graph.nodes, edges: graph.edges };
     plan.risks = graph.warnings;
@@ -1258,21 +1622,23 @@ if (isCli) {
     // plan.json 에 chain 이 끝내 비어 있었기 때문이다.
     if (graph.chain) plan.chain = graph.chain;
     // 이름 있는 체인은 outputs/{YYYY-MM}-{체인}/ 에 쌓는다 · 팀 이름으로 부르면 모델이 「2026-10-퍼포먼스마케팅팀」처럼
-    // 폴더를 지어 원고(광고애널리틱스)와 달라지고 책 실습 대본도 열리지 않았다 (실측 2026-10-12 · 10장)
-    if (plan.chain) {
-      const 자리 = new RegExp(`^(workspace:)?outputs/\\d{4}-\\d{2}-${plan.chain.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}/`);
-      const 틀림 = (plan.steps || []).flatMap(st => st.outputs || []).map(v => String(v?.path ?? v)).filter(v => !자리.test(v));
-      const 여기 = path.relative(process.cwd(), path.dirname(file)).split(path.sep).join('/');
-      if (!자리.test(`${여기}/`)) 틀림.unshift(`plan.json (${여기}/)`);
-      if (틀림.length) {
-        for (const v of 틀림) console.error(`⛔ 체인 「${plan.chain}」의 결과는 outputs/{YYYY-MM}-${plan.chain}/ 아래에 둡니다 · ${v}`);
-        failPlan(`체인 폴더 이름이 다릅니다 · plan.json 과 outputs 를 outputs/{YYYY-MM}-${plan.chain}/ 아래로 옮겨 다시 compile 하세요`);
-      }
+    // 폴더를 지어 원고(광고애널리틱스)와 달라지고 책 실습 대본도 열리지 않았다 (실측 2026-10-12 · 10장).
+    // 처음에는 막기만 했는데 모델이 옛 폴더를 못 지워 빈 폴더가 남았다 (실측 2026-10-14 · 두 번 연속) · 이제 위 placePlan 이
+    // 스스로 옮긴다. 체인 이름을 compile 이 여기서 처음 알게 된 경우(정본 순서와 같음)도 한 번 더 자리를 본다.
+    if (plan.chain && plan.chain !== chainName) {
+      const again = placePlan(file, plan, { cwd: ws, chain: plan.chain });
+      for (const line of again.said) console.log(line);
+      if (again.block) { console.error(`⛔ ${again.block[0]}`); failPlan(again.block[1]); }
+      file = again.file;
+      const re = validatePlan(plan, { cwd: ws });
+      if (re.length) { for (const line of re) console.error(`⛔ ${line}`); failPlan(`계획이 계약과 맞지 않습니다 · ${re.length}건`); }
+      const g2 = compileChain(plan);
+      plan.chain_graph = { schema: g2.schema, chain: g2.chain, nodes: g2.nodes, edges: g2.edges };
     }
     plan.plan_sha256 = planHash(plan);
     plan.status = 'awaiting-approval';
     plan.approved_sha256 = null;
-    const screen = renderPlanScreen(plan, { cwd: process.cwd() });
+    const screen = renderPlanScreen(plan, { cwd: ws });
     if (screen) plan.screen = screen; else delete plan.screen;
     write(file, plan);
     console.log(`✅ 계획 확정 · ${plan.skills.join('→')} · ${plan.plan_sha256.slice(0, 12)} · 승인 대기`);
@@ -1283,14 +1649,20 @@ if (isCli) {
     }
     // 계획 흔적을 실행 타래에 남긴다 (P2 · 2026-08-30) — 작업 공간일 때만 · 실패해도 컴파일을 막지 않는다.
     try {
-      if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {
+      if (fs.existsSync(path.resolve(ws, 'outputs'))) {
         const { appendEvent } = await import('./orchestrator-events.mjs');
-        appendEvent(process.cwd(), { plan: { plan_sha256: plan.plan_sha256 }, skills: plan.skills, status: plan.status },
+        appendEvent(ws, { plan: { plan_sha256: plan.plan_sha256 }, skills: plan.skills, status: plan.status },
           'plan.compiled', { plan_id: plan.plan_id || null, request: plan.request || null });
       }
     } catch { /* 무시 */ }
   } else if (command === 'approve') {
-    const issues = validatePlan(plan);
+    // 앞 실행이 이미 이 자리의 계획으로 돌았으면 다른 계획을 봉인하지 않는다 · 같은 계획이면 그대로 둔다
+    const run = sealedRun(path.dirname(file), slotOf(file) || 1);
+    if (run && run.plan?.plan_sha256 !== planHash(plan)) {
+      const m = nextSlot(path.dirname(file));
+      fail(`${path.basename(file)} 은 이미 돈 실행(${slotName('run', slotOf(file) || 1)} · ${run.run_id})의 계획입니다 · 덮지 않습니다 · 같은 폴더에 ${slotName('plan', m)} 로 다시 쓰고 compile 하세요`);
+    }
+    const issues = validatePlan(plan, { cwd: ws });
     if (issues.length) { for (const line of issues) console.error(`⛔ ${line}`); fail('계획이 계약과 맞지 않아 승인할 수 없습니다.'); }
     const current = planHash(plan);
     if (plan.plan_sha256 && plan.plan_sha256 !== current)
@@ -1301,14 +1673,14 @@ if (isCli) {
     write(file, plan);
     console.log(`✅ 계획 승인 봉인 · ${current.slice(0, 12)}`);
     try {
-      if (fs.existsSync(path.resolve(process.cwd(), 'outputs'))) {
+      if (fs.existsSync(path.resolve(ws, 'outputs'))) {
         const { appendEvent } = await import('./orchestrator-events.mjs');
-        appendEvent(process.cwd(), { plan: { plan_sha256: current }, skills: plan.skills, status: plan.status },
+        appendEvent(ws, { plan: { plan_sha256: current }, skills: plan.skills, status: plan.status },
           'plan.approved', { plan_id: plan.plan_id || null, request: plan.request || null });
       }
     } catch { /* 무시 */ }
   } else if (command === 'check') {
-    const issues = validatePlan(plan);
+    const issues = validatePlan(plan, { cwd: ws });
     for (const line of issues) console.error(`⛔ ${line}`);
     const state = approvalState(plan);
     if (!state.ok) fail(state.reason);

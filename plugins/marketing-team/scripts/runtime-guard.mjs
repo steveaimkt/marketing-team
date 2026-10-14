@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
-import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills } from './plan-compiler.mjs';
+import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills, slotOf, slotName, sealedRun, nextSlot } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -29,7 +29,24 @@ const APPROVAL_SUFFIX = /(?:^|[\s,.!?~])(?:진행\s*승인|계획\s*승인|승�
 // 「진행 승인하지 마세요」·「진행 승인합니다. 아니, 취소할게요」가 접두 승인으로 통과했다).
 // 재료에 우연히 걸리면 한 번 더 묻게 될 뿐이다 · 오인 승인보다 안전한 쪽을 고른다.
 const WITHDRAW = /하지\s*마|하지\s*말|말아\s*(?:줘|주세요|요)|취소|보류|철회|중단|멈춰|그만|아니(?:요|[,.\s]|$)|아뇨|잠깐|아직/;
-const APPROVAL = { test: text => !WITHDRAW.test(text) && (APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text)) };
+// 「진행 승인」으로 시작하는 말은 첫 문장만 철회어를 본다 (실측 2026-10-14 · 회사 B S3 · 「진행 승인. 백화점은 아직 정하지 않았어…」가
+// 「아직」 때문에 보류로 읽혀 승인을 한 번 더 받았다). 뒤 문장은 재료다 · 다만 뒤 문장이 철회로 시작하거나(「아니, 취소할게요」·「잠깐」)
+// 승인·진행을 거두는 말(「승인 취소」·「진행하지 마」·「취소할게」)이면 여전히 철회다.
+// 경계 · 마침표·느낌표·물음표·줄바꿈·「그리고」·「그런데」·「근데」 · 말줄임(…)은 경계가 아니다(「진행 승인… 아니 잠깐 아직」은 한 문장이다).
+const 문장경계 = /[.!?。！？\n]|그리고|그런데|근데/;
+const 바로철회 = /^[\s,.!?~·…]*(?:아니(?:요|[,.\s]|$)|아뇨|잠깐|취소|보류|철회|중단|멈춰|그만(?!큼)|하지\s*마|하지\s*말)/;
+const 승인거둠 = /(?:승인|진행)\s*(?:은|는|을|를|도)?\s*(?:취소|보류|철회|중단|하지\s*마|하지\s*말|말아|안\s*할|못\s*하)|(?:취소|보류|철회)\s*(?:할게|할래|해\s*줘|해주세요|합니다|하자|해요|할게요)|멈춰|그만\s*(?:해|하자|둬)/;
+function withdrawn(text) {
+  const t = String(text);
+  if (!/^\s*진행\s*승인/.test(t)) return WITHDRAW.test(t);
+  const head = t.replace(/^\s*진행\s*승인/, '');
+  const at = head.search(문장경계);
+  const first = at < 0 ? t : t.slice(0, t.length - head.length + at);
+  if (WITHDRAW.test(first)) return true;
+  if (at < 0) return false;
+  return head.slice(at).split(new RegExp(문장경계.source, 'g')).some(part => 바로철회.test(part) || 승인거둠.test(part));
+}
+const APPROVAL = { test: text => !withdrawn(text) && (APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text)) };
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-marketer/SKILL.md', '\\skills\\ai-marketer\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 // 진입 스킬 셋은 절차를 여는 문이다 · 여는 것 자체는 승인 대상이 아니다
@@ -118,7 +135,7 @@ function approved(rows) {
   for (let i = latestPlan + 1; i < rows.length; i++) {
     if (rows[i].role !== 'user') continue;
     if (APPROVAL.test(rows[i].text)) ok = true;
-    else if (WITHDRAW.test(rows[i].text)) ok = false;
+    else if (withdrawn(rows[i].text)) ok = false;
   }
   if (ok) return { ok: true, plan: rows[latestPlan].text };
   return { ok: false, reason: '사용자의 명시적 진행 승인이 없습니다.' };
@@ -194,6 +211,23 @@ function draftConfirmIssue(cwd, receiptArg, rows) {
     `G2 [실행 계획]에서 형식을 확인받은 뒤 시작하거나, 비대화형이면 산출물에 그 문구를 남긴 뒤 다시 시도하세요.`;
 }
 
+/** 시작한 영수증과 그 계획을 덮는 쓰기인가 · 덮으면 앞 실행의 근거가 사라진다 · 같은 폴더의 다음 순번을 알려 준다 */
+function sealedWriteIssue(input) {
+  if (!['Write', 'Edit', 'MultiEdit', 'NotebookEdit'].includes(input.tool_name)) return '';
+  const raw = input.tool_input?.file_path || input.tool_input?.notebook_path || input.tool_input?.path;
+  const name = path.basename(String(raw || ''));
+  const n = slotOf(name);
+  if (!raw || !n) return '';
+  const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
+  const folder = path.dirname(path.resolve(cwd, raw));
+  const run = sealedRun(folder, n);
+  if (!run) return '';
+  const m = nextSlot(folder);
+  const 무엇 = name.startsWith('run') ? '시작한 실행 영수증' : `이미 돈 실행(${slotName('run', n)} · ${run.run_id})의 계획`;
+  return `${path.relative(cwd, path.resolve(cwd, raw))} 은 ${무엇}이라 덮지 않습니다. 영수증은 run-receipt 가 씁니다. ` +
+    `같은 날 같은 스킬을 다시 돌리면 같은 폴더에 ${slotName('plan', m)} 를 새로 쓰고 compile 하세요 · 산출물은 -${m}, 영수증은 ${slotName('run', m)} 입니다.`;
+}
+
 function validateWrite(input) {
   const toolInput = input.tool_input || {};
   const raw = input.tool_name === 'NotebookEdit'
@@ -234,13 +268,89 @@ function allowedPython(input) {
   const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
   const abs = path.resolve(cwd, script);
   if (inside(path.join(cwd, 'outputs'), abs)) return true;
+  // 공식 문서 스킬 캐시의 스크립트는 계획 형식을 보는 docBuildCommand 가 맡는다
+  if (officialDocSkill(abs)) return false;
   return /[\\/]skills[\\/](?:xlsx|docx|pptx|pdf)[\\/]/.test(abs);
+}
+
+/**
+ * 승인 뒤 공식 문서 스킬이 시키는 명령 (실측 2026-10-14 · 회사 B 084 · 공식 pptx 스킬은 pptxgenjs 스크립트를 써서
+ * node 로 돌리고 scripts/office/validate.py 로 검사하라고 한다. 셋 다 막혀 「저장실패」로 끝났다).
+ * 승인한 계획의 형식이나 산출물에 그 확장자가 있을 때만 연다 · 여는 것은 셋이다.
+ *  (a) 작업 폴더 outputs 안의 .js·.mjs·.cjs 를 node 로
+ *  (b) 공식 문서 스킬 캐시의 skills/(그 형식)/scripts/** 를 python 으로 (경로 인수는 outputs 안 · --original 값만 inputs 도)
+ *  (c) 공식 스킬 SKILL.md 가 쓰는 표준 도구 · soffice·libreoffice 변환(--outdir 가 outputs 안) · pdftoppm 렌더 · markitdown 읽기
+ * 명령 하나짜리만 · cd·파이프·리다이렉션·이어 붙이기·변수·치환은 그대로 막는다.
+ */
+const DOC_EXTS = ['pptx', 'docx', 'xlsx', 'pdf'];
+function planDocFormats(plan) {
+  const text = String(plan || '');
+  return new Set(DOC_EXTS.filter(ext => new RegExp(`\\.${ext}(?![a-z0-9])|["']${ext}["']`, 'i').test(text)));
+}
+const OFFICIAL_DOC_SCRIPT = /[\\/]\.claude[\\/]plugins[\\/]cache[\\/]anthropic-agent-skills[\\/]document-skills[\\/][^\\/]+[\\/]skills[\\/](pptx|docx|xlsx|pdf)[\\/]scripts[\\/]/;
+const officialDocSkill = abs => (String(abs).match(OFFICIAL_DOC_SCRIPT) || [])[1] || null;
+
+function shellTokens(command) {
+  const raw = String(command || '').trim();
+  if (!raw || /[;&|<>`\n\r$\\]/.test(raw)) return null;
+  const tokens = [];
+  const re = /"([^"]*)"|'([^']*)'|(\S+)/g;
+  let m;
+  while ((m = re.exec(raw))) {
+    if (m[3] !== undefined && /["']/.test(m[3])) return null;
+    tokens.push(m[1] ?? m[2] ?? m[3]);
+  }
+  return tokens;
+}
+
+function docBuildCommand(input, plan) {
+  const formats = planDocFormats(plan);
+  if (!formats.size) return false;
+  const tokens = shellTokens(input.tool_input?.command);
+  if (!tokens || tokens.length < 2) return false;
+  const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
+  const expand = t => (t.startsWith('~/') ? path.join(process.env.HOME || '', t.slice(2)) : t);
+  const under = (root, t) => inside(path.join(cwd, root), path.resolve(cwd, expand(t)));
+  // 인수 검사 · 깃발(-x)과 숫자는 그대로 · 값을 받는 깃발 뒤 값은 그 깃발 규칙 · 나머지 경로는 outputs 안
+  const VALUE_FLAGS = new Set(['--convert-to', '-r', '-f', '-l', '-scale-to', '-scale-to-x', '-scale-to-y']);
+  const argsOk = (args, { needOutdir = false } = {}) => {
+    let outdir = false;
+    for (let i = 0; i < args.length; i++) {
+      const a = args[i];
+      if (/^--outdir$|^-o$/.test(a)) {
+        if (!args[i + 1] || !under('outputs', args[i + 1])) return false;
+        outdir = true; i++; continue;
+      }
+      if (a === '--original') {
+        if (!args[i + 1] || !(under('outputs', args[i + 1]) || under('inputs', args[i + 1]))) return false;
+        i++; continue;
+      }
+      if (VALUE_FLAGS.has(a)) {
+        if (!/^[\w:.-]+$/.test(args[i + 1] || '') || /[\\/]/.test(args[i + 1])) return false;
+        i++; continue;
+      }
+      if (a.startsWith('-')) { if (!/^--?[\w-]+$/.test(a)) return false; continue; }
+      if (/^\d+$/.test(a)) continue;
+      if (!under('outputs', a)) return false;
+    }
+    return !needOutdir || outdir;
+  };
+  const [cmd, first, ...rest] = tokens;
+  const converts = tokens.includes('--convert-to');
+  if (cmd === 'node') return /\.(?:c|m)?js$/i.test(first) && under('outputs', first) && argsOk(rest);
+  if (/^python3?$/.test(cmd)) {
+    const ext = officialDocSkill(path.resolve(cwd, expand(first)));
+    return Boolean(ext && formats.has(ext)) && argsOk(rest, { needOutdir: converts });
+  }
+  if (cmd === 'soffice' || cmd === 'libreoffice') return converts && argsOk([first, ...rest], { needOutdir: true });
+  if (cmd === 'pdftoppm' || cmd === 'markitdown') return argsOk([first, ...rest]);
+  return false;
 }
 
 function isPlanDraftWrite(input) {
   if (!['Write', 'Edit'].includes(input.tool_name)) return false;
   const raw = input.tool_input?.file_path || input.tool_input?.path;
-  if (!raw || path.basename(String(raw)) !== 'plan.json' || validateWrite(input)) return false;
+  if (!raw || !/^plan(-\d+)?\.json$/.test(path.basename(String(raw))) || validateWrite(input)) return false;
   const cwd = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
   return path.relative(cwd, path.resolve(cwd, raw)).split(path.sep)[0] === 'outputs';
 }
@@ -255,6 +365,8 @@ function validateBash(input) {
   const cacheMatches = command.match(/(?:~|\/[^\s"']+)?\/\.claude\/plugins\/cache\/[^\s"']+/g) || [];
   for (const raw of cacheMatches) {
     const expanded = raw.startsWith('~/') ? path.join(process.env.HOME || '', raw.slice(2)) : raw;
+    // 공식 문서 스킬의 scripts/** 만 예외 · 실행은 승인 뒤 계획 형식이 있을 때만 열린다(docBuildCommand)
+    if (officialDocSkill(path.resolve(expanded))) continue;
     if (!inside(pluginRoot, path.resolve(expanded)))
       return '다른 캐시·설치본을 참조하지 마세요. 현재 ${CLAUDE_PLUGIN_ROOT}만 사용하세요.';
   }
@@ -381,9 +493,13 @@ function allowedScript(input, stage) {
 function validateSkill(input, plan) {
   const skill = String(input.tool_input?.skill || input.tool_input?.name || '').trim();
   if (!skill) return '호출할 스킬 이름을 확인할 수 없습니다.';
-  if (!plan.includes(skill))
-    return `실행 계획에 없는 추가 스킬은 호출할 수 없습니다: ${skill} · 필요하면 새 [실행 계획]에 추가해 다시 승인받으세요.`;
-  return '';
+  if (plan.includes(skill)) return '';
+  // 공식 문서 스킬 · 계획 화면에는 「공식 document-skills」·「.pptx」만 적히고 호출 이름(document-skills:pptx ·
+  // 캐시 접두 683bc88e56f3:pptx)은 없다 (실측 2026-10-14 · 회사 A·B 084 가 여기서 막혔다) ·
+  // 승인한 계획의 형식이나 산출물에 그 확장자가 있으면 그 확장자로 끝나는 문서 스킬 호출을 허용한다
+  const ext = (skill.match(/^(?:[\w.-]+:)?(pptx|docx|xlsx|pdf)$/i) || [])[1]?.toLowerCase();
+  if (ext && planDocFormats(plan).has(ext)) return '';
+  return `실행 계획에 없는 추가 스킬은 호출할 수 없습니다: ${skill} · 필요하면 새 [실행 계획]에 추가해 다시 승인받으세요.`;
 }
 
 /* ── 저위험 자동 승인 · 저자 지시 2026-09-07 「요청하면 바로 결과」 ──────────
@@ -526,6 +642,13 @@ async function main() {
     }
   }
 
+  // 앞 실행의 계획·영수증은 덮지 않는다 (실측 2026-10-14 · 회사 B S7 · 같은 날 「샘플로 실습」이 실데이터 실행의 plan.json 을 덮었다).
+  // 시작한 영수증(run-N.json · run_id 있음)과 그 짝 계획(plan-N.json)은 Write/Edit 로 바꾸지 못한다 · 승인 여부와 상관없다.
+  {
+    const issue = sealedWriteIssue(input);
+    if (issue) { deny(issue); return; }
+  }
+
 /**
  * 승인의 대상은 문장이 아니라 **계획 해시**다.
  *
@@ -593,7 +716,7 @@ function newestPlan(cwd, preferId) {
         if (depth === 0 && /^\d{4}-\d{2}/.test(entry.name) && entry.name.slice(0, 7) < cutoff) continue;
         walk(target, depth + 1);
       }
-      else if (entry.name === 'plan.json') {
+      else if (/^plan(-\d+)?\.json$/.test(entry.name)) {
         try {
           const at = fs.statSync(target).mtimeMs;
           if (!newest || at > newest.at) newest = { file: target, at };
@@ -677,7 +800,7 @@ function planApproval(cwd, preferId) {
   // 읽기 조회는 계획을 위반할 수 없고(R8a), plan.json 자체는 쓰기 차단이 아니라 해시가 지킨다(R8b) —
   // 무효 계획을 고칠 문이 없으면 세션이 벽돌이 된다 (실측 2026-08-30 · 컴파일 거부 계획에서 완전 잠금).
   const planFileWrite = ['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) &&
-    path.basename(String(input.tool_input?.file_path || input.tool_input?.notebook_path || '')) === 'plan.json';
+    /^plan(-\d+)?\.json$/.test(path.basename(String(input.tool_input?.file_path || input.tool_input?.notebook_path || '')));
   if (planIssue && !planFileWrite &&
       !(input.tool_name === 'Bash' && (isReadOnlyBash(input) || allowedScript(input, 'pending')))) {
     // 사용자가 이미 「진행 승인」했는데 plan.json 봉인만 빠진 경우에 재승인을 시키면
@@ -695,8 +818,8 @@ function planApproval(cwd, preferId) {
   {
     const target = String(input.tool_input?.file_path || input.tool_input?.notebook_path || '');
     const r = (() => { try { return replayActive(cwd); } catch { return null; } })();
-    const inside = target && r && path.resolve(cwd, target).startsWith(r.folder + path.sep) && path.basename(target) !== 'plan.json';
-    if (r && ((['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && inside) || (input.tool_name === 'Bash' && allowedPython(input)))) {
+    const inside = target && r && path.resolve(cwd, target).startsWith(r.folder + path.sep) && !/^plan(-\d+)?\.json$/.test(path.basename(target));
+    if (r && ((['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && inside) || (input.tool_name === 'Bash' && (allowedPython(input) || docBuildCommand(input, planText))))) {
       deny('책 실습 대본이 진행 중입니다. 이 차례의 원고 결과 파일은 이미 놓였습니다. 새로 만들지 말고 훅이 넘겨준 원고 답변을 그대로 내세요.');
       return;
     }
@@ -706,7 +829,7 @@ function planApproval(cwd, preferId) {
   // 영수증 단계를 건너뛰어 book 이 한 번도 안 돌았고, 같은 샘플인데 결과가 원고와 달랐다)
   {
     const target = String(input.tool_input?.file_path || input.tool_input?.notebook_path || '');
-    const writesOutput = (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && target) || (input.tool_name === 'Bash' && allowedPython(input));
+    const writesOutput = (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name) && target) || (input.tool_name === 'Bash' && (allowedPython(input) || docBuildCommand(input, planText)));
     if (writesOutput) {
       const found = newestPlan(cwd, preferId);
       let c = null;
@@ -750,10 +873,12 @@ function planApproval(cwd, preferId) {
     // 스크립트도 파일이 있다고 다 허용하지 않는다 — 계획이 요구하는 실행·검증 명령만 (P0 허용 목록).
     // mkdir 로 폴더를 먼저 만들려다 막히고 되풀이하는 일이 실측됐다 (2026-09-23 · 코워크) ·
     // Write 가 상위 폴더를 알아서 만든다는 것과 작업 폴더 기준 상대 경로를 함께 알린다.
-    if (!isReadOnlyBash(input) && !allowedScript(input, 'run') && !allowedPython(input))
-      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회와 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록)만 실행합니다. ' +
+    if (!isReadOnlyBash(input) && !allowedScript(input, 'run') && !allowedPython(input) && !docBuildCommand(input, planText))
+      deny('승인 뒤에도 파일은 Write/Edit 로 씁니다. Bash 는 읽기 조회, 절차가 요구하는 플러그인 스크립트(run-receipt·plan-compiler·router 등 허용 목록), 승인한 계획에 있는 문서 형식을 만드는 명령만 실행합니다. ' +
         `폴더는 따로 만들지 않아도 됩니다 · Write 가 상위 폴더를 알아서 만듭니다(mkdir 불필요). 경로는 작업 폴더(${path.resolve(cwd || process.cwd())}) 기준 outputs/… 로 적으세요. ` +
-        'xlsx·docx·pptx 는 만들 수 있습니다 · outputs 안에 .py 를 Write 로 쓰고 python3 outputs/…/make.py 로 실행하세요(한 줄 명령, 파이프·리다이렉션 없이).');
+        'xlsx·docx·pptx·pdf 는 공식 문서 스킬(document-skills:pptx 등)을 Skill 로 부르고, 그 스킬이 시키는 스크립트(pptxgenjs 의 deck.js, make.py 등)는 outputs 안에 Write 로 써서 실행합니다 · ' +
+        'node outputs/…/deck.js 또는 python3 outputs/…/make.py 처럼 한 줄 명령으로(cd·파이프·리다이렉션·변수 없이). ' +
+        '공식 스킬의 검사 스크립트는 절대 경로로 부르고(python3 …/skills/pptx/scripts/office/validate.py outputs/…/x.pptx), 변환·렌더(soffice·pdftoppm)는 --outdir 와 출력 이름을 outputs 안으로 적습니다. 계획의 형식에 없는 문서는 열리지 않습니다.');
   } else if (input.tool_name === 'Skill') {
     const issue = validateSkill(input, planText);
     if (issue) deny(issue);

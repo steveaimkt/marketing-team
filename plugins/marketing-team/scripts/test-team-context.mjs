@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { profileState } from './plan-compiler.mjs';
 
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'team-context.mjs');
 const run = dir => spawnSync(process.execPath, [SCRIPT], {
@@ -65,9 +66,49 @@ try {
   r = say(noted, '광고 카피 뽑아줘.', fresh);
   assert.ok(!r.stdout.includes('책 실습') && r.stdout.includes('ai-marketer'), '보완 파일이 있는데 책 실습 대본을 열었다');
 
+  // 7장 「대시보드 만들어줘.」 · 빠른 진입이라 계획이 없어 모델이 「판매 분석 대시보드가 이미 있는데 062 로 갈까요?」로
+  // 되묻곤 했다 (실측 2026-10-14 · 세 번에 한 번꼴). 061 원고 결과가 있으면 대본이 062 원고 결과와 화면을 낸다
+  const REF = path.join(path.dirname(SCRIPT), '..', 'sample-data', '참고결과');
+  const now = new Date();
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+  const with061 = name => {
+    const w = path.join(temp, name); const out = path.join(w, 'outputs', today, '061-sales-data-analysis');
+    fs.mkdirSync(out, { recursive: true });
+    for (const n of fs.readdirSync(path.join(REF, '061-sales-data-analysis')).filter(n => !['화면.md', '출처.md'].includes(n)))
+      fs.writeFileSync(path.join(out, n), /\.(md|html|csv)$/.test(n) ? fs.readFileSync(path.join(REF, '061-sales-data-analysis', n), 'utf8').replaceAll('{날짜}', today) : fs.readFileSync(path.join(REF, '061-sales-data-analysis', n)));
+    return w;
+  };
+  const dash = with061('dash');
+  const placed = path.join(dash, 'outputs', today, '062-marketing-dashboard', '062-marketing-dashboard.html');
+  r = say(dash, '대시보드 만들어줘.', fresh);
+  assert.ok(r.stdout.includes('책 실습') && r.stdout.includes('마케팅 대시보드입니다'), '061 결과가 있는데 「대시보드 만들어줘.」 대본이 열리지 않았다');
+  assert.equal(fs.readFileSync(placed, 'utf8'), fs.readFileSync(path.join(REF, '062-marketing-dashboard', '062-marketing-dashboard.html'), 'utf8'), '062 원고 결과가 기준본과 다르게 놓였다');
+  r = say(dash, '아니 괜찮아', fresh);
+  assert.ok(r.stdout.includes('책 실습') && r.stdout.includes('자동 갱신은 걸지 않겠습니다'), '대시보드 대본이 놓은 062 결과로 「아니 괜찮아」가 열리지 않았다');
+  r = say(dash, '대시보드 만들어줘.', fresh);
+  assert.ok(!r.stdout.includes('책 실습'), '「이후」 대본이 두 번 열렸다');
+  const dash2 = with061('dash2');
+  r = say(dash2, '대시보드 만들어줘', fresh);
+  assert.ok(r.stdout.includes('책 실습'), '마침표 없는 「대시보드 만들어줘」에 대본이 열리지 않았다');
+  const no061 = path.join(temp, 'no061'); fs.mkdirSync(path.join(no061, 'outputs'), { recursive: true });
+  r = say(no061, '대시보드 만들어줘.', fresh);
+  assert.ok(!r.stdout.includes('책 실습'), '061 결과가 없는데 대시보드 대본을 열었다');
+  assert.ok(!fs.existsSync(path.join(no061, 'outputs', today, '062-marketing-dashboard')), '061 결과가 없는데 062 파일을 놓았다');
+  const dashNoted = with061('dashNoted');
+  fs.mkdirSync(path.join(dashNoted, 'brand', 'skill-notes'), { recursive: true });
+  fs.writeFileSync(path.join(dashNoted, 'brand', 'skill-notes', '062.md'), '# 062 우리 규칙\n형식: docx\n');
+  r = say(dashNoted, '대시보드 만들어줘.', fresh);
+  assert.ok(!r.stdout.includes('책 실습'), '062 보완 파일이 있는데 대시보드 대본을 열었다');
+  const dashOwn = with061('dashOwn');
+  fs.mkdirSync(path.join(dashOwn, 'brand'), { recursive: true });
+  fs.writeFileSync(path.join(dashOwn, 'brand', 'profile.md'), '# 브랜드 프로필\n\n## 1. 기본 정보\n\n| 항목 | 내용 |\n|---|---|\n| 브랜드명 | 우리회사 |\n| 업종 | 반려동물 사료 |\n');
+  assert.equal(profileState(dashOwn), '채움', '시험용 프로필이 채움으로 읽히지 않는다');
+  r = say(dashOwn, '대시보드 만들어줘.', fresh);
+  assert.ok(!r.stdout.includes('책 실습'), '프로필을 채웠는데 대시보드 대본을 열었다');
+
   const bad = spawnSync(process.execPath, [SCRIPT], { input: 'not json', encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: plain } });
   assert.equal(bad.status, 0, '입력을 못 읽으면 세션을 막았다');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
-console.log('팀원 맥락 훅 · 다른 작업 무개입 1 · 마케팅 폴더 맥락 6 · 개발 저장소 무개입 1 · 말 걸면 AI 마케터 6 · 보완 파일 대본 끔 2 · 입력 오류 무해 1 · ✅');
+console.log('팀원 맥락 훅 · 다른 작업 무개입 1 · 마케팅 폴더 맥락 6 · 개발 저장소 무개입 1 · 말 걸면 AI 마케터 6 · 보완 파일 대본 끔 2 · 7장 대시보드 대본 9 · 입력 오류 무해 1 · ✅');

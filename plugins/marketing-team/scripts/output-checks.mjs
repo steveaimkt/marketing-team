@@ -43,6 +43,8 @@ const SOFT_TERMS = [
   ['착지', '「결과는 여기 저장했습니다」'],
   ['원장', '「실행 기록」'],
   ['정본', '「기준으로 삼는 자료」'],
+  // 저자가 결과물에서 빼라고 한 말 (2026-10-14) · 낱말을 글자 그대로 적으면 배포면 금칙어 검사가 이 파일을 잡을 수 있어 나눠 적는다
+  ['갈' + '\uB798', '「구분」·「경우」·「가지」'],
 ];
 
 /**
@@ -171,7 +173,9 @@ export async function runChecks(run, resolve) {
 const isCli = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (isCli) {
   const PLUGIN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-  const WORK = path.resolve(process.cwd());
+  // 작업 폴더는 영수증 경로에서 찾는다 · 셸 cwd 가 플러그인 안이어도 같은 결과다 (실측 2026-10-14)
+  const { workspaceOf } = await import('./plan-compiler.mjs');
+  const WORK = path.resolve((process.argv[2] && workspaceOf(process.argv[2], { env: {} })) || process.cwd());
   const resolve = ref => {
     const raw = typeof ref === 'string' ? ref : ref?.path;
     if (!raw) throw new Error('경로가 비었습니다.');

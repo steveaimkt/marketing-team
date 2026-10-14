@@ -24,15 +24,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
-import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck, userSkills } from './plan-compiler.mjs';
+import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck, userSkills,
+  planHash, slotOf, slotName, sealedRun, nextSlot, skillDeclarations, skillNeedsData, skillSampleFallback, workInput, outputDataMode, workspaceOf } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
 
 const PLUGIN = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const WORK = path.resolve(process.cwd());
+// 작업 폴더는 영수증·계획 경로에서 찾는다 · 셸 cwd 가 플러그인 안에 남아 있어도 같은 결과다 (실측 2026-10-14 · 책 실습 11장)
+const WORK = path.resolve((process.argv[3] && workspaceOf(process.argv[3], { env: {} })) || process.cwd());
 const SCHEMA = 'marketing-team.run/v1';
-const DATA_MODES = new Set(['실데이터', '샘플', '추정', '혼합']);
+// 「틀」 · 숫자 자료 없이 절차·틀·체크리스트만 낸 결과 (docs/공통규약.md `[틀]` · 2026-10-14 · 회사 A 067·B 045 가 「실데이터」로 적혔다)
+const DATA_MODES = new Set(['실데이터', '샘플', '추정', '혼합', '틀']);
 const KINDS = new Set(['business', 'compliance']);
 const PERSPECTIVES = new Set(['경영', '재무', '고객', '법무', '브랜드']);
 const STATUSES = {
@@ -242,9 +245,28 @@ function normalizePii(value, inputRows) {
  * 실측 2026-08-30 — 중급이 계획에 없던 HTML 을 만들었고, 고급이 지정 순서를 바꿔 돌았다.
  * 승인의 대상이 문장이 아니라 해시여야 그 둘을 대조할 수 있다.
  */
+/**
+ * 이 영수증의 계획 파일 · run.json ↔ plan.json · run-2.json ↔ plan-2.json (같은 날 다시 돌리기 · plan-compiler 와 같은 규칙).
+ * plan-N.json 이 없으면 예전처럼 plan.json 을 본다 · 단 그 plan.json 이 앞 실행(run.json)의 계획이면 쓰지 않는다.
+ */
+function pairedPlanFile(receiptFile) {
+  const dir = path.dirname(receiptFile);
+  const n = slotOf(receiptFile) || 1;
+  const own = path.join(dir, slotName('plan', n));
+  if (n === 1 || fs.existsSync(own)) return fs.existsSync(own) ? own : null;
+  const first = path.join(dir, 'plan.json');
+  if (!fs.existsSync(first)) return null;
+  try {
+    const run = sealedRun(dir, 1);
+    if (run?.plan?.plan_sha256 && run.plan.plan_sha256 === planHash(JSON.parse(fs.readFileSync(first, 'utf8'))))
+      throw new Error(`${slotName('run', n)} 의 계획은 ${slotName('plan', n)} 입니다 · plan.json 은 앞 실행(run.json · ${run.run_id})의 계획이라 쓰지 않습니다 · ${slotName('plan', n)} 을 쓰고 compile·approve 하세요`);
+  } catch (error) { if (/의 계획은/.test(error.message)) throw error; }
+  return first;
+}
+
 function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows, formatChoice) {
-  const planFile = path.join(path.dirname(receiptFile), 'plan.json');
-  if (!fs.existsSync(planFile)) return null;
+  const planFile = pairedPlanFile(receiptFile);
+  if (!planFile) return null;
   let plan;
   try { plan = JSON.parse(fs.readFileSync(planFile, 'utf8')); }
   catch (error) { throw new Error(`plan.json 을 읽지 못했습니다: ${error.message}`); }
@@ -324,14 +346,37 @@ function validateReviewCoverage(skillRows, requiredRows) {
  * 입력이나 프로필에 plugin:sample-data/ 가 하나라도 있으면 「실데이터」를 받지 않는다 · 던진다.
  * 작업 폴더 자료와 샘플이 섞였는데 「샘플」이면 「혼합」이 맞다고 알린다 · 돌려준 문장은 경고다.
  * start 에서 막고, finalize·verify 는 inspect 에서 같은 검사를 한다 (봉인 뒤 run.json 을 고쳐도 잡는다).
+ *
+ * 무엇을 우리 자료로 세나 (2026-10-14 · v0.72.31 실측)
+ *   brand/ · 회사 양식(inputs/양식/ · 프로필 §8) · 레퍼런스·좋았던 글 같은 참고 자료는 우리 자료가 아니다 (plan-compiler workInput)
+ *   앞 결과(workspace:outputs/…)는 그 결과를 낸 영수증의 data_mode 를 이어받는다 · 샘플로 만든 결과는 샘플이다
+ *     (책 실습 4장 011 · 샘플로 만든 006·002 결과를 읽었는데 「혼합이 맞다」고 했다)
+ *   자료를 읽어야 하는 스킬(plan-compiler skillNeedsData · 045·067 등)이 우리 자료도 샘플도 없이 「실데이터」면 받지 않는다 ·
+ *     숫자 없이 틀만 만들었으면 「틀」, 가정한 숫자로 채웠으면 「추정」이다. 프로필만으로 만드는 생성 스킬(카피 등)은 「실데이터」 그대로다.
  */
-function checkDataMode(mode, inputRows = [], profile = null) {
-  const refs = [...inputRows.map(r => r.path), ...(profile?.path ? [profile.path] : [])];
-  const 샘플 = refs.filter(v => String(v).startsWith('plugin:sample-data/'));
-  const 우리 = inputRows.map(r => r.path).filter(v => String(v).startsWith('workspace:'));
+function checkDataMode(mode, inputRows = [], profile = null, { skills: skillRows = [], outputs: outputRows = [] } = {}) {
+  const 이번결과 = new Set(outputRows.map(r => String(r?.path ?? r)));
+  const 샘플 = [], 우리 = [];
+  for (const r of [...inputRows, ...(profile?.path ? [{ path: profile.path, profile: true }] : [])]) {
+    const ref = String(r?.path ?? r);
+    if (ref.startsWith('plugin:sample-data/')) { 샘플.push(ref); continue; }
+    if (r.profile || !ref.startsWith('workspace:') || 이번결과.has(ref)) continue;
+    const 앞 = ref.startsWith('workspace:outputs/') ? outputDataMode(WORK, ref) : null;
+    if (앞 === '샘플' || 앞 === '혼합') 샘플.push(ref);
+    if (앞 === '실데이터' || 앞 === '혼합' || (!앞 && workInput(WORK, ref))) 우리.push(ref);
+  }
   if (mode === '실데이터' && 샘플.length) {
     throw new Error(`쓴 근거에 샘플 자료가 있어 data_mode 「실데이터」로 적을 수 없습니다: ${샘플.join(' · ')} · `
       + (우리.length ? '작업 폴더 자료와 샘플이 섞였으면 「혼합」으로 적으세요.' : '전부 샘플이면 「샘플」, 우리 자료와 섞였으면 「혼합」으로 적으세요.'));
+  }
+  if (mode === '실데이터' && !우리.length) {
+    const decl = skillDeclarations(WORK);
+    const 기록있음 = (() => { try { return fs.readFileSync(path.join(WORK, 'logs', 'build-log.md'), 'utf8').trim().length > 0; } catch { return false; } })();
+    const need = skillRows.map(row => decl.get(cleanId(row?.id ?? row))).filter(Boolean)
+      .filter(d => skillNeedsData(d) && !(/build-log/.test(skillSampleFallback(d)?.file || '') && 기록있음));
+    if (need.length)
+      throw new Error(`${need.map(d => `스킬 ${d.id}, ${d.name}. 읽는 자료는 「${skillNeedsData(d)}」입니다.`).join(' ')} 이 자료가 입력에 없어 data_mode 「실데이터」로 적을 수 없습니다 · `
+        + '숫자 없이 틀만 만들었으면 「틀」, 가정한 숫자로 채웠으면 「추정」으로 적으세요 · 대화로 받은 자료로 만들었으면 inputs/ 에 저장해 입력으로 적습니다. brand/ 와 회사 양식은 업무 자료가 아닙니다.');
   }
   if (mode === '샘플' && 샘플.length && 우리.length)
     return `작업 폴더 자료(${우리.join(' · ')})와 샘플이 섞였습니다 · data_mode 는 「혼합」이 맞습니다.`;
@@ -453,8 +498,9 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
   // 실측 2026-09-14·09-15 · 8장 015→053→051→052, 10장 045→046→043 이 전부 마지막 스킬
   // 폴더로 몰려 저장됐다 — 문서만 고치고 이 코드를 그대로 두면 다시 같은 일이 난다.
   let chainName = null;
-  const planFile = path.join(receiptDir, 'plan.json');
-  if (fs.existsSync(planFile)) {
+  let planFile = null;
+  try { planFile = pairedPlanFile(file); } catch { planFile = null; }
+  if (planFile && fs.existsSync(planFile)) {
     try { chainName = JSON.parse(fs.readFileSync(planFile, 'utf8')).chain || null; } catch { /* plan.json 이 아직 없거나 못 읽으면 옛 규칙대로 간다 */ }
   }
 
@@ -485,7 +531,7 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
     const mainTemplate = skillRows.at(-1).writes_to?.[0];
     const mainFolder = mainTemplate?.split('/')[2];
     if (!mainFolder || !new RegExp(`^outputs/\\d{4}-\\d{2}-\\d{2}/${escapeRegex(mainFolder)}$`).test(receiptRel))
-      throw new Error(`run.json은 주 스킬 폴더 outputs/{날짜}/${mainFolder || '{번호}-{슬러그}'}/에 두세요: ${receiptRel}`);
+      throw new Error(`run.json은 주 스킬 폴더 outputs/{날짜}/${mainFolder || '{번호}-{슬러그}'}/에 두세요: ${receiptRel} · 같은 날 다시 돌리면 폴더는 그대로 두고 plan-2.json · run-2.json · 산출물 -2 처럼 순번만 붙입니다`);
     for (const item of outputRows) {
       const { abs } = resolveRef(item.path, { workspaceOnly: true });
       // writes_to 가 주 스킬 폴더 아래 하위 자리를 적었으면 그 자리는 같은 폴더다 (092 · {NNN}-{slug}/SKILL.md · 2026-10-14)
@@ -531,11 +577,15 @@ async function start(file) {
   const draft = readJson(file);
   if (draft.schema && draft.schema !== SCHEMA) fail(`지원하지 않는 스키마입니다: ${draft.schema}`);
   if (draft.run_id) {
+    // 같은 날 다시 돌리면 폴더는 그대로 · 다음 순번(plan-N.json · run-N.json · 산출물 -N)으로 연다 (2026-10-14 · 「새 폴더(-2)」 안내가
+    // 모델에게 006-review-mining-2/ 폴더를 짓게 했다 · 회사 B S7)
+    const m = nextSlot(path.dirname(file));
+    const 새자리 = `같은 폴더에 ${slotName('plan', m)} · ${slotName('run', m)} · 산출물 -${m} 으로 새로 시작하세요`;
     if (draft.status !== 'running')
-      fail(`이미 ${draft.status} 상태인 실행입니다. 같은 스킬 재실행은 새 폴더(-2)에 시작하세요.`);
+      fail(`이미 ${draft.status} 상태인 실행입니다. 같은 스킬 재실행은 ${새자리}.`);
     const current = await inspect(draft, 'running');
     if (current.issues.length || current.sourceChanges.length)
-      fail(`시작 뒤 자료가 바뀌었습니다. 기존 실행을 덮지 말고 새 폴더(-2)에 시작하세요.`);
+      fail(`시작 뒤 자료가 바뀌었습니다. 기존 실행을 덮지 말고 ${새자리}.`);
     console.log(`✅ 이미 시작된 실행 · ${draft.run_id}`);
     return;
   }
@@ -554,7 +604,8 @@ async function start(file) {
     }
     const pii = skillRows.some(item => item.pii) ? normalizePii(draft.pii, inputRows) : null;
     const profile = draft.profile ? await snapshot(draft.profile) : null;
-    const modeNote = checkDataMode(draft.data_mode, inputRows, profile);
+    const modeNote = checkDataMode(draft.data_mode, inputRows, profile, {
+      skills: skillRows, outputs: draft.outputs.map(value => { try { return resolveRef(value, { workspaceOnly: true }).ref; } catch { return String(value?.path ?? value); } }) });
     if (modeNote) console.warn(`🟡 ${modeNote}`);
     const outputRows = draft.outputs.map(value => {
       const { ref } = resolveRef(value, { workspaceOnly: true });
@@ -668,7 +719,7 @@ async function inspect(run, finalStatus = run.status) {
   };
 
   // 데이터 표시 · start 뒤에 run.json 의 data_mode 를 고쳐도 finalize·verify 가 잡는다
-  try { const note = checkDataMode(run.data_mode, run.inputs || [], run.profile); if (note) notes.push(note); }
+  try { const note = checkDataMode(run.data_mode, run.inputs || [], run.profile, { skills: run.skills || [], outputs: run.outputs || [] }); if (note) notes.push(note); }
   catch (error) { issues.push(error.message); }
   for (const item of run.skills || []) await checkSnapshot(item, `스킬 ${item.id}`);
   for (const item of run.inputs || []) await checkSnapshot(item, '입력');
@@ -916,7 +967,7 @@ async function verify(file) {
 async function book(target) {
   let planFile;
   try { planFile = resolveRef(target, { workspaceOnly: true }).abs; } catch (error) { fail(error.message); }
-  if (path.basename(planFile) !== 'plan.json') fail('book 은 plan.json 을 받는다.');
+  if (!/^plan(-\d+)?\.json$/.test(path.basename(planFile))) fail('book 은 plan.json(같은 날 다시 돌리면 plan-2.json)을 받는다.');
   const plan = readJson(planFile);
   if (!approvalState(plan).ok) fail('승인 봉인된 계획이 아니다. plan-compiler.mjs approve 뒤에 돌린다.');
   const c = bookCheck(plan, WORK);

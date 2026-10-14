@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, todoLines } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -494,7 +494,247 @@ try {
     assert.ok(!화면.includes('📝'), '할 일 줄이 계획 화면 안에 들어갔다');
     for (const d of [a.w, b.w, f]) fs.rmSync(d, { recursive: true, force: true });
   }
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 16 · 샘플 채움 조건 32 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · ✅`);
+  // ── v0.72.31 실측 회사 A·B · 책 실습 (2026-10-14) ──────────────────────────────
+  {
+    const tpl = fs.readFileSync(path.join(HERE, '..', 'brand-templates', 'profile.md'), 'utf8');
+    const 채운 = tpl.replace('| 브랜드명 | (우리 브랜드명) |', '| 브랜드명 | 모래결 |')
+      .replace(/(\| 업종 \(규제 카테고리\) \| )[^|]+\|/, '$1화장품 |');
+    const PC = path.join(HERE, 'plan-compiler.mjs');
+    const pcIn = (w, ...a) => spawnSync(process.execPath, [PC, ...a], { cwd: w, encoding: 'utf8' });
+    const RR = path.join(HERE, 'run-receipt.mjs');
+    const rrIn = (w, ...a) => spawnSync(process.execPath, [RR, ...a], { cwd: w, encoding: 'utf8' });
+    const 공간 = (profile, files = {}) => {
+      const w = fs.mkdtempSync(path.join(os.tmpdir(), 'v07231-'));
+      for (const d of ['brand', 'inputs', 'outputs', 'logs']) fs.mkdirSync(path.join(w, d), { recursive: true });
+      if (profile !== null) fs.writeFileSync(path.join(w, 'brand', 'profile.md'), profile);
+      for (const [rel, text] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(w, rel)), { recursive: true }); fs.writeFileSync(path.join(w, rel), text); }
+      return w;
+    };
+    const 읽기 = (w, rel) => JSON.parse(fs.readFileSync(path.join(w, rel), 'utf8'));
+    const 계획쓰기 = (w, rel, plan) => { fs.mkdirSync(path.dirname(path.join(w, rel)), { recursive: true }); fs.writeFileSync(path.join(w, rel), `${JSON.stringify(plan, null, 2)}\n`); };
+    const D = '2026-10-14', F006 = `outputs/${D}/006-review-mining`;
+    const o006 = (dir, n = '') => [`workspace:${dir}/006-review-mining${n}.xlsx`, `workspace:${dir}/006-review-mining${n}.html`, `workspace:${dir}/006-review-mining-해설${n}.md`];
+
+    // (1) 회사 B S7 · 같은 날 실데이터 006 뒤 「샘플로 실습해볼래. 리뷰 분석」 · 계획을 006-review-mining-2/ 에 썼다 (B 의 실제 plan.json 모양)
+    const 리뷰csv = '리뷰ID,작성일,평점,옵션,리뷰\nR001,2026-09-02,2,핸드·바디 선물 세트,생각보다 향이 약해서 아쉬웠어요\nR002,2026-09-03,3,핸드·바디 선물 세트,세일할 때 사려고요\n';
+    const wB = 공간(채운, { 'inputs/리뷰_자사몰.csv': 리뷰csv, 'inputs/좋았던_인스타글.md': '# 좋았던 글\n' });
+    계획쓰기(wB, `${F006}/plan.json`, { schema: 'marketing-team.plan/v1', request: '자사몰 리뷰 넣었어. inputs/리뷰_자사몰.csv 로 리뷰 분석해줘', skills: ['006'], requested_order: [],
+      steps: [{ step: 1, skill: '006', inputs: ['workspace:inputs/리뷰_자사몰.csv'], outputs: o006(F006), reviews: [{ kind: 'compliance' }] }] });
+    assert.equal(pcIn(wB, 'compile', `${F006}/plan.json`).status, 0);
+    assert.equal(pcIn(wB, 'approve', `${F006}/plan.json`).status, 0);
+    const 실계획 = fs.readFileSync(path.join(wB, F006, 'plan.json'), 'utf8');
+    // 앞 실행 영수증 · B 의 run.json 그대로(run_id·completed·실데이터)
+    fs.writeFileSync(path.join(wB, F006, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', run_id: '20261014090624-006-bcd64a', status: 'completed',
+      plan: { plan_sha256: JSON.parse(실계획).plan_sha256, plan_id: null }, data_mode: '실데이터',
+      inputs: [{ path: 'workspace:inputs/리뷰_자사몰.csv', period: '2026-09-01~2026-09-28' }], outputs: o006(F006).map(p => ({ path: p })) }));
+    // (1-a) B 가 끝에 한 것 · 같은 폴더 plan.json 을 샘플 계획으로 덮어 compile → 막고 새 자리를 알린다
+    계획쓰기(wB, `${F006}/plan.json`, { schema: 'marketing-team.plan/v1', request: '샘플로 실습해볼래. 리뷰 분석', 실습: true, skills: ['006'], requested_order: [],
+      steps: [{ step: 1, skill: '006', inputs: ['plugin:sample-data/A브랜드-리뷰-200건.csv'],
+        outputs: [`workspace:${F006}/006-review-mining-2.xlsx`, `workspace:${F006}/006-review-mining-2.html`, `workspace:${F006}/006-review-mining-2-해설.md`], reviews: [{ kind: 'compliance' }] }],
+      형식: { '006-review-mining-2.xlsx': 'xlsx', '006-review-mining-2.html': 'html', '006-review-mining-2-해설.md': 'md' }, risks: [] });
+    let r = pcIn(wB, 'compile', `${F006}/plan.json`);
+    assert.notEqual(r.status, 0, '앞 실행(run.json)이 돈 plan.json 을 덮은 계획을 compile 이 받아들였다');
+    assert.match(r.stderr, /이미 돈 실행\(run\.json · 20261014090624-006-bcd64a\)의 계획/, '어느 실행의 계획인지 알리지 않았다');
+    assert.match(r.stderr, /plan-2\.json · 영수증 run-2\.json · 산출물 006-review-mining-2\.xlsx · 006-review-mining-2\.html · 006-review-mining-해설-2\.md/, '새 자리(순번 2)를 알리지 않았다');
+    assert.equal(pcIn(wB, 'approve', `${F006}/plan.json`).status === 0, false, '앞 실행의 계획 자리에 다른 계획을 봉인했다');
+    fs.writeFileSync(path.join(wB, F006, 'plan.json'), 실계획);
+    r = pcIn(wB, 'compile', `${F006}/plan.json`);
+    assert.equal(r.status, 0, '이미 돈 같은 계획을 다시 compile 하면 그대로 두어야 한다');
+    assert.match(r.stdout, /이미 승인되어 실행한 계획/);
+    assert.equal(fs.readFileSync(path.join(wB, F006, 'plan.json'), 'utf8'), 실계획, '이미 돈 계획을 다시 compile 해 상태를 풀었다');
+    // (1-b) B S7 처음 모양 · 006-review-mining-2/plan.json (B 가 쓴 글자 그대로) → 같은 폴더 plan-2.json 으로 옮기고 산출물은 -2
+    const F2 = `outputs/${D}/006-review-mining-2`;
+    계획쓰기(wB, `${F2}/plan.json`, { schema: 'marketing-team.plan/v1', request: '샘플로 실습해볼래. 리뷰 분석', 실습: true, skills: ['006'], requested_order: [],
+      steps: [{ step: 1, skill: '006', inputs: ['plugin:sample-data/A브랜드-리뷰-200건.csv'], outputs: o006(F2), reviews: [{ kind: 'compliance' }] }],
+      형식: { '006-review-mining.xlsx': 'xlsx', '006-review-mining.html': 'html', '006-review-mining-해설.md': 'md' },
+      chain_graph: { schema: 'marketing-team.chain/v1', chain: null, nodes: [{ step: 1, skill: '006' }], edges: [] }, risks: [] });
+    r = pcIn(wB, 'compile', `${F2}/plan.json`);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /📁 스킬 폴더로 옮겼다 · outputs\/2026-10-14\/006-review-mining-2\/plan\.json → outputs\/2026-10-14\/006-review-mining\/plan-2\.json · 같은 날 2번째 실행 · 산출물 이름 끝에 -2 · 영수증 run-2\.json/);
+    assert.equal(fs.existsSync(path.join(wB, F2)), false, '옮긴 뒤 빈 006-review-mining-2/ 폴더가 남았다');
+    assert.equal(fs.readFileSync(path.join(wB, F006, 'plan.json'), 'utf8'), 실계획, '앞 실행의 plan.json 이 바뀌었다');
+    const 둘째 = 읽기(wB, `${F006}/plan-2.json`);
+    assert.deepEqual(둘째.steps[0].outputs, o006(F006, '-2'), '산출물 이름이 같은 날 재실행 규칙(-2 · 해설-2)과 다르다');
+    assert.ok(둘째.screen.includes(`나오는 곳: ${F006}/`), '화면의 나오는 곳이 계획 폴더와 다르다');
+    // (4) 실습 화면의 샘플 이유 · 리뷰 csv 가 있는데 「리뷰 파일이 없어」라고 하지 않는다
+    assert.ok(둘째.screen.includes('분석할 자료: 실습을 고르셔서 연습용 A브랜드(화장품) 리뷰 200건으로 돌립니다. 결과에는 [샘플]이 붙습니다.'), '실습 화면이 실습을 고른 이유를 적지 않았다');
+    assert.ok(!둘째.screen.includes('리뷰 파일이 없어'), '리뷰 파일이 있는데 「없어」라고 적었다');
+    // (4-b) 실습은 연습용 A브랜드 프로필로 읽는다 · 회사 프로필(brand/profile.md)을 샘플 해석의 근거로 적지 않는다 (2026-10-14 · 회사 A·B)
+    assert.ok(둘째.screen.includes('근거로 쓰는 것: 실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.'), '실습 화면의 근거가 연습용 프로필이 아니다');
+    assert.ok(!둘째.screen.includes('brand/profile.md'), '실습 화면에 회사 프로필이 근거로 찍혔다');
+    assert.match(r.stdout, /📖 실습은 연습용 A브랜드 프로필로 읽는다 · 회사 기준\(brand\/profile\.md · 우리 양식\)을 샘플 해석에 붙이지 않는다/);
+    // 영수증 짝 · run-2.json 은 plan-2.json 과 맞춘다 · plan-2.json 이 없으면 앞 실행의 plan.json 을 빌리지 않는다
+    assert.equal(pcIn(wB, 'approve', `${F006}/plan-2.json`).status, 0);
+    const 영수증2 = { schema: 'marketing-team.run/v1', status: 'draft', request: '샘플로 실습해볼래. 리뷰 분석. 진행 승인', skills: ['006'], data_mode: '샘플', 단계: '최종',
+      형식: { '006-review-mining.xlsx': 'xlsx', '006-review-mining.html': 'html', '006-review-mining-해설.md': 'md' },
+      inputs: [{ path: 'plugin:sample-data/A브랜드-리뷰-200건.csv', period: '2026-06-01~2026-07-31' }], profile: { path: 'workspace:brand/profile.md' },
+      pii: { source: 'plugin:sample-data/A브랜드-리뷰-200건.csv', id_columns: [], surrogate_column: '번호' },
+      outputs: o006(F006, '-2').map(p => ({ path: p })), required_reviews: o006(F006, '-2').map(a => ({ kind: 'compliance', artifact: a })),
+      ledger: { path: 'workspace:logs/build-log.md' } };
+    fs.renameSync(path.join(wB, F006, 'plan-2.json'), path.join(wB, F006, '.plan-2.json'));
+    fs.writeFileSync(path.join(wB, F006, 'run-2.json'), JSON.stringify(영수증2));
+    r = rrIn(wB, 'start', `${F006}/run-2.json`);
+    assert.notEqual(r.status, 0, 'run-2.json 이 앞 실행의 plan.json 을 계획으로 빌렸다');
+    assert.match(r.stderr, /run-2\.json 의 계획은 plan-2\.json 입니다/);
+    fs.renameSync(path.join(wB, F006, '.plan-2.json'), path.join(wB, F006, 'plan-2.json'));
+    r = rrIn(wB, 'start', `${F006}/run-2.json`);
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(읽기(wB, `${F006}/run-2.json`).plan.plan_sha256, 둘째.plan_sha256, 'run-2.json 이 plan-2.json 으로 봉인되지 않았다');
+    // 다음 재실행 자리는 3 · 시작한 run-2 의 plan-2 도 덮지 않는다
+    r = pcIn(wB, 'compile', `${F006}/plan-2.json`);
+    assert.equal(r.status, 0, '이미 돈 같은 plan-2 를 다시 compile 하면 그대로 둔다');
+    fs.rmSync(wB, { recursive: true, force: true });
+
+    // (2)·(6) 회사 A · 회사 양식(inputs/양식/ · §8)과 brand/ 만 있으면 067 은 「우리 자료가 없습니다」 · 리뷰·문의 csv 는 006 의 자료다
+    const A프로필 = 채운.replace(/(\| 자주 쓰는 회사 양식 \| )[^|]+\|/, '$1`inputs/양식/월간마케팅보고_양식.docx` (스킬 067) · `inputs/양식/제안서_양식.pptx` (스킬 084) |');
+    const wA = 공간(A프로필, { 'inputs/양식/월간마케팅보고_양식.docx': 'docx', 'inputs/양식/제안서_양식.pptx': 'pptx',
+      'inputs/VOC_고객문의_30건.csv': '번호,문의\n1,배송\n', 'inputs/좋았던_링크드인글.md': '# 글\n', 'brand/디자인/가이드.md': '# 가이드\n' });
+    const F067 = `outputs/${D}/067-monthly-report`;
+    계획쓰기(wA, `${F067}/plan.json`, { request: '이번 달 마케팅 성과 보고서 만들어줘', skills: ['067'], steps: [{ step: 1, skill: '067',
+      inputs: ['workspace:brand/profile.md', 'workspace:brand/디자인/가이드.md', 'workspace:inputs/양식/월간마케팅보고_양식.docx'],
+      outputs: [`workspace:${F067}/067-monthly-report.xlsx`, `workspace:${F067}/067-monthly-report.html`], reviews: [{ kind: 'business', perspective: '재무' }] }] });
+    r = pcIn(wA, 'compile', `${F067}/plan.json`);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /📎 우리 자료가 없습니다 · 전 채널 월간 데이터를 inputs\/ 에 넣거나/, '회사 양식과 brand/ 만 있는데 자료가 있다고 봤다');
+    assert.ok(읽기(wA, `${F067}/plan.json`).screen.includes('분석할 자료: 우리 자료가 아직 없습니다 · 전 채널 월간 데이터를 inputs 폴더에'), '067 화면에 「우리 자료가 아직 없습니다」가 없다');
+    const decl = skillDeclarations(wA);
+    assert.deepEqual(matchingInputs(wA, decl.get('067')), [], '회사 양식·VOC·좋았던 글을 067 의 자료로 셌다');
+    assert.deepEqual(matchingInputs(wA, decl.get('006')), ['inputs/VOC_고객문의_30건.csv'], 'VOC 고객문의 csv 를 006 의 자료로 보지 않았다');
+    assert.equal(dataRequest({ steps: [{ skill: '006', inputs: [] }] }, wA), null, '006 자료(VOC csv)가 있는데 달라고 했다');
+    assert.equal(referenceFile(wA, 'inputs/양식/제안서_양식.pptx') && referenceFile(wA, 'inputs/좋았던_링크드인글.md') && referenceFile(wA, 'brand/디자인/가이드.md'), true);
+    // §8 에만 적힌 양식(inputs/양식/ 밖)도 회사 양식이다
+    fs.writeFileSync(path.join(wA, 'brand', 'profile.md'), A프로필.replace('`inputs/양식/제안서_양식.pptx`', '`inputs/월간보고_틀.xlsx`'));
+    fs.writeFileSync(path.join(wA, 'inputs', '월간보고_틀.xlsx'), 'x');
+    assert.equal(referenceFile(wA, 'inputs/월간보고_틀.xlsx'), true, '프로필 §8 「자주 쓰는 회사 양식」에 적힌 파일을 업무 자료로 봤다');
+    assert.deepEqual(matchingInputs(wA, decl.get('067')), [], '§8 회사 양식을 067 자료로 셌다');
+    fs.writeFileSync(path.join(wA, 'inputs', '9월_채널별_성과.csv'), 'a,b\n');
+    assert.deepEqual(matchingInputs(wA, decl.get('067')), ['inputs/9월_채널별_성과.csv'], '채널별 성과 csv 를 067 자료로 보지 않았다');
+    fs.rmSync(wA, { recursive: true, force: true });
+    // 회사 B 045 · 리뷰 csv·좋았던 글만 있다 · 광고 자료가 아니다 · sample_fallback 이 없는 096 도 견적서를 달라고 한다(6)
+    const wB2 = 공간(채운, { 'inputs/리뷰_자사몰.csv': 리뷰csv, 'inputs/좋았던_인스타글.md': '# 글\n' });
+    assert.equal(dataRequest({ steps: [{ skill: '045', inputs: [] }] }, wB2), '매체별 광고 데이터 소스', '리뷰 csv 를 045 광고 자료로 봤다');
+    assert.equal(dataRequest({ steps: [{ skill: '006', inputs: [] }] }, wB2), null, '리뷰 csv 가 있는데 006 자료를 달라고 했다');
+    assert.equal(dataRequest({ steps: [{ skill: '096', inputs: [] }] }, wB2), '견적서 2개 이상', 'sample_fallback 이 없는 096 이 자료(견적서)를 달라고 하지 않았다');
+    // 096 은 화면 틀이 없다 · compile 안내 줄로 본다 · 화면 줄은 틀이 있는 045 로 본다 (회사 B S6 · 045 화면에 줄이 없었다)
+    const F096 = `outputs/${D}/096-quote-comparison`;
+    계획쓰기(wB2, `${F096}/plan.json`, { request: '견적 비교해줘', skills: ['096'], steps: [{ step: 1, skill: '096', inputs: [],
+      outputs: [`workspace:${F096}/096-quote-comparison.csv`, `workspace:${F096}/096-quote-comparison-해설.md`],
+      reviews: [{ kind: 'business', perspective: '법무' }, { kind: 'business', perspective: '재무' }] }] });
+    r = pcIn(wB2, 'compile', `${F096}/plan.json`);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /📎 우리 자료가 없습니다 · 견적서 2개 이상을 inputs\/ 에 넣거나/, '096 compile 이 자료를 달라는 줄을 내지 않았다');
+    const F045 = `outputs/${D}/045-weekly-ads-report`;
+    const s045 = renderPlanScreen({ request: '이번 달 광고 어땠어? 045로 해줘. 광고 파일은 지금 없으니 할 수 있는 것만.', skills: ['045'],
+      steps: [{ step: 1, skill: '045', inputs: [], outputs: [`workspace:${F045}/045-weekly-ads-report.html`], reviews: [] }] }, { cwd: wB2 });
+    assert.ok(s045.includes('분석할 자료: 우리 자료가 아직 없습니다 · 매체별 광고 데이터 소스를 inputs 폴더에'), '045 화면에 「분석할 자료」 요청 줄이 없다');
+    for (const id of ['013', '028', '051', '084']) assert.equal(dataRequest({ steps: [{ skill: id, inputs: [] }] }, wB2), null, `프로필만으로 만드는 생성 스킬(${id})에 자료를 달라고 했다`);
+    fs.rmSync(wB2, { recursive: true, force: true });
+    // 빈 프로필 · inputs/ 의 레퍼런스 그림(10장)은 045 의 자료가 아니다 · 샘플로 채운다 (예전엔 inputs/ 에 무엇이든 있으면 채우지 않았다)
+    const w10 = 공간(tpl, { 'inputs/광고 소재 레퍼런스/A브랜드-광고소재-참고레퍼런스.png': 'png' });
+    assert.deepEqual(sampleInputs({ steps: [{ skill: '045', inputs: [] }] }, w10), ['plugin:sample-data/A브랜드-광고매체통합-12주.csv'], '레퍼런스 그림 때문에 샘플을 채우지 않았다');
+    fs.writeFileSync(path.join(w10, 'inputs', '메타광고_9월.csv'), 'a,b\n');
+    assert.equal(sampleInputs({ steps: [{ skill: '045', inputs: [] }] }, w10), null, '광고 자료가 있는데 샘플로 채웠다');
+    fs.rmSync(w10, { recursive: true, force: true });
+
+    // (7) 책 실습 10장 · 모델이 팀 이름 폴더에 쓴 체인 계획(실측 글자 그대로) · compile 이 체인 폴더로 옮기고 옛 폴더를 지운다 · 대본이 그 폴더를 찾는다
+    const w7 = 공간(tpl, { 'inputs/광고 소재 레퍼런스/A브랜드-광고소재-참고레퍼런스.png': 'png' });
+    const 팀 = 'outputs/2026-10-퍼포먼스마케팅팀', 바른 = 'outputs/2026-10-광고애널리틱스';
+    const wsr = (dir, sk, n) => `workspace:${dir}/${sk}/${n}`;
+    계획쓰기(w7, `${팀}/plan.json`, { schema: 'marketing-team.plan/v1', plan_id: '2026-10-14-퍼포먼스마케팅팀', request: '퍼포먼스 마케팅 팀 업무 시작하자.', chain: '광고애널리틱스',
+      skills: ['045', '046', '043'], steps: [
+        { step: 1, skill: '045', inputs: ['plugin:sample-data/A브랜드-광고매체통합-12주.csv'], outputs: [wsr(팀, '045-weekly-ads-report', '045-weekly-ads-report.html')], reviews: [] },
+        { step: 2, skill: '046', inputs: ['plugin:sample-data/A브랜드-광고매체통합-12주.csv', wsr(팀, '045-weekly-ads-report', '045-weekly-ads-report.html')],
+          outputs: [wsr(팀, '046-roas-budget-rebalance', '046-roas-budget-rebalance.md')], reviews: [{ kind: 'business', perspective: '재무' }] },
+        { step: 3, skill: '043', inputs: [wsr(팀, '046-roas-budget-rebalance', '046-roas-budget-rebalance.md'), 'workspace:inputs/광고 소재 레퍼런스/A브랜드-광고소재-참고레퍼런스.png'],
+          outputs: [wsr(팀, '043-meta-ad-copy', '043-meta-ad-copy.xlsx'), wsr(팀, '043-meta-ad-copy', '043-meta-ad-copy.md')], reviews: [{ kind: 'compliance' }] }],
+      risks: [] });
+    r = pcIn(w7, 'compile', `${팀}/plan.json`);
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /📁 체인 폴더로 옮겼다 · outputs\/2026-10-퍼포먼스마케팅팀\/plan\.json → outputs\/2026-10-광고애널리틱스\/plan\.json/);
+    assert.equal(fs.existsSync(path.join(w7, 팀)), false, '팀 이름 폴더가 남았다');
+    const 체인 = 읽기(w7, `${바른}/plan.json`);
+    assert.ok(체인.steps.flatMap(st => st.outputs).every(v => v.startsWith(`workspace:${바른}/`)), '산출물이 체인 폴더로 옮겨지지 않았다');
+    assert.ok(체인.steps[1].inputs.includes(wsr(바른, '045-weekly-ads-report', '045-weekly-ads-report.html')), '앞 단계 산출물을 읽는 입력을 고치지 않았다');
+    assert.ok(!JSON.stringify(체인).includes('퍼포먼스마케팅팀/'), '옛 폴더 경로가 계획에 남았다');
+    assert.ok(체인.screen.includes(`나오는 곳: ${바른}/`));
+    assert.equal(pcIn(w7, 'approve', `${바른}/plan.json`).status, 0);
+    assert.equal(replayFind(w7)?.name, '광고애널리틱스', '옮긴 체인 폴더를 책 실습 대본이 찾지 못했다');
+    fs.rmSync(w7, { recursive: true, force: true });
+
+    // (8) 책 실습 11장 · 모델이 `cd {플러그인}/100-skills && head …` 를 돌려 셸 cwd 가 플러그인 안에 남은 채 절대 경로로 compile 했다 ·
+    //     cwd 기준으로 재자 계획이 플러그인 안 100-skills/outputs/ 로 옮겨지고 작업 폴더의 원본이 지워졌다 (실측 2026-10-14)
+    const 플안 = path.join(HERE, '..', '100-skills');
+    const 플산출 = path.join(플안, 'outputs');
+    const 플산출있었나 = fs.existsSync(플산출);
+    const 체인계획 = dir => ({ schema: 'marketing-team.plan/v1', plan_id: '2026-10-14-광고애널리틱스', request: '퍼포먼스 마케팅 팀 업무 시작하자.', chain: '광고애널리틱스',
+      skills: ['045', '046', '043'], steps: [
+        { step: 1, skill: '045', inputs: ['plugin:sample-data/A브랜드-광고매체통합-12주.csv'], outputs: [wsr(dir, '045-weekly-ads-report', '045-weekly-ads-report.html')], reviews: [] },
+        { step: 2, skill: '046', inputs: ['plugin:sample-data/A브랜드-광고매체통합-12주.csv', wsr(dir, '045-weekly-ads-report', '045-weekly-ads-report.html')],
+          outputs: [wsr(dir, '046-roas-budget-rebalance', '046-roas-budget-rebalance.md')], reviews: [{ kind: 'business', perspective: '재무' }] },
+        { step: 3, skill: '043', inputs: [wsr(dir, '046-roas-budget-rebalance', '046-roas-budget-rebalance.md')],
+          outputs: [wsr(dir, '043-meta-ad-copy', '043-meta-ad-copy.xlsx'), wsr(dir, '043-meta-ad-copy', '043-meta-ad-copy.md')], reviews: [{ kind: 'compliance' }] }],
+      risks: [] });
+    // (8-a) 바른 자리 · 절대 경로 · cwd 는 플러그인 안 → 옮기지 않고 그대로 compile 된다
+    const w8 = 공간(tpl);
+    계획쓰기(w8, `${바른}/plan.json`, 체인계획(바른));
+    r = pcIn(플안, 'compile', path.join(w8, 바른, 'plan.json'));
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(!r.stdout.includes('📁'), `바른 자리의 계획을 옮겼다 · ${r.stdout}`);
+    assert.equal(fs.existsSync(플산출), 플산출있었나, '플러그인 안 100-skills/outputs/ 에 썼다');
+    const 그대로 = 읽기(w8, `${바른}/plan.json`);
+    assert.equal(그대로.status, 'awaiting-approval', '바른 자리의 계획이 compile 되지 않았다');
+    assert.ok(그대로.steps.flatMap(st => st.outputs).every(v => v.startsWith(`workspace:${바른}/`)), '산출물 자리가 바뀌었다');
+    assert.ok(그대로.screen.includes(`나오는 곳: ${바른}/`));
+    // 같은 계획을 작업 폴더에서 compile 한 화면과 글자까지 같다 (셸 cwd 가 결과를 바꾸지 않는다)
+    const w8b = 공간(tpl);
+    계획쓰기(w8b, `${바른}/plan.json`, 체인계획(바른));
+    assert.equal(pcIn(w8b, 'compile', `${바른}/plan.json`).status, 0);
+    assert.equal(그대로.screen, 읽기(w8b, `${바른}/plan.json`).screen, '셸 cwd 에 따라 계획 화면이 달라졌다');
+    assert.equal(그대로.plan_sha256, 읽기(w8b, `${바른}/plan.json`).plan_sha256, '셸 cwd 에 따라 계획 해시가 달라졌다');
+    assert.equal(pcIn(플안, 'approve', path.join(w8, 바른, 'plan.json')).status, 0);
+    assert.equal(pcIn(플안, 'check', path.join(w8, 바른, 'plan.json')).status, 0);
+    assert.equal(replayFind(w8)?.name, '광고애널리틱스', '책 실습 대본이 바른 자리의 체인 폴더를 찾지 못했다');
+    // 영수증 도구도 작업 폴더를 경로에서 찾는다 · 예전엔 「허용된 기준 폴더를 벗어났습니다」로 막혔다
+    r = rrIn(플안, 'book', path.join(w8, 바른, 'plan.json'));
+    assert.equal(r.status, 0, `셸 cwd 가 플러그인 안이라 영수증 도구가 작업 폴더를 못 찾았다 · ${r.stderr}`);
+    assert.equal(fs.existsSync(플산출), 플산출있었나, '플러그인 안 100-skills/outputs/ 에 썼다');
+    // (8-b) 팀 이름 폴더 · cwd 는 플러그인 안 → 작업 폴더 안에서만 옮긴다
+    const w9 = 공간(tpl);
+    계획쓰기(w9, `${팀}/plan.json`, 체인계획(팀));
+    r = pcIn(플안, 'compile', path.join(w9, 팀, 'plan.json'));
+    assert.equal(r.status, 0, r.stderr);
+    assert.match(r.stdout, /📁 체인 폴더로 옮겼다 · outputs\/2026-10-퍼포먼스마케팅팀\/plan\.json → outputs\/2026-10-광고애널리틱스\/plan\.json/);
+    assert.equal(fs.existsSync(path.join(w9, 팀)), false, '팀 이름 폴더가 남았다');
+    assert.equal(읽기(w9, `${바른}/plan.json`).status, 'awaiting-approval');
+    assert.equal(fs.existsSync(플산출), 플산출있었나, '플러그인 안 100-skills/outputs/ 에 썼다');
+    // (8-c) 작업 폴더를 계획 경로에서 찾는다 · 플러그인 안은 작업 폴더가 아니다
+    assert.equal(fs.realpathSync(workspaceOf(path.join(w9, 바른, 'plan.json'), { cwd: 플안, env: {} })), fs.realpathSync(w9));
+    assert.equal(workspaceOf(path.join(플안, 'outputs', 'x', 'plan.json'), { cwd: 플안, env: {} }), null, '플러그인 안을 작업 폴더로 봤다');
+    assert.equal(fs.realpathSync(workspaceOf(path.join(플안, 'x', 'plan.json'), { cwd: 플안, env: { CLAUDE_PROJECT_DIR: w9 } })), fs.realpathSync(w9), 'CLAUDE_PROJECT_DIR 를 보지 않았다');
+    // (8-d) 옮길 자리·지울 자리가 작업 폴더 밖이면 아무것도 옮기거나 지우지 않고 막는다
+    const 남 = 공간(tpl);
+    계획쓰기(w9, `${팀}/plan.json`, 체인계획(팀));
+    const 밖 = placePlan(path.join(w9, 팀, 'plan.json'), 체인계획(팀), { cwd: 남, chain: '광고애널리틱스' });
+    assert.ok(밖.block && /아무것도 옮기거나 지우지 않았습니다/.test(밖.block[0]), '작업 폴더 밖 계획을 막지 않았다');
+    assert.ok(fs.existsSync(path.join(w9, 팀, 'plan.json')), '작업 폴더 밖이라며 원본을 지웠다');
+    assert.equal(fs.existsSync(path.join(남, 바른)), false, '다른 폴더에 계획을 썼다');
+    const 플막 = placePlan(path.join(w9, 팀, 'plan.json'), 체인계획(팀), { cwd: 플안, chain: '광고애널리틱스' });
+    assert.ok(플막.block, '플러그인 안으로 옮기려 했다');
+    assert.equal(fs.existsSync(플산출), 플산출있었나, '플러그인 안 100-skills/outputs/ 에 썼다');
+    // (8-e) 계획 파일이 플러그인 안이면 compile 이 쓰지 않고 막는다
+    const 플계획 = path.join(플안, '_plan-test-tmp', 'plan.json');
+    fs.mkdirSync(path.dirname(플계획), { recursive: true });
+    const 플글자 = `${JSON.stringify(체인계획(바른), null, 2)}\n`;
+    fs.writeFileSync(플계획, 플글자);
+    try {
+      r = pcIn(플안, 'compile', 플계획);
+      assert.notEqual(r.status, 0, '플러그인 안의 계획을 compile 했다');
+      assert.match(r.stderr, /플러그인 폴더 안에 있습니다/);
+      assert.equal(fs.readFileSync(플계획, 'utf8'), 플글자, '플러그인 안 계획 파일을 고쳐 썼다');
+    } finally { fs.rmSync(path.dirname(플계획), { recursive: true, force: true }); }
+    for (const d of [w8, w8b, w9, 남]) fs.rmSync(d, { recursive: true, force: true });
+  }
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 16 · 샘플 채움 조건 32 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · 같은 날 재실행 자리 14 · 업무 자료 판단 19 · 체인 폴더 옮김 8 · 셸 cwd 무관 작업 폴더 24 · 실습 근거 3 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
