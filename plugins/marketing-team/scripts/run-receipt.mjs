@@ -269,8 +269,17 @@ function validateApprovedPlan(receiptFile, skillRows, outputRows, requiredRows, 
   // (실측 2026-09-22 · 작동 검토 #4 — 045 html·046 docx 계획에서 초안 .md 로 start 하면
   // 「계획에 없는 산출물」로 막혔고, 계획에 .md 를 넣으면 compile 이 계약 위반으로 막았다)
   for (const ref of [...plannedOutputs]) plannedOutputs.add(path.posix.join(path.posix.dirname(ref), 초안이름(ref)));
+  // 이름을 실행 중에 정하는 자리({NNN}-{slug} · 092 가 만드는 새 스킬 폴더)는 계획에서 미리 알 수 없다.
+  // 계획이 자리표시 그대로 적었거나 다른 이름을 짐작해 적었어도, 같은 writes_to 자리·같은 날짜면 계획 안이다
+  // (실측 2026-10-14 · 092 가 새 스킬 이름을 정한 뒤 「계획에 없는 산출물」로 막혀 승인을 두 번 받았다).
+  const 자리틀 = skillRows.flatMap(row => row.writes_to || []).filter(v => 이름자리.test(v)).map(v => 틀식(`workspace:${v}`));
+  const planned자리 = [...plannedOutputs].filter(ref => 이름자리.test(ref)).map(ref => 틀식(ref));
+  const 자리안 = ref => planned자리.some(re => re.test(ref)) || 자리틀.some(re => {
+    const day = (ref.match(re) || [])[1];
+    return day && [...plannedOutputs].some(p => (p.match(re) || [])[1] === day);
+  });
   for (const row of outputRows) {
-    if (!plannedOutputs.has(row.path))
+    if (!plannedOutputs.has(row.path) && !자리안(row.path))
       throw new Error(`승인한 계획에 없는 산출물입니다: ${row.path} · 새 계획으로 다시 승인받으세요.`);
   }
   const plannedReviews = new Set((plan.steps || []).flatMap(step =>
@@ -310,8 +319,49 @@ function validateReviewCoverage(skillRows, requiredRows) {
   if (missing.length) throw new Error(missing.join(' / '));
 }
 
+/**
+ * 데이터 표시는 실제로 쓴 근거로 정한다 (2026-10-14 · 검토 P0 「프로필 찼음 → 실데이터」).
+ * 입력이나 프로필에 plugin:sample-data/ 가 하나라도 있으면 「실데이터」를 받지 않는다 · 던진다.
+ * 작업 폴더 자료와 샘플이 섞였는데 「샘플」이면 「혼합」이 맞다고 알린다 · 돌려준 문장은 경고다.
+ * start 에서 막고, finalize·verify 는 inspect 에서 같은 검사를 한다 (봉인 뒤 run.json 을 고쳐도 잡는다).
+ */
+function checkDataMode(mode, inputRows = [], profile = null) {
+  const refs = [...inputRows.map(r => r.path), ...(profile?.path ? [profile.path] : [])];
+  const 샘플 = refs.filter(v => String(v).startsWith('plugin:sample-data/'));
+  const 우리 = inputRows.map(r => r.path).filter(v => String(v).startsWith('workspace:'));
+  if (mode === '실데이터' && 샘플.length) {
+    throw new Error(`쓴 근거에 샘플 자료가 있어 data_mode 「실데이터」로 적을 수 없습니다: ${샘플.join(' · ')} · `
+      + (우리.length ? '작업 폴더 자료와 샘플이 섞였으면 「혼합」으로 적으세요.' : '전부 샘플이면 「샘플」, 우리 자료와 섞였으면 「혼합」으로 적으세요.'));
+  }
+  if (mode === '샘플' && 샘플.length && 우리.length)
+    return `작업 폴더 자료(${우리.join(' · ')})와 샘플이 섞였습니다 · data_mode 는 「혼합」이 맞습니다.`;
+  return '';
+}
+
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// writes_to 의 이름 자리 · {날짜} 말고 실행 중에 정하는 것({NNN}·{slug} 등)
+const 이름자리 = /\{(?!날짜\})[^{}/]+\}/;
+/** 경로 틀을 정규식으로 · {날짜} 는 잡아 두고(첫 묶음) {NNN} 은 세 자리, 나머지 자리는 / 없는 아무 이름 */
+function 틀식(template) {
+  const body = escapeRegex(String(template))
+    .replace(/\\\{날짜\\\}/g, '(\\d{4}-\\d{2}-\\d{2})')
+    .replace(/\\\{NNN\\\}/g, '\\d{3}')
+    .replace(/\\\{[^{}/]+?\\\}/g, '[^/]+');
+  return new RegExp(`^${body}$`);
+}
+
+/** 산출물이 주 스킬 폴더 아래 하위 폴더에 있어도 되나 · writes_to 가 그 하위 자리({NNN}-{slug}/ 등)를 적었을 때만 */
+function 하위자리(skillRows, receiptDir, abs) {
+  const rel = posix(path.relative(receiptDir, abs));
+  if (!rel.includes('/') || rel.startsWith('..')) return false;
+  return skillRows.some(row => (row.writes_to || []).some(v => {
+    const parts = v.split('/');
+    if (parts.length <= 4) return false;   // outputs/{날짜}/{폴더}/파일 · 하위 자리 없음
+    return 틀식(parts.slice(3).join('/')).test(rel);
+  }));
 }
 
 // 초안 이름 · 정본 파일명의 확장자만 .md 로 바꾼 것
@@ -438,7 +488,8 @@ function validateExecutionContract(file, skillRows, outputRows, formatChoice, �
       throw new Error(`run.json은 주 스킬 폴더 outputs/{날짜}/${mainFolder || '{번호}-{슬러그}'}/에 두세요: ${receiptRel}`);
     for (const item of outputRows) {
       const { abs } = resolveRef(item.path, { workspaceOnly: true });
-      if (path.dirname(abs) !== receiptDir)
+      // writes_to 가 주 스킬 폴더 아래 하위 자리를 적었으면 그 자리는 같은 폴더다 (092 · {NNN}-{slug}/SKILL.md · 2026-10-14)
+      if (path.dirname(abs) !== receiptDir && !하위자리(skillRows, receiptDir, abs))
         throw new Error(`조합 산출물은 run.json과 같은 주 스킬 폴더에 모아야 합니다: ${item.path}`);
     }
   }
@@ -503,6 +554,8 @@ async function start(file) {
     }
     const pii = skillRows.some(item => item.pii) ? normalizePii(draft.pii, inputRows) : null;
     const profile = draft.profile ? await snapshot(draft.profile) : null;
+    const modeNote = checkDataMode(draft.data_mode, inputRows, profile);
+    if (modeNote) console.warn(`🟡 ${modeNote}`);
     const outputRows = draft.outputs.map(value => {
       const { ref } = resolveRef(value, { workspaceOnly: true });
       return { path: ref, sha256: null };
@@ -614,6 +667,9 @@ async function inspect(run, finalStatus = run.status) {
     else if (now !== item.sha256) sourceChanges.push(`실행 뒤 바뀐 ${label}: ${item.path}`);
   };
 
+  // 데이터 표시 · start 뒤에 run.json 의 data_mode 를 고쳐도 finalize·verify 가 잡는다
+  try { const note = checkDataMode(run.data_mode, run.inputs || [], run.profile); if (note) notes.push(note); }
+  catch (error) { issues.push(error.message); }
   for (const item of run.skills || []) await checkSnapshot(item, `스킬 ${item.id}`);
   for (const item of run.inputs || []) await checkSnapshot(item, '입력');
   if (run.profile) await checkSnapshot(run.profile, '프로필');

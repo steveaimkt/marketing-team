@@ -16,7 +16,7 @@ requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["100"]
 gate: false
 mutating: false
-writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md, outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/routing-eval.jsonl]
+writes_to: [outputs/{날짜}/092-skill-builder-meta/092-skill-builder-meta.md, outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/SKILL.md, outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/routing-eval.jsonl]
 builder: 사용자 (이 회사)
 version: 1.0
 persona: "사내 표준 문서를 수백 건 설계한 시스템 빌더, 두 번 이상 쓰이지 않을 스킬은 등록을 거절한다"
@@ -98,7 +98,7 @@ success_metrics: [스킬 완성 소요 시간, 라우팅 평가 통과율, 등�
      - 역할과 보고 대상 (§8 우리 팀과 내 역할): Output Format 의 첫 장, 길이, 보고 단위를 `docs/공통규약.md §0-a` 표대로 정한다. 보고 주기가 있으면 결과물의 기간도 그 주기로 끊는다
      - 회사 양식: 이 업무의 양식이 `inputs/양식/` 에 있거나 Phase 2 에서 받았으면, Output Format 을 그 양식의 절 제목, 표 열, 순서로 쓴다. 형식은 양식의 확장자를 따른다. 양식에 없는 출처와 기간, `[실데이터]` `[샘플]` `[추정]` 표시는 첫 장 머리에 붙인다 (양식이 안전 규칙을 빼지 못한다)
 4. **자가 검증 (8항목)**: 구축 전 점검: 병목 한 문장 / 레퍼런스 2~3개 / 결과물 공통 구조 / 스텝 5~7(입력·출력) / 게이트 ≥1 / 숫자 룰 / 안전 규칙(읽기 우선·마스킹) / 트리거 초안. 미달 항목은 해당 Phase로 되돌아가 보강. ⏸
-5. **초안 생성 + MECE 검사**: 워크시트 답변을 `100-skills/SPEC.md` 규격으로 조립한다. ID는 `101`부터 부여한다. 초안 `SKILL.md`와 `routing-eval.jsonl`은 `outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/`에 함께 쓴다. 트리거를 공식 `ROUTING.md`와 사용자 `brand/my-skills/INDEX.md`에 대조해 겹침 후보를 조정한다.
+5. **초안 생성 + MECE 검사**: 워크시트 답변을 `100-skills/SPEC.md` 규격으로 조립한다. ID는 `101`부터 부여한다. 초안 `SKILL.md`와 `routing-eval.jsonl`은 `outputs/{날짜}/092-skill-builder-meta/{NNN}-{slug}/`에 함께 쓴다. 계획(plan.json)의 outputs 에는 `{NNN}-{slug}` 를 그대로 적는다. 이름은 이 단계에서 정하고, 영수증은 같은 자리로 받는다(다시 승인받지 않는다). 트리거를 공식 `ROUTING.md`와 사용자 `brand/my-skills/INDEX.md`에 대조해 겹침 후보를 조정한다.
    - 겹침이 크면 신규 제작 대신 기존 스킬 복제·개조 경로를 우선 제안한다 (Phase 3부터 재진입).
 6. **시범 실행 + 수정**: 새 스킬을 Phase 2의 실데이터로 1회 완주하고, 기대와 다른 곳을 한 번에 하나씩 고친다 (보통 3~5회). 완주 로그는 **등록 심사**의 "실행 검증 1회" 증빙이 된다.
 7. ⏸ **등록 심사**: `${CLAUDE_PLUGIN_ROOT}/100-skills/gates/quality-checklist.md` C섹션 전 항목과 MECE·eval을 심사한다. 통과하면 「질문 등록」 그대로 묻고, 「등록해줘」를 받은 뒤 초안 폴더를 **`brand/my-skills/{NNN}-{slug}/`**로 복사하고 **`brand/my-skills/INDEX.md`에 ID·이름·트리거·경로 한 줄을 추가**한다. ID 는 **`101`~`199`**, `category: custom` 이다 (`SPEC.md §0`). ⛔ 패키지 안 `100-skills/`는 고치지 않는다. 미통과면 초안 경로와 보강 방법만 반환한다. 완료 후 100(나만의 에이전트 만들기)으로 넘긴다.

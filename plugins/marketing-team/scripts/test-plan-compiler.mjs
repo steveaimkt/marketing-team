@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, todoLines } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -401,9 +401,100 @@ try {
     assert.equal(판정(tpl), true, '새 템플릿 그대로인 프로필을 채움으로 봤다');
     assert.equal(판정(tpl.replace(/\n## 8\. 우리 팀과 내 역할[\s\S]*$/, '\n')), true, '§8 이 없는 옛 템플릿 프로필을 채움으로 봤다 · 책 실습이 꺼진다');
     assert.equal(판정(tpl.replace(/(\| 내 역할 \| )[^|]+\|/, '$1팀장 |')), false, '§8 만 채운 프로필을 빈 것으로 봤다');
+    // 0바이트 · 공백 · 주석 · 안내 인용 · 자리표시만 있으면 「빈」 (검토 2026-10-14 · 0바이트와 주석 붙인 템플릿이 「채움」이었다)
+    for (const [이름, text] of [['0바이트', ''], ['공백뿐', '  \n\n\t\n'], ['템플릿 + 주석', `${tpl}\n<!-- 검토 -->\n`], ['주석뿐', '<!--\n우리 회사\n-->\n'],
+      ['안내 인용뿐', '> 여기에 쓴다\n> 나중에\n'], ['자리표시뿐', '| 브랜드명 | (예: 멍멍푸드) |\n- 업종: {업종}\n| 핵심 제품/서비스 (Top 3) | ① ② ③ |\n']]) {
+      판정(text);
+      assert.equal(profileState(ws), '빈', `${이름} 프로필을 「채움」으로 봤다`);
+      assert.equal(profileIsEmpty(ws), true, `${이름} · profileIsEmpty 가 profileState 와 다르다`);
+    }
+    fs.rmSync(path.join(ws, 'brand', 'profile.md'));
+    assert.equal(profileState(ws), '빈', '프로필 파일이 없는데 「채움」으로 봤다');
+    판정(tpl.replace('| 브랜드명 | (우리 브랜드명) |', '| 브랜드명 | 팀플 |'));
+    assert.equal(profileState(ws), '채움', '브랜드 한 줄만 있어도 「채움」이다');
     fs.rmSync(ws, { recursive: true, force: true });
   }
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 3 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · ✅`);
+
+  // 샘플 자동 채움은 프로필 「빈」이거나 plan.실습 일 때만 · 채움이면 우리 자료를 달라고 한다 (2026-10-14 · 검토 P0 재현)
+  {
+    const tpl = fs.readFileSync(path.join(HERE, '..', 'brand-templates', 'profile.md'), 'utf8');
+    const 채운 = tpl.replace('| 브랜드명 | (우리 브랜드명) |', '| 브랜드명 | 팀플 |')
+      .replace(/(\| 업종 \(규제 카테고리\) \| )[^|]+\|/, '$1B2B 협업 서비스 |')
+      .replace(/(\| 핵심 제품\/서비스 \(Top 3\) \| )[^|]+\|/, '$1팀 협업 툴 |');
+    const 만들기 = (profile, extra = {}) => {
+      const w = fs.mkdtempSync(path.join(os.tmpdir(), 'sample-gate-'));
+      fs.mkdirSync(path.join(w, 'brand'), { recursive: true });
+      if (profile !== null) fs.writeFileSync(path.join(w, 'brand', 'profile.md'), profile);
+      const D = '2026-10-14', d = `outputs/${D}/006-review-mining`;
+      fs.mkdirSync(path.join(w, d), { recursive: true });
+      const o = n => `workspace:${d}/${n}`;
+      const plan = { request: '리뷰 분석해줘', skills: ['006'], ...extra, steps: [{ step: 1, skill: '006', inputs: [],
+        outputs: [o('006-review-mining.xlsx'), o('006-review-mining.html'), o('006-review-mining-해설.md')], reviews: [{ kind: 'compliance' }] }] };
+      fs.writeFileSync(path.join(w, d, 'plan.json'), JSON.stringify(plan));
+      const r = spawnSync(process.execPath, [path.join(HERE, 'plan-compiler.mjs'), 'compile', `${d}/plan.json`], { cwd: w, encoding: 'utf8' });
+      return { w, r, plan: JSON.parse(fs.readFileSync(path.join(w, d, 'plan.json'), 'utf8')), file: `${d}/plan.json` };
+    };
+    // (1) 프로필 채움 · 리뷰 없음 · 006 빈 입력 → 샘플이 들어가지 않는다
+    const a = 만들기(채운);
+    assert.equal(a.r.status, 0, a.r.stderr);
+    assert.deepEqual(a.plan.steps[0].inputs, [], '프로필을 채웠는데 A브랜드 리뷰를 넣었다');
+    assert.equal(sampleInputs({ steps: [{ skill: '006', inputs: [] }] }, a.w), null, 'sampleInputs 가 채운 프로필에 샘플을 돌려줬다');
+    assert.match(a.r.stdout, /📎 우리 자료가 없습니다 · 리뷰·댓글·CS 데이터를 inputs\/ 에 넣거나 대화에 붙여 주세요 · 샘플로 회사 결론을 내지 않는다/, 'compile 이 우리 자료를 달라는 줄을 내지 않았다');
+    assert.doesNotMatch(a.r.stdout, /샘플 자료로 채웠다/);
+    assert.ok(a.plan.screen.includes('분석할 자료: 우리 자료가 아직 없습니다 · 리뷰·댓글·CS 데이터를 inputs 폴더에 넣거나 대화에 붙여 주시면 그 자료로 분석합니다.'), '화면 「분석할 자료」 줄이 우리 자료를 달라고 하지 않았다');
+    assert.ok(!a.plan.screen.includes('[샘플]'), '채운 프로필 화면에 샘플 줄이 남았다');
+    assert.ok(a.plan.screen.includes('우리 자료로 하려면'), '자료가 없으면 내려받는 길을 함께 보여야 한다');
+    assert.ok(!a.plan.screen.includes('업종: 「우리는 반려동물 사료야」'), '프로필에 업종이 있는데 업종을 다시 물었다');
+    assert.ok(a.plan.screen.includes('분석 기간: 기본은 최근 7일'), '업종 말고 다른 질문까지 뺐다');
+    assert.equal(dataRequest({ ...a.plan, 실습: true }, a.w), null, '실습이면 우리 자료를 달라고 하지 않는다');
+    // (2) 같은 상황에 「샘플로 실습」(plan.실습) → 샘플이 들어간다 · 책 실습은 아니다(프로필이 채움)
+    const b = 만들기(채운, { 실습: true });
+    assert.deepEqual(b.plan.steps[0].inputs, ['plugin:sample-data/A브랜드-리뷰-200건.csv'], '실습인데 샘플을 넣지 않았다');
+    assert.match(b.r.stdout, /📎 inputs 가 비어 샘플 자료로 채웠다/);
+    spawnSync(process.execPath, [path.join(HERE, 'plan-compiler.mjs'), 'approve', b.file], { cwd: b.w, encoding: 'utf8' });
+    assert.match(bookCheck(JSON.parse(fs.readFileSync(path.join(b.w, b.file), 'utf8')), b.w).reason || '', /프로필을 채웠다/, '채운 프로필 실습에 원고 결과를 놓으려 했다');
+    // (3) 빈 프로필(템플릿 그대로 · 0바이트 · 없음) + 006 → 샘플이 들어가고 책 실습 그대로 · 화면은 원고와 같다
+    const 원고화면 = renderPlanScreen(canonicalScreenPlan('006'), { cwd: fs.mkdtempSync(path.join(os.tmpdir(), 'sample-gate-none-')) });
+    for (const [이름, profile] of [['템플릿', tpl], ['0바이트', ''], ['없음', null]]) {
+      const c = 만들기(profile);
+      assert.deepEqual(c.plan.steps[0].inputs, ['plugin:sample-data/A브랜드-리뷰-200건.csv'], `${이름} 프로필인데 샘플을 넣지 않았다`);
+      assert.doesNotMatch(c.r.stdout, /우리 자료가 없습니다|📝 할 일/, `${이름} 프로필에 채움 안내를 냈다`);
+      assert.equal(c.plan.screen.replace(/2026-10-14/g, '2026-09-15'), 원고화면, `${이름} 프로필 화면이 원고와 다르다`);
+      spawnSync(process.execPath, [path.join(HERE, 'plan-compiler.mjs'), 'approve', c.file], { cwd: c.w, encoding: 'utf8' });
+      assert.equal(bookCheck(JSON.parse(fs.readFileSync(path.join(c.w, c.file), 'utf8')), c.w).ok, true, `${이름} 프로필 006 이 책 실습이 아니다`);
+      fs.mkdirSync(path.join(c.w, 'outputs'), { recursive: true });
+      assert.ok(replayStep(c.w, '광고 카피 뽑아줘.')?.turn, `${이름} 프로필에서 6장 대본이 열리지 않았다`);
+      fs.rmSync(c.w, { recursive: true, force: true });
+    }
+    // (4) 067 · §4 숫자가 있거나 광고 채널이 없으면 「월 목표」를 묻지 않는다 · 생성 스킬(sample_fallback 없음)은 자료를 달라고 하지 않는다
+    const f = fs.mkdtempSync(path.join(os.tmpdir(), 'ask-067-'));
+    fs.mkdirSync(path.join(f, 'brand'));
+    const 월목표 = () => renderPlanScreen(canonicalScreenPlan('067'), { cwd: f }).includes('월 목표: 목표 ROAS나 월 예산');
+    fs.writeFileSync(path.join(f, 'brand', 'profile.md'), 채운);
+    assert.equal(월목표(), true, '§4 가 비고 채널도 모르면 월 목표를 물어야 한다');
+    fs.writeFileSync(path.join(f, 'brand', 'profile.md'), 채운.replace(/(\| 목표 ROAS \| )\|/, '$1300% |'));
+    assert.equal(월목표(), false, '§4 에 목표 ROAS 가 있는데 월 목표를 다시 물었다');
+    fs.writeFileSync(path.join(f, 'brand', 'profile.md'), 채운.replace('| (채널1) | | |', '| 네이버 블로그 | 운영 | 월 방문 3천 |'));
+    assert.equal(월목표(), false, '광고 채널이 없는데 월 목표(ROAS)를 물었다');
+    fs.writeFileSync(path.join(f, 'brand', 'profile.md'), 채운.replace('| (채널1) | | |', '| 메타 광고 | 운영 | ROAS 250% |'));
+    assert.equal(월목표(), true, '광고 채널이 있고 §4 가 비었으면 월 목표를 물어야 한다');
+    assert.equal(dataRequest(canonicalScreenPlan('013') && { steps: [{ skill: '013', inputs: [] }] }, f), null, '프로필만으로 되는 생성 스킬(013)에 자료를 달라고 했다');
+    assert.equal(dataRequest({ steps: [{ skill: '043', inputs: [] }] }, f), null, '스킬이 읽지 않는 고아 sample_fallback(043)으로 자료를 달라고 했다');
+    // (5) 할 일 줄 · 회사 양식(양식 원본)이 있고 정한 날이 없으면 · §8 역할과 보고 대상이 있으면
+    fs.mkdirSync(path.join(f, 'brand', 'skill-notes'));
+    fs.writeFileSync(path.join(f, 'brand', 'skill-notes', '067.md'), '# 067\n양식 원본: inputs/양식/월간보고.docx\n');
+    let todo = todoLines({ steps: [{ skill: '067' }] }, f);
+    assert.deepEqual(todo, ['📝 할 일 · 회사 양식에서 고칠 점을 3개 이하로 제안하고 승인받은 것만 skill-notes 에 남긴다(정한 날 기록) · brand/skill-notes/067.md'], '양식 원본만 있고 정한 날이 없는데 할 일 줄이 없다');
+    fs.appendFileSync(path.join(f, 'brand', 'skill-notes', '067.md'), '정한 날 2026-10-14\n');
+    assert.deepEqual(todoLines({ steps: [{ skill: '067' }] }, f), [], '정한 날이 있는데 다시 고칠 점을 제안하라고 했다');
+    fs.writeFileSync(path.join(f, 'brand', 'profile.md'), 채운.replace(/(\| 내 역할 \| )[^|]+\|/, '$1팀장 |').replace(/(\| 결과물을 보고받는 사람 \| )[^|]+\|/, '$1대표 |'));
+    todo = todoLines({ steps: [{ skill: '067' }] }, f);
+    assert.deepEqual(todo, ['📝 할 일 · 보고 대상 대표 · 역할 팀장 → docs/공통규약.md §0-a 표대로 첫 장·길이를 맞춘다'], '§8 을 채웠는데 보고 대상 할 일 줄이 없다');
+    const 화면 = renderPlanScreen(canonicalScreenPlan('067'), { cwd: f });
+    assert.ok(!화면.includes('📝'), '할 일 줄이 계획 화면 안에 들어갔다');
+    for (const d of [a.w, b.w, f]) fs.rmSync(d, { recursive: true, force: true });
+  }
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 16 · 샘플 채움 조건 32 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

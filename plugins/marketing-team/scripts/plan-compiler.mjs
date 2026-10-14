@@ -208,7 +208,8 @@ export function skillNotes(cwd, id) {
   const line = key => ((text.match(new RegExp(`^[ \\t>*-]*${key}[ \\t]*(?:[:：][ \\t]*|[ \\t]+)([^\\n]+)$`, 'm')) || [])[1] || '')
     .replace(/\s+#(?=\s|$).*$/, '').replace(/[`*]/g, '').trim();
   const 형식 = (line('형식').match(/^\.?([a-z]+)/i) || [])[1]?.toLowerCase() || '';
-  return { rel, 형식, 양식원본: line('양식 원본') };
+  // 「정한 날」 줄 · 회사 양식에서 고칠 점을 승인받아 남긴 날 · 없으면 compile 이 할 일 줄을 낸다
+  return { rel, 형식, 양식원본: line('양식 원본'), 정한날: /^[ \t>*|-]*정한 날/m.test(text) };
 }
 const notesOfPlan = (plan, cwd) => (plan.steps || [])
   .map(st => String(st.skill || '').match(/\d{3}/)?.[0]).filter(Boolean).some(id => skillNotes(cwd, id));
@@ -572,18 +573,209 @@ export function chainScreenTemplate(name) {
   return null;
 }
 
-/** 브랜드 프로필이 비었나 · 없거나, 설치 때 받은 빈 템플릿과 같으면 빈 것이다. */
+/* ── 브랜드 프로필 상태 · 「빈」 또는 「채움」 (2026-10-14) ─────────────
+ * 예전에는 템플릿과 글자째 같을 때만 빈 것으로 봐서 0바이트 파일이나 템플릿 뒤에 주석 한 줄 붙인 파일이
+ * 「채움」이 됐다 (검토 2026-10-14 · 재현). 이제는 우리 회사 정보가 한 줄이라도 있는지를 본다.
+ * 빼는 것 · 빈 줄 · HTML 주석 · 안내 인용(> 줄) · 코드 울타리 · 구분선 · 받은 템플릿(지금 판 · §8 없는 옛 판)의 줄 ·
+ * 자리표시((예: …) · {…} · 칸 전체가 괄호 · ①②③) · 값이 빈 표 행과 「항목:」 줄 · 상태 체크 줄.
+ * 남는 줄이 하나라도 있으면 「채움」이다. 「채움」은 「이번 업무에 충분하다」는 뜻이 아니다 (docs/공통규약.md §0-b).
+ */
+const 줄정리 = line => String(line).replace(/\s+/g, ' ').trim();
+const 글자있음 = v => /[가-힣A-Za-z0-9]/.test(v);
+/** 값 칸의 자리표시를 뗀다 · 남은 것이 없으면 '' */
+const 자리표시뗌 = v => {
+  let s = String(v).replace(/`/g, '').replace(/\*\*/g, '').replace(/⭐/g, '')
+    .replace(/\((?:예|e\.g\.)\s*[:：)][^)]*\)?/gi, '').replace(/\{[^{}]*\}/g, '').replace(/[①-⑩]/g, '').trim();
+  if (/^\([^()]*\)$/.test(s)) s = '';
+  return 글자있음(s) ? s : '';
+};
+const 표칸 = t => t.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+const 열쇠 = v => 줄정리(String(v).replace(/\*\*|⭐|`/g, '')).replace(/^[-*]\s*/, '');
+let 틀캐시 = null;
+function 프로필틀() {
+  const file = path.join(PLUGIN, 'brand-templates', 'profile.md');
+  let text = '';
+  try { text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'); } catch { /* 없으면 줄 대조 없이 자리표시만 본다 */ }
+  if (틀캐시?.text === text) return 틀캐시;
+  const lines = new Set(), labels = new Set(), keys = new Set();
+  for (const raw of text.replace(/<!--[\s\S]*?-->/g, '').split('\n')) {
+    const t = 줄정리(raw);
+    if (!t) continue;
+    lines.add(t);
+    if (t.startsWith('|')) labels.add(열쇠(표칸(t)[0] || ''));
+    const kv = t.match(/^[-*]?\s*([^:：|]+)[:：]/);
+    if (kv) keys.add(열쇠(kv[1]));
+  }
+  틀캐시 = { text, lines, labels, keys };
+  return 틀캐시;
+}
+
+/** 프로필에서 우리 정보가 든 줄 · { section, label, value, line } · 표 행은 label·value, 「항목: 값」 줄도 같다 */
+export function profileRows(cwd) {
+  const file = path.join(cwd || '', 'brand', 'profile.md');
+  let text;
+  try { text = fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n'); } catch { return null; }
+  const tpl = 프로필틀();
+  const rows = [];
+  let section = '';
+  for (const raw of text.replace(/<!--[\s\S]*?-->/g, '').split('\n')) {
+    const t = 줄정리(raw);
+    const h = t.match(/^#{1,6}\s*(\d+)\./);
+    if (h) section = h[1];
+    if (!t || t.startsWith('>') || /^(```|~~~)/.test(t) || /^[-*_]{3,}$/.test(t)) continue;
+    if (/^\|[\s:|-]+\|?$/.test(t)) continue;   // 표 머리 구분선
+    if (tpl.lines.has(t)) continue;
+    if (/^[-*]\s*\[[ xX]\]/.test(t) || /^[-*]?\s*최종 갱신/.test(t)) continue;   // 상태 칸
+    if (t.startsWith('|')) {
+      const cells = 표칸(t);
+      const label = 열쇠(cells[0] || '');
+      const values = cells.slice(1).map(자리표시뗌).filter(Boolean);
+      if (tpl.labels.has(label)) { if (values.length) rows.push({ section, label, value: values.join(' · '), line: t }); continue; }
+      const own = 자리표시뗌(label);
+      if (own || values.length) rows.push({ section, label: own, value: values.join(' · '), line: t });
+      continue;
+    }
+    const kv = t.match(/^[-*]?\s*([^:：|]+)[:：]\s*(.*)$/);
+    if (kv && tpl.keys.has(열쇠(kv[1]))) {
+      const value = 자리표시뗌(kv[2]);
+      if (value) rows.push({ section, label: 열쇠(kv[1]), value, line: t });
+      continue;
+    }
+    // 「항목: 값」 꼴은 값이 있어야 우리 정보다 (「- 업종: {업종}」 같은 자리표시 줄)
+    if (kv) { const value = 자리표시뗌(kv[2]); if (value) rows.push({ section, label: 열쇠(kv[1]), value, line: t }); continue; }
+    if (자리표시뗌(t.replace(/^#{1,6}\s*/, ''))) rows.push({ section, label: '', value: 자리표시뗌(t), line: t });
+  }
+  return rows;
+}
+
+/** 프로필 상태 · 'empty' 가 아니라 화면·문서와 같은 말 「빈」·「채움」을 돌려준다 */
+export function profileState(cwd) {
+  const rows = profileRows(cwd);
+  return rows && rows.length ? '채움' : '빈';
+}
+
+/** 예전 이름 · 책 실습·대본 판단이 그대로 쓴다 */
 export function profileIsEmpty(cwd) {
-  const file = path.join(cwd, 'brand', 'profile.md');
-  if (!fs.existsSync(file)) return true;
-  const template = path.join(PLUGIN, 'brand-templates', 'profile.md');
-  if (!fs.existsSync(template)) return false;
-  // §8 우리 팀과 내 역할은 2026-10-14 에 덧붙인 선택 절이다 · 그 전에 구축한 빈 프로필(§8 없음)도 빈 것으로 본다.
-  // 안 떼면 템플릿이 바뀔 때마다 예전 독자의 빈 프로필이 「채움」이 되어 책 실습이 꺼진다.
-  const 역할절 = /\n## 8\. 우리 팀과 내 역할[\s\S]*$/;
-  const mine = fs.readFileSync(file, 'utf8').trim(), tpl = fs.readFileSync(template, 'utf8').trim();
-  const 앞 = t => t.replace(역할절, '').trim(), 뒤 = t => (t.match(역할절) || [''])[0].trim();
-  return 앞(mine) === 앞(tpl) && (!뒤(mine) || 뒤(mine) === 뒤(tpl));
+  return profileState(cwd) === '빈';
+}
+
+const 광고채널 = /광고|\bads?\b|메타|페이스북|facebook|구글|google|네이버\s*(?:검색|쇼핑)|파워링크|GFA|모먼트|틱톡|tiktok|애드|ROAS|CPA|CPC/i;
+/** 화면과 compile 안내 줄이 읽는 칸 몇 개 · 프로필이 「빈」이면 전부 비어 있다 */
+export function profileFacts(cwd) {
+  const rows = profileRows(cwd) || [];
+  const pick = (re, section) => rows.find(r => (!section || r.section === section) && re.test(r.label) && r.value)?.value || '';
+  const 채널 = rows.filter(r => r.section === '5' && r.label && !/중단/.test(r.value)).map(r => `${r.label} ${r.value}`);
+  return {
+    state: rows.length ? '채움' : '빈',
+    업종: pick(/^업종/),
+    브랜드명: pick(/^브랜드명/),
+    핵심제품: pick(/^핵심 제품/),
+    마진율: pick(/^마진율/, '4'),
+    숫자: rows.some(r => r.section === '4' && r.value),
+    채널,
+    광고채널없음: 채널.length > 0 && !채널.some(c => 광고채널.test(c)),
+    역할: pick(/^내 역할/, '8'),
+    보고: pick(/^결과물을 보고받는 사람/, '8'),
+  };
+}
+
+/**
+ * 「함께 알려주면 좋은 것」에서 프로필이 이미 답한 줄 · 틀 파일은 그대로 두고 찍을 때만 뺀다.
+ * 프로필이 「빈」이면 아무것도 빼지 않는다 · 원고 화면과 글자까지 같다.
+ * 줄 앞 이름(「업종:」 등)으로 고른다 · 스킬 번호로 고르지 않아 새 틀에도 같은 규칙이 간다.
+ */
+const 이미답함 = [
+  [/^업종$/, f => Boolean(f.업종)],
+  [/^월 목표$/, f => f.숫자 || f.광고채널없음],
+  [/^브랜드명과 제품명$/, f => Boolean(f.브랜드명 && f.핵심제품)],
+  [/^마진율$/, f => Boolean(f.마진율)],
+];
+export function askAnswered(item, facts) {
+  if (!facts || facts.state !== '채움') return false;
+  const label = (String(item).match(/^([^:：]+)[:：]/) || [])[1]?.trim() || '';
+  return 이미답함.some(([re, ok]) => re.test(label) && ok(facts));
+}
+
+/** 스킬의 sample_fallback · { file, orphan } · 없으면 null · 「고아 필드」라고 적힌 것은 스킬이 읽지 않는 파일이다 (043) */
+export function skillSampleFallback(d) {
+  if (!d?.dir) return null;
+  let text = '';
+  try { text = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'); } catch { return null; }
+  const raw = (frontmatterOf(text).match(/^sample_fallback:[ \t]*(.*)$/m) || [])[1];
+  if (!raw) return null;
+  const file = clean(raw).split(/\s+/)[0];
+  return file ? { file, orphan: /고아/.test(raw) } : null;
+}
+
+/** 스킬 inputs 에서 자료를 가리키는 칸 하나 · 괄호 안 설명은 뗀다 (괄호 안 쉼표로 쪼개지 않는다)
+ *  고르는 순서 · (선택) 이 아닌 칸 중 자료 낱말이 든 첫 칸 → (선택) 이 아닌 첫 칸 → 첫 칸 */
+const 자료말 = /데이터|자료|리포트|보고서|리뷰|댓글|CSV|XLSX|엑셀|시트|이력|기록|로그|내보내기|녹취|메모|스냅샷|원가|VoC|문의/i;
+export function skillDataNeed(d) {
+  if (!d?.dir) return '';
+  let text = '';
+  try { text = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8').replace(/\r\n/g, '\n'); } catch { return ''; }
+  // 실행 기록을 읽는 스킬(091·097·098·100)은 inputs 가 아니라 logs/build-log.md 가 자료다
+  if (/build-log/.test(skillSampleFallback(d)?.file || '')) return '실행 기록(logs/build-log.md)';
+  let value = frontmatterField(text, 'inputs');
+  if (value.startsWith('[') && value.endsWith(']')) value = value.slice(1, -1);
+  const items = [];
+  let depth = 0, cur = '';
+  for (const ch of value) {
+    if (ch === '(' || ch === '（') depth += 1;
+    if (ch === ')' || ch === '）') depth = Math.max(0, depth - 1);
+    if (ch === ',' && depth === 0) { items.push(cur); cur = ''; } else cur += ch;
+  }
+  items.push(cur);
+  const tidy = v => 줄정리(v.replace(/\([^()]*\)|（[^（）]*）/g, '').replace(/[`*]/g, '').replace(/^있으면\s+/, ''));
+  const list = items.map(raw => ({ raw, name: tidy(raw) })).filter(v => v.name && !/^brand\//.test(v.name));
+  const must = list.filter(v => !/선택/.test(v.raw));
+  return (must.find(v => 자료말.test(v.raw)) || must[0] || list[0])?.name || '';
+}
+
+/** 받침이 있으면 「을」, 없으면 「를」 · 한글로 안 끝나면 「을(를)」 */
+const 을를 = word => {
+  const code = String(word).trim().slice(-1).charCodeAt(0) - 0xac00;
+  if (code < 0 || code > 11171) return `${word}을(를)`;
+  return `${word}${code % 28 === 0 ? '를' : '을'}`;
+};
+
+/**
+ * 우리 자료를 달라고 할 때인가 · 그 스킬이 무엇을 받는지(inputs 의 자료 칸)를 돌려준다 · 아니면 null.
+ * 판단 규칙 · 프로필 「채움」 · 실습 아님 · 첫 단계 입력과 계획 맨 위 입력이 비었고 inputs/ 도 비었다 ·
+ * 그 스킬에 sample_fallback 이 있고 「고아 필드」가 아니다 (= 그 스킬은 자료 파일을 읽는다).
+ * sample_fallback 이 없는 스킬(카피·이름 짓기처럼 프로필만으로 되는 생성)은 묻지 않고 그대로 돈다.
+ */
+export function dataRequest(plan, cwd) {
+  const first = (plan?.steps || [])[0];
+  if (!cwd || !first || plan.실습 === true) return null;
+  if ((first.inputs || []).length || (plan.inputs || []).length) return null;
+  try { if (fs.readdirSync(path.join(cwd, 'inputs')).some(n => !n.startsWith('.'))) return null; } catch { /* inputs/ 없음 */ }
+  if (profileState(cwd) !== '채움') return null;
+  const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
+  const fb = skillSampleFallback(d);
+  if (!fb || fb.orphan) return null;
+  // 실행 기록을 읽는 스킬은 logs/build-log.md 에 기록이 있으면 그것이 우리 자료다
+  if (/build-log/.test(fb.file)) { try { if (fs.readFileSync(path.join(cwd, 'logs', 'build-log.md'), 'utf8').trim()) return null; } catch { /* 없음 */ } }
+  return skillDataNeed(d) || '이 업무의 자료';
+}
+
+/** 화면 「분석할 자료」 줄 · 우리 자료가 없을 때 (문서가 같은 문장을 쓴다 · docs/공통규약.md §0-b) */
+export const 자료없음줄 = need => `분석할 자료: 우리 자료가 아직 없습니다 · ${을를(need)} inputs 폴더에 넣거나 대화에 붙여 주시면 그 자료로 분석합니다. 연습용 샘플로 우리 회사 결론을 내지 않습니다.`;
+/** compile 안내 줄 · 화면 밖 */
+export const 자료없음안내 = need => `📎 우리 자료가 없습니다 · ${을를(need)} inputs/ 에 넣거나 대화에 붙여 주세요 · 샘플로 회사 결론을 내지 않는다 · 사용자가 「샘플로 실습」이라고 했을 때만 plan.json 에 "실습": true 를 적고 다시 compile 한다`;
+
+/** compile 「할 일」 줄 · 화면 밖 · 문서 규칙만으로는 모델이 따르지 않았다 (실측 2026-10-14) */
+export function todoLines(plan, cwd) {
+  const out = [];
+  const ids = [...new Set((plan?.steps || []).map(st => String(st.skill || '').match(/\d{3}/)?.[0]).filter(Boolean))];
+  for (const id of ids) {
+    const note = skillNotes(cwd, id);
+    if (note?.양식원본 && !note.정한날)
+      out.push(`📝 할 일 · 회사 양식에서 고칠 점을 3개 이하로 제안하고 승인받은 것만 skill-notes 에 남긴다(정한 날 기록) · ${note.rel}`);
+  }
+  const f = profileFacts(cwd);
+  if (f.역할 && f.보고) out.push(`📝 할 일 · 보고 대상 ${f.보고} · 역할 ${f.역할} → docs/공통규약.md §0-a 표대로 첫 장·길이를 맞춘다`);
+  return out;
 }
 
 const stopSentences = decl => {
@@ -624,11 +816,15 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
   const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
   const 샘플이유 = first.tpl['샘플 이유'] || 'inputs 폴더가 비어있어';
+  // 프로필 「채움」 · 실습 아님 · 자료 없음이면 샘플을 넣지 않고 우리 자료를 달라고 적는다 (빈 프로필 화면은 그대로)
+  const need = !own.length && !sample ? dataRequest(plan, cwd) : null;
   if (own.length) lines.push(`분석할 자료: ${own.join(' · ')} 파일을 읽습니다.`);
   else if (sample && first.tpl['샘플 자료']) lines.push(`분석할 자료: ${샘플이유} ${으로(first.tpl['샘플 자료'])} 돌립니다. 결과에는 [샘플]이 붙습니다.`);
+  else if (need) lines.push(자료없음줄(need));
   // 보완 파일이 있는 스킬만 덧붙인다 · 없으면 원고 화면과 글자까지 같다
   const 우리양식 = [...new Set(rows.map(r => skillNotes(cwd, r.id)?.rel).filter(Boolean))].map(v => ` · 우리 양식 ${v}`).join('');
-  lines.push(`근거로 쓰는 것: ${profileIsEmpty(cwd) ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${우리양식}`);
+  const facts = profileFacts(cwd);
+  lines.push(`근거로 쓰는 것: ${facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${우리양식}`);
 
   const firstOut = rel((first.step.outputs || [])[0] || '');
   const parts = firstOut.split('/');
@@ -636,7 +832,8 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
 
   const formatsOf = r => {
     const 계약 = [...new Set(r.decl.writesTo.map(v => path.posix.basename(v)).filter(b => b.includes('.')))];
-    return applyFormatChoice(계약, scopeFormatChoice(계약, choice)).map(formatLabel).join(' · ');
+    // 같은 그릇 이름은 한 번만 · 092 처럼 .md 를 둘 내는 스킬(제작 리포트 · 새 SKILL.md)도 「문서 .md」 하나다
+    return [...new Set(applyFormatChoice(계약, scopeFormatChoice(계약, choice)).map(formatLabel))].join(' · ');
   };
   if (isChain) {
     lines.push('나오는 형식:');
@@ -676,14 +873,15 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   // 체인 틀에 같은 키가 있으면 체인 것을 쓴다 · 없으면 첫 단계 스킬 것을 쓴다
   const pick = key => (isChain && chainTpl.목록[key]) || first.tpl.목록[key] || [];
   const handoff = pick('우리 자료로 하려면');
-  if (sample && !own.length && handoff.length) {
+  if ((sample || need) && !own.length && handoff.length) {
     lines.push('', '우리 자료로 하려면');
     const 안내 = (isChain && chainTpl['우리 자료 안내']) || first.tpl['우리 자료 안내'];
     if (안내) lines.push(`  ${안내}`);
     for (const item of handoff) lines.push(`  ${item}`);
     lines.push('  넣은 뒤 승인할 때 「진행 승인. inputs/파일이름」처럼 파일 이름을 함께 적어주세요.');
   }
-  const asks = pick('함께 알려주면 좋은 것');
+  // 프로필이 이미 답한 것(업종·월 목표·브랜드명·마진율)은 다시 묻지 않는다 · 「빈」이면 그대로
+  const asks = pick('함께 알려주면 좋은 것').filter(item => !askAnswered(item, facts));
   if (asks.length) {
     lines.push('', '함께 알려주면 좋은 것');
     for (const item of asks) lines.push(`  ${item}`);
@@ -799,11 +997,13 @@ export function bookInputs(plan, cwd) {
 export function sampleInputs(plan, cwd) {
   const first = (plan.steps || [])[0];
   if (!cwd || !first || (first.inputs || []).length || (plan.inputs || []).length) return null;
+  // 샘플로 채우는 것은 프로필이 「빈」이거나 사용자가 「샘플로 실습」을 말했을 때(plan.실습)뿐이다 (2026-10-14 · 검토 P0)
+  // 우리 회사 프로필에 A브랜드 리뷰를 넣으면 그 리뷰의 고객·제품은 여전히 A브랜드 것이다
+  if (plan.실습 !== true && profileState(cwd) !== '빈') return null;
   try { if (fs.readdirSync(path.join(cwd, 'inputs')).some(n => !n.startsWith('.'))) return null; } catch { /* inputs/ 없음 */ }
   const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
   if (!d) return null;
-  const skillText = fs.readFileSync(path.join(d.dir, 'SKILL.md'), 'utf8');
-  const fallback = ((skillText.match(/^sample_fallback:\s*(\S+)/m) || [])[1] || '').trim();
+  const fallback = skillSampleFallback(d)?.file || '';
   if (!fallback) return null;
   first.inputs = [`plugin:${fallback}`];
   return first.inputs;
@@ -1030,6 +1230,7 @@ if (isCli) {
   if (command === 'compile') {
     const filled = sampleInputs(plan, process.cwd());
     if (filled) console.log(`📎 inputs 가 비어 샘플 자료로 채웠다 · ${filled[0].replace(/^plugin:/, '')}`);
+    else { const need = dataRequest(plan, process.cwd()); if (need) console.log(자료없음안내(need)); }
     for (const line of userSkills(process.cwd()).warnings) console.log(`🟡 ${line}`);
     for (const line of notesFormat(plan, process.cwd())) console.log(line);
     for (const st of plan.steps || []) {
@@ -1038,6 +1239,8 @@ if (isCli) {
       const there = fs.existsSync(path.resolve(process.cwd(), note.양식원본.replace(/^workspace:/, '')));
       console.log(there ? `📎 우리 양식 원본 · ${note.양식원본} 의 틀을 따른다` : `🟡 ${note.rel} 의 양식 원본이 없습니다 · ${note.양식원본}`);
     }
+    // 할 일 줄 · 화면 밖 안내다 · 계획 화면 글자는 바꾸지 않는다
+    for (const line of todoLines(plan, process.cwd())) console.log(line);
     const forced = bookInputs(plan, process.cwd());
     if (forced) console.log(`📖 책 실습 · 원고 계획의 입력으로 맞췄다 · ${forced.map(v => v.replace(/^(workspace|plugin):/, '')).join(' · ')}`);
     const issues = validatePlan(plan);

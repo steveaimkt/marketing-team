@@ -102,6 +102,9 @@ try {
   assert.equal(decision(result), 'none', '승인 뒤 cohort-retention.mjs 실행을 막았습니다.');
   result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/rfm-segments.mjs" "sample-data/x.csv" --dormancy-days 120' });
   assert.equal(decision(result), 'none', '승인 뒤 rfm-segments.mjs 실행을 막았습니다.');
+  // 092 등록 심사 · 사용자 스킬 검사기는 읽기만 한다 (실측 2026-10-14 · 승인 뒤에도 막혔다)
+  result = call('Bash', { command: 'node "${CLAUDE_PLUGIN_ROOT}/scripts/validate-my-skills.mjs" "outputs/2026-10-14/092-skill-builder-meta"' });
+  assert.equal(decision(result), 'none', '승인 뒤 validate-my-skills.mjs 실행을 막았습니다.');
   // 굵은 표식도 계획으로 결속된다 (실측 2026-08-31 · 헛 재승인 2회)
   const boldPlan = row('assistant', '**[실행 계획]**\n광고 문구 3안\n**[승인 요청]**\n진행하려면 「진행 승인」');
   writeTranscript([active, boldPlan, approval]);
@@ -486,6 +489,15 @@ try {
       W([active, p, row('user', '진행 승인'), row('user', '아니 취소할게요')]);
       assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
         '사람이 친 취소는 여전히 승인을 풀어야 합니다.');
+      // 하위 에이전트 완료 알림·시스템 알림도 role:user 로 온다 · 알림 속 「아직」이 승인을 풀었다 (실측 2026-10-14)
+      const notice = row('user', '<task-notification>\n<task-id>a1</task-id>\n<status>completed</status>\n<result>검토가 아직 한 건 남았습니다 · 보류 · 취소</result>\n</task-notification>');
+      const reminder = JSON.stringify({ message: { role: 'user', content: '<system-reminder>\n아직 끝나지 않은 할 일이 있습니다 · 중단\n</system-reminder>' } });
+      W([active, p, row('user', '진행 승인'), notice, reminder]);
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'none',
+        '하위 에이전트 완료 알림·시스템 알림 속 낱말이 승인을 풀었습니다.');
+      W([active, p, notice, reminder]);
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+        '알림 행을 사람 승인으로 셌습니다.');
 
       // ③ 문장 승인은 있고 plan.json 봉인만 빠졌으면 재승인이 아니라 봉인을 알린다
       const rel3 = 'outputs/2026-09-23/002-x';
@@ -683,7 +695,7 @@ try {
     }
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 2 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 4 · 사용자 스킬 검사기 1 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

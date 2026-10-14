@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash } from './plan-compiler.mjs';
+import { planHash, skillDeclarations } from './plan-compiler.mjs';
 
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'run-receipt.mjs');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-run-receipt-'));
@@ -704,7 +704,78 @@ try {
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
 
-  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · 보완 파일 책 실습 끔 1 · 사용자 스킬 영수증 3 · ✅');
+  // 데이터 표시는 실제로 쓴 근거로 · 샘플 입력이 있으면 「실데이터」를 받지 않는다 (2026-10-14 · 검토 P0)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-data-mode-'));
+    try {
+      const dir = 'outputs/2026-10-14/045-weekly-ads-report';
+      for (const d of [dir, 'inputs', 'logs', 'brand']) fs.mkdirSync(path.join(ws, d), { recursive: true });
+      fs.writeFileSync(path.join(ws, 'inputs', 'ads.csv'), 'date,spend\n2026-10-01,1000\n');
+      fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '| 브랜드명 | 팀플 |\n');
+      const art = `workspace:${dir}/045-weekly-ads-report.html`;
+      const go = (mode, inputs, name = 'run.json') => {
+        fs.writeFileSync(path.join(ws, dir, name), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '광고 주간 리포트',
+          skills: ['045'], data_mode: mode, inputs, profile: 'workspace:brand/profile.md', outputs: [art], required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
+        return spawnSync(process.execPath, [SCRIPT, 'start', `${dir}/${name}`], { cwd: ws, encoding: 'utf8' });
+      };
+      const 샘플 = { path: 'plugin:sample-data/A브랜드-광고매체통합-12주.csv', period: '12주' }, 우리 = { path: 'workspace:inputs/ads.csv', period: '2026-10' };
+      let r = go('실데이터', [샘플]);
+      assert.notEqual(r.status, 0, '샘플 입력인데 「실데이터」로 시작했다');
+      assert.match(r.stderr, /「실데이터」로 적을 수 없습니다[\s\S]*전부 샘플이면 「샘플」/, '전부 샘플일 때 무엇으로 적을지 알리지 않았다');
+      r = go('실데이터', [우리, 샘플], 'run-2.json');
+      assert.notEqual(r.status, 0, '우리 자료와 샘플이 섞였는데 「실데이터」로 시작했다');
+      assert.match(r.stderr, /섞였으면 「혼합」/, '섞였을 때 「혼합」을 알리지 않았다');
+      r = go('샘플', [우리, 샘플], 'run-3.json');
+      assert.equal(r.status, 0, r.stderr);
+      assert.match(r.stderr, /「혼합」이 맞습니다/, '섞였는데 「샘플」로 적으면 「혼합」을 알려야 한다');
+      r = go('실데이터', [우리], 'run-4.json');
+      assert.equal(r.status, 0, `우리 자료만 쓴 「실데이터」를 막았다: ${r.stderr}`);
+      // start 뒤에 data_mode 를 고쳐도 finalize 가 잡는다
+      r = go('혼합', [우리, 샘플], 'run-5.json');
+      assert.equal(r.status, 0, r.stderr);
+      const f5 = path.join(ws, dir, 'run-5.json');
+      fs.writeFileSync(f5, JSON.stringify({ ...JSON.parse(fs.readFileSync(f5, 'utf8')), data_mode: '실데이터' }));
+      r = spawnSync(process.execPath, [SCRIPT, 'finalize', `${dir}/run-5.json`, '--status', 'interrupted'], { cwd: ws, encoding: 'utf8' });
+      assert.notEqual(r.status, 0, '봉인 뒤 「실데이터」로 고친 영수증을 finalize 가 통과시켰다');
+      assert.match(r.stderr, /「실데이터」로 적을 수 없습니다/);
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  // 092 · 새 스킬 폴더 {NNN}-{slug}/ 는 실행 중에 이름이 정해진다 · 같은 승인으로 영수증을 연다 (실측 2026-10-14 · 승인 두 번)
+  {
+    const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-092-'));
+    try {
+      const pc = (...a) => spawnSync(process.execPath, [path.join(path.dirname(SCRIPT), 'plan-compiler.mjs'), ...a], { cwd: ws, encoding: 'utf8' });
+      const dir = 'outputs/2026-10-14/092-skill-builder-meta';
+      fs.mkdirSync(path.join(ws, dir), { recursive: true });
+      fs.mkdirSync(path.join(ws, 'logs'), { recursive: true });
+      const rep = `workspace:${dir}/092-skill-builder-meta.md`;
+      // 새 스킬 폴더에 쓰는 파일 · 092 writes_to 를 그대로 읽는다 (SKILL.md 가 writes_to 에 들어오면 함께 시험한다)
+      const 하위 = skillDeclarations().get('092').writesTo.filter(v => v.split('/').length > 4).map(v => path.posix.basename(v));
+      const 자리 = sub => 하위.map(n => `workspace:${dir}/${sub}/${n}`);
+      const 열기 = (planSub, realSub, extra = []) => {
+        fs.writeFileSync(path.join(ws, dir, 'plan.json'), JSON.stringify({ request: '내 업무를 스킬로 만들자', skills: ['092'],
+          steps: [{ step: 1, skill: '092', inputs: [], outputs: [rep, ...자리(planSub)], reviews: [] }] }));
+        const c = pc('compile', `${dir}/plan.json`);
+        assert.equal(c.status, 0, `092 계획이 compile 되지 않는다: ${c.stderr}`);
+        pc('approve', `${dir}/plan.json`);
+        fs.writeFileSync(path.join(ws, dir, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '내 업무를 스킬로 만들자',
+          skills: ['092'], data_mode: '실데이터', inputs: [], outputs: [rep, ...자리(realSub), ...extra],
+          required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
+        return spawnSync(process.execPath, [SCRIPT, 'start', `${dir}/run.json`], { cwd: ws, encoding: 'utf8' });
+      };
+      let r = 열기('{NNN}-{slug}', '101-ad-stop-judge');
+      assert.equal(r.status, 0, `계획이 {NNN}-{slug} 를 그대로 적었는데 정해진 이름으로 시작하지 못했다: ${r.stderr}`);
+      r = 열기('101-guess', '102-ad-stop-judge');
+      assert.equal(r.status, 0, `계획이 짐작한 이름과 다르다고 다시 승인을 요구했다: ${r.stderr}`);
+      r = 열기('{NNN}-{slug}', '101-ad-stop-judge/deep');
+      assert.notEqual(r.status, 0, 'writes_to 자리보다 깊은 폴더를 받아들였다');
+      r = 열기('{NNN}-{slug}', 'x-not-a-skill');
+      assert.notEqual(r.status, 0, '{NNN} 자리에 세 자리 번호가 아닌 폴더를 받아들였다');
+    } finally { fs.rmSync(ws, { recursive: true, force: true }); }
+  }
+
+  console.log('실행 영수증 검사 · 멱등 시작 1 · 미완료 verify 차단 1 · 성공 1 · 산출물 변경 차단 1 · 입력 변경 차단 1 · writes_to 외 산출물 차단 1 · 재실행 1:1 3 · 조기 중단 보존 1 · PII 블록 누락 차단·보존 2 · 검토 정책 자동 생성 2 · 다중 산출물 검토 누락 차단 1 · 고른 그릇 4 · 단계별 실행·재개 6 · 이름 있는 체인 자기 폴더 2 · 초안 실재 검사 2 · .md 없는 스킬 예외 1 · 초안은 계획 안 3 · 책 실습 9 · 보완 파일 책 실습 끔 1 · 사용자 스킬 영수증 3 · 데이터 표시 근거 7 · 092 새 스킬 폴더 4 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

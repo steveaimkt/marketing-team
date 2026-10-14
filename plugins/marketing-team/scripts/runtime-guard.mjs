@@ -87,6 +87,10 @@ function transcriptRows(file) {
         const role = event?.message?.role;
         if (role !== 'assistant' && role !== 'user') continue;
         const text = textOfContent(event.message.content);
+        // 하위 에이전트 완료 알림(<task-notification>)과 시스템 알림(<system-reminder>)도 role:user 로 온다 ·
+        // 사람 말이 아니다. 알림 속 「아직」이 WITHDRAW 에 걸려 승인이 풀렸다 (실측 2026-10-14).
+        // 승인·철회·⏸ 답 판정 모두 이 행들을 보지 않는다.
+        if (role === 'user' && /^\s*<(?:task-notification|system-reminder)>/.test(text)) continue;
         if (text) rows.push({ role, text });
       } catch {
         // 손상된 한 줄 때문에 훅 전체를 무력화하지 않는다.
@@ -356,6 +360,8 @@ const SCRIPT_ALLOW = {
     // 표준출력에 JSON만 낸다. 해석은 여전히 모델의 일이다.
     'cohort-retention.mjs': null,
     'rfm-segments.mjs': null,
+    // 092 등록 심사 · 사용자 스킬 검사기 · 읽기만 한다 (실측 2026-10-14 · 승인 뒤에도 막혀 심사를 못 돌렸다)
+    'validate-my-skills.mjs': null,
   },
 };
 
