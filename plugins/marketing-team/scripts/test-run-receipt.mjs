@@ -18,7 +18,10 @@ try {
   fs.mkdirSync(path.join(temp, 'outputs', '2026-08-30', '043-meta-ad-copy'), { recursive: true });
   fs.mkdirSync(path.join(temp, 'logs'), { recursive: true });
   fs.writeFileSync(path.join(temp, 'brand', 'profile.md'), '업종: 화장품\n');
+  // 프로필이 「채움」이라 회사 업무(실무)다 · 아래 샘플 영수증·계획은 「샘플로 실습」이라 "실습": true 를 적는다 (재검토 2026-10-15)
   fs.writeFileSync(path.join(temp, 'inputs', 'brief.md'), '신제품 광고\n');
+  // 045 는 광고 자료를 읽는다 · 「실데이터」로 시작하려면 그 스킬의 자료가 입력에 있어야 한다 (재검토 2026-10-15)
+  fs.writeFileSync(path.join(temp, 'inputs', '메타광고_8월.csv'), 'date,spend\n2026-08-01,1000\n');
 
   const out = 'outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.md';
   const 표 = 'outputs/2026-08-30/043-meta-ad-copy/043-meta-ad-copy.xlsx';
@@ -101,7 +104,7 @@ try {
     request: '광고 주간 리포트 만들어줘',
     skills: ['045'],
     data_mode: '실데이터',
-    inputs: [{ path: 'workspace:inputs/brief.md', period: '2026-08' }],
+    inputs: [{ path: 'workspace:inputs/brief.md', period: '2026-08' }, { path: 'workspace:inputs/메타광고_8월.csv', period: '2026-08' }],
     profile: 'workspace:brand/profile.md',
     outputs: [`workspace:${staleOut}`],
     required_reviews: [],
@@ -125,7 +128,7 @@ try {
     status: 'draft',
     request: '광고 예산 다시 짜줘',
     skills: ['046'],
-    data_mode: '샘플',
+    실습: true, data_mode: '샘플',
     outputs: [
       'workspace:outputs/2026-08-30/046-roas-budget-rebalance/046-roas-budget-rebalance.md',
       'workspace:outputs/2026-08-30/046-roas-budget-rebalance/046-roas-budget-rebalance.html',
@@ -174,6 +177,7 @@ try {
   fs.mkdirSync(path.join(temp, 'outputs', '2026-08-30', '050-utm-attribution'), { recursive: true });
   fs.writeFileSync(path.join(temp, ordReceipt), `${JSON.stringify(rerunDraft({
     request: 'UTM 규칙 다시 만들어줘', skills: ['050'],
+    data_mode: '틀',   // 050 은 UTM 현황 자료를 읽는다 · brief.md 만으로는 「실데이터」가 아니다 (재검토 2026-10-15)
     outputs: [
       'workspace:outputs/2026-08-30/050-utm-attribution/050-utm-attribution-2.csv',
       'workspace:outputs/2026-08-30/050-utm-attribution/050-utm-attribution-해설-3.md',
@@ -187,7 +191,7 @@ try {
   const blockedReceipt = 'outputs/2026-08-30/046-roas-budget-rebalance/run-4.json';
   fs.writeFileSync(path.join(temp, blockedReceipt), `${JSON.stringify({
     schema: 'marketing-team.run/v1', status: 'draft', request: '광고 예산 다시 짜줘',
-    skills: ['046'], data_mode: '샘플',
+    skills: ['046'], 실습: true, data_mode: '샘플',
     outputs: ['workspace:outputs/2026-08-30/046-roas-budget-rebalance/046-roas-budget-rebalance.md'],
     required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
   }, null, 2)}\n`);
@@ -208,7 +212,7 @@ try {
     status: 'draft',
     request: '샘플 리뷰를 분석해줘',
     skills: ['006'],
-    data_mode: '샘플',
+    실습: true, data_mode: '샘플',
     inputs: [{ path: 'plugin:sample-data/A브랜드-리뷰-200건.csv', period: '미확인' }],
     outputs: piiOutputs,
     required_reviews: [],
@@ -291,7 +295,7 @@ try {
     status: 'draft',
     request: '채널 두 곳 광고 카피 만들어줘',
     skills: ['050'],
-    data_mode: '실데이터',
+    data_mode: '틀',   // 050 은 UTM 현황 자료를 읽는다 · brief.md 만으로는 「실데이터」가 아니다 (재검토 2026-10-15)
     inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
     profile: 'workspace:brand/profile.md',
     outputs: [`workspace:${multiA}`, `workspace:${multiB}`],
@@ -325,7 +329,7 @@ try {
       status: 'draft',
       request: '고객 여정 그려줘',
       skills: ['073'],
-      data_mode: '샘플',
+      실습: true, data_mode: '샘플',
       inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
       profile: 'workspace:brand/profile.md',
       outputs: [
@@ -356,7 +360,7 @@ try {
       status: 'draft',
       request: '보도자료 써줘',
       skills: ['083'],
-      data_mode: '샘플',
+      실습: true, data_mode: '샘플',
       inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
       profile: 'workspace:brand/profile.md',
       outputs: [`workspace:${dir}/083-press-release.md`],
@@ -379,7 +383,7 @@ try {
       const rj = `${dir}/${name}`;
       fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
         schema: 'marketing-team.run/v1', status: 'draft', request: '네이버 광고 키워드 진단해줘',
-        skills: ['042'], data_mode: '샘플',
+        skills: ['042'], 실습: true, data_mode: '샘플',
         inputs: [{ path: 'workspace:inputs/brief.md', period: '해당없음' }],
         profile: 'workspace:brand/profile.md',
         required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
@@ -432,7 +436,7 @@ try {
     fs.mkdirSync(dir, { recursive: true });
     const ref = name => `workspace:${rel}/${name}`;
     const plan = {
-      schema: 'marketing-team.plan/v1', plan_id: 'chain', request: '061 → 073 → 065 → 066 조합',
+      schema: 'marketing-team.plan/v1', plan_id: 'chain', request: '061 → 073 → 065 → 066 조합', 실습: true,
       requested_order: ['061', '073', '065', '066'], skills: ['061', '073', '065', '066'],
       steps: [
         { step: 1, skill: '061', inputs: ['plugin:sample-data/A브랜드-2026-06-매출.xlsx'], outputs: [ref('061-sales-data-analysis.xlsx'), ref('061-sales-data-analysis.html'), ref('061-sales-data-analysis.md')], reviews: [] },
@@ -449,7 +453,7 @@ try {
     const rj = `${rel}/run.json`;
     fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
       schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 → 065 → 066 조합',
-      skills: ['061', '073', '065', '066'], data_mode: '샘플',
+      skills: ['061', '073', '065', '066'], 실습: true, data_mode: '샘플',
       inputs: [
         { path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' },
         { path: 'plugin:sample-data/A브랜드-고객마스터.csv', period: '2025-07-02~2026-06-30' },
@@ -502,7 +506,7 @@ try {
       const ref = name => `workspace:${proj}/073-customer-journey-map/${name}`;
       fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
         schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
-        skills: ['061', '073'], data_mode: '샘플',
+        skills: ['061', '073'], 실습: true, data_mode: '샘플',
         inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
         profile: 'plugin:sample-data/profile-sample.md',
         outputs: [
@@ -527,7 +531,7 @@ try {
       const ref1 = name => `workspace:${proj}/061-sales-data-analysis/${name}`;
       const ref2 = name => `workspace:${proj}/073-customer-journey-map/${name}`;
       const plan = {
-        schema: 'marketing-team.plan/v1', plan_id: 'chain-named', request: '061 → 073 조합(이름 있는 체인)',
+        schema: 'marketing-team.plan/v1', plan_id: 'chain-named', request: '061 → 073 조합(이름 있는 체인)', 실습: true,
         chain: '테스트체인', requested_order: ['061', '073'], skills: ['061', '073'],
         risks: [],
         steps: [
@@ -547,7 +551,7 @@ try {
       const rj = `${proj}/run.json`;
       fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
         schema: 'marketing-team.run/v1', status: 'draft', request: '061 → 073 조합(이름 있는 체인)',
-        skills: ['061', '073'], data_mode: '샘플',
+        skills: ['061', '073'], 실습: true, data_mode: '샘플',
         inputs: [{ path: 'plugin:sample-data/A브랜드-2026-06-매출.xlsx', period: '2026-06-01~2026-06-30' }],
         profile: 'plugin:sample-data/profile-sample.md',
         outputs: plan.steps.flatMap(x => x.outputs),
@@ -570,7 +574,7 @@ try {
       const rj = `${dir}/${name}`;
       fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
         schema: 'marketing-team.run/v1', status: 'draft', request: '광고 예산 다시 짜줘',
-        skills: ['046'], data_mode: '샘플',
+        skills: ['046'], 실습: true, data_mode: '샘플',
         required_reviews: [], reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
         형식: { '046-roas-budget-rebalance.md': 'docx' },
         ...extra,
@@ -600,7 +604,7 @@ try {
     const rj = `${dir}/run-18.json`;
     fs.writeFileSync(path.join(temp, rj), `${JSON.stringify({
       schema: 'marketing-team.run/v1', status: 'draft', request: '광고 주간 리포트 만들어줘',
-      skills: ['045'], data_mode: '샘플',
+      skills: ['045'], 실습: true, data_mode: '샘플',
       outputs: [`workspace:${dir}/045-weekly-ads-report.html`],
       required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' },
     }, null, 2)}\n`);
@@ -615,7 +619,7 @@ try {
       const rel = `outputs/2026-09-22/${id}-${slug}`;
       fs.mkdirSync(path.join(temp, rel), { recursive: true });
       const out = ext => `workspace:${rel}/${id}-${slug}.${ext}`;
-      const plan = { schema: 'marketing-team.plan/v1', plan_id: `draft-${id}`, request: '초안 재현', skills: [id],
+      const plan = { schema: 'marketing-team.plan/v1', plan_id: `draft-${id}`, request: '초안 재현', 실습: true, skills: [id],
         steps: [{ step: 1, skill: id, inputs: ['plugin:sample-data/A브랜드-채널성과-90일.csv'], outputs: [out(finalExt)], reviews }],
         budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 } };
       if (fmt) plan.형식 = fmt;
@@ -623,7 +627,7 @@ try {
       assert.equal(pc('compile', `${rel}/plan.json`).status, 0, `${id} 계획이 compile 되지 않는다`);
       pc('approve', `${rel}/plan.json`);
       return (단계, exts) => {
-        const receipt = { schema: 'marketing-team.run/v1', status: 'draft', request: '초안 재현', skills: [id], data_mode: '샘플',
+        const receipt = { schema: 'marketing-team.run/v1', status: 'draft', request: '초안 재현', skills: [id], 실습: true, data_mode: '샘플',
           inputs: [{ path: 'plugin:sample-data/A브랜드-채널성과-90일.csv', period: '2026-05-01~2026-07-29' }],
           profile: 'plugin:sample-data/profile-sample.md', outputs: exts.map(out),
           required_reviews: exts.flatMap(e => reviews.map(r => ({ ...r, artifact: out(e) }))), reviews: [],
@@ -715,7 +719,7 @@ try {
       const art = `workspace:${dir}/045-weekly-ads-report.html`;
       const go = (mode, inputs, name = 'run.json') => {
         fs.writeFileSync(path.join(ws, dir, name), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '광고 주간 리포트',
-          skills: ['045'], data_mode: mode, inputs, profile: 'workspace:brand/profile.md', outputs: [art], required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
+          skills: ['045'], 실습: true, data_mode: mode, inputs, profile: 'workspace:brand/profile.md', outputs: [art], required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
         return spawnSync(process.execPath, [SCRIPT, 'start', `${dir}/${name}`], { cwd: ws, encoding: 'utf8' });
       };
       const 샘플 = { path: 'plugin:sample-data/A브랜드-광고매체통합-12주.csv', period: '12주' }, 우리 = { path: 'workspace:inputs/ads.csv', period: '2026-10' };

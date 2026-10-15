@@ -25,7 +25,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { runChecks } from './output-checks.mjs';
 import { approvalState, normalizeFormatChoice, applyFormatChoice, scopeFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookCheck, userSkills,
-  planHash, slotOf, slotName, sealedRun, nextSlot, skillDeclarations, skillNeedsData, skillSampleFallback, workInput, outputDataMode, workspaceOf } from './plan-compiler.mjs';
+  planHash, slotOf, slotName, sealedRun, nextSlot, skillDeclarations, skillNeedsData, skillSampleFallback, workInput, outputRun, workspaceOf, workMode, 실무샘플안내, 표시충돌안내 } from './plan-compiler.mjs';
 import { mergeRequiredReviews, requiredReviewsForExecution } from './review-policy.mjs';
 import { appendEvent } from './orchestrator-events.mjs';
 import { identifierLikeHeaders } from './pii-check.mjs';
@@ -354,33 +354,96 @@ function validateReviewCoverage(skillRows, requiredRows) {
  *   자료를 읽어야 하는 스킬(plan-compiler skillNeedsData · 045·067 등)이 우리 자료도 샘플도 없이 「실데이터」면 받지 않는다 ·
  *     숫자 없이 틀만 만들었으면 「틀」, 가정한 숫자로 채웠으면 「추정」이다. 프로필만으로 만드는 생성 스킬(카피 등)은 「실데이터」 그대로다.
  */
-function checkDataMode(mode, inputRows = [], profile = null, { skills: skillRows = [], outputs: outputRows = [] } = {}) {
+/**
+ * 쓴 근거를 세 가지로 나눈다 · { 실데이터, 샘플, 추정 } · 영수증에 data_basis 로 남긴다 (재검토 2026-10-15 · P1 추정 전달)
+ *   샘플 · plugin:sample-data/ · 샘플(이나 샘플이 든 혼합)로 만든 앞 결과
+ *   추정 · 「추정」으로 만든 앞 결과 · 추정이 든 혼합의 앞 결과
+ *   실데이터 · 작업 폴더의 업무 자료(workInput) · 실데이터(나 실제 자료가 든 혼합)로 만든 앞 결과
+ * 앞 결과가 「혼합」인데 그 영수증에 data_basis 가 없으면(이 판 전) 예전처럼 샘플과 실데이터 둘 다로 센다.
+ * 이번 실행이 만드는 파일(체인의 앞 단계 산출물)은 세지 않는다 · 「틀」로 만든 앞 결과는 숫자 근거가 아니라 세지 않는다.
+ */
+function dataBasis(inputRows = [], profile = null, outputRows = []) {
   const 이번결과 = new Set(outputRows.map(r => String(r?.path ?? r)));
-  const 샘플 = [], 우리 = [];
+  const basis = { 실데이터: [], 샘플: [], 추정: [] };
   for (const r of [...inputRows, ...(profile?.path ? [{ path: profile.path, profile: true }] : [])]) {
     const ref = String(r?.path ?? r);
-    if (ref.startsWith('plugin:sample-data/')) { 샘플.push(ref); continue; }
+    if (ref.startsWith('plugin:sample-data/')) { basis.샘플.push(ref); continue; }
     if (r.profile || !ref.startsWith('workspace:') || 이번결과.has(ref)) continue;
-    const 앞 = ref.startsWith('workspace:outputs/') ? outputDataMode(WORK, ref) : null;
-    if (앞 === '샘플' || 앞 === '혼합') 샘플.push(ref);
-    if (앞 === '실데이터' || 앞 === '혼합' || (!앞 && workInput(WORK, ref))) 우리.push(ref);
+    const 앞 = ref.startsWith('workspace:outputs/') ? outputRun(WORK, ref) : null;
+    const mode = 앞?.data_mode || null;
+    const 세부 = 앞?.data_basis;
+    const 있음 = key => Array.isArray(세부?.[key]) && 세부[key].length > 0;
+    if (mode === '샘플' || (mode === '혼합' && (세부 ? 있음('샘플') : true))) basis.샘플.push(ref);
+    if (mode === '추정' || (mode === '혼합' && 있음('추정'))) basis.추정.push(ref);
+    if (mode === '실데이터' || (mode === '혼합' && (세부 ? 있음('실데이터') : true)) || (!mode && workInput(WORK, ref))) basis.실데이터.push(ref);
   }
+  return basis;
+}
+
+/**
+ * 데이터 표시는 실제로 쓴 근거로 정한다 (2026-10-14 · 검토 P0 「프로필 찼음 → 실데이터」).
+ * 입력이나 프로필에 plugin:sample-data/ 가 하나라도 있으면 「실데이터」를 받지 않는다 · 던진다.
+ * 앞 결과가 추정이면 「실데이터」를 받지 않는다 · 실제 자료와 섞였으면 「혼합」, 전부 추정이면 「추정」 (재검토 2026-10-15).
+ * 작업 폴더 자료와 샘플이 섞였는데 「샘플」이면 「혼합」이 맞다고 알린다 · 돌려준 문장은 경고다.
+ * start 에서 막고, finalize·verify 는 inspect 에서 같은 검사를 한다 (봉인 뒤 run.json 을 고쳐도 잡는다).
+ *
+ * 무엇을 우리 자료로 세나 (2026-10-14 · v0.72.31 실측)
+ *   brand/ · 회사 양식(inputs/양식/ · 프로필 §8) · 레퍼런스·좋았던 글 같은 참고 자료는 우리 자료가 아니다 (plan-compiler workInput)
+ *   앞 결과(workspace:outputs/…)는 그 결과를 낸 영수증의 data_mode(와 data_basis)를 이어받는다 · 샘플로 만든 결과는 샘플이다
+ *     (책 실습 4장 011 · 샘플로 만든 006·002 결과를 읽었는데 「혼합이 맞다」고 했다)
+ *   자료를 읽어야 하는 스킬(plan-compiler skillNeedsData · 045·067 등)이 그 스킬의 자료 없이 「실데이터」면 받지 않는다 ·
+ *     그 스킬의 자료인지는 계획과 같은 기준이다(relevantInput · 자료 칸 낱말·확장자 · 리뷰 csv 는 045 광고 자료가 아니다) ·
+ *     체인은 단계마다 본다 · 앞 단계 산출물을 입력으로 받은 단계는 자료가 있다 ·
+ *     숫자 없이 틀만 만들었으면 「틀」, 가정한 숫자로 채웠으면 「추정」이다. 프로필만으로 만드는 생성 스킬(카피 등)은 「실데이터」 그대로다.
+ */
+function checkDataMode(mode, inputRows = [], profile = null, { skills: skillRows = [], outputs: outputRows = [], steps = null } = {}) {
+  const { 실데이터: 우리, 샘플, 추정 } = dataBasis(inputRows, profile, outputRows);
   if (mode === '실데이터' && 샘플.length) {
     throw new Error(`쓴 근거에 샘플 자료가 있어 data_mode 「실데이터」로 적을 수 없습니다: ${샘플.join(' · ')} · `
       + (우리.length ? '작업 폴더 자료와 샘플이 섞였으면 「혼합」으로 적으세요.' : '전부 샘플이면 「샘플」, 우리 자료와 섞였으면 「혼합」으로 적으세요.'));
   }
-  if (mode === '실데이터' && !우리.length) {
+  if (mode === '실데이터' && 추정.length) {
+    throw new Error(`쓴 근거에 추정으로 만든 앞 결과가 있어 data_mode 「실데이터」로 적을 수 없습니다: ${추정.join(' · ')} · `
+      + (우리.length ? '실제 자료와 추정이 섞였으면 「혼합」으로 적고, 추정 수치를 쓴 부분은 결과에 [추정]으로 남기세요.' : '전부 추정이면 「추정」으로 적으세요.'));
+  }
+  if (mode === '실데이터') {
     const decl = skillDeclarations(WORK);
     const 기록있음 = (() => { try { return fs.readFileSync(path.join(WORK, 'logs', 'build-log.md'), 'utf8').trim().length > 0; } catch { return false; } })();
-    const need = skillRows.map(row => decl.get(cleanId(row?.id ?? row))).filter(Boolean)
-      .filter(d => skillNeedsData(d) && !(/build-log/.test(skillSampleFallback(d)?.file || '') && 기록있음));
-    if (need.length)
-      throw new Error(`${need.map(d => `스킬 ${d.id}, ${d.name}. 읽는 자료는 「${skillNeedsData(d)}」입니다.`).join(' ')} 이 자료가 입력에 없어 data_mode 「실데이터」로 적을 수 없습니다 · `
+    const 입력 = inputRows.map(r => String(r?.path ?? r));
+    const need = [];
+    const produced = new Set();
+    skillRows.forEach((row, i) => {
+      const d = decl.get(cleanId(row?.id ?? row));
+      const st = Array.isArray(steps) ? steps[i] : null;
+      if (d && skillNeedsData(d) && !(/build-log/.test(skillSampleFallback(d)?.file || '') && 기록있음)) {
+        const mine = [...(st?.inputs || []).map(String), ...입력];
+        // 단계가 없으면(계획 없이 연 영수증) 두 번째 스킬부터는 앞 스킬의 결과를 받는다고 본다
+        const ok = (!st && i > 0) || mine.some(ref => workInput(WORK, ref, d, { produced }));
+        if (!ok) need.push(d);
+      }
+      for (const o of st?.outputs || []) produced.add(String(o));
+    });
+    if (need.length) {
+      const 안맞음 = 우리.length ? ` · 적은 입력(${우리.join(' · ')})은 이 자료가 아닙니다` : '';
+      throw new Error(`${need.map(d => `스킬 ${d.id}, ${d.name}. 읽는 자료는 「${skillNeedsData(d)}」입니다.`).join(' ')} 이 자료가 입력에 없어 data_mode 「실데이터」로 적을 수 없습니다${안맞음} · `
         + '숫자 없이 틀만 만들었으면 「틀」, 가정한 숫자로 채웠으면 「추정」으로 적으세요 · 대화로 받은 자료로 만들었으면 inputs/ 에 저장해 입력으로 적습니다. brand/ 와 회사 양식은 업무 자료가 아닙니다.');
+    }
   }
-  if (mode === '샘플' && 샘플.length && 우리.length)
-    return `작업 폴더 자료(${우리.join(' · ')})와 샘플이 섞였습니다 · data_mode 는 「혼합」이 맞습니다.`;
+  if (mode === '샘플' && 샘플.length && (우리.length || 추정.length))
+    return `${우리.length ? `작업 폴더 자료(${우리.join(' · ')})` : `추정으로 만든 앞 결과(${추정.join(' · ')})`}와 샘플이 섞였습니다 · data_mode 는 「혼합」이 맞습니다.`;
+  if (mode === '추정' && 우리.length && 추정.length)
+    return `실제 자료(${우리.join(' · ')})와 추정으로 만든 앞 결과가 섞였습니다 · data_mode 는 「혼합」이 맞습니다.`;
   return '';
+}
+
+/** 이번 실행이 「책」·「실습」·「실무」 중 무엇인가 · 짝 계획(plan.json)과 영수증 초안의 실습·실무 표시를 함께 본다 */
+function runWorkMode(file, draft) {
+  let plan = null;
+  const pf = pairedPlanFile(file);   // 짝이 어긋났으면 그 오류가 먼저다
+  try { if (pf) plan = JSON.parse(fs.readFileSync(pf, 'utf8')); } catch { plan = null; }
+  const flags = { 실습: draft.실습 === true || plan?.실습 === true, 실무: draft.실무 === true || plan?.실무 === true };
+  if (flags.실습 && flags.실무) throw new Error(표시충돌안내);
+  return { mode: workMode(flags, WORK), flags, steps: Array.isArray(plan?.steps) ? plan.steps : null };
 }
 
 function escapeRegex(value) {
@@ -604,8 +667,13 @@ async function start(file) {
     }
     const pii = skillRows.some(item => item.pii) ? normalizePii(draft.pii, inputRows) : null;
     const profile = draft.profile ? await snapshot(draft.profile) : null;
-    const modeNote = checkDataMode(draft.data_mode, inputRows, profile, {
-      skills: skillRows, outputs: draft.outputs.map(value => { try { return resolveRef(value, { workspaceOnly: true }).ref; } catch { return String(value?.path ?? value); } }) });
+    // 회사 업무(실무)에 샘플을 넣었으면 시작하지 않는다 · 사용자가 실습을 말했을 때만 "실습": true (재검토 2026-10-15 · P1)
+    const 작업 = runWorkMode(file, draft);
+    const 샘플입력 = inputRows.map(r => r.path).filter(ref => String(ref).startsWith('plugin:sample-data/'));
+    if (작업.mode === '실무' && 샘플입력.length) throw new Error(`${실무샘플안내} · ${샘플입력.join(' · ')}`);
+    const 이번산출 = draft.outputs.map(value => { try { return resolveRef(value, { workspaceOnly: true }).ref; } catch { return String(value?.path ?? value); } });
+    const modeNote = checkDataMode(draft.data_mode, inputRows, profile, { skills: skillRows, outputs: 이번산출, steps: 작업.steps });
+    const basis = dataBasis(inputRows, profile, 이번산출);
     if (modeNote) console.warn(`🟡 ${modeNote}`);
     const outputRows = draft.outputs.map(value => {
       const { ref } = resolveRef(value, { workspaceOnly: true });
@@ -635,6 +703,9 @@ async function start(file) {
       request: String(draft.request).trim(),
       skills: skillRows,
       data_mode: draft.data_mode,
+      data_basis: basis,
+      ...(작업.flags.실습 ? { 실습: true } : {}),
+      ...(작업.flags.실무 ? { 실무: true } : {}),
       단계,
       ...(formatChoice ? { 형식: formatChoice } : {}),
       inputs: inputRows,
@@ -719,7 +790,7 @@ async function inspect(run, finalStatus = run.status) {
   };
 
   // 데이터 표시 · start 뒤에 run.json 의 data_mode 를 고쳐도 finalize·verify 가 잡는다
-  try { const note = checkDataMode(run.data_mode, run.inputs || [], run.profile, { skills: run.skills || [], outputs: run.outputs || [] }); if (note) notes.push(note); }
+  try { const note = checkDataMode(run.data_mode, run.inputs || [], run.profile, { skills: run.skills || [], outputs: run.outputs || [], steps: Array.isArray(run.steps) && run.steps.length ? run.steps : null }); if (note) notes.push(note); }
   catch (error) { issues.push(error.message); }
   for (const item of run.skills || []) await checkSnapshot(item, `스킬 ${item.id}`);
   for (const item of run.inputs || []) await checkSnapshot(item, '입력');

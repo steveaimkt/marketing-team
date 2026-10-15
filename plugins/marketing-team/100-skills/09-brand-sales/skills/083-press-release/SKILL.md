@@ -12,7 +12,7 @@ triggers:
   - "이 소식 기사화하고 싶어"
   - "프레스 릴리스 작성"
 inputs: [알릴 소식 1건 (출시·성과·제휴·수상 등), 근거 수치·인용 가능한 담당자, brand/profile.md]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 **"재료가 있냐"고 되묻지 않고 바로** 이 파일로 채운다 (산출물에 [샘플]) · 앵글 선택(Phase 3 ⏸)·게이트 통과(Phase 6 ⏸) 승인은 그대로 거친다 — 재료 확보와 승인 게이트는 서로 다른 것이다
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 채운다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다 · 앵글 선택(Phase 3 ⏸)·게이트 통과(Phase 6 ⏸) 승인은 그대로 거친다. 재료 확보와 승인 게이트는 서로 다른 것이다
 outputs: [뉴스 가치 앵글 3안, 표준 보도자료 완성본, 배포 리스트 + 피칭 메일 1통, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["028"]

@@ -12,7 +12,7 @@ triggers:
   - "신입 첫 주 가이드 만들어줘"
   - "퇴사 전에 업무 정리해야 해"
 inputs: [brand/my-playbook.md·logs/build-log.md(실업무 자동 추출), 업무 프로세스 보완 문답, 사용 툴·계정 목록]
-sample_fallback: sample-data/build-log-sample.md   # `logs/build-log.md` 가 비었으면 이 파일로 완주한다 (산출물에 `[샘플]`)
+sample_fallback: sample-data/build-log-sample.md   # `logs/build-log.md` 가 비었으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 `[샘플]`) · `채움` 이면 원본을 요청한다
 outputs: [업무 매뉴얼(업무 목록→절차→계정·자산→비상 연락 4부), 인수인계 표준 문서, 갱신 규칙(주기·담당), 저장 파일(.md)]
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["093"]

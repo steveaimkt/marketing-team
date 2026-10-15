@@ -12,7 +12,7 @@ triggers:
   - "브랜드 키워드 빼고 ROAS 얼마야"
   - "네이버 검색광고 어디가 적자야"
 inputs: [네이버 광고 리포트(광고주센터 보고서 CSV 또는 검색광고 REST API · 키워드형·쇼핑검색형 무관), 자사 브랜드명·제품명, 기간]
-sample_fallback: sample-data/A브랜드-네이버쇼핑검색광고-30일.csv   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-네이버쇼핑검색광고-30일.csv   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [집계 단위 결론, 분리 집계 ROAS 리포트, 3개 항목 진단, 단위별 ROAS 막대그래프, 조정 제안, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["046"]
@@ -59,7 +59,7 @@ success_metrics: [일반 키워드 ROAS 개선폭, 적자 키워드 절감액, �
 
 | 멈추는 곳 | 묻는 것 | 기본값 (답 없으면) |
 |---|---|---|
-| Phase 2 | 보고서 CSV 도 API 도 없으면 묻지 않고 `sample_fallback` 으로 완주한다 (frontmatter 참고) | 멈추지 않는다 · `sample-data/A브랜드-네이버쇼핑검색광고-30일.csv` |
+| Phase 2 | 보고서 CSV 도 API 도 없으면 프로필이 `빈` 이거나 실습일 때만 묻지 않고 `sample_fallback` 으로 완주한다 (frontmatter 참고). `채움` 이면 원본을 요청한다 | 멈추지 않는다 · `sample-data/A브랜드-네이버쇼핑검색광고-30일.csv` |
 | Phase 3 | 브랜드 키워드 판별 시드가 없으면 계획 화면 「함께 알려주면 좋은 것」의 브랜드명과 제품명 줄로만 알린다 | `brand/profile.md` §1 → 없으면 `sample-data/profile-sample.md`(A브랜드) · **멈추지 않는다** |
 | Phase 6 ⏸ | 아래 「질문 조정 순서」 그대로 | 지출 큰 순 3개만 제시하고 종료 |
 

@@ -13,7 +13,7 @@ triggers:
   - "상세페이지 섹션 구조 바꿔줘"
   - "상세페이지 구조 잡아줘"
 inputs: [제품 정보·셀링포인트, 타깃 페르소나, VoC·리뷰 자료(선택), brand/tone.md]
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [구조 제안·구조 확정 기록, 확정 구조 기획서(기본 24섹션), 섹션별 카피, 규제 치환 로그, 저장 파일(.docx)]
 requires: [brand/profile.md, brand/tone.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["052", "049"]

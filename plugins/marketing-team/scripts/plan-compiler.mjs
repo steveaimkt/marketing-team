@@ -315,6 +315,13 @@ export function validatePlan(plan, { cwd = process.cwd() } = {}) {
       issues.push(`사용자가 지정한 순서와 다릅니다: 요청 ${requested.join('→')} · 계획 ${got.join('→')}`);
   }
 
+  // 실습·실무 표시 · 함께 적으면 무엇을 할지 모른다 · 회사 업무(실무)에 샘플을 넣으면 막는다 (재검토 2026-10-15 · P1)
+  if (plan.실습 === true && plan.실무 === true) issues.push(표시충돌안내);
+  else if (workMode(plan, cwd) === '실무') {
+    const 샘플들 = [...steps.flatMap(st => st.inputs || []), ...(plan.inputs || [])].filter(샘플참조).map(v => String(v?.path ?? v));
+    if (샘플들.length) issues.push(`${실무샘플안내} · ${[...new Set(샘플들)].join(' · ')}`);
+  }
+
   let planFormat = null;
   try { planFormat = normalizeFormatChoice(plan.형식, '계획의'); }
   catch (error) { issues.push(error.message); }
@@ -829,7 +836,22 @@ export function profileRows(cwd) {
     if (kv) { const value = 자리표시뗌(kv[2]); if (value) rows.push({ section, label: 열쇠(kv[1]), value, line: t }); continue; }
     if (자리표시뗌(t.replace(/^#{1,6}\s*/, ''))) rows.push({ section, label: '', value: 자리표시뗌(t), line: t });
   }
+  // 제목만 남았고 그 제목이 전부 일반 제목(「# 회사 정보」·「## 기본 정보」)이면 우리 정보가 없다 (재검토 2026-10-15 · P2)
+  if (rows.length && rows.every(r => 일반제목(r.line))) return [];
   return rows;
+}
+
+/* 일반 제목 · 「#」 제목 줄의 낱말이 전부 아래 말(과 숫자)뿐이면 어느 회사에나 붙는 제목이다 · 브랜드명처럼 고유한 말이 하나라도 있으면 우리 정보다
+ * 낱말은 한글·영문·숫자 덩어리로 자른다 · 「모래결 브랜드 프로필」은 「모래결」 때문에 채움, 「우리 회사 소개」는 빈 */
+const 일반제목말 = new Set(['회사', '정보', '기본', '브랜드', '프로필', '우리', '우리의', '소개', '개요', '요약', '현황', '회사명', '브랜드명', '제품', '서비스',
+  '고객', '타겟', '채널', '목표', '숫자', '메모', '노트', '기타', '내', '팀', '역할', '양식', '자료', '업종', '규제', '톤', '경쟁사', '마케팅', '사업', '소개서',
+  '및', '와', '과', '그리고', '우리회사', '회사정보', '기본정보', '브랜드정보', '회사소개', '브랜드소개', '브랜드프로필', '회사프로필', '우리브랜드',
+  'company', 'brand', 'profile', 'info', 'information', 'about', 'us', 'our', 'overview', 'basic', 'basics']);
+function 일반제목(line) {
+  const m = String(line).match(/^#{1,6}\s*(.*)$/);
+  if (!m) return false;
+  const 낱말 = m[1].replace(/\*\*|`|⭐/g, '').toLowerCase().split(/[^0-9a-z가-힣]+/).filter(t => t && !/^\d+$/.test(t));
+  return 낱말.every(t => 일반제목말.has(t));
 }
 
 /** 프로필 상태 · 'empty' 가 아니라 화면·문서와 같은 말 「빈」·「채움」을 돌려준다 */
@@ -842,6 +864,23 @@ export function profileState(cwd) {
 export function profileIsEmpty(cwd) {
   return profileState(cwd) === '빈';
 }
+
+/* ── 이번 실행이 무엇인가 · 「책」·「실습」·「실무」 (재검토 2026-10-15 · P1) ─────────────
+ * 프로필 파일만 보면 대화로 회사 정보를 준 사용자가 샘플·책 실습으로 빠졌다. 모델이 plan.json 에 적는 두 표시를 함께 본다.
+ *   「실습」 · plan.실습 이 true · 사용자가 「샘플로 실습」을 말했다
+ *   「실무」 · 프로필이 「채움」이거나 plan.실무 가 true · 대화·요청문으로 회사 정보를 받았고 이번 실행이 그 회사 업무다
+ *   「책」   · 빈 프로필이고 두 표시가 없다 · 샘플 책 실습 · 원고와 같아야 한다
+ * 「실습」과 「실무」를 함께 적으면 validatePlan 이 막는다. 여기서는 「실습」이 먼저다.
+ */
+export function workMode(plan, cwd) {
+  if (plan?.실습 === true) return '실습';
+  if (plan?.실무 === true || profileState(cwd) === '채움') return '실무';
+  return '책';
+}
+/** 회사 업무에 샘플을 넣었을 때 · validatePlan 과 run-receipt start 가 같은 문장을 쓴다 */
+export const 실무샘플안내 = '회사 업무에 연습용 샘플을 넣었습니다 · 우리 자료를 쓰거나, 사용자가 실습을 원하면 "실습": true';
+export const 표시충돌안내 = '"실습": true 와 "실무": true 를 함께 적었습니다 · 사용자가 「샘플로 실습」을 말했으면 "실습" 만, 회사 업무면 "실무" 만 적으세요';
+const 샘플참조 = v => String(v?.path ?? v).replace(/^package:/, 'plugin:').startsWith('plugin:sample-data/');
 
 const 광고채널 = /광고|\bads?\b|메타|페이스북|facebook|구글|google|네이버\s*(?:검색|쇼핑)|파워링크|GFA|모먼트|틱톡|tiktok|애드|ROAS|CPA|CPC/i;
 /** 화면과 compile 안내 줄이 읽는 칸 몇 개 · 프로필이 「빈」이면 전부 비어 있다 */
@@ -1040,6 +1079,11 @@ export function matchingInputs(cwd, d) {
 
 /** 그 폴더(와 위 폴더)의 영수증에서 이 산출물을 낸 실행의 data_mode · 못 찾으면 null */
 export function outputDataMode(cwd, rel) {
+  return outputRun(cwd, rel)?.data_mode || null;
+}
+
+/** 이 산출물을 낸 실행의 근거 · { data_mode, data_basis } · data_basis 는 그 영수증에 있을 때만 · 못 찾으면 null */
+export function outputRun(cwd, rel) {
   const r = String(rel?.path ?? rel).replace(/^workspace:/, '');
   if (!cwd || !r.startsWith('outputs/')) return null;
   const ref = `workspace:${r}`;
@@ -1051,20 +1095,61 @@ export function outputDataMode(cwd, rel) {
       try {
         const run = JSON.parse(fs.readFileSync(path.join(cwd, dir, n), 'utf8'));
         const outs = (run.outputs || []).map(o => String(o?.path ?? o).replace(/^(?!workspace:)/, 'workspace:'));
-        if (outs.includes(ref) && run.data_mode) return run.data_mode;
+        if (outs.includes(ref) && run.data_mode) return { data_mode: run.data_mode, data_basis: run.data_basis && typeof run.data_basis === 'object' ? run.data_basis : null };
       } catch { /* 못 읽으면 다음 것 */ }
     }
   }
   return null;
 }
 
-/** 계획·영수증에 적힌 입력이 업무 자료인가 · 회사 양식·참고 자료는 아니다 · 앞 결과는 그 실행의 data_mode 를 따른다 */
-export function workInput(cwd, ref) {
+/**
+ * 계획·영수증에 적힌 입력이 업무 자료인가 · 회사 양식·참고 자료는 아니다 · 앞 결과는 그 실행의 data_mode 를 따른다.
+ * d(스킬 선언)를 넘기면 그 스킬의 자료인지도 본다 (relevantInput) · 리뷰 csv 는 045 광고 분석의 자료가 아니다.
+ */
+export function workInput(cwd, ref, d = null, opts = {}) {
   const v = String(ref?.path ?? ref);
   if (!v.startsWith('workspace:')) return false;
   if (referenceFile(cwd, v)) return false;
   const mode = outputDataMode(cwd, v);
-  return !mode || mode === '실데이터' || mode === '혼합';
+  if (!(!mode || mode === '실데이터' || mode === '혼합')) return false;
+  return d ? relevantInput(cwd, v, d, opts) : true;
+}
+
+/** 체인 정본(chain_steps · CHAINS.md)에서 앞 스킬 a 가 뒤 스킬 b 보다 먼저 오는가 */
+function 체인앞(a, b) {
+  if (!a || !b || a === b) return false;
+  for (const c of canonicalChains().values())
+    for (const v of c.variants || []) { const i = v.indexOf(a), j = v.indexOf(b); if (i >= 0 && j > i) return true; }
+  return false;
+}
+const 자료확장자 = /\.(csv|tsv|xlsx|xls|json|txt|md|pdf|docx|hwp|hwpx)$/i;
+/**
+ * 이 입력이 그 스킬의 자료 칸에 맞는가 (재검토 2026-10-15 · P1) · 자료를 읽는 스킬(skillNeedsData)만 본다 · 아니면 늘 맞다.
+ *   inputs/ 등 사용자 파일 · matchingInputs 와 같은 기준 · 확장자(캡처 칸이면 그림도)와 그 스킬의 자료 낱말(skillDataWords)
+ *   앞 결과(outputs/) · 이 계획의 앞 단계가 만든 것(opts.produced) · 같은 스킬의 앞 결과 · 체인 정본 순서에서 앞 스킬의 결과 ·
+ *     그 스킬의 자료 칸이 번호로 적은 스킬의 결과면 맞다 · 결과를 낸 스킬은 경로의 {번호}-{이름}/ 폴더로 안다
+ *   실행 기록을 읽는 스킬(091·097·098·100) · logs/ 와 outputs/ 가 자료다
+ * 모호하면 맞지 않는다고 본다 · 자료를 달라고 하는 쪽이 안전하다.
+ */
+export function relevantInput(cwd, ref, d, { produced = null } = {}) {
+  const v = String(ref?.path ?? ref);
+  if (!d || !skillNeedsData(d)) return true;
+  const rel = v.replace(/^workspace:/, '');
+  if (/build-log/.test(skillSampleFallback(d)?.file || '')) return /^(logs|outputs)\//.test(rel);
+  if (rel.startsWith('outputs/')) {
+    if (produced?.has(v) || produced?.has(rel)) return true;
+    const 낸스킬 = [...rel.matchAll(/(?:^|\/)(\d{3})-[^/]+(?=\/)/g)].map(m => m[1]).pop();
+    const id = String(d.id || '').match(/\d{3}/)?.[0];
+    // 그 스킬의 자료 칸이 앞 스킬 번호를 적었으면(011 「001·002·005·006 산출물 권장」 · 046 「041·042·045 산출물」) 그 결과도 자료다
+    const 칸이적음 = 낸스킬 && inputItems(d).some(x => new RegExp(`(^|\\D)${낸스킬}(\\D|$)`).test(x.raw));
+    return Boolean(낸스킬 && id && (낸스킬 === id || 체인앞(낸스킬, id) || 칸이적음));
+  }
+  const words = skillDataWords(d);
+  if (!words.length) return false;
+  const 그림됨 = inputItems(d).some(x => /캡처|스크린샷|이미지|사진/.test(x.raw));
+  const name = path.posix.basename(rel);
+  if (!자료확장자.test(name) && !(그림됨 && 그림.test(name))) return false;
+  return 낱말맞음(rel.replace(/^inputs\//, ''), words);
 }
 
 /** 받침이 있으면 「을」, 없으면 「를」 · 한글로 안 끝나면 「을(를)」 */
@@ -1076,26 +1161,36 @@ const 을를 = word => {
 
 /**
  * 우리 자료를 달라고 할 때인가 · 그 스킬이 무엇을 받는지(inputs 의 자료 칸)를 돌려준다 · 아니면 null.
- * 판단 규칙 · 프로필 「채움」 · 실습 아님 · 그 스킬이 자료를 읽어야 한다(skillNeedsData) ·
- * 계획에 적힌 입력에 업무 자료가 없다(workInput · brand/·회사 양식·참고 자료·샘플로 만든 앞 결과는 세지 않는다) ·
+ * 판단 규칙 · 「실무」(workMode · 프로필 「채움」이거나 plan.실무) · 그 스킬이 자료를 읽어야 한다(skillNeedsData) ·
+ * 계획에 적힌 입력에 그 스킬의 업무 자료가 없다(workInput + relevantInput · brand/·회사 양식·참고 자료·샘플·추정으로 만든 앞 결과·
+ * 그 스킬의 자료 칸에 맞지 않는 파일은 세지 않는다 · 샘플을 적었어도 회사 업무면 묻는다) ·
  * inputs/ 에 그 스킬의 자료 칸에 맞는 파일이 없다(matchingInputs · 확장자와 이름 낱말).
  * 프로필만으로 되는 생성 스킬(카피·상세페이지·이름 짓기)은 묻지 않고 그대로 돈다.
  * sample_fallback 이 없어도 파일을 요구하는 스킬(050·096 등)이면 묻는다 (2026-10-14 · 회사 B 045 계획에 줄이 없었다).
+ * 체인은 단계마다 본다 · 앞 단계가 만든 결과를 입력으로 적은 단계는 자료가 있는 것이다 (재검토 2026-10-15).
  */
+export function dataRequests(plan, cwd) {
+  const steps = plan?.steps || [];
+  if (!cwd || !steps.length || workMode(plan, cwd) !== '실무') return [];
+  const decl = skillDeclarations(cwd);
+  const out = [];
+  const produced = new Set();
+  steps.forEach((st, i) => {
+    const id = String(st.skill || '').match(/\d{3}/)?.[0] || '';
+    const d = decl.get(id);
+    const need = skillNeedsData(d);
+    const listed = [...(st.inputs || []), ...(i === 0 ? plan.inputs || [] : [])];
+    let ok = !need || listed.some(v => workInput(cwd, v, d, { produced }));
+    // 실행 기록을 읽는 스킬은 logs/build-log.md 에 기록이 있으면 그것이 우리 자료다
+    if (!ok && /build-log/.test(skillSampleFallback(d)?.file || '')) { try { ok = Boolean(fs.readFileSync(path.join(cwd, 'logs', 'build-log.md'), 'utf8').trim()); } catch { /* 없음 */ } }
+    else if (!ok) ok = matchingInputs(cwd, d).length > 0;
+    if (!ok) out.push({ step: i + 1, skill: id, need });
+    for (const o of st.outputs || []) produced.add(String(o));
+  });
+  return out;
+}
 export function dataRequest(plan, cwd) {
-  const first = (plan?.steps || [])[0];
-  if (!cwd || !first || plan.실습 === true) return null;
-  const listed = [...(first.inputs || []), ...(plan.inputs || [])];
-  if (listed.some(v => String(v?.path ?? v).replace(/^package:/, 'plugin:').startsWith('plugin:sample-data/'))) return null;   // 샘플을 적었으면 화면이 샘플 줄을 낸다
-  if (listed.some(v => workInput(cwd, v))) return null;
-  if (profileState(cwd) !== '채움') return null;
-  const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
-  const need = skillNeedsData(d);
-  if (!need) return null;
-  // 실행 기록을 읽는 스킬은 logs/build-log.md 에 기록이 있으면 그것이 우리 자료다
-  if (/build-log/.test(skillSampleFallback(d)?.file || '')) { try { if (fs.readFileSync(path.join(cwd, 'logs', 'build-log.md'), 'utf8').trim()) return null; } catch { /* 없음 */ } }
-  else if (matchingInputs(cwd, d).length) return null;
-  return need || '이 업무의 자료';
+  return dataRequests(plan, cwd)[0]?.need || null;
 }
 
 /** 화면 「분석할 자료」 줄 · 우리 자료가 없을 때 (문서가 같은 문장을 쓴다 · docs/공통규약.md §0-b) */
@@ -1155,7 +1250,8 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   const sample = inputs.some(v => v.startsWith('plugin:sample-data/'));
   const own = inputs.filter(v => v.startsWith('workspace:')).map(rel);
   // 업무 자료 · brand/·회사 양식·참고 자료·샘플로 만든 앞 결과는 빼고 센다 (2026-10-14 · 회사 A 067 은 양식과 brand/ 만 적고 「읽습니다」가 찍혔다)
-  const ownData = inputs.filter(v => v.startsWith('workspace:') && workInput(cwd, v));
+  // 자료를 읽는 스킬이면 그 스킬의 자료 칸에 맞는 것만 센다 (재검토 2026-10-15 · 리뷰 csv 만 적은 045 에 「읽습니다」가 찍혔다)
+  const ownData = inputs.filter(v => v.startsWith('workspace:') && workInput(cwd, v, first.decl));
   // 「샘플로 실습」을 고른 채움 프로필이면 그렇게 적는다 · 틀의 이유(「inputs 폴더에 리뷰 파일이 없어」)는 사실과 다를 수 있다
   // (실측 2026-10-14 · 회사 B S7 · 리뷰 csv 가 있는데 「리뷰 파일이 없어」) · 빈 프로필(책 실습) 화면은 원고 글자 그대로다
   const 샘플이유 = plan.실습 === true && profileState(cwd) === '채움' ? '실습을 고르셔서' : (first.tpl['샘플 이유'] || 'inputs 폴더가 비어있어');
@@ -1171,7 +1267,9 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   // 「샘플로 실습」(plan.실습) · 채움 프로필이어도 샘플 해석에는 연습용 A브랜드 프로필을 쓴다 · 회사 기준·우리 양식을 붙이지 않는다
   // (실측 2026-10-14 · 회사 A·B · 실습 화면에 brand/profile.md 가 찍혀 회사 기준이 샘플 해석에 섞였다) · 빈 프로필 화면은 그대로다
   const 연습 = plan.실습 === true && facts.state !== '빈';
-  lines.push(`근거로 쓰는 것: ${facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 연습 ? '실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${연습 ? '' : 우리양식}`);
+  // 「실무」 표시(plan.실무)로 대화에서 회사 정보를 받았으면 프로필이 비어 있어도 연습용 프로필을 쓰지 않는다 (재검토 2026-10-15)
+  const 대화실무 = facts.state === '빈' && workMode(plan, cwd) === '실무';
+  lines.push(`근거로 쓰는 것: ${대화실무 ? '대화로 받은 우리 회사 정보 (brand/profile.md 는 아직 비어 있습니다)' : facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 연습 ? '실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${연습 ? '' : 우리양식}`);
 
   const firstOut = rel((first.step.outputs || [])[0] || '');
   const parts = firstOut.split('/');
@@ -1285,6 +1383,7 @@ export function bookCheck(plan, cwd) {
   if (steps.length !== 1) return no('여러 단계 계획');
   if (plan.형식 && Object.keys(plan.형식).length) return no('형식을 골랐다');
   if (!profileIsEmpty(cwd)) return no('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
+  if (workMode(plan, cwd) === '실무') return no('회사 업무(plan.실무) · 독자 기준으로 만든다');
   // 우리 양식을 정했거나 회사 양식(inputs/양식/)을 넣었으면 원고 결과를 놓지 않는다 (2026-10-14)
   if (notesOfPlan(plan, cwd)) return no('우리 양식(brand/skill-notes)이 있다 · 독자 기준으로 만든다');
   if ((steps[0].inputs || []).some(양식입력)) return no('회사 양식(inputs/양식/)을 넣었다 · 독자 기준으로 만든다');
@@ -1319,7 +1418,7 @@ export function bookCheck(plan, cwd) {
  * 빈 프로필이고 inputs/ 의 자기 자료가 없을 때만, 입력.json 의 앞 결과가 실제로 있을 때만 맞춘다.
  */
 export function bookInputs(plan, cwd) {
-  if (!cwd || !profileIsEmpty(cwd) || notesOfPlan(plan, cwd)) return null;
+  if (!cwd || !profileIsEmpty(cwd) || plan?.실무 === true || notesOfPlan(plan, cwd)) return null;
   const steps = plan.steps || [];
   if (steps.length !== 1) return null;
   const folder = skillDeclarations(cwd).get(String(steps[0].skill || '').match(/\d{3}/)?.[0] || '')?.writesTo?.[0]?.split('/')[2];
@@ -1346,7 +1445,8 @@ export function sampleInputs(plan, cwd) {
   if (!cwd || !first || (first.inputs || []).length || (plan.inputs || []).length) return null;
   // 샘플로 채우는 것은 프로필이 「빈」이거나 사용자가 「샘플로 실습」을 말했을 때(plan.실습)뿐이다 (2026-10-14 · 검토 P0)
   // 우리 회사 프로필에 A브랜드 리뷰를 넣으면 그 리뷰의 고객·제품은 여전히 A브랜드 것이다
-  if (plan.실습 !== true && profileState(cwd) !== '빈') return null;
+  // 대화로 회사 정보를 받은 회사 업무(plan.실무)도 같다 · 프로필 파일이 비어 있어도 샘플을 넣지 않는다 (재검토 2026-10-15 · P1)
+  if (workMode(plan, cwd) === '실무') return null;
   const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
   if (!d) return null;
   // inputs/ 에 그 스킬의 자료 칸에 맞는 파일이 있으면 채우지 않는다 · 회사 양식·레퍼런스·좋았던 글은 자료가 아니다 (2026-10-14)
@@ -1396,6 +1496,7 @@ export function replayFind(cwd) {
   try {
     const plan = JSON.parse(fs.readFileSync(best.planFile, 'utf8'));
     if (!['awaiting-approval', 'approved'].includes(plan.status)) return null;
+    if (plan.실무 === true) return null;   // 회사 업무 · 책 실습 대본을 열지 않는다 (재검토 2026-10-15)
     if (plan.형식 && Object.keys(plan.형식).length) return null;
     if (notesOfPlan(plan, cwd)) return null;   // 우리 양식을 정했으면 독자 기준
     const own = `${path.relative(cwd, best.folder).split(path.sep).join('/')}/`;
@@ -1593,7 +1694,8 @@ if (isCli) {
     file = placed.file;
     const filled = sampleInputs(plan, ws);
     if (filled) console.log(`📎 inputs 가 비어 샘플 자료로 채웠다 · ${filled[0].replace(/^plugin:/, '')}`);
-    else { const need = dataRequest(plan, ws); if (need) console.log(자료없음안내(need)); }
+    else for (const q of dataRequests(plan, ws))
+      console.log((plan.steps || []).length > 1 ? 자료없음안내(q.need).replace(/^📎 /, `📎 단계 ${q.step}(스킬 ${q.skill}) · `) : 자료없음안내(q.need));
     if (plan.실습 === true && profileState(ws) === '채움') console.log('📖 실습은 연습용 A브랜드 프로필로 읽는다 · 회사 기준(brand/profile.md · 우리 양식)을 샘플 해석에 붙이지 않는다');
     for (const line of userSkills(ws).warnings) console.log(`🟡 ${line}`);
     for (const line of notesFormat(plan, ws)) console.log(line);

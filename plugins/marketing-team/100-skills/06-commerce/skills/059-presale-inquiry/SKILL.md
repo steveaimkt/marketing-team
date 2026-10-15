@@ -14,7 +14,7 @@ triggers:
   - "상품 문의 답변 기준 잡아줘"
   - "상품 페이지 문의 응대 정리해줘"
 inputs: [상품 페이지 문의·Q&A 내보내기 또는 캡처, 상품 정보(스펙·옵션·재고), 배송·교환 정책(058 산출물 권장)]
-sample_fallback: sample-data/A브랜드-고객문의-60건.csv   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-고객문의-60건.csv   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [문의 유형 분류표(건수·전환 영향), 유형별 표준 답변 세트, 상세페이지에 미리 넣을 FAQ 후보, 답변 규칙(말투·시간·넘기는 기준), 규제 검사 결과 블록, 저장 파일(.md)]
 requires: [brand/profile.md, 100-skills/gates/compliance-gate.md]
 chains_to: ["051", "054"]

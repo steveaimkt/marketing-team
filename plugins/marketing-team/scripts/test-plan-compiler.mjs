@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
+import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, dataRequests, workMode, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -35,6 +35,7 @@ const base = () => ({
   }],
   budget: { tool_calls: 0, wall_minutes: 0, review_rounds: 3 },
 });
+const 계획쓰기전 = (w, rel, plan) => { fs.mkdirSync(path.dirname(path.join(w, rel)), { recursive: true }); fs.writeFileSync(path.join(w, rel), `${JSON.stringify(plan, null, 2)}\n`); };
 const save = plan => fs.writeFileSync(planFile, `${JSON.stringify(plan, null, 2)}\n`);
 const load = () => JSON.parse(fs.readFileSync(planFile, 'utf8'));
 
@@ -297,7 +298,7 @@ try {
       assert.equal(bookInputs(b, ws)?.length, 2, '011 은 원고처럼 006·002 결과를 입력으로 맞춰야 한다');
       const c = 계획('011', '011-product-concept-ideation', ['workspace:inputs/내자료.md']);
       assert.equal(bookInputs(c, ws), null, '독자 자료가 있는데 입력을 바꿨다');
-      fs.mkdirSync(path.join(ws, 'brand')); fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
+      fs.mkdirSync(path.join(ws, 'brand')); fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사 · 반려동물 사료\n');
       assert.equal(bookInputs(계획('011', '011-product-concept-ideation', []), ws), null, '프로필을 채웠는데 입력을 바꿨다');
     } finally { fs.rmSync(ws, { recursive: true, force: true }); }
   }
@@ -734,7 +735,150 @@ try {
     } finally { fs.rmSync(path.dirname(플계획), { recursive: true, force: true }); }
     for (const d of [w8, w8b, w9, 남]) fs.rmSync(d, { recursive: true, force: true });
   }
-  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 16 · 샘플 채움 조건 32 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · 같은 날 재실행 자리 14 · 업무 자료 판단 19 · 체인 폴더 옮김 8 · 셸 cwd 무관 작업 폴더 24 · 실습 근거 3 · ✅`);
+
+  // ── 재검토 2026-10-15 재현 다섯 · 실무(프로필 채움 · plan.실무)에서만 걸린다 · 빈 프로필 책 실습은 그대로 ─────────
+  let 재검토 = 0;
+  {
+    const tpl = fs.readFileSync(path.join(HERE, '..', 'brand-templates', 'profile.md'), 'utf8');
+    const 회사 = tpl.replace('| 브랜드명 | (우리 브랜드명) |', '| 브랜드명 | 팀플 |').replace(/(\| 업종 \(규제 카테고리\) \| )[^|]+\|/, '$1B2B 협업 서비스 |');
+    const PC = path.join(HERE, 'plan-compiler.mjs'), RR = path.join(HERE, 'run-receipt.mjs');
+    const 돌림 = (w, script, ...a) => spawnSync(process.execPath, [script, ...a], { cwd: w, encoding: 'utf8' });
+    const 공간 = (profile, files = {}) => {
+      const w = fs.mkdtempSync(path.join(os.tmpdir(), 'rereview-'));
+      for (const d of ['brand', 'inputs', 'outputs', 'logs']) fs.mkdirSync(path.join(w, d), { recursive: true });
+      if (profile !== null) fs.writeFileSync(path.join(w, 'brand', 'profile.md'), profile);
+      for (const [rel, text] of Object.entries(files)) { fs.mkdirSync(path.dirname(path.join(w, rel)), { recursive: true }); fs.writeFileSync(path.join(w, rel), text); }
+      return w;
+    };
+    const ok = (cond, msg) => { assert.ok(cond, msg); 재검토 += 1; };
+    const D = '2026-10-15', F045 = `outputs/${D}/045-weekly-ads-report`;
+    const out045 = `workspace:${F045}/045-weekly-ads-report.html`;
+    const 계획045 = (inputs, extra = {}) => ({ request: '이번 주 광고 어땠어', skills: ['045'], ...extra, steps: [{ step: 1, skill: '045', inputs, outputs: [out045], reviews: [] }] });
+    const 영수증 = (w, name, mode, inputs, extra = {}) => {
+      fs.mkdirSync(path.join(w, F045), { recursive: true });
+      fs.writeFileSync(path.join(w, F045, name), JSON.stringify({ schema: 'marketing-team.run/v1', status: 'draft', request: '이번 주 광고 어땠어', skills: ['045'], data_mode: mode, ...extra,
+        inputs: inputs.map(p => ({ path: p, period: '2026-10' })), profile: 'workspace:brand/profile.md', outputs: [out045], required_reviews: [], ledger: { path: 'workspace:logs/build-log.md' } }));
+      return 돌림(w, RR, 'start', `${F045}/${name}`);
+    };
+    const 샘플 = 'plugin:sample-data/A브랜드-광고매체통합-12주.csv';
+
+    // 재현 1 · 회사 프로필 + 045 계획에 샘플을 직접 · 실습 표시 없음 → validatePlan · start · dataRequest 가 모두 막거나 자료를 달라고 한다
+    const w1 = 공간(회사);
+    const v1 = validatePlan(계획045([샘플]), { cwd: w1 });
+    ok(v1.some(x => x.startsWith('회사 업무에 연습용 샘플을 넣었습니다 · 우리 자료를 쓰거나, 사용자가 실습을 원하면 "실습": true')), `validatePlan 이 회사 업무의 샘플을 막지 않았다: ${JSON.stringify(v1)}`);
+    ok(dataRequest(계획045([샘플]), w1) === '매체별 광고 데이터 소스', '계획에 샘플이 있다는 이유로 dataRequest 가 null 을 돌려줬다');
+    let r = 영수증(w1, 'run.json', '샘플', [샘플]);
+    ok(r.status !== 0 && /회사 업무에 연습용 샘플을 넣었습니다/.test(r.stderr), `회사 업무에 샘플로 run-receipt start 가 열렸다: ${r.stderr}`);
+    // 사용자가 실습을 말했을 때만 허용 · 계획과 영수증 둘 다
+    ok(validatePlan(계획045([샘플], { 실습: true }), { cwd: w1 }).length === 0, '실습 표시가 있는데 샘플 계획을 막았다');
+    ok(dataRequest(계획045([샘플], { 실습: true }), w1) === null, '실습인데 자료를 달라고 했다');
+    r = 영수증(w1, 'run-2.json', '샘플', [샘플], { 실습: true });
+    ok(r.status === 0, `실습 영수증을 막았다: ${r.stderr}`);
+    // 둘 다 적으면 오류
+    ok(validatePlan(계획045([], { 실습: true, 실무: true }), { cwd: w1 }).some(x => /"실습": true 와 "실무": true 를 함께 적었습니다/.test(x)), '실습·실무를 함께 적었는데 막지 않았다');
+    r = 영수증(w1, 'run-3.json', '틀', [], { 실습: true, 실무: true });
+    ok(r.status !== 0 && /함께 적었습니다/.test(r.stderr), '영수증에 실습·실무를 함께 적었는데 열렸다');
+    // compile 도 막는다
+    계획쓰기전(w1, `${F045}/plan.json`, 계획045([샘플]));
+    r = 돌림(w1, PC, 'compile', `${F045}/plan.json`);
+    ok(r.status !== 0 && /회사 업무에 연습용 샘플을 넣었습니다/.test(r.stderr) && /📎 우리 자료가 없습니다 · 매체별 광고 데이터 소스를/.test(r.stdout), `compile 이 회사 업무의 샘플을 막지 않았다: ${r.stdout}${r.stderr}`);
+    fs.rmSync(w1, { recursive: true, force: true });
+
+    // 재현 2 · 프로필·입력 파일 없음 · 요청문에만 회사 정보 · 모델이 "실무": true 를 적었다 → 샘플을 넣지 않고 책 실습을 켜지 않는다
+    const w2 = 공간(null);
+    const p2 = { ...계획045([]), request: '우리 회사 B2B 서비스 광고 분석', 실무: true };
+    ok(workMode(p2, w2) === '실무' && workMode(계획045([]), w2) === '책', 'workMode 가 실무·책을 구분하지 못했다');
+    ok(sampleInputs(structuredClone(p2), w2) === null, '대화로 회사 정보를 받은 실무인데 샘플을 넣었다');
+    ok(dataRequest(p2, w2) === '매체별 광고 데이터 소스', '실무인데 우리 자료를 달라고 하지 않았다');
+    계획쓰기전(w2, `${F045}/plan.json`, p2);
+    r = 돌림(w2, PC, 'compile', `${F045}/plan.json`);
+    ok(r.status === 0 && !/샘플 자료로 채웠다/.test(r.stdout) && /📎 우리 자료가 없습니다/.test(r.stdout), `실무 compile 이 샘플을 채웠거나 자료를 달라고 하지 않았다: ${r.stdout}${r.stderr}`);
+    const s2 = JSON.parse(fs.readFileSync(path.join(w2, F045, 'plan.json'), 'utf8'));
+    ok(s2.screen.includes('근거로 쓰는 것: 대화로 받은 우리 회사 정보') && !s2.screen.includes('연습용 A브랜드 프로필'), '실무 화면이 연습용 프로필을 근거로 적었다');
+    돌림(w2, PC, 'approve', `${F045}/plan.json`);
+    ok(/회사 업무/.test(bookCheck(JSON.parse(fs.readFileSync(path.join(w2, F045, 'plan.json'), 'utf8')), w2).reason || ''), '실무 계획에 책 실습을 켰다');
+    ok(bookInputs({ ...canonicalScreenPlan('011'), 실무: true }, w2) === null, '실무 계획을 원고 입력으로 바꿨다');
+    // 같은 폴더에 실무 표시 없는 책 계획이면 그대로 샘플 (저자 지시 · 책 실습은 원고와 같다)
+    ok(JSON.stringify(sampleInputs(계획045([]), w2)) === JSON.stringify([`plugin:${'sample-data/A브랜드-광고매체통합-12주.csv'}`]), '빈 프로필 책 실습에서 샘플을 채우지 않았다');
+    fs.rmSync(w2, { recursive: true, force: true });
+
+    // 재현 3 · 045 에 별점·리뷰 두 열뿐인 reviews.csv · 폴더에만 있을 때와 계획에 적었을 때 모두 광고 자료를 달라고 한다 · 실데이터 start 는 막는다
+    const 리뷰 = '별점,리뷰\n5,좋아요\n2,별로예요\n';
+    const w3 = 공간(회사, { 'inputs/reviews.csv': 리뷰 });
+    ok(dataRequest(계획045([]), w3) === '매체별 광고 데이터 소스', '폴더에만 있는 리뷰 csv 를 045 자료로 봤다');
+    ok(dataRequest(계획045(['workspace:inputs/reviews.csv']), w3) === '매체별 광고 데이터 소스', '계획에 적은 리뷰 csv 를 045 자료로 봤다');
+    ok(dataRequest({ request: '리뷰 분석', skills: ['006'], steps: [{ step: 1, skill: '006', inputs: ['workspace:inputs/reviews.csv'], outputs: [] }] }, w3) === null, '리뷰 csv 를 006 자료로 보지 않았다');
+    const s3 = renderPlanScreen(계획045(['workspace:inputs/reviews.csv']), { cwd: w3 });
+    ok(s3.includes('분석할 자료: 우리 자료가 아직 없습니다 · 매체별 광고 데이터 소스를') && !s3.includes('reviews.csv 파일을 읽습니다'), '리뷰 csv 만 적은 045 화면이 「읽습니다」를 찍었다');
+    r = 영수증(w3, 'run.json', '실데이터', ['workspace:inputs/reviews.csv']);
+    ok(r.status !== 0 && /스킬 045[\s\S]*이 자료가 입력에 없어[\s\S]*적은 입력\(workspace:inputs\/reviews\.csv\)은 이 자료가 아닙니다/.test(r.stderr), `리뷰 csv 만으로 045 를 실데이터로 시작했다: ${r.stderr}`);
+    fs.writeFileSync(path.join(w3, 'inputs', '메타광고_10월.csv'), 'date,spend\n');
+    r = 영수증(w3, 'run-2.json', '실데이터', ['workspace:inputs/메타광고_10월.csv', 'workspace:inputs/reviews.csv']);
+    ok(r.status === 0, `광고 자료가 있는데 실데이터를 막았다: ${r.stderr}`);
+    // 체인은 단계마다 · 앞 단계 결과를 받은 046 은 자료가 있다 · 입력이 빈 046 은 자료를 달라고 한다
+    const P = `outputs/2026-10-광고애널리틱스`;
+    const 체인 = (in2) => ({ request: '광고 분석하고 예산 다시 짜줘', chain: '광고애널리틱스', skills: ['045', '046'], steps: [
+      { step: 1, skill: '045', inputs: ['workspace:inputs/메타광고_10월.csv'], outputs: [`workspace:${P}/045-weekly-ads-report/045-weekly-ads-report.html`] },
+      { step: 2, skill: '046', inputs: in2, outputs: [`workspace:${P}/046-roas-budget-rebalance/046-roas-budget-rebalance.md`] }] });
+    fs.rmSync(path.join(w3, 'inputs', 'reviews.csv'));
+    ok(dataRequests(체인([`workspace:${P}/045-weekly-ads-report/045-weekly-ads-report.html`]), w3).length === 0, '앞 단계 결과를 받은 046 에 자료를 달라고 했다');
+    // inputs/ 에 광고 파일이 없으면(1단계는 계획에 적은 이름으로 본다) 입력이 빈 2단계(046)만 자료를 달라고 한다
+    const 광고파일 = path.join(w3, 'inputs', '메타광고_10월.csv');
+    fs.renameSync(광고파일, `${광고파일}.bak`);
+    const q3 = dataRequests(체인([]), w3);
+    ok(q3.length === 1 && q3[0].step === 2 && q3[0].skill === '046' && q3[0].need === '채널별 지출·성과 데이터', `체인 단계별 자료 요청이 틀렸다: ${JSON.stringify(q3)}`);
+    fs.renameSync(`${광고파일}.bak`, 광고파일);
+    // 앞 실행의 결과 · 체인 정본에서 앞 스킬(045)의 결과는 046 의 자료다 · 006 의 자료는 아니다
+    const 앞045 = `workspace:outputs/2026-10-13/045-weekly-ads-report/045-weekly-ads-report.html`;
+    ok(dataRequest({ request: '예산', skills: ['046'], steps: [{ step: 1, skill: '046', inputs: [앞045], outputs: [] }] }, w3) === null, '체인 앞 스킬(045) 결과를 046 자료로 보지 않았다');
+    fs.rmSync(path.join(w3, 'inputs', '메타광고_10월.csv'));
+    ok(dataRequest({ request: '리뷰', skills: ['006'], steps: [{ step: 1, skill: '006', inputs: [앞045], outputs: [] }] }, w3) === '리뷰·댓글·CS 데이터', '광고 결과를 006 리뷰 자료로 봤다');
+    fs.rmSync(w3, { recursive: true, force: true });
+
+    // 재현 4 · 앞 결과 forecast.csv(영수증 data_mode 추정) + 실제 inputs/ads.csv → 045 실데이터 start 는 막고 혼합·추정을 알린다
+    const F = 'outputs/2026-10-14/047-forecast';
+    const w4 = 공간(회사, { 'inputs/ads.csv': 'date,spend\n2026-10-01,1000\n', [`${F}/forecast.csv`]: 'week,roas\n1,2.1\n' });
+    fs.writeFileSync(path.join(w4, F, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', run_id: 'r-fc', status: 'completed', data_mode: '추정', outputs: [{ path: `workspace:${F}/forecast.csv` }] }));
+    r = 영수증(w4, 'run.json', '실데이터', [`workspace:${F}/forecast.csv`, 'workspace:inputs/ads.csv']);
+    ok(r.status !== 0 && /추정으로 만든 앞 결과가 있어 data_mode 「실데이터」로 적을 수 없습니다[\s\S]*「혼합」/.test(r.stderr), `추정 앞 결과와 실제 자료를 실데이터로 시작했다: ${r.stderr}`);
+    r = 영수증(w4, 'run-2.json', '혼합', [`workspace:${F}/forecast.csv`, 'workspace:inputs/ads.csv']);
+    ok(r.status === 0, `혼합을 막았다: ${r.stderr}`);
+    const b4 = JSON.parse(fs.readFileSync(path.join(w4, F045, 'run-2.json'), 'utf8')).data_basis;
+    ok(JSON.stringify(b4) === JSON.stringify({ 실데이터: ['workspace:inputs/ads.csv'], 샘플: [], 추정: [`workspace:${F}/forecast.csv`] }), `영수증 data_basis 가 세부 근거를 남기지 않았다: ${JSON.stringify(b4)}`);
+    r = 영수증(w4, 'run-3.json', '실데이터', [`workspace:${F}/forecast.csv`]);
+    ok(r.status !== 0 && /전부 추정이면 「추정」/.test(r.stderr), '추정 앞 결과만으로 실데이터를 받았다');
+    // 혼합 앞 결과는 data_basis 를 이어받는다 · 샘플 없이 추정만 섞인 혼합은 샘플로 세지 않는다
+    const G = 'outputs/2026-10-14/046-roas-budget-rebalance';
+    fs.mkdirSync(path.join(w4, G), { recursive: true });
+    fs.writeFileSync(path.join(w4, G, '046-roas-budget-rebalance.md'), '# 예산\n');
+    fs.writeFileSync(path.join(w4, G, 'run.json'), JSON.stringify({ schema: 'marketing-team.run/v1', run_id: 'r-046', status: 'completed', data_mode: '혼합',
+      data_basis: { 실데이터: ['workspace:inputs/ads.csv'], 샘플: [], 추정: [`workspace:${F}/forecast.csv`] }, outputs: [{ path: `workspace:${G}/046-roas-budget-rebalance.md` }] }));
+    r = 영수증(w4, 'run-4.json', '실데이터', [`workspace:${G}/046-roas-budget-rebalance.md`, 'workspace:inputs/ads.csv']);
+    ok(r.status !== 0 && /추정으로 만든 앞 결과/.test(r.stderr) && !/샘플 자료가 있어/.test(r.stderr), `추정이 든 혼합 앞 결과를 샘플로 셌거나 실데이터로 받았다: ${r.stderr}`);
+    fs.rmSync(w4, { recursive: true, force: true });
+
+    // 재현 5 · 제목만 있는 프로필은 「빈」 · 고유한 말이 든 제목은 「채움」
+    const w5 = 공간('# 회사 정보\n## 기본 정보\n');
+    ok(profileState(w5) === '빈', '「# 회사 정보」·「## 기본 정보」 두 줄만 있는 프로필을 채움으로 봤다');
+    for (const t of ['# 브랜드 프로필\n## 우리 회사 소개\n', '# 1. 프로필\n', '# Company Info\n## About Us\n']) {
+      fs.writeFileSync(path.join(w5, 'brand', 'profile.md'), t); ok(profileState(w5) === '빈', `일반 제목만 있는 프로필을 채움으로 봤다: ${JSON.stringify(t)}`);
+    }
+    for (const t of ['# 모래결 브랜드 프로필\n', '# 회사 정보\n## 기본 정보\n팀 협업 툴을 판다\n', '# 우리 회사 · 반려동물 사료\n']) {
+      fs.writeFileSync(path.join(w5, 'brand', 'profile.md'), t); ok(profileState(w5) === '채움', `고유한 말이 있는데 빈 것으로 봤다: ${JSON.stringify(t)}`);
+    }
+    fs.writeFileSync(path.join(w5, 'brand', 'profile.md'), tpl);
+    ok(profileState(w5) === '빈', '빈 템플릿을 보는 규칙이 바뀌었다');
+    fs.rmSync(w5, { recursive: true, force: true });
+
+    // 책 실습 그대로 · 빈 프로필 + 006 빈 입력 → 샘플로 채우고 · 자료를 달라고 하지 않고 · 샘플 계획을 막지 않는다
+    const w6 = 공간(tpl);
+    const p6 = { request: '리뷰 분석해줘', skills: ['006'], steps: [{ step: 1, skill: '006', inputs: [], outputs: [] }] };
+    ok(JSON.stringify(sampleInputs(p6, w6)) === JSON.stringify(['plugin:sample-data/A브랜드-리뷰-200건.csv']), '빈 프로필 책 실습에서 샘플을 채우지 않았다');
+    ok(dataRequest(p6, w6) === null && workMode(p6, w6) === '책', '빈 프로필 책 실습에서 자료를 달라고 했다');
+    ok(!validatePlan(p6, { cwd: w6 }).some(x => /회사 업무에 연습용 샘플/.test(x)), '책 실습 샘플 계획을 막았다');
+    fs.rmSync(w6, { recursive: true, force: true });
+  }
+  console.log(`계획 컴파일러 · 해시 재현·민감도 7 · 계약 검사 4 · 고른 그릇 3 · 재실행 1:1 3 · 최근 순번 입력 1 · 지정 순서 2 · 승인 상태 5 · start 차단·통과 2 · 이름 있는 체인 자동 채움 2 · 체인 폴더 2 · 찍힌 화면 ${화면수} · 사용자 원본 입력 2 · 단계별 형식 1 · md 대체 합침 2 · 머리말 모양 4 · 책 실습 입력 4 · 빈 프로필 판정 16 · 샘플 채움 조건 32 · 사용자 스킬 8 · 보완 형식 4 · 보완 화면 2 · 보완·양식 책 실습 끔 8 · 같은 날 재실행 자리 14 · 업무 자료 판단 19 · 체인 폴더 옮김 8 · 셸 cwd 무관 작업 폴더 24 · 실습 근거 3 · 재검토 재현 ${재검토} · ✅`);
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

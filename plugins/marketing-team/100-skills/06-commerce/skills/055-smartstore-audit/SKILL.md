@@ -11,7 +11,7 @@ triggers:
   - "스토어 성장 컨설팅해줘"
   - "내 스토어 점검해줘"
 inputs: [스토어 지표(스토어센터 → 통계 → 판매분석 → 엑셀 → inputs, 센터는 로그인 뒤라 크롤링 불가), 스토어 URL(공개 페이지), 대표 상품 목록(선택)]
-sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-채널성과-90일.csv   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [3단계 성장 진단 리포트, 병목 결론(근거 수치), 2주 실행 액션 목록, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["053", "042"]

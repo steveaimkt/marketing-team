@@ -754,6 +754,19 @@ function planApproval(cwd, preferId) {
   } catch { return null; }
 }
 
+  // 패키지 설치와 NODE_PATH 는 승인 앞뒤 모두 막는다. 사용자 컴퓨터에 까는 일은 사용자가 한다.
+  // 「모듈을 찾을 수 없다」 뒤에 설치를 시도하면 막는 이유와 사용자에게 낼 설치 안내를 함께 준다 (v0.72.32 뒤)
+  // 따옴표 속은 인수다. `grep "npm install" 문서` 같은 조회는 막지 않는다
+  if (input.tool_name === 'Bash' &&
+      /(?:^|[;&|(]\s*)(?:sudo\s+)?(?:(?:npm|pnpm|yarn|bun)\s+(?:i|install|add|ci)(?:\s|$)|NODE_PATH=)/m
+        .test(String(input.tool_input?.command || '').replace(/'[^']*'|"[^"]*"/g, "''"))) {
+    deny('패키지 설치(npm install 등)와 NODE_PATH 는 여기서 돌리지 않습니다. 사용자 컴퓨터에 까는 일은 사용자가 합니다. ' +
+      '`Cannot find module` 로 막혔다면 사용자에게 작업 폴더에서 `npm install pptxgenjs` 를 한 번 돌려 달라고 안내합니다 ' +
+      '(.docx 는 `npm install docx`, 둘 다면 `npm install pptxgenjs docx`). 문구는 marketing-team-setup ① 「문서 스킬」 절의 설치 안내를 그대로 씁니다. ' +
+      '이번 결과는 .md 개요로 내고, 첫 줄에 어느 도구가 없어서 그렇게 냈는지 적습니다.');
+    return;
+  }
+
   const approval = approved(rows);
   const cwd = process.env.CLAUDE_PROJECT_DIR || input.cwd;
   const preferId = currentStepId(input);

@@ -13,7 +13,7 @@ triggers:
   - "한 주 마무리 정리해줘"
   - "다음 주 뭐부터 할지 정해줘"
 inputs: [logs/build-log.md 주간 기록(자동 조회), 이번 주 완료·미완료 업무 보완 입력, 주요 지표(선택)]
-sample_fallback: sample-data/build-log-sample.md   # `logs/build-log.md` 가 비었으면 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/build-log-sample.md   # `logs/build-log.md` 가 비었으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [주간 회고(완료·성과·배움 3구획), 다음 조치표(다음 주로/중단/넘김), 다음 주 우선순위 TOP 3, my-playbook 루틴 갱신 제안, 저장 파일(.xlsx + .md)]
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["095"]

@@ -14,7 +14,7 @@ triggers:
 inputs: [랜딩 URL(자사 공개 페이지면 직접 조회) 또는 스크린샷, 전환 데이터(선택), 유입 광고 소재(선택), 퍼널 단계별 전환(sample-data/A브랜드-퍼널단계.csv, 선택), 지난 A/B 결과(sample-data/A브랜드-ab테스트-3건.csv, 선택)]
 # 🔴 2026-09-04 · 둘 다 온사이트 퍼널 자료다. 있으면 진단이 추정에서 실측으로 바뀐다.
 #   `sample_fallback` 은 진단 대상인 페이지라 그대로 둔다. 한 파일만 적을 수 있다.
-sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-상세페이지.md   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [4개 항목 진단표(첫 화면·신뢰·마찰·CTA), 24섹션 결손 맵, 우선순위 처방 TOP 5, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["019", "051"]

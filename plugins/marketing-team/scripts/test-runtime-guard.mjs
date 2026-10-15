@@ -538,6 +538,22 @@ try {
         assert.match(msg, /공식 문서 스킬\(document-skills:pptx 등\)을 Skill 로 부르고, 그 스킬이 시키는 스크립트[^·]*outputs 안에 Write 로 써서 실행합니다/, msg);
         assert.doesNotMatch(msg, /코드를 짜지 않습니다/, '거부 안내가 공식 스킬이 시키는 스크립트 작성을 막습니다.');
       }
+      // 「모듈을 찾을 수 없다」 뒤의 설치 시도는 계속 막고, 사용자에게 낼 설치 안내를 알린다 (승인 앞뒤 모두)
+      for (const lines of [[active, pptxPlan, row('user', '진행 승인')], [active, pptxPlan]]) {
+        W(lines);
+        for (const bad of ['npm install pptxgenjs', 'npm i docx', `cd ${fresh} && npm install pptxgenjs docx`, 'sudo npm install -g pptxgenjs',
+          'pnpm add pptxgenjs', 'yarn add docx', `NODE_PATH=/usr/local/lib/node_modules node ${d}/deck.js`]) {
+          const r = call2('Bash', { command: bad });
+          assert.equal(decision(r), 'deny', `설치 명령을 열었습니다: ${bad}`);
+          const why = JSON.parse(r.stdout).hookSpecificOutput.permissionDecisionReason;
+          assert.match(why, /사용자에게 작업 폴더에서 `npm install pptxgenjs` 를 한 번 돌려 달라고 안내합니다/, why);
+          assert.match(why, /marketing-team-setup ① 「문서 스킬」/, why);
+        }
+      }
+      // 따옴표 속 낱말은 조회다. 설치 안내로 막지 않는다
+      W([active, pptxPlan]);
+      assert.equal(decision(call2('Bash', { command: 'grep -n "npm install" README.md' })), 'none', '따옴표 속 npm install 조회를 막았습니다.');
+      assert.equal(decision(call2('Bash', { command: 'ls node_modules/pptxgenjs' })), 'none', '작업 폴더 node_modules 조회를 막았습니다.');
       // 계획에 문서 형식이 없으면 막는다
       W([active, p, row('user', '진행 승인')]);
       for (const bad of [`node ${d}/deck.js`, docOk[2], docOk[6], docOk[7]])
@@ -730,7 +746,7 @@ try {
       assert.ok(Number.isInteger(JSON.parse(fs.readFileSync(blogState, 'utf8')).pending), '방금 연 차례는 원고 답변을 기다려야 한다');
       say('채널 성장이 왜 멈췄어?');
       assert.equal(JSON.parse(fs.readFileSync(blogState, 'utf8')).pending, undefined, '다음 말이 왔는데 지난 차례가 원고 답변을 계속 기다린다');
-      fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사\n');
+      fs.writeFileSync(path.join(ws, 'brand', 'profile.md'), '# 우리 회사 · 반려동물 사료\n');
       fs.rmSync(path.join(ws, 'outputs', '.대본-13장-스킬제안.json'), { force: true });
       assert.doesNotMatch(say('추가로 내가 만들면 좋을 스킬을 제안해줘'), /책 실습/, '프로필을 채웠는데 대본을 돌렸다');
     } finally {
@@ -789,7 +805,7 @@ try {
     fs.rmSync(path.join(temp, 'outputs', '2026-10-14'), { recursive: true, force: true });
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 4 · 사용자 스킬 검사기 1 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · 재료 속 철회어 8 · 계획·영수증 덮기 차단 4 · 공식 문서 스킬 8 · 문서 스킬 명령 36 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 4 · 사용자 스킬 검사기 1 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · 재료 속 철회어 8 · 계획·영수증 덮기 차단 4 · 공식 문서 스킬 8 · 문서 스킬 명령 36 · 설치 안내 16 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }

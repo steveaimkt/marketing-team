@@ -17,7 +17,7 @@ triggers:
   - "지금까지 한 일 정리해줘"
   - "여태까지 뭐 했는지 정리해줘"
 inputs: [사용자 문답 (주간 업무 목록 · 파일·시트·툴 사용 흐름), 있으면 업무 목록 문서]
-sample_fallback: sample-data/build-log-sample.md   # `logs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/build-log-sample.md   # `logs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [업무 인벤토리표, 자동화 매트릭스 (효과×난이도 4분면), 개인 에이전트 도입 로드맵 30일, brand/my-playbook.md 생성·갱신(다음 라운드 대기열·보완 목록 포함), brand/profile.md 온보딩 연결, 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md, brand/my-playbook.md]
 chains_to: ["092", "100"]

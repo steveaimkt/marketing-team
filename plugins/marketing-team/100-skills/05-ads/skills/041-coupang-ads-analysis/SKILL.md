@@ -12,7 +12,7 @@ triggers:
   - "쿠팡 광고비 어디서 새는지 봐줘"
   - "쿠팡 입찰가 조정안 만들어줘"
 inputs: [쿠팡 광고센터 키워드 리포트(xlsx·CSV), 스토어 일별 매출 요약(SELLER_INSIGHTS_DAILY_SUMMARY_METRICS · 선택), 분석 기간]
-sample_fallback: sample-data/A브랜드-쿠팡광고-30일.csv   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-쿠팡광고-30일.csv   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [KPI 성과 요약, 키워드 분류표(효자·낭비·잠재), 지면별·캠페인별·상품별 상세, 전환 0 키워드 목록, 그래프 3개, 입찰 조정안, 실행 계획(긴급·주간·월간), 저장 파일(.xlsx + .html + .md)]
 requires: [brand/profile.md]
 chains_to: ["046", "043"]
@@ -52,7 +52,7 @@ success_metrics: [낭비 키워드 절감액, 리포트 작성 시간, ROAS 개�
 
 | 멈추는 곳 | 묻는 것 | 기본값 (답 없으면) |
 |---|---|---|
-| Phase 2 (자료 없음) | `inputs` 에 리포트가 **전혀 없으면** 묻지 않고 `sample_fallback` 으로 완주한다 (frontmatter 참고) | 멈추지 않는다 · `sample_fallback` 으로 바로 완주 |
+| Phase 2 (자료 없음) | `inputs` 에 리포트가 **전혀 없으면** 프로필이 `빈` 이거나 실습일 때만 묻지 않고 `sample_fallback` 으로 완주한다 (frontmatter 참고). `채움` 이면 원본을 요청한다 | 멈추지 않는다 · `sample_fallback` 으로 바로 완주 |
 | Phase 2 (자료 형식 오류) | `inputs` 에 **캠페인·광고그룹 리포트만** 있으면(컬럼 구조가 달라 대체 불가) 아래 「질문 리포트 종류」 그대로 | 캠페인 리포트로는 대체 불가 · **D3 계약**을 낸다 (쿠팡 광고센터 → 보고서 → **키워드** 리포트로 다시 받기) |
 | Phase 2 | **스토어 일별 매출 요약**(SELLER_INSIGHTS_DAILY_SUMMARY_METRICS)이 있으면 함께 읽는다 · 선택 자료다 | 없으면 **광고 의존도 카드와 핵심 ①을 내지 않는다** · 그 사실을 ⑫에 적는다 |
 | Phase 1 | profile.md §4 에 손익분기 ROAS 가 없으면 아래 「질문 손익분기」 그대로 | **2.0** · 폴백값임을 산출물에 밝힌다 |

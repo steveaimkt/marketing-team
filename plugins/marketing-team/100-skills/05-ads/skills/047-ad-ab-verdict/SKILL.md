@@ -12,7 +12,7 @@ triggers:
   - "A안 B안 차이가 우연인지 알려줘"
   - "테스트 더 돌려야 해?"
 inputs: [소재별 노출·클릭·전환·광고비, 결론 지표(019 설계서가 있으면 그 값)]
-sample_fallback: sample-data/A브랜드-ab테스트-3건.csv   # `inputs` 를 먼저 보고, 없으면 **묻지 않고 바로** 이 파일로 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/A브랜드-ab테스트-3건.csv   # `inputs` 를 먼저 보고, 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일로 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [3결론(확정승·박빙·표본부족), 승리 패턴 1줄, 다음 변형 제안 3개, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["043", "019"]

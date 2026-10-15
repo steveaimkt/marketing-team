@@ -11,7 +11,7 @@ triggers:
   - "스킬 전부 묶어서 운영하자"
   - "나만의 마케팅 에이전트 만들어줘"
 inputs: [보유 스킬 명부(ROUTING.md), 업무 우선순위(091 산출물 brand/my-playbook.md)]
-sample_fallback: sample-data/build-log-sample.md   # `brand/my-playbook.md` 가 없으면 이 파일의 실행 기록으로 대신 집계해 **묻지 않고 바로** 완주한다 (산출물에 [샘플])
+sample_fallback: sample-data/build-log-sample.md   # `brand/my-playbook.md` 가 없으면 프로필이 `빈` 이거나 실습일 때만 이 파일의 실행 기록으로 대신 집계해 완주한다 (산출물에 [샘플]) · `채움` 이면 원본을 요청한다
 outputs: [구조 해설, 내 업무 배선표(스킬 체인·주기), 승인 정책표, 주간 운영 루틴, 저장 파일(.md)]
 requires: [brand/profile.md]
 chains_to: ["ALL"]
