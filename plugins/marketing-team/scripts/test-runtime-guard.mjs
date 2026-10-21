@@ -48,38 +48,40 @@ try {
 
   const active = row('user', '# 마케팅 AI 마케터\n/skills/ai-marketer/SKILL.md');
   writeTranscript([active, row('user', '광고 예산 다시 짜줘')]);
-  result = call('Bash', { command: 'node analysis.mjs' });
+  result = call('Bash', { command: 'node outputs/2026-10-21/061-x/analysis.mjs' });
   assert.equal(decision(result), 'deny', '계획 없는 실행을 허용했습니다.');
+  // 업무 스킬 일이 아닌 간단한 일은 계획 없이 된다 (실측 2026-10-21 · MCP실습폴더 · 네이버광고실습에서 막혔던 모양 그대로)
+  for (const [tool, inp] of [
+    ['Write', { file_path: path.join(temp, 'outputs', '2026-10-21_메일일정정리.html') }],
+    ['Bash', { command: 'python ".claude/skills/naver-ads-lab/scripts/report.py" --demo' }],
+    ['Bash', { command: 'rm "outputs/2026-10-21-메일일정시각화/plan.json" && rmdir "outputs/2026-10-21-메일일정시각화"' }],
+    ['Bash', { command: 'mkdir -p inputs/영수증 && mv inputs/a.csv inputs/영수증/' }],
+  ]) assert.equal(decision(call(tool, inp)), 'none', `간단한 일을 막았습니다: ${JSON.stringify(inp)}`);
   result = call('Bash', { command: `BASE="${pluginRoot}"\necho "routing"; grep -n "046" "$BASE/100-skills/ROUTING.md" 2>/dev/null | head -5` });
   assert.equal(decision(result), 'none', '계획 수립에 필요한 읽기 전용 조회까지 막았습니다.');
-  result = call('Bash', { command: 'BASE="$(touch outputs/bypass)"\necho "$BASE"' });
+  result = call('Bash', { command: 'BASE="$(touch outputs/2026-10-21/043-x/bypass)"\necho "$BASE"' });
   assert.equal(decision(result), 'deny', '변수 선언으로 감싼 명령 실행을 읽기 전용으로 허용했습니다.');
-  result = call('Bash', { command: 'ls sample-data > outputs/list.txt' });
+  result = call('Bash', { command: 'ls sample-data > outputs/2026-10-21/043-x/list.txt' });
   assert.equal(decision(result), 'deny', '읽기 명령으로 위장한 리다이렉션 쓰기를 허용했습니다.');
 
   const plan = row('assistant', '[실행 계획]\n046 ROAS 진단을 실행합니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
   writeTranscript([active, plan]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'deny', '사용자 승인 없는 쓰기를 허용했습니다.');
 
   const approval = row('user', '진행 승인');
   writeTranscript([active, plan, approval]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'none', '승인 뒤 작업 폴더의 정상 쓰기를 막았습니다.');
 
-  result = call('Edit', { file_path: path.join(temp, '..', 'outside.md') });
-  assert.equal(decision(result), 'deny', '작업 폴더 밖 쓰기를 허용했습니다.');
-  result = call('Write', { file_path: path.join(temp, 'tmp', 'result.md') });
-  assert.equal(decision(result), 'deny', '허용되지 않은 최상위 폴더 쓰기를 허용했습니다.');
-  // 예외 하나 · 구축 ③-d 의 작업 폴더 맨 위 CLAUDE.md · 다른 맨 위 파일은 여전히 막는다
-  result = call('Write', { file_path: path.join(temp, 'CLAUDE.md') });
-  assert.equal(decision(result), 'none', '작업 폴더 맨 위 CLAUDE.md 쓰기를 막았습니다.');
-  result = call('Write', { file_path: path.join(temp, 'NOTES.md') });
-  assert.equal(decision(result), 'deny', '맨 위의 다른 파일 쓰기를 허용했습니다.');
+  // 업무 스킬 일이 아닌 쓰기는 막지 않는다 (2026-10-21 「간단한 일도 오류가 생겨」) · 메모, 정리, 다른 스킬의 파일
+  // 작업 폴더 밖은 클로드 자체 권한이 묻는다
+  for (const f of [path.join(temp, '..', 'outside.md'), path.join(temp, 'tmp', 'result.md'), path.join(temp, 'CLAUDE.md'), path.join(temp, 'NOTES.md'), path.join(temp, 'outputs', '2026-10-21_메일일정정리.html')])
+    assert.equal(decision(call('Write', { file_path: f })), 'none', `업무 스킬 일이 아닌 쓰기를 막았습니다: ${f}`);
 
   const secondPlan = row('assistant', '[실행 계획]\n새 캠페인 카피를 만듭니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
   writeTranscript([active, plan, approval, secondPlan]);
-  result = call('Bash', { command: 'node build.mjs' });
+  result = call('Bash', { command: 'node outputs/2026-10-21/043-x/build.mjs' });
   assert.equal(decision(result), 'deny', '새 계획에 예전 승인을 재사용했습니다.');
 
   writeTranscript([active, plan, approval]);
@@ -106,16 +108,16 @@ try {
   assert.equal(decision(call('Skill', { skill: 'document-skills:pptx' })), 'deny', '형식에 없는 문서 스킬을 허용했습니다.');
   // 승인 뒤 셸 쓰기 거부 안내 · 공식 문서 스킬을 먼저 부르고, 그 스킬이 시키는 스크립트는 outputs 안에 써서 실행한다
   {
-    const msg = JSON.parse(call('Bash', { command: 'mkdir -p outputs/x' }).stdout).hookSpecificOutput.permissionDecisionReason;
+    const msg = JSON.parse(call('Bash', { command: 'mkdir -p outputs/2026-10-21/043-x' }).stdout).hookSpecificOutput.permissionDecisionReason;
     assert.ok(msg.indexOf('공식 문서 스킬') >= 0 && msg.indexOf('공식 문서 스킬') < msg.indexOf('make.py'), `거부 안내가 공식 문서 스킬보다 python 생성을 먼저 권합니다 · ${msg}`);
     assert.match(msg, /그 스킬이 시키는 스크립트/);
   }
 
   // 회귀 2026-08-30 · 훅 결함 — 승인 뒤 셸 쓰기 · 따옴표 오인 · 표식 인용 오인 · 스크립트 예외
   writeTranscript([active, plan, approval]);
-  result = call('Bash', { command: 'python3 patch.py' });
+  result = call('Bash', { command: `python3 -c "open('outputs/2026-10-21/043-x/y.md','w')"` });
   assert.equal(decision(result), 'deny', '승인 뒤 스크립트 언어로 쓰는 것을 허용했습니다.');
-  result = call('Bash', { command: "cat > outputs/x.md <<'EOF'\nhi\nEOF" });
+  result = call('Bash', { command: "cat > outputs/2026-10-21/043-x/x.md <<'EOF'\nhi\nEOF" });
   assert.equal(decision(result), 'deny', '승인 뒤 heredoc 쓰기를 허용했습니다.');
   result = call('Bash', { command: 'grep -n "=> {" outputs/result.md' });
   assert.equal(decision(result), 'none', '따옴표 속 기호를 문법으로 오인해 조회를 막았습니다.');
@@ -132,34 +134,34 @@ try {
   // 굵은 표식도 계획으로 결속된다 (실측 2026-08-31 · 헛 재승인 2회)
   const boldPlan = row('assistant', '**[실행 계획]**\n광고 문구 3안\n**[승인 요청]**\n진행하려면 「진행 승인」');
   writeTranscript([active, boldPlan, approval]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'none', '굵은 표식 계획에 승인이 결속되지 않았습니다 — 헛 재승인이 난다.');
 
   const quotedMarker = row('assistant', '본보기 설명 · 되돌림 화면도 「[실행 계획]」·「[승인 요청]」 표식을 그대로 쓴다.');
   writeTranscript([active, plan, approval, quotedMarker]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'none', '문장 속 표식 인용을 새 계획으로 오인해 승인을 무효화했습니다.');
 
   // 회귀 v0.47 · 승인 유연화(R4) · 승인 전 상태 기계(R6) · 기준 폴더(R2)
   writeTranscript([active, plan, row('user', '진행 승인 그리고 규제 세팅도 확인해줘')]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'none', '「진행 승인」으로 시작하는 답을 거부했습니다.');
   writeTranscript([active, plan, row('user', '네 진행해주세요')]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'none', '자연스러운 승인 변형을 거부했습니다.');
   writeTranscript([active, plan, row('user', '진행 승인 보류할게')]);
-  result = call('Write', { file_path: path.join(temp, 'outputs', 'result.md') });
+  result = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') });
   assert.equal(decision(result), 'deny', '보류 답변을 승인으로 오인했습니다.');
   // 「진행 승인」으로 시작하면 첫 문장 뒤 재료 속 「아직」은 철회가 아니다 (실측 2026-10-14 · 회사 B S3 · 승인을 한 번 더 받았다)
   for (const 말 of ['진행 승인. 백화점은 아직 정하지 않았어(여러 곳에 돌릴 공용 제안서). 희망 시기는 12월 둘째 주부터 2주, 면적은 10㎡ 정도. 지난 팝업 실적 자료는 지금 없어.',
     '진행 승인\n지속력 시험 자료는 아직 없어', '진행 승인 그리고 가격은 아직 공개하지 마']) {
     writeTranscript([active, plan, row('user', 말)]);
-    assert.equal(decision(call('Write', { file_path: path.join(temp, 'outputs', 'result.md') })), 'none', `첫 문장 뒤 재료의 「아직」으로 승인을 막았습니다: ${말}`);
+    assert.equal(decision(call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'none', `첫 문장 뒤 재료의 「아직」으로 승인을 막았습니다: ${말}`);
   }
   // 바로 이어지는 철회 · 뒤 문장이 철회로 시작하거나 승인을 거두면 여전히 막는다
   for (const 말 of ['진행 승인 아직 하지 마', '진행 승인… 아니 잠깐 아직', '진행 승인합니다. 아니, 취소할게요', '진행 승인. 잠깐, 다시 볼게', '진행 승인. 그런데 승인 취소할게요']) {
     writeTranscript([active, plan, row('user', 말)]);
-    assert.equal(decision(call('Write', { file_path: path.join(temp, 'outputs', 'result.md') })), 'deny', `바로 이어지는 철회를 승인으로 오인했습니다: ${말}`);
+    assert.equal(decision(call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'deny', `바로 이어지는 철회를 승인으로 오인했습니다: ${말}`);
   }
   writeTranscript([active, plan]);
   result = call('Bash', { command: `node "${pluginRoot}/scripts/plan-compiler.mjs" compile "outputs/plan.json"` });
@@ -167,7 +169,7 @@ try {
   writeTranscript([active, plan, approval]);
   result = spawnSync(process.execPath, [SCRIPT], {
     input: JSON.stringify({ hook_event_name: 'PreToolUse', session_id: 'test-session', transcript_path: transcript,
-      cwd: os.tmpdir(), tool_name: 'Write', tool_input: { file_path: path.join(temp, 'outputs', 'result.md') } }),
+      cwd: os.tmpdir(), tool_name: 'Write', tool_input: { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') } }),
     encoding: 'utf8', env: { ...process.env, CLAUDE_PLUGIN_ROOT: pluginRoot, CLAUDE_PROJECT_DIR: temp },
   });
   assert.equal(decision(result), 'none', '셸 cd 표류 시 작업 폴더 쓰기를 오차단했습니다.');
@@ -491,12 +493,15 @@ try {
       W([active, row('user', '광고 예산 다시 짜줘')]);
       assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-09-22', '046-x', 'plan.json') })), 'none',
         '승인 전 첫 plan.json 초안을 막았습니다 (G2 화면을 만들 수 없다).');
-      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'deny',
         '승인 전 산출물 쓰기를 plan.json 예외로 허용했습니다.');
       assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'brand', 'plan.json') })), 'deny',
         'outputs 밖 plan.json 을 허용했습니다.');
-      assert.equal(decision(call2('Bash', { command: 'python3 -c "import openpyxl"' })), 'deny',
-        '승인 전 python 실행을 허용했습니다.');
+      // 업무 결과 폴더를 건드리지 않는 명령은 막지 않는다 (2026-10-21)
+      assert.equal(decision(call2('Bash', { command: 'python3 -c "import openpyxl"' })), 'none',
+        '업무 스킬 일이 아닌 python 확인을 막았습니다.');
+      assert.equal(decision(call2('Bash', { command: 'python3 outputs/2026-09-22/046-x/a.py' })), 'deny',
+        '승인 전 업무 결과 폴더의 python 실행을 허용했습니다.');
 
       const p = row('assistant', '[실행 계획]\n046 ROAS 진단을 실행합니다.\n[승인 요청]\n진행하려면 “진행 승인”이라고 답해주세요.');
       W([active, p, row('user', '진행 승인')]);
@@ -505,10 +510,14 @@ try {
         'python3 -c "import openpyxl; print(openpyxl.__version__)"',
         'python3 /tmp/x/skills/xlsx/recalc.py outputs/a.xlsx'])
         assert.equal(decision(call2('Bash', { command: ok })), 'none', `승인 뒤 문서 생성 명령을 막았습니다: ${ok}`);
-      for (const bad of ['python3 -c "import os; os.remove(\'x\')"', 'python3 outputs/a.py > /etc/x',
-        'python3 -c "import os; print(os.system(1))"', 'python3 -c "print(open(1))"',
-        'python3 /tmp/other.py', 'python3 outputs/a.py && rm -rf brand'])
+      for (const bad of ['python3 outputs/2026-09-22/046-x/a.py > /etc/x', 'python3 outputs/2026-09-22/046-x/a.py && rm -rf brand',
+        'python3 -c "import os; os.remove(\'outputs/2026-09-22/046-x/a.md\')"'])
         assert.equal(decision(call2('Bash', { command: bad })), 'deny', `승인 뒤 허용 밖 python 을 열었습니다: ${bad}`);
+      // 업무 결과 폴더 밖의 python 은 업무 스킬 일이 아니다 (2026-10-21) · 다만 brand·logs 를 지우거나 옮기는 명령은 막는다
+      for (const free of ['python3 -c "print(open(1))"', 'python3 /tmp/other.py'])
+        assert.equal(decision(call2('Bash', { command: free })), 'none', `업무 스킬 일이 아닌 python 을 막았습니다: ${free}`);
+      for (const bad of ['rm -rf brand', 'python3 x.py && rm -rf brand', 'mv logs/build-log.md /tmp/'])
+        assert.equal(decision(call2('Bash', { command: bad })), 'deny', `회사 정보·실적 원장을 지우는 명령을 열었습니다: ${bad}`);
 
       // 공식 문서 스킬이 시키는 명령 (실측 2026-10-14 · 회사 B 084 · pptxgenjs deck.js 를 node 로, validate.py 를 캐시에서 · 셋 다 막혀 저장실패)
       const cache = path.join(os.homedir(), '.claude', 'plugins', 'cache', 'anthropic-agent-skills', 'document-skills', '683bc88e56f3', 'skills');
@@ -528,22 +537,21 @@ try {
       for (const ok of docOk)
         assert.equal(decision(call2('Bash', { command: ok })), 'none', `pptx 계획 승인 뒤 공식 스킬이 시키는 명령을 막았습니다: ${ok}`);
       for (const bad of [
-        'node deck.js', 'node /tmp/deck.js', `node ${d}/deck.js && rm -rf brand`, `cd ${d} && node deck.js`,
+        `node ${d}/deck.js && rm -rf brand`, `cd ${d} && node deck.js`,
         `node ${d}/deck.js > /tmp/o`, `node ${d}/deck.js /tmp/out.pptx`, `NODE_PATH=/x node ${d}/deck.js`, 'npm install pptxgenjs',
         `python3 "${cache}/docx/scripts/office/validate.py" ${d}/a.docx`,          // 계획에 docx 가 없다
         `python3 "${cache}/xlsx/scripts/recalc.py" ${d}/a.xlsx`,                   // 계획에 xlsx 가 없다
-        `python3 "${cache}/pptx/scripts/../../../../evil.py"`,                     // scripts 밖으로 빠져나감
-        `python3 "${cache}/pptx/scripts/office/validate.py" /tmp/a.pptx`,          // 인수가 outputs 밖
         `python3 "${cache}/pptx/scripts/office/soffice.py" --headless --convert-to pdf ${d}/084.pptx`, // 결과가 작업 폴더 맨 위로
-        `python3 ${path.join(os.homedir(), '.claude', 'plugins', 'cache', 'other-market', 'x', '1.0', 'skills', 'pptx', 'scripts', 'a.py')}`,
-        `cat ${path.join(os.homedir(), '.claude', 'plugins', 'cache', 'other-market', 'x', 'SKILL.md')}`,
         `soffice --headless --convert-to pdf ${d}/084.pptx`, `soffice --headless --convert-to pdf --outdir /tmp ${d}/084.pptx`,
-        `pdftoppm -jpeg ${d}/084.pdf /tmp/slide`, 'markitdown /etc/passwd',
+        `pdftoppm -jpeg ${d}/084.pdf /tmp/slide`,
       ])
         assert.equal(decision(call2('Bash', { command: bad })), 'deny', `pptx 계획 승인 뒤 허용 밖 명령을 열었습니다: ${bad}`);
+      // 업무 결과 폴더를 건드리지 않는 명령은 계획과 상관없이 막지 않는다 (2026-10-21) · 클로드 자체 권한이 묻는다
+      for (const free of ['node deck.js', 'node /tmp/deck.js', 'markitdown /etc/passwd', `python3 "${cache}/pptx/scripts/office/validate.py" /tmp/a.pptx`])
+        assert.equal(decision(call2('Bash', { command: free })), 'none', `업무 스킬 일이 아닌 명령을 막았습니다: ${free}`);
       // 거부 안내 · 공식 스킬을 부르고 그 스킬이 시키는 스크립트는 outputs 안에 써서 실행한다
       {
-        const msg = JSON.parse(call2('Bash', { command: 'node deck.js' }).stdout).hookSpecificOutput.permissionDecisionReason;
+        const msg = JSON.parse(call2('Bash', { command: `cd ${d} && node deck.js` }).stdout).hookSpecificOutput.permissionDecisionReason;
         assert.match(msg, /공식 문서 스킬\(document-skills:pptx 등\)을 Skill 로 부르고, 그 스킬이 시키는 스크립트[^·]*outputs 안에 Write 로 써서 실행합니다/, msg);
         assert.doesNotMatch(msg, /코드를 짜지 않습니다/, '거부 안내가 공식 스킬이 시키는 스크립트 작성을 막습니다.');
       }
@@ -576,25 +584,28 @@ try {
       W([active, row('user', '마케팅팀 업무 시작하자')]);
       for (const s of ['ai-marketer', 'marketing-team:ai-marketer', 'marketing-team-setup', 'marketing-team:marketing-team-tasks'])
         assert.equal(decision(call2('Skill', { skill: s })), 'none', `승인 전 진입 스킬 호출을 막았습니다: ${s}`);
-      assert.equal(decision(call2('Skill', { skill: 'dataviz' })), 'deny', '승인 전 다른 스킬 호출을 허용했습니다.');
+      // 계획이 나오기 전의 다른 스킬은 업무 스킬 일이 아니다 (2026-10-21) · 계획이 나온 뒤에는 계획 형식을 따른다
+      assert.equal(decision(call2('Skill', { skill: 'dataviz' })), 'none', '계획 전 다른 스킬 호출을 막았습니다.');
+      W([active, pptxPlan]);
+      assert.equal(decision(call2('Skill', { skill: 'dataviz' })), 'deny', '계획 승인 전 다른 스킬 호출을 허용했습니다.');
 
       // ② 스킬 본문(isMeta)·압축 요약(isCompactSummary)은 사람 말이 아니다 · 승인을 풀지 않는다
       const meta = JSON.stringify({ isMeta: true, message: { role: 'user', content: [{ type: 'text', text: 'Base directory for this skill\n직접 답하지 말고 · 취소 · 아직' }] } });
       const compact = JSON.stringify({ isCompactSummary: true, message: { role: 'user', content: 'This session is being continued ... 보류 · 아직 · 취소' } });
       W([active, p, row('user', '진행 승인'), meta, compact]);
-      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'none',
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'none',
         '스킬 본문·압축 요약 속 낱말이 승인을 풀었습니다.');
       W([active, p, row('user', '진행 승인'), row('user', '아니 취소할게요')]);
-      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'deny',
         '사람이 친 취소는 여전히 승인을 풀어야 합니다.');
       // 하위 에이전트 완료 알림·시스템 알림도 role:user 로 온다 · 알림 속 「아직」이 승인을 풀었다 (실측 2026-10-14)
       const notice = row('user', '<task-notification>\n<task-id>a1</task-id>\n<status>completed</status>\n<result>검토가 아직 한 건 남았습니다 · 보류 · 취소</result>\n</task-notification>');
       const reminder = JSON.stringify({ message: { role: 'user', content: '<system-reminder>\n아직 끝나지 않은 할 일이 있습니다 · 중단\n</system-reminder>' } });
       W([active, p, row('user', '진행 승인'), notice, reminder]);
-      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'none',
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'none',
         '하위 에이전트 완료 알림·시스템 알림 속 낱말이 승인을 풀었습니다.');
       W([active, p, notice, reminder]);
-      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', 'result.md') })), 'deny',
+      assert.equal(decision(call2('Write', { file_path: path.join(fresh, 'outputs', '2026-10-21', '043-meta-ad-copy', 'result.md') })), 'deny',
         '알림 행을 사람 승인으로 셌습니다.');
 
       // ③ 문장 승인은 있고 plan.json 봉인만 빠졌으면 재승인이 아니라 봉인을 알린다

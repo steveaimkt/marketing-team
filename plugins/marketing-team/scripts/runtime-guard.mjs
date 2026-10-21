@@ -348,6 +348,41 @@ function docBuildCommand(input, plan) {
   return false;
 }
 
+/**
+ * 이 호출이 100개 업무 스킬의 일인가 · 그렇다면 아래 계획·승인 절차를 탄다.
+ * ① 번호 결과 폴더(outputs/…/043-…)에 쓰거나 셸에서 그 경로를 다루는 것
+ * ② 플러그인 절차 스크립트(scripts/*.mjs)를 부르는 것
+ * ③ 책 실습 대본이 진행 중인 장 폴더에 쓰는 것
+ * ④ 이 대화에 [실행 계획]이 나온 뒤의 Skill 호출(문서 스킬은 계획 형식을 따라야 한다)
+ * plan.json 초안 쓰기도 ①에 든다 · 아래 절차가 승인 전에 따로 연다.
+ */
+function isSkillWork(input, cwd, rows) {
+  const base = path.resolve(cwd || process.cwd());
+  const numbered = rel => rel.split(/[\\/]/)[0] === 'outputs' && rel.split(/[\\/]/).slice(1).some(part => /^\d{3}-/.test(part));
+  if (['Write', 'Edit', 'NotebookEdit'].includes(input.tool_name)) {
+    const raw = input.tool_input?.file_path || input.tool_input?.notebook_path || input.tool_input?.path;
+    if (!raw) return true;
+    const target = path.resolve(base, String(raw));
+    if (/^plan(-\d+)?\.json$/.test(path.basename(target))) return true;
+    if (inside(base, target) && numbered(path.relative(base, target))) return true;
+    try { const r = replayActive(base); if (r && inside(r.folder, target)) return true; } catch { /* 무시 */ }
+    return false;
+  }
+  if (input.tool_name === 'Bash') {
+    const command = String(input.tool_input?.command || '');
+    if (/CLAUDE_PLUGIN_ROOT|scripts\/[\w-]+\.mjs/.test(command)) return true;
+    if (/outputs[\\/](?:[^\s"'\\/]+[\\/])*\d{3}-/.test(command)) return true;
+    // 회사 정보(brand)와 실적 원장(logs)을 지우거나 옮기는 명령은 계획과 승인을 거친다
+    if (/(?:^|[;&|]\s*)(?:sudo\s+)?(?:rm|mv)(?:\s[^;&|\n]*?)?[\s"'/](?:brand|logs)(?:[\\/]|["'\s]|$)/m.test(command)) return true;
+    return false;
+  }
+  if (input.tool_name === 'Skill') {
+    const name = String(input.tool_input?.skill || input.tool_input?.name || '');
+    return /\d{3}/.test(name) || rows.some(row => row.role === 'assistant' && PLAN_MARKER.test(row.text));
+  }
+  return true; // Agent·Task 는 예전대로
+}
+
 function isPlanDraftWrite(input) {
   if (!['Write', 'Edit'].includes(input.tool_name)) return false;
   const raw = input.tool_input?.file_path || input.tool_input?.path;
@@ -772,6 +807,12 @@ function planApproval(cwd, preferId) {
   const approval = approved(rows);
   const cwd = process.env.CLAUDE_PROJECT_DIR || input.cwd;
   const preferId = currentStepId(input);
+
+  // 업무 스킬 일이 아니면 계획·승인을 묻지 않는다 (사용자 지시 2026-10-21 「간단한 일도 오류가 생겨」).
+  // 메모 저장, 파일 정리, 다른 스킬·MCP 작업까지 「실행 계획 표식이 없습니다」로 막혀 오류로 보였다
+  // (실측 2026-10-21 · MCP실습폴더 메일 일정 HTML 저장 · 네이버광고실습 전용 스킬 python).
+  // 맥락 훅도 「자잘한 일은 바로 챙긴다」고 시킨다. 위의 보안 검사·영수증 보호·설치 금지는 그대로 지난다.
+  if (!isSkillWork(input, cwd, rows)) return;
 
   // 저위험 단일 업무는 사람 문장 없이 통과한다 (2026-09-07). 계획이 없으면 해당 없다.
   let autoPlan = null;

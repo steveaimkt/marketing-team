@@ -48,26 +48,26 @@ try {
   // 승인 + 재료 한 답 — 플랜 §13.4 의 정확한 사용례
   fs.writeFileSync(transcript, [active, plan,
     row('user', '진행 승인. 제품은 저자극 선크림이고 핵심 혜택은 자외선 차단')].join('\n') + '\n');
-  let r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  let r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
   assert.equal(decision(r), 'none', '승인 접두 뒤 재료가 붙은 답을 승인으로 인정하지 않는다.');
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인. 샘플로')].join('\n') + '\n');
-  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
   assert.equal(decision(r), 'none', '「진행 승인. 샘플로」를 승인으로 인정하지 않는다.');
   // 단독 「진행 승인」 — 승인 줄이 기본값으로 안내하는 경로 (사용자 지적 2026-09-01)
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인')].join('\n') + '\n');
-  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
   assert.equal(decision(r), 'none', '단독 「진행 승인」을 승인으로 인정하지 않는다 — 기본값 경로가 막힌다.');
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인 보류할게')].join('\n') + '\n');
-  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
   assert.equal(decision(r), 'deny', '보류를 승인으로 오인했다.');
   // 부정·철회 (작동 검토 2026-09-22 #3)
   for (const t of ['진행 승인하지 마세요', '진행 승인합니다. 아니, 취소할게요']) {
     fs.writeFileSync(transcript, [active, plan, row('user', t)].join('\n') + '\n');
-    r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+    r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
     assert.equal(decision(r), 'deny', `「${t}」를 승인으로 오인했다.`);
   }
   fs.writeFileSync(transcript, [active, plan, row('user', '진행 승인'), row('user', '잠깐, 취소해줘')].join('\n') + '\n');
-  r = call('Write', { file_path: path.join(temp, 'outputs', 'copy.md') });
+  r = call('Write', { file_path: path.join(temp, 'outputs', '2026-10-21', '043-meta-ad-copy', 'copy.md') });
   assert.equal(decision(r), 'deny', '승인 뒤 철회했는데 승인이 남아 있다.');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
