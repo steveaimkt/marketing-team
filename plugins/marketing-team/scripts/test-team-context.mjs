@@ -9,6 +9,13 @@ import { fileURLToPath } from 'node:url';
 import { profileState } from './plan-compiler.mjs';
 
 const SCRIPT = path.join(path.dirname(fileURLToPath(import.meta.url)), 'team-context.mjs');
+// 구축한 작업 폴더에는 brand/profile.md 가 있다 · 테스트 폴더도 그 모양으로 만든다 (2026-10-21)
+const PROFILE = path.resolve(path.dirname(SCRIPT), '..', 'brand-templates', 'profile.md');
+const built = dir => {
+  const p = path.join(dir, 'brand', 'profile.md');
+  if (fs.existsSync(path.join(dir, 'outputs')) && !fs.existsSync(p)) { fs.mkdirSync(path.dirname(p), { recursive: true }); fs.copyFileSync(PROFILE, p); }
+  return dir;
+};
 const run = dir => spawnSync(process.execPath, [SCRIPT], {
   input: JSON.stringify({ hook_event_name: 'SessionStart', source: 'compact', cwd: dir }),
   encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
@@ -21,6 +28,8 @@ try {
 
   const ws = path.join(temp, 'ws'); fs.mkdirSync(path.join(ws, 'outputs'), { recursive: true });
   r = run(ws);
+  assert.equal(r.stdout.trim(), '', '구축하지 않은 폴더(outputs 만 있음)에 끼어들었다');
+  r = run(built(ws));
   const out = JSON.parse(r.stdout).hookSpecificOutput;
   assert.equal(out.hookEventName, 'SessionStart');
   for (const word of ['마케팅 팀원인 AI 마케터', 'ai-marketer 스킬을 연다', '트리거 문구와 달라도', '첫 줄에 무엇으로 하는지', 'plan.json 과 run.json', '첫 답을 하기 전에'])
@@ -34,7 +43,7 @@ try {
 
   // UserPromptSubmit · 말을 거는 순간 AI 마케터가 답한다 (사용자 지시 2026-09-24)
   const say = (dir, prompt, transcript) => spawnSync(process.execPath, [SCRIPT], {
-    input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt, cwd: dir, transcript_path: transcript }),
+    input: JSON.stringify({ hook_event_name: 'UserPromptSubmit', prompt, cwd: built(dir), transcript_path: transcript }),
     encoding: 'utf8', env: { ...process.env, CLAUDE_PROJECT_DIR: dir },
   });
   const fresh = path.join(temp, 'fresh.jsonl'); fs.writeFileSync(fresh, '{"type":"user","message":{"role":"user","content":"안녕"}}\n');

@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { isMarketingWorkspace } from './team-context.mjs';
 import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills, slotOf, slotName, sealedRun, nextSlot } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
@@ -582,11 +583,12 @@ async function main() {
   const rows = transcriptRows(input.transcript_path);
   if (!isActive(rows, rawTranscript)) return;
 
-  // 플러그인 개발 저장소(marketplace.json 이 있는 곳)에서는 실행 보호를 걸지 않는다 —
-  // 이 가드는 사용자 마케팅 작업 공간을 위한 것이다. 스킬 경로를 언급만 해도 무장되는 탓에
-  // 자기 소스 유지보수(패치·커밋)까지 잠겼다 (실측 2026-08-30 · 편집 6건 전부 거부).
-  const devRoot = process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd();
-  try { if (fs.existsSync(path.join(devRoot, '.claude-plugin', 'marketplace.json'))) return; } catch { /* 무시 */ }
+  // 구축한 작업 폴더(brand/profile.md 가 있는 곳)에서만 실행 보호를 건다. 플러그인은 사용자 전체로
+  // 설치되고, 스킬 경로를 언급만 해도 무장되는 탓에 다른 폴더의 일까지 잠갔다
+  // (실측 2026-08-30 개발 저장소 편집 6건 거부 · 사용자 지시 2026-10-21 「설치하는 폴더에만 권한」).
+  // 플러그인 개발 저장소(marketplace.json 이 있는 곳)도 isMarketingWorkspace 가 뺀다.
+  const projectDir = path.resolve(process.env.CLAUDE_PROJECT_DIR || input.cwd || process.cwd());
+  if (!isMarketingWorkspace(projectDir)) return;
 
   if (input.hook_event_name === 'Stop') {
     if (input.stop_hook_active) return;

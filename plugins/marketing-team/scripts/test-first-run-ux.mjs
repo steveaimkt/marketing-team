@@ -30,6 +30,9 @@ for (const [anchor, why] of [
 const GUARD = path.join(HERE, 'runtime-guard.mjs');
 const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-first-run-'));
 const transcript = path.join(temp, 'session.jsonl');
+// 구축한 작업 폴더에서만 실행 보호가 켜진다 (2026-10-21) · 「마케팅 팀 구축하자」가 만드는 프로필을 둔다
+fs.mkdirSync(path.join(temp, 'brand'));
+fs.copyFileSync(path.join(ROOT, 'brand-templates', 'profile.md'), path.join(temp, 'brand', 'profile.md'));
 const row = (role, text) => JSON.stringify({ message: { role, content: [{ type: 'text', text }] } });
 const call = (tool_name, tool_input = {}) => spawnSync(process.execPath, [GUARD], {
   input: JSON.stringify({ hook_event_name: 'PreToolUse', session_id: 't', transcript_path: transcript,

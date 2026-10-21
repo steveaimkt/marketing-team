@@ -38,6 +38,14 @@ try {
   assert.equal(decision(devResult), 'none', '개발 저장소에서 소스 편집을 잠갔습니다.');
   fs.rmSync(path.join(temp, '.claude-plugin'), { recursive: true, force: true });
 
+  // ③ 구축하지 않은 폴더 (2026-10-21 「설치하는 폴더에만 권한」) · AI 마케터 표식이 있어도 막지 않는다
+  writeTranscript([row('user', '# 마케팅 AI 마케터\n/skills/ai-marketer/SKILL.md'), row('user', '광고 예산 다시 짜줘')]);
+  fs.mkdirSync(path.join(temp, 'outputs'), { recursive: true });
+  assert.equal(decision(call('Write', { file_path: path.join(temp, 'src', 'app.js') })), 'none', '구축하지 않은 폴더까지 막았습니다 (outputs 만 있음).');
+  assert.equal(decision(call('Bash', { command: 'node analysis.mjs' })), 'none', '구축하지 않은 폴더의 명령까지 막았습니다.');
+  fs.mkdirSync(path.join(temp, 'brand'), { recursive: true });
+  fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(temp, 'brand', 'profile.md'));
+
   const active = row('user', '# 마케팅 AI 마케터\n/skills/ai-marketer/SKILL.md');
   writeTranscript([active, row('user', '광고 예산 다시 짜줘')]);
   result = call('Bash', { command: 'node analysis.mjs' });
@@ -472,6 +480,7 @@ try {
   // 작동 검토 2026-09-22 #1·#2 · 빈 작업 폴더에서 새로 본다 (앞 검사가 남긴 계획이 끼지 않게)
   {
     const fresh = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-guard-review-'));
+    fs.mkdirSync(path.join(fresh, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(fresh, 'brand', 'profile.md'));
     const tr = path.join(fresh, 's.jsonl');
     const call2 = (tool_name, tool_input) => spawnSync(process.execPath, [SCRIPT], {
       input: JSON.stringify({ hook_event_name: 'PreToolUse', session_id: 'r', transcript_path: tr, cwd: fresh, tool_name, tool_input }),
@@ -612,6 +621,7 @@ try {
   // Stop · 계획 화면은 점검을 통과한 그대로, text 상자 안에 (실측 2026-10-12 · 맥미니 006 · 상자 없이 두 번)
   {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-stop-'));
+    fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
     try {
       const T = path.join(ws, 'session.jsonl');
       const stop = (last, extra = {}) => {
@@ -652,6 +662,7 @@ try {
   // 책 실습 · 원고 결과를 놓기 전에는 결과 파일을 지어 쓰지 못한다 (실측 2026-10-12 · 맥미니 · book 을 건너뜀)
   {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-bookguard-'));
+    fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
     try {
       const T = path.join(ws, 'session.jsonl');
       fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
@@ -685,6 +696,7 @@ try {
   // 책 실습 대본 · 여러 턴 장(10장) · 턴마다 원고 파일 · 진행 중에는 지어 쓰지 못함 · 원고에 없는 말이면 끝 (2026-10-12)
   {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-replay-'));
+    fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
     try {
       const T = path.join(ws, 'session.jsonl');
       fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
@@ -723,6 +735,7 @@ try {
   // 계획 없이 첫 말로 시작하는 대본(13장) · 프로필을 채우면 돌지 않는다
   {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-opening-'));
+    fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
     try {
       fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.mkdirSync(path.join(ws, 'outputs'));
       fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
@@ -757,6 +770,7 @@ try {
   // 스킬 하나짜리 책 실습도 응답 끝에 원고 화면을 냈는지 본다 (실측 2026-10-12 · 002 가 「발행 보류」를 내고 통과)
   {
     const ws = fs.mkdtempSync(path.join(os.tmpdir(), 'marketing-bookstop-'));
+    fs.mkdirSync(path.join(ws, 'brand'), { recursive: true }); fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));
     try {
       fs.mkdirSync(path.join(ws, 'brand'), { recursive: true });
       fs.copyFileSync(path.join(pluginRoot, 'brand-templates', 'profile.md'), path.join(ws, 'brand', 'profile.md'));

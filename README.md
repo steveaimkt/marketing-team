@@ -142,12 +142,15 @@ AI 규제검토자는 **법에 저촉되는지**, AI 사업검토자는 **사업
 
 ### 클로드 코드
 
+작업 폴더로 옮겨 가서 설치한다. `--scope project` 를 붙이면 **이 폴더에서만** 플러그인이 켜진다.
+
 ```bash
-claude plugin marketplace add steveaimkt/marketing-team
-claude plugin install marketing-team@marketing-team
+cd {작업 폴더}
+claude plugin marketplace add steveaimkt/marketing-team --scope project
+claude plugin install marketing-team@marketing-team --scope project
 ```
 
-작업 폴더에서 `claude` 를 실행하고 `/marketing-team-setup 마케팅 팀 구축하자` 를 입력한다. 폴더째 여는 방식(고급)은 [CONTRIBUTING.md](CONTRIBUTING.md) 에 있다.
+같은 폴더에서 `claude` 를 실행하고 `/marketing-team-setup 마케팅 팀 구축하자` 를 입력한다. 다른 폴더에서도 쓰려면 그 폴더에서 설치 명령을 한 번 더 돌린다. 폴더째 여는 방식(고급)은 [CONTRIBUTING.md](CONTRIBUTING.md) 에 있다.
 
 > **업데이트.** 데스크톱 앱은 「Sync automatically」를 켜 두면 새 버전이 알아서 들어온다. 바로 받으려면 마켓플레이스에서 「Check for updates」를 누른 뒤 **새 대화를 연다.**
 
@@ -404,6 +407,8 @@ claude plugin install marketing-team@marketing-team
   outputs/   결과물이 날짜별로 쌓이는 곳
   logs/      build-log.md (실적 원장)
 ```
+
+**마케팅 팀은 구축한 폴더에서만 일한다.** 데스크톱 앱은 플러그인을 계정 전체에 설치하지만, AI 마케터가 팀원으로 답하는 일과 실행 전 승인, 저장 경로 확인은 「마케팅 팀 구축하자」를 마친 폴더(`brand/profile.md` 가 있는 곳)에서만 켜진다. 다른 폴더의 코딩이나 문서 작업에는 끼어들지 않는다.
 
 ⚠️ 작업 폴더를 여러 개 두면 결과물도 폴더마다 나뉘어 저장된다. 어제 만든 결과물이 보이지 않으면 **지금 열린 폴더가 맞는지** 먼저 확인한다.
 

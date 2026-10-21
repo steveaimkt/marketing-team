@@ -12,8 +12,10 @@
  *   한 번 열렸으면(압축 뒤에도 스킬은 다시 붙는다) 아무것도 내지 않는다. 매번 다시 열면 컨텍스트만 불어난다.
  *   「/」로 시작하는 명령은 사용자가 이미 스킬을 고른 것이라 건드리지 않는다.
  *
- * 켜는 조건 · 작업 폴더에 brand · outputs · logs · inputs 중 하나가 있을 때만.
- *   다른 작업(코딩 등)에는 끼어들지 않는다. 플러그인 개발 저장소에서도 켜지 않는다.
+ * 켜는 조건 · 「마케팅 팀 구축하자」를 마친 작업 폴더(brand/profile.md 가 있는 곳)에서만.
+ *   플러그인은 사용자 전체로 설치되므로 훅은 모든 폴더에서 불린다. 구축한 폴더 밖에는 끼어들지 않는다
+ *   (사용자 지시 2026-10-21 「설치하는 폴더에만 권한」 · 전에는 logs·inputs 폴더만 있어도 켜졌다).
+ *   플러그인 개발 저장소에서도 켜지 않는다.
  *   못 읽거나 조건이 안 맞으면 아무것도 내지 않는다. 훅이 세션을 막는 일은 없다.
  */
 import fs from 'node:fs';
@@ -21,7 +23,6 @@ import path from 'node:path';
 import process from 'node:process';
 import { replayStep } from './plan-compiler.mjs';
 
-const ROOTS = ['brand', 'outputs', 'logs', 'inputs'];
 
 export const TEAM_CONTEXT = `이 작업 폴더는 사용자의 마케팅 팀 공간이다. 이 대화에서 너는 사용자의 마케팅 팀원인 AI 마케터다.
 - 이 대화의 첫 답을 하기 전에 ai-marketer 스킬을 연다. 인사나 짧은 질문이어도, 트리거 문구와 달라도 같다.
@@ -40,9 +41,7 @@ export function isMarketingWorkspace(dir) {
   if (!dir) return false;
   try {
     if (fs.existsSync(path.join(dir, '.claude-plugin', 'marketplace.json'))) return false; // 플러그인 개발 저장소
-    return ROOTS.some(name => {
-      try { return fs.statSync(path.join(dir, name)).isDirectory(); } catch { return false; }
-    });
+    return fs.statSync(path.join(dir, 'brand', 'profile.md')).isFile();
   } catch { return false; }
 }
 
