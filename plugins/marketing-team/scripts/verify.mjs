@@ -1608,7 +1608,7 @@ for (const link of ['agents', 'skills']) {
     if (!sales.includes(word)) missing.push(`061 요일 보정의 「${word}」`);
   for (const word of ['실행별 임의 대체키', '무염 SHA-256', '설명용 예시'])
     if (!rfm.includes(word)) missing.push(`065 ID 보호의 「${word}」`);
-  for (const word of ['회사 자료가 없어 연습용 자료를 사용했습니다', '원문 식별자'])
+  for (const word of ['연습용 자료로 검토했습니다', '실무에서는 샘플 자료로 판단하지 않는다', '판단 보류', '원문 식별자'])
     if (!reviewer.includes(word)) missing.push(`사업검토자 쉬운말·식별자 점검의 「${word}」`);
   if (!common.includes('[자료 충돌]') || !common.includes('교차 계산 금지'))
     missing.push('공통규약의 [자료 충돌]·교차 계산 금지');
