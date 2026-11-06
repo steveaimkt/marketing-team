@@ -8,20 +8,20 @@
 - 제품 일관성: 13번(제품 3종) 이미지를 먼저 만들고 나머지 제품 칸의 참고 이미지로 넣었습니다
 - 모든 이미지에 글자를 넣지 않도록 지시했습니다. 커버 글자와 가격 띠는 편집 도구에서 얹습니다
 - 미리보기: `031-instagram-feed-planning-grid.html` (같은 폴더 `images/`의 파일을 불러와 인터넷 없이 열림)
-- 파일: `images/` 9장 · PNG 896×1120
+- 파일: `images/` 9장 · JPG 896×1120
 
 ## 9칸
 | 칸 | 날짜 | 주제 | 모델 | 작업 번호 | 파일 |
 |---|---|---|---|---|---|
-| 15 | 10/29 | 3스텝 세트 구성과 가격 | - | 72f3e485-e908-42e8-adae-31201246c170 | [파일](images/10-29_칸15_세트구성.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_72f3e485-e908-42e8-adae-31201246c170.png) |
-| 14 | 10/27 | 성분 질문 받고 영상으로 답하기 | - | 1d266f1c-7cdc-4d02-aa6a-0dd954cb759d | [파일](images/10-27_칸14_성분질문_배경.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114919_1d266f1c-7cdc-4d02-aa6a-0dd954cb759d.png) |
-| 13 | 10/25 | 3종에서 뺀 것만 모아 보기 | - | d1d7636d-7648-4ab0-8a73-8d4baaf3f5be | [파일](images/10-25_칸13_제품3종.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_113351_d1d7636d-7648-4ab0-8a73-8d4baaf3f5be.png) |
-| 12 | 10/23 | 개봉일, 뚜껑에 적어 두기 | 모델 | 438f065a-9c61-4e7a-a06e-36a5ba0ca7e4 | [파일](images/10-23_칸12_개봉일_모델.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114919_438f065a-9c61-4e7a-a06e-36a5ba0ca7e4.png) |
-| 11 | 10/21 | 피부 자극 인체적용시험은 무엇을 확인하나 | - | 35515a3d-c683-4c18-9263-56be9e4f0612 | [파일](images/10-21_칸11_자극시험.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_35515a3d-c683-4c18-9263-56be9e4f0612.png) |
-| 10 | 10/19 | 리뷰 한 줄 · 「끈적임 없이 잘 스며듭니다」 | - | 0e84633b-efa3-4db3-8d1b-d3379364ff8a | [파일](images/10-19_칸10_리뷰카드_배경.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114838_0e84633b-efa3-4db3-8d1b-d3379364ff8a.png) |
-| 9 | 10/17 | 클렌징 밤이 오일 → 밀크로 바뀌는 순간 | 손(모델) | 67b8efdf-0b36-475d-a029-0852e271e1be | [파일](images/10-17_칸9_클렌징밤_모델손.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114838_67b8efdf-0b36-475d-a029-0852e271e1be.png) |
-| 8 | 10/15 | 새 제품 바르고 따가울 때 먼저 할 3가지 | - | bdccb027-64ca-4a14-83d8-8df66fa9adc4 | [파일](images/10-15_칸8_따가울때_배경.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_bdccb027-64ca-4a14-83d8-8df66fa9adc4.png) |
-| 7 | 10/13 | 두 통 써도 달라진 걸 모르겠다면 | 손(모델) | 06f00270-a9c6-45ab-8348-c6e2b8e5c5cc | [파일](images/10-13_칸7_빈세럼두병_모델손.png) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_06f00270-a9c6-45ab-8348-c6e2b8e5c5cc.png) |
+| 15 | 10/29 | 3스텝 세트 구성과 가격 | - | 72f3e485-e908-42e8-adae-31201246c170 | [파일](images/10-29_칸15_세트구성.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_72f3e485-e908-42e8-adae-31201246c170.png) |
+| 14 | 10/27 | 성분 질문 받고 영상으로 답하기 | - | 1d266f1c-7cdc-4d02-aa6a-0dd954cb759d | [파일](images/10-27_칸14_성분질문_배경.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114919_1d266f1c-7cdc-4d02-aa6a-0dd954cb759d.png) |
+| 13 | 10/25 | 3종에서 뺀 것만 모아 보기 | - | d1d7636d-7648-4ab0-8a73-8d4baaf3f5be | [파일](images/10-25_칸13_제품3종.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_113351_d1d7636d-7648-4ab0-8a73-8d4baaf3f5be.png) |
+| 12 | 10/23 | 개봉일, 뚜껑에 적어 두기 | 모델 | 438f065a-9c61-4e7a-a06e-36a5ba0ca7e4 | [파일](images/10-23_칸12_개봉일_모델.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114919_438f065a-9c61-4e7a-a06e-36a5ba0ca7e4.png) |
+| 11 | 10/21 | 피부 자극 인체적용시험은 무엇을 확인하나 | - | 35515a3d-c683-4c18-9263-56be9e4f0612 | [파일](images/10-21_칸11_자극시험.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_35515a3d-c683-4c18-9263-56be9e4f0612.png) |
+| 10 | 10/19 | 리뷰 한 줄 · 「끈적임 없이 잘 스며듭니다」 | - | 0e84633b-efa3-4db3-8d1b-d3379364ff8a | [파일](images/10-19_칸10_리뷰카드_배경.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114838_0e84633b-efa3-4db3-8d1b-d3379364ff8a.png) |
+| 9 | 10/17 | 클렌징 밤이 오일 → 밀크로 바뀌는 순간 | 손(모델) | 67b8efdf-0b36-475d-a029-0852e271e1be | [파일](images/10-17_칸9_클렌징밤_모델손.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114838_67b8efdf-0b36-475d-a029-0852e271e1be.png) |
+| 8 | 10/15 | 새 제품 바르고 따가울 때 먼저 할 3가지 | - | bdccb027-64ca-4a14-83d8-8df66fa9adc4 | [파일](images/10-15_칸8_따가울때_배경.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_bdccb027-64ca-4a14-83d8-8df66fa9adc4.png) |
+| 7 | 10/13 | 두 통 써도 달라진 걸 모르겠다면 | 손(모델) | 06f00270-a9c6-45ab-8348-c6e2b8e5c5cc | [파일](images/10-13_칸7_빈세럼두병_모델손.jpg) · [원본](https://d8j0ntlcm91z4.cloudfront.net/user_3D6KNZ6kIMu4NGbzgCZUivtFFG6/hf_20260916_114837_06f00270-a9c6-45ab-8348-c6e2b8e5c5cc.png) |
 
 12·14번은 첫 요청이 생성량 제한(429)에 걸려 같은 프롬프트로 한 번 더 보냈습니다.
 

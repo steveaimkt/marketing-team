@@ -24,7 +24,6 @@ description: |
   "지금까지 뭘 얼마나 했는지 정리해줘"
 
   ⛔ 「업무 리스트 보여줘」는 `marketing-team-tasks`, 「구축하자」는 `marketing-team-setup`.
-  결과물이 나오는 요청은 전부 여기서 받는다.
 ---
 
 # 마케팅 AI 마케터

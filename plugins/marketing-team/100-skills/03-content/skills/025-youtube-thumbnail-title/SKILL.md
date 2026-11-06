@@ -61,7 +61,7 @@ success_metrics: [썸네일 CTR, 제목 후보 산출 개수(10안), 후보 제�
 ```
 
 ⛔ **개수와 대상을 함께 묻는다.** 「만들까요?」만 묻지 않는다.
-⛔ **도구가 없으면 프롬프트까지가 끝이다.** 그것도 완주다 — 못 만들었다고 적지 않는다.
+⛔ **도구가 없으면 프롬프트까지가 끝이다.** 그것도 완주다. 못 만들었다고 적지 않는다.
 
 정본은 `docs/공통규약.md §H` 「이미지는 한 겹 더 멈춘다」.
 
@@ -104,7 +104,7 @@ success_metrics: [썸네일 CTR, 제목 후보 산출 개수(10안), 후보 제�
 > 아티팩트·스크래치패드·화면 출력은 착지가 아니다. **파일이 없으면 안 한 것이다.**
 >
 > 🔴 **`.docx` 는 우리가 직접 만들지 않는다.** 내용은 여기서 만들고 **파일로 바꾸는 일만 앤트로픽 공식
-> `document-skills` 의 docx 스킬**에 넘긴다. 안 깔려 있으면 **`.md` 로 내고 그렇게 말한다** — 이
+> `document-skills` 의 docx 스킬**에 넘긴다. 안 깔려 있으면 **`.md` 로 내고 그렇게 말한다**. 이
 > 스킬은 `.md` 를 따로 안 만들므로, 안 깔려 있을 땐 `025-youtube-thumbnail-title.docx` 대신
 > `025-youtube-thumbnail-title.md` 로 같은 내용을 낸다. 설치 명령은 `/plugin marketplace add
 > anthropics/skills`, `/plugin install document-skills@anthropic-agent-skills` 이다.
