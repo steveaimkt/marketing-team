@@ -14,6 +14,7 @@
 <p align="center">
   <a href="#설치">설치</a> ·
   <a href="#할-수-있는-일-100가지">할 수 있는 일 100가지</a> ·
+  <a href="#책으로-배우기">책</a> ·
   <a href="plugins/marketing-team/100-skills/ROUTING.md">전체 명부</a> ·
   <a href="plugins/marketing-team/100-skills/CHAINS.md">체인</a> ·
   <a href="CONTRIBUTING.md">기여</a> ·
@@ -45,6 +46,16 @@
 팀 단위로 맡기려면 → **「브랜드 마케팅 팀 업무 시작하자」** (콘텐츠, 퍼포먼스, 그로스도 같은 형식이다)
 
 스킬 번호나 이름은 외울 필요가 없다. 사용자가 하고 싶은 일을 평소 말로 입력하면 AI 마케터가 알맞은 스킬을 찾아 실행한다.
+
+## 책으로 배우기
+
+이 저장소를 쓰는 방법을 책 『퇴근을 앞당기는 AI 마케팅 자동화 with 클로드』(한빛미디어, 2026년 11월)로 냈다.
+설치부터 스킬 100개를 실제 업무에 쓰는 과정까지 장마다 실습으로 따라 할 수 있다.
+
+- **책 실습은 이 저장소 그대로 돈다.** 실습에 쓰는 A브랜드 샘플 자료와 이미지가 플러그인에 들어 있어, 회사 자료가 없어도 책과 같은 결과를 볼 수 있다.
+- **책과 화면이 다르면 저장소가 최신이다.** 클로드와 플러그인은 계속 업데이트된다. 설치 방법이나 메뉴 이름이 책과 다르면 이 README의 [설치](#설치)를 따른다.
+
+구매 → [알라딘](https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=405946877), [예스24](https://www.yes24.com/product/goods/199803766), [교보문고](https://product.kyobobook.co.kr/detail/S000221846958)
 
 ## 무엇이 다른가
 
@@ -428,6 +439,6 @@ claude plugin install marketing-team@marketing-team --scope project
 ---
 
 <p align="center">
-  <sub><a href="https://github.com/steveaimkt">WMBB</a> 한성국이 만들었다 · 『퇴근을 앞당기는 AI 마케팅 자동화』의 실습 플러그인</sub><br>
+  <sub><a href="https://github.com/steveaimkt">WMBB</a> 한성국이 만들었다 · 『퇴근을 앞당기는 AI 마케팅 자동화 with 클로드』(한빛미디어) 실습 플러그인</sub><br>
   <sub>MIT · <a href="LICENSE">LICENSE</a></sub>
 </p>
