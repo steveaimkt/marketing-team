@@ -485,10 +485,26 @@ try {
     // 2단계 산출물만 고치면 그것을 먹는 4단계만 되돌아간다 (3단계는 073을 안 먹는다)
     fs.writeFileSync(path.join(dir, '073-customer-journey-map.md'), '073 수정\n');
     const again = run('resume', rj);
-    assert.match(again.stdout, /되돌린 단계: 4/, '바뀐 앞 산출물을 먹는 단계만 되돌려야 한다');
+    assert.match(again.stdout, /되돌렸습니다: 4/, '바뀐 앞 산출물을 먹는 단계만 되돌려야 한다');
     const after = JSON.parse(fs.readFileSync(path.join(temp, rj), 'utf8'));
     assert.equal(after.steps.find(x => x.step === 3).status, 'completed', '무관한 단계까지 지우면 안 된다');
     assert.equal(after.steps.find(x => x.step === 4).status, 'pending');
+
+    // 원본 입력이 바뀌면 그것을 먹는 단계(3)와 그 산출물을 먹는 단계(4)만 되돌린다
+    // 실측 2026-11-11 · 1단계처럼 앞 산출물을 안 먹는 단계는 원본이 바뀌어도 resume 이 몰랐다
+    run('step-start', rj, '--step', '4'); make[4](); run('step-done', rj, '--step', '4');
+    const sealed = JSON.parse(fs.readFileSync(path.join(temp, rj), 'utf8'));
+    const 고객 = sealed.inputs.find(x => x.path.endsWith('고객마스터.csv'));
+    const real = 고객.sha256;
+    고객.sha256 = '0'.repeat(64); // start 뒤에 원본이 바뀐 것과 같다
+    fs.writeFileSync(path.join(temp, rj), `${JSON.stringify(sealed, null, 2)}\n`);
+    const changed = run('resume', rj);
+    assert.match(changed.stdout, /원본 입력이 바뀌었습니다/, '원본 변경을 알려야 한다');
+    assert.match(changed.stdout, /되돌렸습니다: 3 · 4/, '바뀐 원본을 먹는 단계와 그 뒤 의존 단계만 되돌려야 한다');
+    const reopened = JSON.parse(fs.readFileSync(path.join(temp, rj), 'utf8'));
+    for (const n of [1, 2]) assert.equal(reopened.steps.find(x => x.step === n).status, 'completed', '원본과 무관한 단계는 그대로 둔다');
+    assert.equal(reopened.inputs.find(x => x.path.endsWith('고객마스터.csv')).sha256, real, '다시 만들 것이므로 새 지문으로 다시 봉인한다');
+    assert.match(changed.stdout, /단계 3/, '3단계부터 재개해야 한다');
   }
 
   // 이름 있는 체인 · 스킬마다 자기 폴더, run.json 이 있는 프로젝트 폴더 아래 나란히 둔다

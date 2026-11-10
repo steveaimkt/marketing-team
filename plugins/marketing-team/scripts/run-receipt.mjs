@@ -918,35 +918,70 @@ async function stepDone(file, args) {
   console.log(`✅ 단계 ${n} 완료 · 스킬 ${target.skill} · 남은 단계 ${left}`);
 }
 
-/** 완료한 단계 중 먹은 앞 산출물이 바뀐 것을 찾아 그 뒤를 전부 되돌린다 */
+/** 같은 파일인지 · 계획의 inputs 와 run.json 의 inputs 는 적는 모양이 다를 수 있다 */
+function sameRef(a, b) {
+  if (a === b) return true;
+  try { return resolveRef(a).abs === resolveRef(b).abs; } catch { return false; }
+}
+
+/**
+ * 바뀐 자료를 실제로 먹는 단계와, 그 단계의 산출물을 먹는 뒤 단계만 되돌린다.
+ * 바뀐 자료 = 완료 단계가 먹은 앞 산출물 · 또는 start 때 봉인한 원본 입력.
+ * 실측 2026-11-11 · 1단계 분석은 앞 산출물을 먹지 않아 리뷰 원본을 바꿔도 resume 이
+ * 되돌리지 못했다. finalize 에서야 「실행 뒤 바뀐 입력」으로 막혀 끝까지 돈 시간이 버려졌다.
+ */
 async function resume(file) {
   const run = readJson(file);
   const steps = stepsOf(run);
-  let invalidFrom = null;
-  for (const [index, step] of steps.entries()) {
-    if (step.status !== 'completed') continue;
-    for (const [ref, was] of Object.entries(step.consumed || {})) {
-      const now = await currentHash(ref);
-      if (now !== was) { invalidFrom = invalidFrom ?? index; break; }
-    }
-    if (invalidFrom !== null) break;
+
+  // ① 원본 입력 · 지문이 달라진 것
+  const changedInputs = [];
+  const missingInputs = [];
+  for (const item of run.inputs || []) {
+    if (!item.sha256) continue;
+    const now = await currentHash(item.path);
+    if (!now) missingInputs.push(item.path);
+    else if (now !== item.sha256) changedInputs.push({ item, now });
   }
-  const undone = [];
-  if (invalidFrom !== null) {
-    for (let i = invalidFrom; i < steps.length; i++) {
-      if (steps[i].status === 'completed') undone.push(steps[i].step);
-      steps[i].status = 'pending';
-      steps[i].consumed = {};
-      steps[i].started_at = null;
-      steps[i].completed_at = null;
+  if (missingInputs.length) fail(`원본 입력 파일이 없습니다: ${missingInputs.join(' · ')} · 파일을 되돌리거나 새 실행으로 시작하세요.`);
+
+  // ② 영향 단계 · 앞에서 뒤로 한 번 훑으면 의존이 전파된다
+  const dirty = new Set();
+  const dirtyOutputs = [];
+  // 어느 단계도 이름으로 적지 않은 입력이 바뀌면 누가 먹었는지 모른다 · 전부 되돌린다
+  const orphan = changedInputs.some(({ item }) => !steps.some(step => (step.inputs || []).some(ref => sameRef(ref, item.path))));
+  for (const step of steps) {
+    let hit = orphan;
+    if (!hit) hit = changedInputs.some(({ item }) => (step.inputs || []).some(ref => sameRef(ref, item.path)));
+    if (!hit) hit = (step.inputs || []).some(ref => dirtyOutputs.some(out => sameRef(ref, out)));
+    if (!hit && step.status === 'completed') {
+      for (const [ref, was] of Object.entries(step.consumed || {})) {
+        if (await currentHash(ref) !== was) { hit = true; break; }
+      }
     }
+    if (hit) { dirty.add(step.step); dirtyOutputs.push(...(step.outputs || [])); }
+  }
+
+  const undone = [];
+  if (dirty.size || changedInputs.length) {
+    for (const step of steps) {
+      if (!dirty.has(step.step)) continue;
+      if (step.status === 'completed') undone.push(step.step);
+      step.status = 'pending';
+      step.consumed = {};
+      step.started_at = null;
+      step.completed_at = null;
+    }
+    // 바뀐 원본을 먹는 단계를 모두 다시 만들므로 새 지문으로 다시 봉인한다
+    for (const { item, now } of changedInputs) item.sha256 = now;
     run.status = 'running';
     run.completed_at = null;
     writeJson(file, run);
-    emit(file, run, 'run.resumed', { invalidated_steps: undone });
+    emit(file, run, 'run.resumed', { invalidated_steps: undone, changed_inputs: changedInputs.map(({ item }) => item.path) });
   }
   const next = steps.find(item => item.status !== 'completed');
-  if (undone.length) console.log(`🟡 앞 산출물이 바뀌어 되돌린 단계: ${undone.join(' · ')}`);
+  if (changedInputs.length) console.log(`🟡 원본 입력이 바뀌었습니다: ${changedInputs.map(({ item }) => item.path).join(' · ')}`);
+  if (undone.length) console.log(`🟡 바뀐 자료를 먹는 단계만 되돌렸습니다: ${undone.join(' · ')}`);
   if (!next) { console.log(`✅ 모든 단계 완료 · finalize 로 넘어가세요.`); return; }
   const done = steps.filter(item => item.status === 'completed').map(item => item.step);
   console.log(`▶ 재개 지점 · 단계 ${next.step} (스킬 ${next.skill})` +
