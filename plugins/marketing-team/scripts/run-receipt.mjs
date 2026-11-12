@@ -759,15 +759,31 @@ async function recordReview(file, args) {
       reviewed_at: iso(),
     };
     const key = reviewKey(row);
+    // 루프 멈춤 (2026-11-12) · 같은 산출물 · 같은 관점 검토를 몇 번째 하는지 센다.
+    // 예산(budget.review_rounds)을 넘긴 다음 검토는 사용자 답 없이 봉인하지 않는다.
+    // 고치고 다시 검토하는 반복이 사람 모르게 끝없이 도는 것을 막는다.
+    const prev = (run.reviews || []).find(item => reviewKey(item) === key);
+    row.round = prev ? (prev.round || 1) + 1 : 1;
+    const limit = Number(run.budget?.review_rounds || 0);
+    const label = `${kind}${row.perspective ? `:${row.perspective}` : ''}`;
+    if (limit > 0 && row.round > limit && !args['user-ok'])
+      fail(`${label} 검토를 이미 ${limit}번 했습니다 · 더 고치지 말고 남은 지적을 사용자에게 보여 주고 어떻게 할지 물으세요. ` +
+        `사용자가 한 번 더 고치라고 답했을 때만 --user-ok 를 붙여 다시 봉인합니다.`);
     run.reviews = (run.reviews || []).filter(item => reviewKey(item) !== key);
     run.reviews.push(row);
     run.status = 'running';
     run.completed_at = null;
     run.integrity = { status: 'pending', verified_at: null, issues: [] };
-    refreshUsage(run, { review_rounds: 1 });
+    refreshUsage(run);
+    run.usage.review_rounds = Math.max(...run.reviews.map(item => item.round || 1));
     writeJson(file, run);
-    emit(file, run, 'review.recorded', { kind, perspective: row.perspective || null, review_status: status, artifact: row.artifact });
-    console.log(`✅ 검토 봉인 · ${kind}${row.perspective ? `:${row.perspective}` : ''} · ${status}`);
+    emit(file, run, 'review.recorded', { kind, perspective: row.perspective || null, review_status: status, artifact: row.artifact, round: row.round });
+    console.log(`✅ 검토 봉인 · ${label} · ${status} · ${row.round}번째`);
+    const passed = status === 'approved' || status === 'pass';
+    if (!passed && limit > 0 && row.round >= limit && !args['user-ok']) {
+      emit(file, run, 'review.escalated', { kind, perspective: row.perspective || null, artifact: row.artifact, round: row.round });
+      console.log(`🟡 ${label} 검토가 ${row.round}번째에도 통과하지 못했습니다 · 더 고치지 말고 남은 지적을 사용자에게 보여 주고 어떻게 할지 물으세요.`);
+    }
   } catch (error) {
     fail(error.message);
   }

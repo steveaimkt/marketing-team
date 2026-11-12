@@ -71,6 +71,32 @@ try {
     '--report', 'outputs/2026-08-30/043-meta-ad-copy/gate.md', '--artifact', 표);
   assert.equal(result.status, 0, result.stderr || result.stdout);
 
+  // 루프 멈춤 (2026-11-12) · 라운드는 같은 산출물 · 같은 관점 검토 횟수다 · 검토 기록 전체 수가 아니다
+  {
+    const first = JSON.parse(fs.readFileSync(path.join(temp, receipt), 'utf8'));
+    assert.equal(first.usage.review_rounds, 1, '산출물 둘 × 검토 둘은 한 라운드다');
+    assert.ok(!first.usage.warnings.some(w => /검토 라운드/.test(w)), '평범한 실행에 라운드 초과 경고가 뜨면 안 된다');
+    const loop = 'outputs/2026-08-30/043-meta-ad-copy/run-99.json';
+    fs.copyFileSync(path.join(temp, receipt), path.join(temp, loop));
+    const brand = (...extra) => run('review', loop, '--kind', 'business', '--perspective', '브랜드', '--status', 'rejected',
+      '--report', 'outputs/2026-08-30/043-meta-ad-copy/review-브랜드.md', '--artifact', out, ...extra);
+    let r = brand();
+    assert.equal(r.status, 0, r.stderr || r.stdout);
+    assert.doesNotMatch(r.stdout, /통과하지 못했습니다/, '2번째에는 아직 묻지 않는다');
+    r = brand();
+    assert.equal(r.status, 0, r.stderr || r.stdout);
+    assert.match(r.stdout, /3번째에도 통과하지 못했습니다/, '예산 번째에 통과 못 하면 사용자에게 묻게 한다');
+    r = brand();
+    assert.notEqual(r.status, 0, '예산을 넘긴 검토는 사용자 답 없이 봉인하지 않는다');
+    assert.match(r.stderr, /이미 3번 했습니다/);
+    r = brand('--user-ok');
+    assert.equal(r.status, 0, r.stderr || r.stdout);
+    const looped = JSON.parse(fs.readFileSync(path.join(temp, loop), 'utf8'));
+    assert.equal(looped.reviews.find(x => x.perspective === '브랜드' && x.artifact.endsWith(out)).round, 4);
+    assert.equal(looped.usage.review_rounds, 4);
+    fs.rmSync(path.join(temp, loop));
+  }
+
   fs.writeFileSync(path.join(temp, 'logs', 'build-log.md'), [
     '| 일시 | 스킬 ID | 요청 | 데이터 모드 | 산출물 경로 | 게이트 | 보완 횟수 | 상태 |',
     '|---|---|---|---|---|---|---|---|',
