@@ -1067,6 +1067,20 @@ const 낱말맞음 = (name, words) => {
   return words.some(w => (영문낱말(w) ? new RegExp(`(^|[^a-z])${w}s?([^a-z]|$)`).test(s) : s.includes(w)));
 };
 
+// 표 파일(csv·tsv)은 이름이 안 맞으면 머리 행도 본다 (로컬자료 점검 2026-11-14 · 광고 자료를 「11월.csv」로 두면
+// 못 찾고 빈 프로필에 A브랜드 샘플을 조용히 넣었다). 첫 줄만 읽는다 · xlsx 는 이름으로만 고른다
+const 머리행맞음 = (file, words) => {
+  if (!/\.(csv|tsv)$/i.test(file)) return false;
+  try {
+    const fd = fs.openSync(file, 'r');
+    const buf = Buffer.alloc(4096);
+    const n = fs.readSync(fd, buf, 0, buf.length, 0);
+    fs.closeSync(fd);
+    const head = buf.subarray(0, n).toString('utf8').replace(/^\uFEFF/, '').split(/\r?\n/)[0] || '';
+    return head.split(/[,\t]/).some(cell => 낱말맞음(cell.trim().replace(/^"|"$/g, ''), words));
+  } catch { return false; }
+};
+
 /** 프로필 §8 「자주 쓰는 회사 양식」에 적힌 파일 · 경로와 파일 이름 둘 다 */
 function 회사양식(cwd) {
   const out = new Set();
@@ -1089,7 +1103,7 @@ export function referenceFile(cwd, rel) {
   return r.split('/').slice(r.startsWith('inputs/') ? 1 : 0).some(seg => 참고말.test(seg));
 }
 
-/** inputs/ 아래 이 스킬의 자료 칸에 맞는 파일 · 확장자와 이름 낱말로만 고른다 · 참고 자료는 세지 않는다 */
+/** inputs/ 아래 이 스킬의 자료 칸에 맞는 파일 · 확장자와 이름 낱말로 고른다(csv·tsv 는 머리 행도 본다) · 참고 자료는 세지 않는다 */
 export function matchingInputs(cwd, d) {
   if (!cwd || !d) return [];
   const words = skillDataWords(d);
@@ -1106,7 +1120,7 @@ export function matchingInputs(cwd, d) {
       const full = `inputs/${r}`;
       if (referenceFile(cwd, full)) continue;
       if (!/\.(csv|tsv|xlsx|xls|json|txt|md|pdf|docx|hwp|hwpx)$/i.test(e.name) && !(그림됨 && 그림.test(e.name))) continue;
-      if (낱말맞음(r, words)) out.push(full);
+      if (낱말맞음(r, words) || 머리행맞음(path.join(dir, e.name), words)) out.push(full);
     }
   };
   walk(path.join(cwd, 'inputs'), '', 0);

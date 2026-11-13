@@ -375,6 +375,18 @@ try {
       const ws3 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-'));
       fs.mkdirSync(path.join(ws3, 'outputs'), { recursive: true });
       assert.ok(replayStep(ws3, '광고 카피 뽑아줘.')?.turn, '보완 파일 없으면 6장 대본이 열려야 한다');
+      // 표 파일은 이름이 안 맞아도 머리 행으로 찾는다 · 빈 프로필에 샘플을 조용히 넣지 않는다 (로컬자료 점검 2026-11-14)
+      {
+        const w = fs.mkdtempSync(path.join(os.tmpdir(), 'inputs-header-'));
+        fs.mkdirSync(path.join(w, 'inputs'), { recursive: true });
+        fs.writeFileSync(path.join(w, 'inputs', '11월.csv'), '\uFEFF날짜,매체,노출,클릭,비용,전환수,전환매출\n2026-11-01,메타,1000,20,30000,2,90000\n');
+        const d045 = skillDeclarations(w).get('045'), d006 = skillDeclarations(w).get('006');
+        assert.deepEqual(matchingInputs(w, d045), ['inputs/11월.csv'], '머리 행이 광고 자료인 11월.csv 를 못 찾았다');
+        assert.equal(sampleInputs({ steps: [{ skill: '045', inputs: [] }] }, w), null, '광고 자료가 있는데 빈 프로필이라고 샘플을 넣었다');
+        assert.deepEqual(matchingInputs(w, d006), [], '광고 머리 행을 리뷰 자료로 잘못 골랐다');
+        fs.writeFileSync(path.join(w, 'inputs', '11월.csv'), '이름,메모\n가,나\n');
+        assert.deepEqual(matchingInputs(w, d045), [], '광고와 상관없는 머리 행을 광고 자료로 골랐다');
+      }
       // 대본 승인도 일반 실행과 같은 철회 판별 · 「진행 승인하지 마세요」로 원고 결과를 복사하면 안 된다 (설치 검토 2026-11-12 P1)
       {
         const 블로그 = 승인말 => {
