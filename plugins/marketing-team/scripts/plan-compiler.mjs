@@ -353,9 +353,9 @@ export function validatePlan(plan, { cwd = process.cwd() } = {}) {
 
   // 실습·실무 표시 · 함께 적으면 무엇을 할지 모른다 · 회사 업무(실무)에 샘플을 넣으면 막는다 (재검토 2026-10-15 · P1)
   if (plan.실습 === true && plan.실무 === true) issues.push(표시충돌안내);
-  else if (workMode(plan, cwd) === '실무') {
+  else if (['실무', '틀'].includes(workMode(plan, cwd))) {
     const 샘플들 = [...steps.flatMap(st => st.inputs || []), ...(plan.inputs || [])].filter(샘플참조).map(v => String(v?.path ?? v));
-    if (샘플들.length) issues.push(`${실무샘플안내} · ${[...new Set(샘플들)].join(' · ')}`);
+    if (샘플들.length) issues.push(`${workMode(plan, cwd) === '틀' ? 틀샘플안내 : 실무샘플안내} · ${[...new Set(샘플들)].join(' · ')}`);
   }
 
   let planFormat = null;
@@ -852,7 +852,7 @@ export function profileRows(cwd) {
     if (!t || t.startsWith('>') || /^(```|~~~)/.test(t) || /^[-*_]{3,}$/.test(t)) continue;
     if (/^\|[\s:|-]+\|?$/.test(t)) continue;   // 표 머리 구분선
     if (tpl.lines.has(t)) continue;
-    if (/^[-*]\s*\[[ xX]\]/.test(t) || /^[-*]?\s*최종 갱신/.test(t)) continue;   // 상태 칸
+    if (/^[-*]\s*\[[ xX]\]/.test(t) || /^[-*]?\s*(?:최종 갱신|쓰는 방식)/.test(t)) continue;   // 상태 칸 · 「쓰는 방식」은 회사 정보가 아니다
     if (t.startsWith('|')) {
       const cells = 표칸(t);
       const label = 열쇠(cells[0] || '');
@@ -911,8 +911,24 @@ export function profileIsEmpty(cwd) {
 export function workMode(plan, cwd) {
   if (plan?.실습 === true) return '실습';
   if (plan?.실무 === true || profileState(cwd) === '채움') return '실무';
+  if (쓰는방식(cwd) === '스킬만') return '틀';
   return '책';
 }
+
+/* 구축 ③에서 고른 것 · brand/profile.md 「상태」의 「- 쓰는 방식: …」 한 줄 (설치 검토 2026-11-12 P1 · 로컬자료 점검 2026-11-14)
+ * 「스킬만」을 골라도 빈 프로필이라 책 대본과 A브랜드 샘플로 빠졌다. 이 줄은 회사 정보로 세지 않는다(profileRows).
+ *   「스킬만」 → workMode 「틀」 · 책 대본을 열지 않고 샘플을 넣지 않는다 · 자료가 필요하면 묻는다
+ *   그 밖(「샘플 실습」·「우리 회사」·줄 없음) → 지금과 같다 · 구축 없이 책을 따라 하는 독자도 그대로 책 실습이다
+ */
+export function 쓰는방식(cwd) {
+  let text = '';
+  try { text = fs.readFileSync(path.join(cwd || '', 'brand', 'profile.md'), 'utf8'); } catch { return null; }
+  const m = text.replace(/<!--[\s\S]*?-->/g, '').match(/^[-*]?\s*쓰는 방식\s*[:：]\s*(.+)$/m);
+  const v = (m?.[1] || '').split('←')[0].trim();   // 틀의 설명(← …)은 값이 아니다
+  if (!v || /[{}]/.test(v)) return null;           // 고르지 않은 틀 · {샘플 실습 · 우리 회사 · 스킬만}
+  return /스킬만/.test(v) ? '스킬만' : /샘플|실습/.test(v) ? '샘플 실습' : /우리|회사/.test(v) ? '우리 회사' : null;
+}
+export const 틀샘플안내 = '회사 정보 없이 스킬만 쓰기로 하셔서 연습용 샘플을 넣지 않습니다 · 우리 자료를 쓰거나, 사용자가 실습을 원하면 "실습": true';
 /** 회사 업무에 샘플을 넣었을 때 · validatePlan 과 run-receipt start 가 같은 문장을 쓴다 */
 export const 실무샘플안내 = '회사 업무에 연습용 샘플을 넣었습니다 · 우리 자료를 쓰거나, 사용자가 실습을 원하면 "실습": true';
 export const 표시충돌안내 = '"실습": true 와 "실무": true 를 함께 적었습니다 · 사용자가 「샘플로 실습」을 말했으면 "실습" 만, 회사 업무면 "실무" 만 적으세요';
@@ -1221,7 +1237,7 @@ const 을를 = word => {
  */
 export function dataRequests(plan, cwd) {
   const steps = plan?.steps || [];
-  if (!cwd || !steps.length || workMode(plan, cwd) !== '실무') return [];
+  if (!cwd || !steps.length || !['실무', '틀'].includes(workMode(plan, cwd))) return [];
   const decl = skillDeclarations(cwd);
   const out = [];
   const produced = new Set();
@@ -1319,7 +1335,8 @@ export function renderPlanScreen(plan, { cwd = process.cwd() } = {}) {
   const 연습 = plan.실습 === true && facts.state !== '빈';
   // 「실무」 표시(plan.실무)로 대화에서 회사 정보를 받았으면 프로필이 비어 있어도 연습용 프로필을 쓰지 않는다 (재검토 2026-10-15)
   const 대화실무 = facts.state === '빈' && workMode(plan, cwd) === '실무';
-  lines.push(`근거로 쓰는 것: ${대화실무 ? '대화로 받은 우리 회사 정보 (brand/profile.md 는 아직 비어 있습니다)' : facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 연습 ? '실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${연습 ? '' : 우리양식}`);
+  const 틀모드 = facts.state === '빈' && workMode(plan, cwd) === '틀';
+  lines.push(`근거로 쓰는 것: ${틀모드 ? '회사 정보 없이 스킬만 쓰기로 하셔서 브랜드 값 자리는 비워 두고 무엇이 들어가는지 적습니다.' : 대화실무 ? '대화로 받은 우리 회사 정보 (brand/profile.md 는 아직 비어 있습니다)' : facts.state === '빈' ? '브랜드 프로필이 비어있어 연습용 A브랜드 프로필을 씁니다.' : 연습 ? '실습을 고르셔서 연습용 A브랜드 프로필을 씁니다.' : 'brand/profile.md'}${연습 ? '' : 우리양식}`);
 
   const firstOut = rel((first.step.outputs || [])[0] || '');
   const parts = firstOut.split('/');
@@ -1434,6 +1451,7 @@ export function bookCheck(plan, cwd) {
   if (plan.형식 && Object.keys(plan.형식).length) return no('형식을 골랐다');
   if (!profileIsEmpty(cwd)) return no('브랜드 프로필을 채웠다 · 독자 기준으로 만든다');
   if (workMode(plan, cwd) === '실무') return no('회사 업무(plan.실무) · 독자 기준으로 만든다');
+  if (workMode(plan, cwd) === '틀') return no('회사 정보 없이 스킬만 (brand/profile.md 쓰는 방식) · 원고 결과를 놓지 않는다');
   // 우리 양식을 정했거나 회사 양식(inputs/양식/)을 넣었으면 원고 결과를 놓지 않는다 (2026-10-14)
   if (notesOfPlan(plan, cwd)) return no('우리 양식(brand/skill-notes)이 있다 · 독자 기준으로 만든다');
   if ((steps[0].inputs || []).some(양식입력)) return no('회사 양식(inputs/양식/)을 넣었다 · 독자 기준으로 만든다');
@@ -1496,7 +1514,7 @@ export function sampleInputs(plan, cwd) {
   // 샘플로 채우는 것은 프로필이 「빈」이거나 사용자가 「샘플로 실습」을 말했을 때(plan.실습)뿐이다 (2026-10-14 · 검토 P0)
   // 우리 회사 프로필에 A브랜드 리뷰를 넣으면 그 리뷰의 고객·제품은 여전히 A브랜드 것이다
   // 대화로 회사 정보를 받은 회사 업무(plan.실무)도 같다 · 프로필 파일이 비어 있어도 샘플을 넣지 않는다 (재검토 2026-10-15 · P1)
-  if (workMode(plan, cwd) === '실무') return null;
+  if (['실무', '틀'].includes(workMode(plan, cwd))) return null;
   const d = skillDeclarations(cwd).get(String(first.skill || '').match(/\d{3}/)?.[0] || '');
   if (!d) return null;
   // inputs/ 에 그 스킬의 자료 칸에 맞는 파일이 있으면 채우지 않는다 · 회사 양식·레퍼런스·좋았던 글은 자료가 아니다 (2026-10-14)
@@ -1520,7 +1538,7 @@ const 채움 = (v, 월, 날짜) => String(v).replaceAll('{{날짜}}', '\0d').rep
   .replaceAll('{월}', 월).replaceAll('{날짜}', 날짜).replaceAll('\0d', '{날짜}').replaceAll('\0m', '{월}');
 
 export function replayFind(cwd) {
-  if (!cwd || !profileIsEmpty(cwd)) return null;
+  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만') return null;
   let names = [];
   try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
   let best = null;
@@ -1588,7 +1606,7 @@ function 원고결과있음(cwd, folderName) {
 
 /** 계획 없이 첫 말로 시작하는 대본(13장 등) · 상태는 outputs/.대본-{이름}.json 에 둔다 */
 function replayOpening(cwd, prompt) {
-  if (!cwd || !profileIsEmpty(cwd)) return null;
+  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만') return null;
   let names = [];
   try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
   for (const name of names) {

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, dataRequests, workMode, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
+import { 쓰는방식, planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, dataRequests, workMode, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -375,6 +375,30 @@ try {
       const ws3 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-'));
       fs.mkdirSync(path.join(ws3, 'outputs'), { recursive: true });
       assert.ok(replayStep(ws3, '광고 카피 뽑아줘.')?.turn, '보완 파일 없으면 6장 대본이 열려야 한다');
+      // 구축 ③ 「스킬만」 · 빈 프로필이어도 책 대본 · 샘플로 빠지지 않는다 (설치 검토 2026-11-12 P1 · 로컬자료 점검 2026-11-14)
+      {
+        const 틀 = fs.readFileSync(path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'brand-templates', 'profile.md'), 'utf8');
+        const 폴더 = 줄 => {
+          const w = fs.mkdtempSync(path.join(os.tmpdir(), 'work-choice-'));
+          fs.mkdirSync(path.join(w, 'brand'), { recursive: true }); fs.mkdirSync(path.join(w, 'outputs'), { recursive: true });
+          fs.writeFileSync(path.join(w, 'brand', 'profile.md'), 줄 === null ? 틀 : 틀.replace(/^- 쓰는 방식:.*$/m, `- 쓰는 방식: ${줄}`));
+          return w;
+        };
+        const 그대로 = 폴더(null), 스킬만 = 폴더('스킬만'), 샘플 = 폴더('샘플 실습');
+        assert.equal(쓰는방식(그대로), null, '고르지 않은 틀을 「스킬만」으로 읽었다');
+        assert.equal(쓰는방식(스킬만), '스킬만');
+        for (const w of [그대로, 스킬만, 샘플]) assert.equal(profileState(w), '빈', '「쓰는 방식」 줄을 회사 정보로 셌다');
+        const 계획 = () => ({ steps: [{ skill: '045', inputs: [] }] });
+        assert.equal(workMode(계획(), 그대로), '책'); assert.equal(workMode(계획(), 샘플), '책'); assert.equal(workMode(계획(), 스킬만), '틀');
+        assert.equal(workMode({ ...계획(), 실습: true }, 스킬만), '실습', '스킬만이어도 「샘플로 실습」을 말하면 실습이다');
+        assert.equal(sampleInputs(계획(), 스킬만), null, '스킬만인데 샘플을 넣었다');
+        assert.ok(sampleInputs(계획(), 그대로), '대조군 · 틀 그대로(책 독자)면 샘플이 들어가야 한다');
+        assert.equal(dataRequest(계획(), 스킬만), '매체별 광고 데이터 소스', '스킬만인데 필요한 자료를 묻지 않았다');
+        const 샘플계획 = { steps: [{ skill: '045', inputs: ['plugin:sample-data/A브랜드-광고매체통합-12주.csv'] }] };
+        assert.ok(validatePlan(샘플계획, { cwd: 스킬만 }).some(m => /스킬만 쓰기로/.test(m)), '스킬만인데 샘플 계획을 통과시켰다');
+        assert.equal(replayStep(스킬만, '광고 카피 뽑아줘.')?.turn, undefined, '스킬만인데 책 대본(6장)을 열었다');
+        assert.ok(replayStep(샘플, '광고 카피 뽑아줘.')?.turn, '대조군 · 샘플 실습이면 책 대본이 열려야 한다');
+      }
       // 표 파일은 이름이 안 맞아도 머리 행으로 찾는다 · 빈 프로필에 샘플을 조용히 넣지 않는다 (로컬자료 점검 2026-11-14)
       {
         const w = fs.mkdtempSync(path.join(os.tmpdir(), 'inputs-header-'));
