@@ -27,6 +27,15 @@ import { spawnSync } from 'node:child_process';
 import { execFileSync } from 'node:child_process';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// 구축 스킬은 본문 + 참조/ 로 나뉜다 (2026-11-13 · 본문 500줄 기준) · 문구 검사는 둘을 합쳐 본다
+const 구축문서 = () => {
+  const d = path.join(ROOT, 'skills', 'marketing-team-setup');
+  const 참조 = path.join(d, '참조');
+  const 파일 = [path.join(d, 'SKILL.md'),
+    ...(fs.existsSync(참조) ? fs.readdirSync(참조).filter(f => f.endsWith('.md')).sort().map(f => path.join(참조, f)) : [])];
+  return 파일.map(f => fs.readFileSync(f, 'utf8')).join('\n');
+};
 const issues = [];
 const notes = [];
 const err = (m) => issues.push(['🔴', m]);
@@ -451,7 +460,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
       //   임계 숫자의 정본은 이제 그쪽이다 — 규약에는 한 줄 포인터만 남았다.
       const 문서 = [
         [path.join(ROOT, 'docs', '원장-운영.md'), '원장-운영.md'],
-        [path.join(ROOT, 'skills', 'marketing-team-setup', 'SKILL.md'), 'marketing-team-setup'],
+        [path.join(ROOT, 'skills', 'marketing-team-setup', '참조', '주기-점검.md'), 'marketing-team-setup 참조/주기-점검'],
       ];
       let drift = 0;
       for (const [p, name] of 문서) {
@@ -568,7 +577,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   ⛔ 다만 **접거나 지우지 않는다.** 업태를 잘못 읽었을 수 있고, 근거 없이 접으면 틀린 걸 접는다.
 {
   const L = fs.readFileSync(path.join(ROOT, 'skills', 'marketing-team-tasks', 'SKILL.md'), 'utf8');
-  const B = fs.readFileSync(path.join(ROOT, 'skills', 'marketing-team-setup', 'SKILL.md'), 'utf8');
+  const B = 구축문서();
   const 빠짐 = [];
   if (!L.includes('100개를 그냥 던지지 않는다'))
     빠짐.push('업무리스트가 100개를 업태 무관하게 편다 — 「내 것이 뭔지」에 답을 못 한다');
@@ -612,7 +621,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
     빠짐.push('규약 §0-b 에 「업종만 말했음」 모드가 없다');
   //   사용자가 고른 셋 — ①샘플로 실습 ②우리 회사 정보 ③회사 정보 없이 스킬만.
   //   ⛔ ③ 은 **고를 때만** 들어간다. 프로필이 없다고 여기로 오면 결과가 텅 빈다.
-  const B2 = fs.readFileSync(path.join(ROOT, 'skills', 'marketing-team-setup', 'SKILL.md'), 'utf8');
+  const B2 = 구축문서();
   if (!B2.includes('③ 회사 정보 없이 스킬만 사용한다'))
     빠짐.push('온보딩에 3지선다가 없다 — 브랜드 없이 쓸 길을 사용자가 못 고른다');
   for (const [f, 이름] of [[G, '규약 §0-b'], [R, '런타임 §0']])
@@ -980,7 +989,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //   실측 · 온보딩 ③ 이 「모르면 비우고 넘어간다」였다. 규약 §E 「빈칸은 셋 중 최악」과 정면으로 어긋난다.
 //   ⚠️ 대신 써 주되 **말만** 쓴다. 숫자·경쟁사 실명·채널을 지어내면 판정이 통째로 뒤집힌다.
 {
-  const B = fs.readFileSync(path.join(ROOT, 'skills', 'marketing-team-setup', 'SKILL.md'), 'utf8');
+  const B = 구축문서();
   const G = fs.readFileSync(path.join(ROOT, 'docs', '공통규약.md'), 'utf8');
   const T = fs.readFileSync(path.join(ROOT, 'brand-templates', 'profile.md'), 'utf8');
   const 빠짐 = [];
@@ -1050,7 +1059,7 @@ if (REFD.size) ok.push(`패키지 참조 ${REFD.size}건 검사 (brand·outputs�
 //      **읽으라고 적은 파일이 몇 년간 없었다** — 그러면 원장을 통독하게 되고 §A 가 깨진다.
 {
   const L = fs.readFileSync(path.join(ROOT, 'scripts', 'ledger-stats.mjs'), 'utf8');
-  const B = fs.readFileSync(path.join(ROOT, 'skills', 'marketing-team-setup', 'SKILL.md'), 'utf8');
+  const B = 구축문서();
   const 빠짐 = [];
 
   // 재방문 신호 3종이 기계와 문서 양쪽에 있나 (한쪽만 있으면 죽은 신호다)
