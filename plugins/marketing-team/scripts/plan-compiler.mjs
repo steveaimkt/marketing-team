@@ -1215,7 +1215,8 @@ export function relevantInput(cwd, ref, d, { produced = null } = {}) {
   const 그림됨 = inputItems(d).some(x => /캡처|스크린샷|이미지|사진/.test(x.raw));
   const name = path.posix.basename(rel);
   if (!자료확장자.test(name) && !(그림됨 && 그림.test(name))) return false;
-  return 낱말맞음(rel.replace(/^inputs\//, ''), words);
+  // 탐색(matchingInputs)과 같은 기준 · 이름이 안 맞아도 표 머리 행이 맞으면 그 스킬 자료다 (보완플랜 2026-11-14 · 「11월.csv」를 찾고도 계획에 적으면 거절했다)
+  return 낱말맞음(rel.replace(/^inputs\//, ''), words) || 머리행맞음(path.join(cwd, rel), words);
 }
 
 /** 받침이 있으면 「을」, 없으면 「를」 · 한글로 안 끝나면 「을(를)」 */
@@ -1537,8 +1538,28 @@ const 말 = v => String(v || '').replace(/[\s.,!?~·'"「」]/g, '');
 const 채움 = (v, 월, 날짜) => String(v).replaceAll('{{날짜}}', '\0d').replaceAll('{{월}}', '\0m')
   .replaceAll('{월}', 월).replaceAll('{날짜}', 날짜).replaceAll('\0d', '{날짜}').replaceAll('\0m', '{월}');
 
+/**
+ * inputs/ 에 사용자가 넣은 업무 자료가 있는가 · 있으면 책 대본을 틀지 않는다 (로컬자료 점검 2026-11-14)
+ * 대본 화면은 모두 「inputs 폴더가 비어있어 연습용 A브랜드로」라고 말한다 · 자료가 있는데 틀면 화면이 사실과 어긋난다
+ * 참고 자료(레퍼런스·양식·예시 폴더)와 그림(캡처)은 세지 않는다 · 책 실습 중에도 넣으라고 하는 것들이다
+ */
+function 업무자료있음(cwd) {
+  const walk = (dir, rel, depth) => {
+    let es = [];
+    try { es = fs.readdirSync(dir, { withFileTypes: true }); } catch { return false; }
+    for (const e of es) {
+      if (e.name.startsWith('.')) continue;
+      const r = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) { if (depth < 3 && walk(path.join(dir, e.name), r, depth + 1)) return true; continue; }
+      if (자료확장자.test(e.name) && !referenceFile(cwd, `inputs/${r}`)) return true;
+    }
+    return false;
+  };
+  return walk(path.join(cwd, 'inputs'), '', 0);
+}
+
 export function replayFind(cwd) {
-  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만') return null;
+  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만' || 업무자료있음(cwd)) return null;
   let names = [];
   try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
   let best = null;
@@ -1606,7 +1627,7 @@ function 원고결과있음(cwd, folderName) {
 
 /** 계획 없이 첫 말로 시작하는 대본(13장 등) · 상태는 outputs/.대본-{이름}.json 에 둔다 */
 function replayOpening(cwd, prompt) {
-  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만') return null;
+  if (!cwd || !profileIsEmpty(cwd) || 쓰는방식(cwd) === '스킬만' || 업무자료있음(cwd)) return null;
   let names = [];
   try { names = fs.readdirSync(대본뿌리()); } catch { return null; }
   for (const name of names) {
@@ -1667,7 +1688,8 @@ export function replayStep(cwd, prompt, again = true) {
   const turns = r.data.turns || [];
   const said = 말(prompt);
   // 대본도 일반 실행과 같은 판별 · 「진행 승인하지 마세요」·「진행 승인. 아니, 취소할게요」는 승인이 아니다 (설치 검토 2026-11-12 P1)
-  const fits = t => (t.approve && APPROVAL_PREFIX.test(String(prompt)) && !withdrawn(prompt)) ||
+  // 철회한 말은 승인 차례에 문구 비교로도 맞추지 않는다 · 「진행 승인 취소」가 「진행 승인」과 글자가 겹쳐 통과했다 (보완플랜 2026-11-14)
+  const fits = t => (t.approve && withdrawn(prompt)) ? false : (t.approve && APPROVAL_PREFIX.test(String(prompt))) ||
     (t.user || []).some(u => { const a = 말(u); return a && (a === said || (said.length > 1 && (a.includes(said) || said.includes(a)) && Math.min(a.length, said.length) / Math.max(a.length, said.length) > 0.6)); });
   let k = -1;
   for (let i = r.state.next; i < Math.min(turns.length, r.state.next + 3); i += 1) {

@@ -9,7 +9,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { 쓰는방식, planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, dataRequests, workMode, todoLines, matchingInputs, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
+import { 쓰는방식, planHash, validatePlan, approvalState, renderPlanScreen, skillDeclarations, parseScreenTemplate, canonicalScreenPlan, chainScreenTemplate, preferLatestReruns, applyFormatChoice, frontmatterField, frontmatterFlag, frontmatterList, bookInputs, bookCheck, replayFind, replayStep, userSkills, notesFormat, profileIsEmpty, profileState, sampleInputs, dataRequest, dataRequests, workMode, todoLines, matchingInputs, relevantInput, referenceFile, placePlan, workspaceOf } from './plan-compiler.mjs';
 import { canonicalChains } from './chain-compiler.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -408,6 +408,17 @@ try {
         assert.deepEqual(matchingInputs(w, d045), ['inputs/11월.csv'], '머리 행이 광고 자료인 11월.csv 를 못 찾았다');
         assert.equal(sampleInputs({ steps: [{ skill: '045', inputs: [] }] }, w), null, '광고 자료가 있는데 빈 프로필이라고 샘플을 넣었다');
         assert.deepEqual(matchingInputs(w, d006), [], '광고 머리 행을 리뷰 자료로 잘못 골랐다');
+        assert.equal(relevantInput(w, 'workspace:inputs/11월.csv', d045), true, '찾은 11월.csv 를 계획에 적으니 광고 자료가 아니라고 했다 (보완플랜 2026-11-14)');
+        assert.equal(relevantInput(w, 'workspace:inputs/11월.csv', d006), false, '광고 머리 행을 계획에 적으니 리뷰 자료로 받았다');
+        // inputs/ 에 업무 자료가 있으면 책 대본을 틀지 않는다 · 대본 화면은 「inputs 폴더가 비어있어」라고 말한다
+        fs.mkdirSync(path.join(w, 'outputs'), { recursive: true });
+        assert.equal(replayStep(w, '세럼 따가움으로 블로그 글 써줘.')?.turn, undefined, 'inputs/ 에 업무 자료가 있는데 책 대본을 열었다');
+        for (const [f, 무엇] of [['레퍼런스/좋았던글.md', '참고 자료'], ['피드캡처.png', '캡처']]) {
+          const v = fs.mkdtempSync(path.join(os.tmpdir(), 'inputs-ref-'));
+          fs.mkdirSync(path.join(v, 'outputs'), { recursive: true }); fs.mkdirSync(path.dirname(path.join(v, 'inputs', f)), { recursive: true });
+          fs.writeFileSync(path.join(v, 'inputs', f), 'x');
+          assert.ok(replayStep(v, '세럼 따가움으로 블로그 글 써줘.')?.turn, `inputs/ 에 ${무엇}만 있는데 책 대본을 막았다 (대조군)`);
+        }
         fs.writeFileSync(path.join(w, 'inputs', '11월.csv'), '이름,메모\n가,나\n');
         assert.deepEqual(matchingInputs(w, d045), [], '광고와 상관없는 머리 행을 광고 자료로 골랐다');
       }
@@ -423,7 +434,7 @@ try {
           walk(path.join(w, 'outputs'));
           return { r, 원고 };
         };
-        for (const 거절 of ['진행 승인하지 마세요', '진행 승인합니다. 아니, 취소할게요', '진행 승인은 아직 못 하겠어요']) {
+        for (const 거절 of ['진행 승인하지 마세요', '진행 승인합니다. 아니, 취소할게요', '진행 승인은 아직 못 하겠어요', '진행 승인 취소', '진행 승인 보류']) {
           const { r, 원고 } = 블로그(거절);
           assert.equal(원고.length, 0, `「${거절}」인데 대본이 원고 결과를 복사했다`);
           assert.ok(!r?.turn?.files?.length, `「${거절}」인데 승인 차례로 넘어갔다`);
