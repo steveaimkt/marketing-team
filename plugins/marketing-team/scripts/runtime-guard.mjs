@@ -5,7 +5,7 @@ import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
 import { isMarketingWorkspace } from './team-context.mjs';
-import { approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills, slotOf, slotName, sealedRun, nextSlot } from './plan-compiler.mjs';
+import { APPROVAL, withdrawn, approvalState, frontmatterFlag, bookCheck, replayFind, replayActive, replayCurrent, userSkills, slotOf, slotName, sealedRun, nextSlot } from './plan-compiler.mjs';
 
 const MAX_TRANSCRIPT_BYTES = 5 * 1024 * 1024;
 const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 요청\]|⏸)/m;
@@ -15,39 +15,7 @@ const PLAN_MARKER = /^(?:\*\*)?\[실행 계획\][\s\S]*?(?:^(?:\*\*)?\[승인 �
 // ⏸ 만 있고 리터럴 [승인 요청] 헤더가 없는 계획 화면도 승인 대상으로 인정한다 —
 // [승인 요청] 헤더를 생략한 채 ⏸ 로만 멈추는 스킬(039)에서 정상 "진행 승인"이
 // 영구 거부되는 버그가 실측됐다 (2026-09-13 · 5장 039).
-// 승인 판정 A안 (2026-08-30) · 「진행 승인」으로 시작하면 뒤에 지시가 붙어도 승인이다 (보류·취소류는 제외).
-// 자연 변형(「네 진행해주세요」 등)은 온전한 한 문장일 때만 승인으로 친다.
-const APPROVAL_EXACT = /^\s*(?:네|예|넵)?[\s,]*(?:진행\s*승인|계획\s*승인|승인합니다|승인|이\s*계획으로\s*진행(?:해\s*줘|해주세요|합니다)?|진행해\s*줘요?|진행해주세요|진행하자)\s*[.!~]?\s*$/;
-// 조사(은·는·이·가)가 승인과 부정어 사이에 끼면 부정 lookahead 를 못 걸었다
-// (실측 2026-09-13, 「진행 승인은 아직 못 하겠어요」가 승인으로 오판됨) — 조사를 선택적으로 허용한다.
-const APPROVAL_PREFIX = /^\s*진행\s*승인(?!\s*(?:은|는|이|가)?\s*(?:보류|취소|아직|말|안\s|못\s))/;
-// 승인 판정 B안 (2026-09-13 · 4장 038) · 사용자가 정보와 승인 의사를 한 문장에 담아
-// 「진행 승인」이 문장 맨 끝에 오면(앞에 다른 말이 있어도) 승인으로 친다. A안(접두)의 반대쪽 —
-// 실제 대화에서 정보를 먼저 말하고 승인으로 문장을 맺는 경우가 실측으로 재현됐다.
-// 부정형 뒤엔 걸리지 않는다("승인 안 함"처럼 승인 뒤에 말이 더 붙으면 $ 에서 끝나지 않아 제외된다).
-const APPROVAL_SUFFIX = /(?:^|[\s,.!?~])(?:진행\s*승인|계획\s*승인|승인합니다|승인)\s*[.!~]?\s*$/;
-// 부정·철회가 한 군데라도 있으면 승인이 아니다 (실측 2026-09-22 · 작동 검토 #3 —
-// 「진행 승인하지 마세요」·「진행 승인합니다. 아니, 취소할게요」가 접두 승인으로 통과했다).
-// 재료에 우연히 걸리면 한 번 더 묻게 될 뿐이다 · 오인 승인보다 안전한 쪽을 고른다.
-const WITHDRAW = /하지\s*마|하지\s*말|말아\s*(?:줘|주세요|요)|취소|보류|철회|중단|멈춰|그만|아니(?:요|[,.\s]|$)|아뇨|잠깐|아직/;
-// 「진행 승인」으로 시작하는 말은 첫 문장만 철회어를 본다 (실측 2026-10-14 · 회사 B S3 · 「진행 승인. 백화점은 아직 정하지 않았어…」가
-// 「아직」 때문에 보류로 읽혀 승인을 한 번 더 받았다). 뒤 문장은 재료다 · 다만 뒤 문장이 철회로 시작하거나(「아니, 취소할게요」·「잠깐」)
-// 승인·진행을 거두는 말(「승인 취소」·「진행하지 마」·「취소할게」)이면 여전히 철회다.
-// 경계 · 마침표·느낌표·물음표·줄바꿈·「그리고」·「그런데」·「근데」 · 말줄임(…)은 경계가 아니다(「진행 승인… 아니 잠깐 아직」은 한 문장이다).
-const 문장경계 = /[.!?。！？\n]|그리고|그런데|근데/;
-const 바로철회 = /^[\s,.!?~·…]*(?:아니(?:요|[,.\s]|$)|아뇨|잠깐|취소|보류|철회|중단|멈춰|그만(?!큼)|하지\s*마|하지\s*말)/;
-const 승인거둠 = /(?:승인|진행)\s*(?:은|는|을|를|도)?\s*(?:취소|보류|철회|중단|하지\s*마|하지\s*말|말아|안\s*할|못\s*하)|(?:취소|보류|철회)\s*(?:할게|할래|해\s*줘|해주세요|합니다|하자|해요|할게요)|멈춰|그만\s*(?:해|하자|둬)/;
-function withdrawn(text) {
-  const t = String(text);
-  if (!/^\s*진행\s*승인/.test(t)) return WITHDRAW.test(t);
-  const head = t.replace(/^\s*진행\s*승인/, '');
-  const at = head.search(문장경계);
-  const first = at < 0 ? t : t.slice(0, t.length - head.length + at);
-  if (WITHDRAW.test(first)) return true;
-  if (at < 0) return false;
-  return head.slice(at).split(new RegExp(문장경계.source, 'g')).some(part => 바로철회.test(part) || 승인거둠.test(part));
-}
-const APPROVAL = { test: text => !withdrawn(text) && (APPROVAL_EXACT.test(text) || APPROVAL_PREFIX.test(text) || APPROVAL_SUFFIX.test(text)) };
+// 승인 · 철회 판별은 plan-compiler.mjs 에 있다 · 책 대본도 같은 판별을 쓴다 (2026-11-14 · 설치 검토 P1 · 대본이 「진행 승인하지 마세요」를 승인으로 읽었다)
 const ACTIVE_MARKERS = ['# 마케팅 AI 마케터', '/skills/ai-marketer/SKILL.md', '\\skills\\ai-marketer\\SKILL.md'];
 const WRITE_ROOTS = new Set(['brand', 'outputs', 'logs', 'inputs']);
 // 진입 스킬 셋은 절차를 여는 문이다 · 여는 것 자체는 승인 대상이 아니다
@@ -380,7 +348,11 @@ function isSkillWork(input, cwd, rows) {
     const name = String(input.tool_input?.skill || input.tool_input?.name || '');
     return /\d{3}/.test(name) || rows.some(row => row.role === 'assistant' && PLAN_MARKER.test(row.text));
   }
-  return true; // Agent·Task 는 예전대로
+  // 규제세팅 담당은 읽기 도구만 가진 구축 담당이다 · 업무 실행이 아니다 (설치 검토 2026-11-12 P2 ·
+  // AI 마케터를 쓰던 대화에서 새 업종을 넣으면 가짜 실행 계획을 요구받았다). 저장(brand/compliance-custom.md)은 따로 ⏸ 뒤 Write 로 한다
+  const agent = String(input.tool_input?.subagent_type || '').replace(/^marketing-team:/, '');
+  if (['Agent', 'Task'].includes(input.tool_name) && agent === 'staff-compliance-setup') return false;
+  return true; // 그 밖의 Agent·Task 는 예전대로
 }
 
 function isPlanDraftWrite(input) {

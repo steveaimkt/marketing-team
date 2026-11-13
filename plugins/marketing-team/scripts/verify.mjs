@@ -1610,7 +1610,9 @@ for (const link of ['agents', 'skills']) {
   const common = read('docs', '공통규약.md');
   const marketer = read('skills', 'ai-marketer', 'SKILL.md');
   const samples = read('sample-data', 'README.md');
-  const liveGuide = read('docs', '클로드코드-실기검증.md');
+  // 실기검증 안내는 개발 문서라 배포 밖 maintenance/docs 에 있다 (2026-11-14) · 설치본에서는 건너뛴다
+  const liveGuidePath = path.resolve(ROOT, '..', '..', 'maintenance', 'docs', '클로드코드-실기검증.md');
+  const liveGuide = fs.existsSync(liveGuidePath) ? fs.readFileSync(liveGuidePath, 'utf8') : null;
   const missing = [];
 
   for (const word of ['같은 요일', '반복 패턴', '[기준 부족]'])
@@ -1625,7 +1627,7 @@ for (const link of ['agents', 'skills']) {
     missing.push('AI 마케터의 [자료 충돌]·합산/나눗셈 금지');
   if (!samples.includes('독립적으로 만든 합성 데이터') || !samples.includes('파일을 넘나드는 계산을 하지 않는다'))
     missing.push('샘플 README의 독립 합성 데이터·교차 계산 금지');
-  for (const word of ['Source: Directory', 'GitHub', '~/.claude/plugins/cache', 'plugins/marketing-team/scripts/실제확인-기록'])
+  if (liveGuide) for (const word of ['Source: Directory', 'GitHub', '~/.claude/plugins/cache', 'plugins/marketing-team/scripts/실제확인-기록'])
     if (!liveGuide.includes(word)) missing.push(`실기검증 설치 격리·기록 경로의 「${word}」`);
 
   if (missing.length) {

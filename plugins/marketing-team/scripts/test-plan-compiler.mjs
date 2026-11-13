@@ -375,6 +375,25 @@ try {
       const ws3 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-'));
       fs.mkdirSync(path.join(ws3, 'outputs'), { recursive: true });
       assert.ok(replayStep(ws3, '광고 카피 뽑아줘.')?.turn, '보완 파일 없으면 6장 대본이 열려야 한다');
+      // 대본 승인도 일반 실행과 같은 철회 판별 · 「진행 승인하지 마세요」로 원고 결과를 복사하면 안 된다 (설치 검토 2026-11-12 P1)
+      {
+        const 블로그 = 승인말 => {
+          const w = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-deny-'));
+          fs.mkdirSync(path.join(w, 'outputs'), { recursive: true });
+          assert.ok(replayStep(w, '세럼 따가움으로 블로그 글 써줘.')?.turn, '5장 블로그 대본이 열려야 한다');
+          const r = replayStep(w, 승인말);
+          const 원고 = [];
+          const walk = d => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const q = path.join(d, e.name); if (e.isDirectory()) walk(q); else if (e.name.startsWith('022-blog-seo-article') && e.name.endsWith('.md')) 원고.push(q); } };
+          walk(path.join(w, 'outputs'));
+          return { r, 원고 };
+        };
+        for (const 거절 of ['진행 승인하지 마세요', '진행 승인합니다. 아니, 취소할게요', '진행 승인은 아직 못 하겠어요']) {
+          const { r, 원고 } = 블로그(거절);
+          assert.equal(원고.length, 0, `「${거절}」인데 대본이 원고 결과를 복사했다`);
+          assert.ok(!r?.turn?.files?.length, `「${거절}」인데 승인 차례로 넘어갔다`);
+        }
+        assert.equal(블로그('진행 승인').원고.length, 1, '「진행 승인」이면 대본이 원고 결과를 놓아야 한다 (대조군)');
+      }
       const ws4 = fs.mkdtempSync(path.join(os.tmpdir(), 'book-replay-note-'));
       fs.mkdirSync(path.join(ws4, 'outputs'), { recursive: true });
       fs.mkdirSync(path.join(ws4, 'brand', 'skill-notes'), { recursive: true }); fs.writeFileSync(path.join(ws4, 'brand', 'skill-notes', '043.md'), '형식: docx\n');

@@ -584,6 +584,11 @@ try {
       W([active, row('user', '마케팅팀 업무 시작하자')]);
       for (const s of ['ai-marketer', 'marketing-team:ai-marketer', 'marketing-team-setup', 'marketing-team:marketing-team-tasks'])
         assert.equal(decision(call2('Skill', { skill: s })), 'none', `승인 전 진입 스킬 호출을 막았습니다: ${s}`);
+      // 구축 중 규제세팅 담당은 계획 없이 부른다 · 다른 담당은 그대로 막는다 (설치 검토 2026-11-12 P2)
+      W([active, row('user', '브랜드 정보 넣을래. 우리는 반려동물 사료 브랜드야. 업종 규제도 세팅해줘')]);
+      for (const a of ['staff-compliance-setup', 'marketing-team:staff-compliance-setup'])
+        assert.equal(decision(call2('Agent', { subagent_type: a, prompt: '반려동물 사료 조심할 말' })), 'none', `규제세팅 담당 호출에 실행 계획을 요구했습니다: ${a}`);
+      assert.equal(decision(call2('Agent', { subagent_type: 'staff-reviewer', prompt: '검토' })), 'deny', '계획 없이 사업검토자 호출을 열었습니다.');
       // 계획이 나오기 전의 다른 스킬은 업무 스킬 일이 아니다 (2026-10-21) · 계획이 나온 뒤에는 계획 형식을 따른다
       assert.equal(decision(call2('Skill', { skill: 'dataviz' })), 'none', '계획 전 다른 스킬 호출을 막았습니다.');
       W([active, pptxPlan]);
@@ -830,7 +835,7 @@ try {
     fs.rmSync(path.join(temp, 'outputs', '2026-10-14'), { recursive: true, force: true });
   }
 
-  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 비사람 행 무시 4 · 사용자 스킬 검사기 1 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · 재료 속 철회어 8 · 계획·영수증 덮기 차단 4 · 공식 문서 스킬 8 · 문서 스킬 명령 36 · 설치 안내 16 · ✅');
+  console.log('실행 보호 훅 · 비마케팅 격리 1 · 승인 전 실행 차단 1 · 읽기 전용 조회 허용 1 · 위장 쓰기 차단 1 · 승인 차단 1 · 승인 통과 1 · 경로 차단 2 · 맨 위 CLAUDE.md 2 · 승인 재사용 차단 1 · 설치본 탐색 차단 1 · 계획 밖 스킬 차단 1 · 셸 쓰기 차단 2 · 따옴표 조회 허용 1 · 스크립트 예외 1 · 계산 도구 허용 2 · 표식 인용 무해 1 · 계획 해시 승인 5 · 상태기계 탈출 1 · 승인 유연화 3 · 승인 전 컴파일 1 · 기준 폴더 1 · 계획대기 조회·수정 2 · 개발 저장소 예외 1 · P0 허용 목록 15 · 저위험 자동 승인 4 · 사용자 스킬 위험 표시 2 · ⏸ 열린질문 차단 3 · 계획 스코핑 1 · ⏸ 초안 확인 증거 4 · 저위험 그릇 확인 면제 1 · 계획 초안 3 · 문서 생성 python 10 · 진입 스킬 5 · 규제세팅 담당 3 · 비사람 행 무시 4 · 사용자 스킬 검사기 1 · 봉인 안내 1 · mkdir 안내 1 · 계획 화면 상자 8 · 책 실습 강제 4 · 대본 8 · 첫 말 대본 3 · 책 실습 화면 4 · 재료 속 철회어 8 · 계획·영수증 덮기 차단 4 · 공식 문서 스킬 8 · 문서 스킬 명령 36 · 설치 안내 16 · ✅');
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });
 }
